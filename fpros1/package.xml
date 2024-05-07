@@ -1,17 +1,16 @@
 <?xml version="1.0"?>
 <package format="2">
-    <name>fpl2bag</name>
+    <name>fpros1</name>
     <version>1.0.0</version>
-    <description>The fpl2bag package</description>
+    <description>Fixposition SDK: ROS1 library</description>
     <maintainer email="support@fixposition.com">Fixposition Support</maintainer>
     <license>MIT</license>
-    <url type="website">https://github.com/fixposition/fixposition_utility/</url>
-    <buildtool_depend>catkin</buildtool_depend>
     <export>
+        <build_type>cmake</build_type>
     </export>
-    <buildtool_depend>catkin</buildtool_depend>
+    <depend>fpcommon</depend>
     <depend>roscpp</depend>
     <depend>rosbag</depend>
-    <depend>topic_tools</depend>
     <depend>std_msgs</depend>
+    <depend>topic_tools</depend>
 </package>

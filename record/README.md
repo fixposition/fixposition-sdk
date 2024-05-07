@@ -39,4 +39,3 @@ A more sophisticated script with error handling and status reporting.
 ## License
 
 MIT, see [LICENSE](LICENSE)
-

@@ -1,0 +1,14 @@
+*~
+/build
+/*/build
+core
+core.*
+CMakeFiles/*
+CMakeCache.txt
+/.vscode
+/.vscode-cache
+/config.mk
+/fpsdk
+*.fpl
+*.fpl.gz
+*.bag

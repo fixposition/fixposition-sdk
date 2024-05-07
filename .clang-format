@@ -1,0 +1,23 @@
+BasedOnStyle: Google
+IndentWidth: 4
+ColumnLimit: 120
+DerivePointerAlignment: false
+PointerAlignment: Left
+AlignAfterOpenBracket: DontAlign
+AllowShortFunctionsOnASingleLine: false
+BreakBeforeBraces: Custom
+BraceWrapping:
+    AfterClass: true
+    AfterFunction: true
+IndentPPDirectives: AfterHash
+PPIndentWidth: 2
+IncludeCategories:
+  - Regex:           '^<.*'
+    Priority:        1
+    SortPriority:    1
+    CaseSensitive:   false
+  - Regex:           '^".*'
+    Priority:        1
+    SortPriority:    2
+    CaseSensitive:   false
+InsertBraces: true

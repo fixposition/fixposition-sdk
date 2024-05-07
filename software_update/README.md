@@ -65,7 +65,7 @@ curl -v -F name=@image.swu http://10.0.2.1/update/upload
 > Content-Length: 435603202
 > Content-Type: multipart/form-data; boundary=------------------------5ee14ea9339300b5
 > Expect: 100-continue
-> 
+>
 * Done waiting for 100-continue
 * We are completely uploaded and fine
 * Mark bundle as not supporting multiuse
@@ -73,7 +73,7 @@ curl -v -F name=@image.swu http://10.0.2.1/update/upload
 < Server: Mongoose/6.18
 < Content-Type: text/plain
 < Connection: close
-< 
+<
 Ok, image.swu - 435602944 bytes.
 ```
 
@@ -91,7 +91,7 @@ curl -v -F name=@image.swu http://10.0.2.1:8080/upload
 > Content-Length: 435603202
 > Content-Type: multipart/form-data; boundary=------------------------5ee14ea9339300b5
 > Expect: 100-continue
-> 
+>
 * Done waiting for 100-continue
 * We are completely uploaded and fine
 * Mark bundle as not supporting multiuse
@@ -99,7 +99,7 @@ curl -v -F name=@image.swu http://10.0.2.1:8080/upload
 < Server: Mongoose/6.18
 < Content-Type: text/plain
 < Connection: close
-< 
+<
 Ok, image.swu - 435602944 bytes.
 ```
 
