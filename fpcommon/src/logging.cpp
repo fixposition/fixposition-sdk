@@ -2,7 +2,7 @@
  * \verbatim
  * ___    ___
  * \  \  /  /
- *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com)
+ *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
  *  /  /\  \   License: MIT (see the LICENSE file)
  * /__/  \__\
  * \033ndverbatim

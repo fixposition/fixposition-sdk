@@ -2,7 +2,7 @@
  * \verbatim
  * ___    ___
  * \  \  /  /
- *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com)
+ *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
  *  /  /\  \   License: MIT (see the LICENSE file)
  * /__/  \__\
  * \endverbatim
@@ -22,6 +22,7 @@
 /* PACKAGE */
 #include "fpltool_args.hpp"
 
+namespace fp {
 namespace fpltool {
 /* ****************************************************************************************************************** */
 
@@ -29,4 +30,5 @@ bool DoMeta(const FpltoolArgs& args);
 
 /* ****************************************************************************************************************** */
 }  // namespace fpltool
+}  // namespace fp
 #endif  // __FPLTOOL_FPLTOOL_META_HPP__

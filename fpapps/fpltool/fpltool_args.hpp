@@ -2,7 +2,7 @@
  * \verbatim
  * ___    ___
  * \  \  /  /
- *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com)
+ *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
  *  /  /\  \   License: MIT (see the LICENSE file)
  * /__/  \__\
  * \endverbatim
@@ -25,6 +25,7 @@
 
 /* PACKAGE */
 
+namespace fp {
 namespace fpltool {
 /* ****************************************************************************************************************** */
 
@@ -131,4 +132,5 @@ class FpltoolArgs
 
 /* ****************************************************************************************************************** */
 }  // namespace fpltool
+}  // namespace fp
 #endif  // __FPLTOOL_FPLTOOL_PARAMS_HPP__

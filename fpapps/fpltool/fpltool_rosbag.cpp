@@ -2,7 +2,7 @@
  * \verbatim
  * ___    ___
  * \  \  /  /
- *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com)
+ *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
  *  /  /\  \   License: MIT (see the LICENSE file)
 
 * /__/  \__\
@@ -34,6 +34,7 @@
 /* PACKAGE */
 #include "fpltool_rosbag.hpp"
 
+namespace fp {
 namespace fpltool {
 /* ****************************************************************************************************************** */
 #ifdef FP_USE_ROS1
@@ -200,3 +201,4 @@ bool DoRosbag(const FpltoolArgs& args)
 
 /* ****************************************************************************************************************** */
 }  // namespace fpltool
+}  // namespace fp

@@ -2,7 +2,7 @@
  * \verbatim
  * ___    ___
  * \  \  /  /
- *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com)
+ *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
  *  /  /\  \   License: MIT (see the LICENSE file)
  * /__/  \__\
  * \endverbatim
@@ -31,25 +31,25 @@ namespace logging {
 /**
  * @name Printf() style logging
  *
- * For example, `INFO("Hello world, the numner is %d", 42);`
+ * For example: `INFO("Hello world, the numner is %d", 42);`
  *
  * @{
  */
 // clang-format off
+#define FATAL(fmt, ...)   fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::FATAL,   "Fatal: "   fmt, ## __VA_ARGS__)
+#define ERROR(fmt, ...)   fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::ERROR,   "Error: "   fmt, ## __VA_ARGS__)
+#define WARNING(fmt, ...) fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::WARNING, "Warning: " fmt, ## __VA_ARGS__)
+#define NOTICE(fmt, ...)  fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::NOTICE,              fmt, ## __VA_ARGS__)
+#define INFO(fmt, ...)    fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::INFO,                fmt, ## __VA_ARGS__)
+#define DEBUG(fmt, ...)   fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::DEBUG,               fmt, ## __VA_ARGS__)
+#define DEBUG_HEXDUMP(data, size, prefix, fmt, ...) fp::common::logging::LoggingHexdump(fp::common::logging::LoggingLevel::DEBUG, data, size, prefix, fmt, ## __VA_ARGS__)
 #ifndef NDEBUG // Only for non-Release builds
 #  define TRACE(fmt, ...)   fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::TRACE,               fmt, ## __VA_ARGS__)
 #define TRACE_HEXDUMP(data, size, prefix, fmt, ...) fp::common::logging::LoggingHexdump(fp::common::logging::LoggingLevel::TRACE, data, size, prefix, fmt, ## __VA_ARGS__)
 #else
-#  define TRACE(...) /* nothing */
+#  define TRACE(...)         /* nothing */
 #  define TRACE_HEXDUMP(...) /* nothing */
 #endif
-#define DEBUG(fmt, ...)   fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::DEBUG,               fmt, ## __VA_ARGS__)
-#define INFO(fmt, ...)    fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::INFO,                fmt, ## __VA_ARGS__)
-#define NOTICE(fmt, ...)  fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::NOTICE,              fmt, ## __VA_ARGS__)
-#define WARNING(fmt, ...) fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::WARNING, "Warning: " fmt, ## __VA_ARGS__)
-#define ERROR(fmt, ...)   fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::ERROR,   "Error: "   fmt, ## __VA_ARGS__)
-#define FATAL(fmt, ...)   fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::FATAL,   "Fatal: "   fmt, ## __VA_ARGS__)
-#define DEBUG_HEXDUMP(data, size, prefix, fmt, ...) fp::common::logging::LoggingHexdump(fp::common::logging::LoggingLevel::DEBUG, data, size, prefix, fmt, ## __VA_ARGS__)
 // clang-format on
 ///@}
 
@@ -61,17 +61,17 @@ namespace logging {
  * @{
  */
 // clang-format off
+#define FATAL_S(expr)   do { std::stringstream _ss; _ss << expr; FATAL(  "%s", _ss.str().c_str()); } while (false)
+#define ERROR_S(expr)   do { std::stringstream _ss; _ss << expr; ERROR(  "%s", _ss.str().c_str()); } while (false)
+#define WARNING_S(expr) do { std::stringstream _ss; _ss << expr; WARNING("%s", _ss.str().c_str()); } while (false)
+#define DEBUG_S(expr)   do { std::stringstream _ss; _ss << expr; DEBUG(  "%s", _ss.str().c_str()); } while (false)
+#define NOTICE_S(expr)  do { std::stringstream _ss; _ss << expr; NOTICE( "%s", _ss.str().c_str()); } while (false)
+#define INFO_S(expr)    do { std::stringstream _ss; _ss << expr; INFO(   "%s", _ss.str().c_str()); } while (false)
 #ifndef NDEBUG // Only for non-Release builds
 #  define TRACE_S(expr)   do { std::stringstream _ss; _ss << expr; TRACE(  "%s", _ss.str().c_str()); } while (false)
 #else
 #  define TRACE_S(...) /* nothing */
 #endif
-#define DEBUG_S(expr)   do { std::stringstream _ss; _ss << expr; DEBUG(  "%s", _ss.str().c_str()); } while (false)
-#define INFO_S(expr)    do { std::stringstream _ss; _ss << expr; INFO(   "%s", _ss.str().c_str()); } while (false)
-#define NOTICE_S(expr)  do { std::stringstream _ss; _ss << expr; NOTICE( "%s", _ss.str().c_str()); } while (false)
-#define WARNING_S(expr) do { std::stringstream _ss; _ss << expr; WARNING("%s", _ss.str().c_str()); } while (false)
-#define ERROR_S(expr)   do { std::stringstream _ss; _ss << expr; ERROR(  "%s", _ss.str().c_str()); } while (false)
-#define FATAL_S(expr)   do { std::stringstream _ss; _ss << expr; FATAL(  "%s", _ss.str().c_str()); } while (false)
 // clang-format on
 ///@}
 
@@ -79,21 +79,26 @@ namespace logging {
 
 /**
  * @brief Logging verbosity levels, default is INFO
+ *
+ * The logging levels loosely follow syslog levels (indicated in [] below, see also
+ * https://en.wikipedia.org/wiki/Syslog)
+ *
+ * Libraries (fpcommon, fpros, ...) code shall only use WARNING and DEBUG.
  */
 enum class LoggingLevel {
-    FATAL,    //!< Panic! Cannot be silenced.
-    ERROR,    //!< Errors, reserved for apps, should not be used by libraries
-    WARNING,  //!< Warnings
-    NOTICE,   //!< Noticable stuff
-    INFO,     //!< Interesting stuff, the default level
-    DEBUG,    //!< Debugging
-    TRACE     //!< Extra debugging, on compiled-in in non-Release builds
+    FATAL,    //!< [2/crit]    Hard errors, critical conditions (for apps) Cannot be silenced.
+    ERROR,    //!< [3/err]     Errors (for apps)
+    WARNING,  //!< [4/warning] Warnings (for libs and apps)
+    NOTICE,   //!< [5/notice]  Significant stuff, for example headings (for apps)
+    INFO,     //!< [6/info]    Interesting stuff, the default level (for apps)
+    DEBUG,    //!< [7/debug]   Debugging (for libs and apps)
+    TRACE     //!< [7/debug]   Extra debugging, only compiled-in in non-Release builds
 };
 
-LoggingLevel& operator++(LoggingLevel& level);      //!< pre-increment
-LoggingLevel& operator--(LoggingLevel& level);      //!< pre-decrement
-LoggingLevel operator++(LoggingLevel& level, int);  //!< post-increment
-LoggingLevel operator--(LoggingLevel& level, int);  //!< post-decrement
+LoggingLevel& operator++(LoggingLevel& level);      //!< Pre-increment, increase verbosity
+LoggingLevel& operator--(LoggingLevel& level);      //!< Pre-decrement, decrease verbosity
+LoggingLevel operator++(LoggingLevel& level, int);  //!< Post-increment, increase verbosity
+LoggingLevel operator--(LoggingLevel& level, int);  //!< Post-decrement, decrease verbosity
 
 /**
  * @brief Stringify log level
@@ -154,9 +159,9 @@ LoggingParams LoggingSetup(const LoggingParams& params);
  *
  * @note Use INFO(), DEBUG(), WARNING() etc. instead of this function.
  *
- * @param[in] level  Logging level
- * @param[in] fmt    printf() style format string
- * @param[in] ...    arguments to the format string
+ * @param[in]  level  Logging level
+ * @param[in]  fmt    printf() style format string
+ * @param[in]  ...    arguments to the format string
  */
 void LoggingPrint(const LoggingLevel level, const char* fmt, ...) PRINTF_ATTR(2);
 
@@ -165,12 +170,12 @@ void LoggingPrint(const LoggingLevel level, const char* fmt, ...) PRINTF_ATTR(2)
  *
  * @note Typically, use TRACE_HEXDUMP() or DEBUG_HEXDUMP() instead of this function.
  *
- * @param[in] level  Logging level
- * @param[in] data   Pointer to start of data to dump
- * @param[in] size   Size of data to dump
- * @param[in] prefix prefix to add to each line, can be NULL to omit
- * @param[in] fmt    printf() style format string (for a first line to print), can be NULL to omit
- * @param[in] ...    arguments to the format string
+ * @param[in]  level   Logging level
+ * @param[in]  data    Pointer to start of data to dump
+ * @param[in]  size    Size of data to dump
+ * @param[in]  prefix  prefix to add to each line, can be NULL to omit
+ * @param[in]  fmt     printf() style format string (for a first line to print), can be NULL to omit
+ * @param[in]  ...     arguments to the format string
  */
 void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const uint64_t size, const char* prefix,
     const char* fmt, ...) PRINTF_ATTR(5);

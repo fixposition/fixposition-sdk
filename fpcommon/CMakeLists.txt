@@ -23,12 +23,17 @@ if (CMAKE_BUILD_TYPE STREQUAL "Release")
 else()
     add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE)
     add_definitions(-DBOOST_STACKTRACE_USE_ADDR2LINE)
+    set(FP_BOOST_STACKTRACE 1)
 endif()
 
 # DEPENDENCIES =========================================================================================================
 
 find_package(yaml-cpp REQUIRED)
-find_package(Boost REQUIRED)
+if(FP_BOOST_STACKTRACE)
+    find_package(Boost REQUIRED COMPONENTS REQUIRED stacktrace_basic stacktrace_backtrace stacktrace_addr2line)
+else()
+    find_package(Boost REQUIRED)
+endif()
 find_package(ZLIB REQUIRED)
 
 include_directories(include
@@ -50,7 +55,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
     ${YAML_CPP_LIBRARIES}
-    ${Boost_LIBRARIES} dl boost_stacktrace_backtrace
+    ${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
     ${ZLIB_LIBRARIES}
 )
 

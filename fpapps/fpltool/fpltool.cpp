@@ -2,7 +2,7 @@
  * \verbatim
  * ___    ___
  * \  \  /  /
- *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com)
+ *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
  *  /  /\  \   License: MIT (see the LICENSE file)
  * /__/  \__\
  * \endverbatim
@@ -31,7 +31,7 @@
 
 /* ****************************************************************************************************************** */
 
-using namespace fpltool;
+using namespace fp::fpltool;
 
 int main(int argc, char** argv)
 {

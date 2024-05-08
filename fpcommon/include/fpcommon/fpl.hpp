@@ -2,7 +2,7 @@
  * \verbatim
  * ___    ___
  * \  \  /  /
- *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com)
+ *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
  *  /  /\  \   License: MIT (see the LICENSE file)
  * /__/  \__\
  * \endverbatim
@@ -82,7 +82,7 @@ class FplMessage
     /**
      * @brief Get message
      *
-     * @returns a pointer to the message data (size = Size())
+     * @returns a reference to the message data
      */
     const std::vector<uint8_t>& Raw() const;
     /**
@@ -311,7 +311,7 @@ struct RosMsgBin {
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- * @brief Helper for extracting parser message data
+ * @brief Helper for extracting data of a stream message (NMEA, RTCM3, etc.)
  */
 struct StreamMsg {
     StreamMsg(const FplMessage& log_msg);
