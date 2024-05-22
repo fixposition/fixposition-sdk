@@ -2,6 +2,7 @@
 # Some variables
 set(FP_CMAKE_CMD_HELP "cmake -B build -DCMAKE_INSTALL_PREFIX=~/fpsdk")
 
+
 ########################################################################################################################
 # (Somewhat) prevent in-source builds
 get_filename_component(srcdir "${CMAKE_SOURCE_DIR}" REALPATH)
@@ -14,11 +15,6 @@ endif()
 
 
 ########################################################################################################################
-# Make sure that a installation prefix is provided so that the various packages in the SDK can find each other
-if("${CMAKE_INSTALL_PREFIX}" STREQUAL "")
-    message(FATAL_ERROR "\n\n ==> No install prefix provided! Use '${FP_CMAKE_CMD_HELP}'\n\n")
-endif()
-
 # Add install prefix to cmake path. Other fpsdk libs may be available there.
 if(NOT "${CMAKE_INSTALL_PREFIX}" STREQUAL "")
     list(APPEND CMAKE_PREFIX_PATH ${CMAKE_INSTALL_PREFIX})
@@ -40,46 +36,53 @@ else()
     message(STATUS "fpsdk: No ROS environment detected")
 endif()
 
+
 ########################################################################################################################
 # Get version info from GIT, unless explicitly given by the user (cmake command line)
 # TODO: This is executed only once on configuration of the project. That's of course wrong. We'd have to execute this
 # always, write/update some.hpp that can be included and properly dependency-managed. There are things like
 # https://github.com/andrew-hardin/cmake-git-version-tracking/tree/master, but they're quite involved, too. So perhaps
 # we should just supply -DFP_VERSION_NUMBER it by the release CI and otherwise just use 0.0.0
-if (FP_VERSION_NUMBER)
-    set(FP_VERSION_STRING "${FP_VERSION_NUMBER}")
-else()
-    execute_process(
-        COMMAND git -C ${CMAKE_CURRENT_LIST_DIR} describe --dirty --tags --always --exact-match --all --long
-        OUTPUT_VARIABLE CMD_OUTPUT
-        OUTPUT_STRIP_TRAILING_WHITESPACE
-    )
-    # tags/fp_9.16.0-0-g9db8f03                 at tag, clean
-    # tags/fp_9.16.0-0-g9db8f03-dirty           at tag, dirty
-    # heads/integ/master-0-geec9255             at commit, clean
-    # heads/integ/master-0-geec9255-dirty       at commit, dirty
 
-    # Anything dirty: version number 0.0.0 and string "0.0.0-dirty"
-    if("${CMD_OUTPUT}" MATCHES "-dirty")
-        set(FP_VERSION_NUMBER 0.0.0)
-        set(FP_VERSION_STRING "${FP_VERSION_NUMBER}-${CMD_OUTPUT}")
-    # Tags that look like a version: version number x.y.z and string "x.y.z"
-    elseif("${CMD_OUTPUT}" MATCHES "^tags/([a-z0-9]+_|v|)(0|[1-9][0-9]*).(0|[1-9][0-9]*).(0|[1-9][0-9]*)")
-        set(FP_VERSION_NUMBER "${CMAKE_MATCH_2}.${CMAKE_MATCH_3}.${CMAKE_MATCH_4}")
+if (NOT FP_VERSION_IS_SET) # Do this only once. E.g. when running the top-level CMakeLists.txt
+    if (FP_VERSION_NUMBER)
         set(FP_VERSION_STRING "${FP_VERSION_NUMBER}")
-    # Anything else: version number 0.0.0 and string "0.0.0-whatevergitsaid"
-    elseif(NOT "${CMD_OUTPUT}" STREQUAL "")
-        set(FP_VERSION_NUMBER 0.0.0)
-        set(FP_VERSION_STRING "${FP_VERSION_NUMBER}-${CMD_OUTPUT}")
-    # Git failed: version number 0.0.0 and string "0.0.0-dev"
     else()
-        set(FP_VERSION_NUMBER 0.0.0)
-        set(FP_VERSION_STRING "${FP_VERSION_NUMBER}-dev")
+        execute_process(
+            COMMAND git -C ${CMAKE_CURRENT_LIST_DIR} describe --dirty --tags --always --exact-match --all --long
+            OUTPUT_VARIABLE CMD_OUTPUT
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+        )
+        # tags/fp_9.16.0-0-g9db8f03                 at tag, clean
+        # tags/fp_9.16.0-0-g9db8f03-dirty           at tag, dirty
+        # heads/integ/master-0-geec9255             at commit, clean
+        # heads/integ/master-0-geec9255-dirty       at commit, dirty
+
+        # Anything dirty: version number 0.0.0 and string "0.0.0-dirty"
+        if("${CMD_OUTPUT}" MATCHES "-dirty")
+            set(FP_VERSION_NUMBER 0.0.0)
+            set(FP_VERSION_STRING "${FP_VERSION_NUMBER}-${CMD_OUTPUT}")
+        # Tags that look like a version: version number x.y.z and string "x.y.z"
+        elseif("${CMD_OUTPUT}" MATCHES "^tags/([a-z0-9]+_|v|)(0|[1-9][0-9]*).(0|[1-9][0-9]*).(0|[1-9][0-9]*)")
+            set(FP_VERSION_NUMBER "${CMAKE_MATCH_2}.${CMAKE_MATCH_3}.${CMAKE_MATCH_4}")
+            set(FP_VERSION_STRING "${FP_VERSION_NUMBER}")
+        # Anything else: version number 0.0.0 and string "0.0.0-whatevergitsaid"
+        elseif(NOT "${CMD_OUTPUT}" STREQUAL "")
+            set(FP_VERSION_NUMBER 0.0.0)
+            set(FP_VERSION_STRING "${FP_VERSION_NUMBER}-${CMD_OUTPUT}")
+        # Git failed: version number 0.0.0 and string "0.0.0-dev"
+        else()
+            set(FP_VERSION_NUMBER 0.0.0)
+            set(FP_VERSION_STRING "${FP_VERSION_NUMBER}-dev")
+        endif()
     endif()
+
+    #add_compile_definitions(FP_VERSION_NUMBER="${FP_VERSION_NUMBER}")
+    add_compile_definitions(FP_VERSION_STRING="${FP_VERSION_STRING}")
+
+    set(FP_VERSION_IS_SET ON)
 endif()
 
-#add_definitions(-DFP_VERSION_NUMBER="${FP_VERSION_NUMBER}")
-add_definitions(-DFP_VERSION_STRING="${FP_VERSION_STRING}")
 
 ########################################################################################################################
 # Some debugging

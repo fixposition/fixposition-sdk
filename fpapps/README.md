@@ -13,11 +13,14 @@ This contains various apps (tools, utilities). See below for details.
 ---
 ## Build
 
+> While this package can be built individually, it's recommended to build the entire SDK as described
+> [here](../README.md#building).
+
 ```sh
 source /opt/ros/noetic/setup.bash # optional, but recommoneded, and required for ROS functionalities
-cmake -B fpapps/build -S fpapps -DCMAKE_INSTALL_PREFIX=~/fpsdk
-make -C fpapps/build
-make -C fpapps/build install
+cmake -B build -DCMAKE_INSTALL_PREFIX=~/fpsdk
+cmake --build build
+cmake --install build
 ```
 
 Or in a ROS workspace:
@@ -25,8 +28,6 @@ Or in a ROS workspace:
 ```sh
 catkin build fpapps
 ```
-
-See also [Fixposition SDK building](../README.md#building)
 
 
 ---

@@ -14,11 +14,16 @@ This library contains various ROS1 functionality. This is used for example by th
 ---
 ## Build
 
+> While this package can be built individually, it's recommended to build the entire SDK as described
+> [here](../README.md#building).
+
+To build and install:
+
 ```sh
 source /opt/ros/noetic/setup.bash
-cmake -B fpros1/build -S fpros1 -DCMAKE_INSTALL_PREFIX=~/fpsdk
-make -C fpros1/build
-make -C fpros1/build install
+cmake -B build -DCMAKE_INSTALL_PREFIX=~/fpsdk
+cmake --build build
+cmake --install build
 ```
 
 Or in a ROS workspace:
@@ -26,8 +31,6 @@ Or in a ROS workspace:
 ```sh
 catkin build fpros1
 ```
-
-See also [Fixposition SDK building](../README.md#building)
 
 
 ---

@@ -13,10 +13,15 @@ This library contains various common functionality. This is used for example by 
 ---
 ## Build
 
+> While this package can be built individually, it's recommended to build the entire SDK as described
+> [here](../README.md#building).
+
+To build and install:
+
 ```sh
-cmake -B fpcommon/build -S fpcommon -DCMAKE_INSTALL_PREFIX=~/fpsdk
-make -C fpcommon/build
-make -C fpcommon/build install
+cmake -B build -DCMAKE_INSTALL_PREFIX=~/fpsdk
+cmake --build build
+cmake --install build
 ```
 
 Or in a ROS workspace:
@@ -24,8 +29,6 @@ Or in a ROS workspace:
 ```sh
 catkin build fpcommon
 ```
-
-See also [Fixposition SDK building](../README.md#building)
 
 
 ---

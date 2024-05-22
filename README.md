@@ -41,17 +41,51 @@ apt install build-essential cmake libyaml-cpp-dev libboost-dev zlib1g-dev
 
 ### Building
 
-> *tl;dr* Do `catkin build fpapps` in your ROS workspace. Then do `fpltool -h` and follow the examples.
+> *tl;dr*:
+>
+> ```sh
+> source /opt/ros/noetic/setup.bash
+> make install INSTALL_PREFIX=~/fpsdk
+> ```
 
-See the instructions in the [fpcommon](fpcommon/README.md), [fpros1](fpros1/README.md) and [fpapps](fpapps/README.md)
-packages.
+1. Source ROS environment (optional, but required for some functionality)
 
-There's also a [`Makefile`](./Makefile) that should work for many setups. See its help for details and examples:
+    ```sh
+    source /opt/ros/noetic/setup.bash
+    ```
 
-```sh
-make help
-```
+2. Configure
 
+    ```sh
+    cmake -B build -DCMAKE_INSTALL_PREFIX=~/fpsdk
+    ```
+
+    Additional parameters include: `-DCMAKE_BUILD_TYPE=Debug`, `-DROS_PACKAGE_PATH=/path/to/ros`
+
+3. Build
+
+    ```sh
+    cmake --build build
+    ```
+
+4. Install
+
+    ```sh
+    cmake --install build
+    ```
+
+5. Enjoy!
+
+    For example:
+
+    ```sh
+    ~/fpsdk/bin/fpltool -h
+    ```
+
+Alternatively, you can do `catkin build fpapps` in your ROS workspace.
+
+The packages can be build individually. See the instructions in the [fpcommon](fpcommon/README.md),
+[fpros1](fpros1/README.md) and [fpapps](fpapps/README.md) packages.
 
 ---
 ## License

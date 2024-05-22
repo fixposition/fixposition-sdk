@@ -1,4 +1,5 @@
 # GENERAL ==============================================================================================================
+
 cmake_minimum_required(VERSION 3.16)
 include(cmake/setup.cmake)
 
@@ -9,6 +10,7 @@ project(fpcommon
 )
 
 # COMPILER SETUP =======================================================================================================
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic\
     -Wshadow -Wunused-parameter -Wformat -Wpointer-arith\
@@ -19,10 +21,10 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_definitions(-DNDEBUG)
+    add_compile_definitions(NDEBUG)
 else()
-    add_definitions(-DBOOST_STACKTRACE_USE_BACKTRACE)
-    add_definitions(-DBOOST_STACKTRACE_USE_ADDR2LINE)
+    add_compile_definitions(BOOST_STACKTRACE_USE_BACKTRACE)
+    add_compile_definitions(BOOST_STACKTRACE_USE_ADDR2LINE)
     set(FP_BOOST_STACKTRACE 1)
 endif()
 
@@ -48,16 +50,18 @@ add_library(${PROJECT_NAME} SHARED ${CPP_FILES})
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-    $<INSTALL_INTERFACE:include>
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
 
 target_link_libraries(${PROJECT_NAME}
+    PUBLIC
+        ${YAML_CPP_LIBRARIES}
     PRIVATE
-    ${YAML_CPP_LIBRARIES}
-    ${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
-    ${ZLIB_LIBRARIES}
+        ${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
+        ${ZLIB_LIBRARIES}
 )
+
 
 # INSTALL ==============================================================================================================
 
