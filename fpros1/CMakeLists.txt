@@ -21,12 +21,15 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_definitions(-DNDEBUG)
+    add_compile_definitions(NDEBUG)
 endif()
 
 # DEPENDENCIES =========================================================================================================
 
-find_package(fpcommon REQUIRED)
+# Handle this being used as add_subdirectory() of ../CMakeLists.txt vs. building this standalone
+if(NOT TARGET fpcommon)
+    find_package(fpcommon REQUIRED)
+endif()
 
 set(FP_ROS_INCLUDE_DIRS "")
 set(FP_ROS_LIBRARIES "")
@@ -53,8 +56,6 @@ list(REMOVE_DUPLICATES FP_ROS_LIBRARIES)
 message(STATUS "fpsdk: FP_ROS_INCLUDE_DIRS=${FP_ROS_INCLUDE_DIRS}")
 message(STATUS "fpsdk: FP_ROS_LIBRARIES=${FP_ROS_LIBRARIES}")
 
-include_directories(include ${fpcommon_INCLUDE_DIRS} ${FP_ROS_INCLUDE_DIRS})
-
 # SHARED LIBRARY =======================================================================================================
 
 file(GLOB CPP_FILES src/*.cpp)
@@ -62,14 +63,15 @@ add_library(${PROJECT_NAME} SHARED ${CPP_FILES})
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
-    $<INSTALL_INTERFACE:include>
-    $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        ${FP_ROS_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-    ${fpcommon_LIBRARIES}
-    ${FP_ROS_LIBRARIES}
+    PUBLIC
+        fpcommon
+        ${FP_ROS_LIBRARIES}
 )
 
 # INSTALL ==============================================================================================================

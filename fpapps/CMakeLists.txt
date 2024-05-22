@@ -1,4 +1,5 @@
 # GENERAL ==============================================================================================================
+
 cmake_minimum_required(VERSION 3.16)
 include(../fpcommon/cmake/setup.cmake)
 
@@ -9,6 +10,7 @@ project(fpapps
 )
 
 # COMPILER SETUP =======================================================================================================
+
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic\
     -Wshadow -Wunused-parameter -Wformat -Wpointer-arith\
@@ -19,18 +21,23 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 if(CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_definitions(-DNDEBUG)
+    add_compile_definitions(NDEBUG)
 endif()
 
 # DEPENDENCIES =========================================================================================================
 
-find_package(fpcommon REQUIRED)
+# Handle this being used as add_subdirectory() of ../CMakeLists.txt vs. building this standalone
+if(NOT TARGET fpcommon)
+    find_package(fpcommon REQUIRED)
+endif()
 
 if(FP_USE_ROS1)
-    find_package(fpros1 REQUIRED)
-    add_definitions(-DFP_USE_ROS1)
-    message(DEBUG "fpsdk: fpros1_INCLUDE_DIRS=${fpros1_INCLUDE_DIRS}")
-    message(DEBUG "fpsdk: fpros1_LIBRARIES=${fpros1_LIBRARIES}")
+    if(NOT TARGET fpros1)
+        find_package(fpros1 REQUIRED)
+    endif()
+    add_compile_definitions(FP_USE_ROS1)
+    message(STATUS "apps fpsdk: fpros1_INCLUDE_DIRS=${fpros1_INCLUDE_DIRS}")
+    message(STATUS "apps fpsdk: fpros1_LIBRARIES=${fpros1_LIBRARIES}")
 else()
     message(WARNING "fpsdk: No ROS available. Some functionality will not be compiled in!")
 endif()
@@ -53,8 +60,11 @@ endif()
 
 file(GLOB FPL_TOOL_CPP_FILES fpltool/*.cpp)
 add_executable(fpltool ${FPL_TOOL_CPP_FILES})
-target_link_libraries(fpltool ${fpcommon_LIBRARIES} ${YAML_CPP_LIBRARIES} ${fpros1_LIBRARIES})
-#set_property(TARGET ${PROJECT_NAME}-exe PROPERTY OUTPUT_NAME ${PROJECT_NAME})
+target_link_libraries(fpltool
+    fpcommon
+    $<$<BOOL:${FP_USE_ROS1}>:fpros1>
+)
+
 
 # INSTALL ==============================================================================================================
 

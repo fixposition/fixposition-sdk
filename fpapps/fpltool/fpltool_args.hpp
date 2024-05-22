@@ -111,6 +111,7 @@ class FpltoolArgs
         "    fpltool [-vqpPfo] -S <sec> -D <sec> <fpl-file>\n"
         "\n"
         "Examples:\n"
+#ifdef FP_USE_ROS1
         "\n"
         "    Create a some.bag from a some.fpl logfile:\n"
         "\n"
@@ -119,6 +120,7 @@ class FpltoolArgs
         "    Create a compressed another.bag with 2 minutes of data starting 60 seconds into some.fpl logfile:\n"
         "\n"
         "        fpltool rosbag some.fpl -c -c -o another.bag -S 60 -D 120\n"
+#endif
         "\n"
         "    Show meta data of some.fpl:\n"
         "\n"
