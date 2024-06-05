@@ -40,7 +40,7 @@ jobs:
     - name: pre-commit checks
       run: |
         pwd
-        ls -l
+        ls -la
         git status
         pre-commit run --all-files --hook-stage manual
 
