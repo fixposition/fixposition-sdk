@@ -21,16 +21,16 @@ jobs:
 
     steps:
 
-    - name: install packages
+    - name: install dependencies
       run: |
         sudo apt-get -y update
-        sudo apt-get -y install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktrace-dev zlib1g-dev python3-pip git clang-format
+        sudo apt-get -y install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktrace-dev zlib1g-dev python3-pip git clang-format-17
         sudo python3 -m pip install pre-commit
 
     # Note: *after* installing git or we won't have a .git folder and e.g. pre-commit will fail
     - uses: actions/checkout@v4
 
-    - name: prepare
+    - name: prepare things
       run: |
         git config --global --add safe.directory ${GITHUB_WORKSPACE}
 
