@@ -14,6 +14,8 @@ The SDK part of this repo refers to C++ libraries and apps.
 ---
 ## SDK
 
+[![CI](https://github.com/fixposition/fixposition_utility/actions/workflows/main.yml/badge.svg)](https://github.com/fixposition/fixposition_utility/actions/workflows/main.yml)
+
 ### Overview
 
 - [fpcommon](fpcommon/README.md) c++ library with common functions
