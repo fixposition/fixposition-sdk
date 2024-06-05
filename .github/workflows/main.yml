@@ -32,11 +32,12 @@ jobs:
       #   fetch-depth: 0
       #   fetch-tags: true
 
+    - name: prepare
+      run: |
+        git config --global --add safe.directory ${GITHUB_WORKSPACE}
+
     - name: pre-commit checks
       run: |
-        pwd
-        ls -la
-        git status
         pre-commit run --all-files --hook-stage manual
 
     # ----- w/o ROS ----------------------------------------------------------------------------------------------------
