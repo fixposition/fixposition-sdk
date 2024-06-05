@@ -1,0 +1,86 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: ros:noetic-ros-base
+      env:
+        ROS_DISTRO: noetic
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: install packages
+      run: |
+        sudo apt-get -y update
+        sudo apt-get -y install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktrace-dev zlib1g-dev
+
+    # ----- w/o ROS ----------------------------------------------------------------------------------------------------
+
+    - name: build using top-level cmake project (release, without ROS)
+      run: |
+        buildname=fpsdk-toplevel-release-noros
+        make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Release BUILD_DIR=build/${buildname}
+        install/${buildname}/bin/fpltool -h
+
+    - name: build using top-level cmake project (debug, without ROS)
+      run: |
+        buildname=fpsdk-toplevel-debug-noros
+        make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Debug BUILD_DIR=build/${buildname}
+        install/${buildname}/bin/fpltool -h
+
+    - name: build individual cmake projects (release, without ROS)
+      run: |
+        buildname=fpsdk-projs-release-noros
+        cmake -B build/${buildname}/fpcommon -S fpcommon -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
+        cmake --build build/${buildname}/fpcommon
+        cmake --install build/${buildname}/fpcommon
+        cmake -B build/${buildname}/fpapps -S fpapps -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
+        cmake --build build/${buildname}/fpapps
+        cmake --install build/${buildname}/fpapps
+        install/${buildname}/bin/fpltool -h
+
+    # ----- with ROS ---------------------------------------------------------------------------------------------------
+
+    - name: build using top-level cmake project (release, with ROS)
+      run: |
+        buildname=fpsdk-toplevel-release-withros
+        source /opt/ros/${ROS_DISTRO}/setup.bash
+        make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Release BUILD_DIR=build/${buildname}
+        install/${buildname}/bin/fpltool -h
+
+    - name: build using top-level cmake project (debug, with ROS)
+      run: |
+        buildname=fpsdk-toplevel-debug-withros
+        source /opt/ros/${ROS_DISTRO}/setup.bash
+        make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Debug BUILD_DIR=build/${buildname}
+        install/${buildname}/bin/fpltool -h
+
+    - name: build individual cmake projects (release, with ROS)
+      run: |
+        buildname=fpsdk-projs-release-noros
+        source /opt/ros/${ROS_DISTRO}/setup.bash
+        cmake -B build/${buildname}/fpcommon -S fpcommon -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
+        cmake --build build/${buildname}/fpcommon
+        cmake --install build/${buildname}/fpcommon
+        cmake -B build/${buildname}/fpros1 -S fpros1 -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
+        cmake --build build/${buildname}/fpros1
+        cmake --install build/${buildname}/fpros1
+        cmake -B build/${buildname}/fpapps -S fpapps -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
+        cmake --build build/${buildname}/fpapps
+        cmake --install build/${buildname}/fpapps
+        install/${buildname}/bin/fpltool -h
+
+# eof

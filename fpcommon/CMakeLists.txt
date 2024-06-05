@@ -27,6 +27,9 @@ else()
     add_compile_definitions(BOOST_STACKTRACE_USE_ADDR2LINE)
     set(FP_BOOST_STACKTRACE 1)
 endif()
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(NDEBUG)
+endif()
 
 # DEPENDENCIES =========================================================================================================
 

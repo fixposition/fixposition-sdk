@@ -14,6 +14,8 @@ The SDK part of this repo refers to C++ libraries and apps.
 ---
 ## SDK
 
+[![CI](https://github.com/fixposition/fixposition_utility/actions/workflows/main.yml/badge.svg)](https://github.com/fixposition/fixposition_utility/actions/workflows/main.yml)
+
 ### Overview
 
 - [fpcommon](fpcommon/README.md) c++ library with common functions
@@ -36,7 +38,7 @@ The SDK part of this repo refers to C++ libraries and apps.
 This should install the necessary dependencies on Ubuntu or Debian:
 
 ```sh
-apt install build-essential cmake libyaml-cpp-dev libboost-dev zlib1g-dev
+apt install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktrace-dev zlib1g-dev
 ```
 
 ### Building

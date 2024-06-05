@@ -23,6 +23,9 @@ endif()
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_definitions(NDEBUG)
 endif()
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_compile_definitions(NDEBUG)
+endif()
 
 # DEPENDENCIES =========================================================================================================
 
