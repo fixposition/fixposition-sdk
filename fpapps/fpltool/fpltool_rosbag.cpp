@@ -27,8 +27,8 @@
 #include <fpcommon/path.hpp>
 #include <fpcommon/string.hpp>
 #ifdef FP_USE_ROS1
-#  include <fpros1/bagwriter.hpp>
-#  include <fpros1/ext/std_msgs.hpp>
+#    include <fpros1/bagwriter.hpp>
+#    include <fpros1/ext/std_msgs.hpp>
 #endif
 
 /* PACKAGE */

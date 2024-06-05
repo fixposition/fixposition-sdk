@@ -34,7 +34,7 @@ namespace string {
  * This helps the compiler to check that the number and types of the variable arguments match the format string.
  */
 #ifndef PRINTF_ATTR
-#  define PRINTF_ATTR(n) __attribute__((format(printf, n, n + 1)))
+#    define PRINTF_ATTR(n) __attribute__((format(printf, n, n + 1)))
 #endif
 
 /**
