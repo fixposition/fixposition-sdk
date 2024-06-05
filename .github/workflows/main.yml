@@ -1,9 +1,5 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the action will run. Triggers the workflow on push or pull request
-# events but only for the master branch
 on:
   push:
     branches: [ main ]
@@ -11,7 +7,6 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
   build:
@@ -59,21 +54,21 @@ jobs:
     - name: build using top-level cmake project (release, with ROS)
       run: |
         buildname=fpsdk-toplevel-release-withros
-        source /opt/${ROS_DISTRO}/setup.bash
+        source /opt/ros/${ROS_DISTRO}/setup.bash
         make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Release BUILD_DIR=build/${buildname}
         install/${buildname}/bin/fpltool -h
 
     - name: build using top-level cmake project (debug, with ROS)
       run: |
         buildname=fpsdk-toplevel-debug-withros
-        source /opt/${ROS_DISTRO}/setup.bash
+        source /opt/ros/${ROS_DISTRO}/setup.bash
         make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Debug BUILD_DIR=build/${buildname}
         install/${buildname}/bin/fpltool -h
 
     - name: build individual cmake projects (release, with ROS)
       run: |
         buildname=fpsdk-projs-release-noros
-        source /opt/${ROS_DISTRO}/setup.bash
+        source /opt/ros/${ROS_DISTRO}/setup.bash
         cmake -B build/${buildname}/fpcommon -S fpcommon -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
         cmake --build build/${buildname}/fpcommon
         cmake --install build/${buildname}/fpcommon
