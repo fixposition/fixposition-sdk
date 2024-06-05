@@ -26,6 +26,11 @@ jobs:
       run: |
         sudo apt-get -y update
         sudo apt-get -y install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktrace-dev zlib1g-dev
+        sudo python3 -m pip install pre-commit
+
+    - name: pre-commit checks
+      run: |
+        pre-commit run --all-files --hook-stage manual
 
     # ----- w/o ROS ----------------------------------------------------------------------------------------------------
 
