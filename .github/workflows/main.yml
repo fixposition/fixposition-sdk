@@ -31,33 +31,39 @@ jobs:
 
     - name: build using top-level cmake project (release, without ROS)
       run: |
-        prefix=${GITHUB_WORKSPACE}/fpsdk-toplevel-release-noros
-        make install INSTALL_PREFIX=${prefix} BUILD_TYPE=Release
+        buildname=fpsdk-toplevel-release-noros
+        make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Release BUILD_DIR=build/${buildname}
         ${prefix}/bin/fpltool -h
 
     - name: build using top-level cmake project (debug, without ROS)
       run: |
-        prefix=${GITHUB_WORKSPACE}/fpsdk-toplevel-debug-noros
-        make install INSTALL_PREFIX=${prefix} BUILD_TYPE=Release
+        buildname=fpsdk-toplevel-debug-noros
+        make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Debug BUILD_DIR=build/${buildname}
         ${prefix}/bin/fpltool -h
 
     - name: build individual cmake projects (release, without ROS)
       run: |
-        prefix=${GITHUB_WORKSPACE}/fpsdk-projs-release-noros
-        cmake -B fplib/build -S fplib -DCMAKE_INSTALL_PREFIX=${prefix} -DCMAKE_BUILD_TYPE=Release
-        cmake --build fplib/build
-        cmake --install fplib/build
-        cmake -B fpapps/build -S fpapps -DCMAKE_INSTALL_PREFIX=${prefix}
-        cmake --build fpapps/build
-        cmake --install fpapps/build
+        buildname=fpsdk-projs-release-noros
+        cmake -B build/${buildname}/fplib -S fplib -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
+        cmake --build build/${buildname}/fplib
+        cmake --install build/${buildname}/fplib
+        cmake -B build/${buildname}/fpapps -S fpapps -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
+        cmake --build build/${buildname}/fpapps
+        cmake --install build/${buildname}/fpapps
         ${prefix}/bin/fpltool -h
 
-
-    - name: build using top-level cmake project (release, without ROS)
+    - name: build using top-level cmake project (release, with ROS)
       run: |
-        prefix=${GITHUB_WORKSPACE}/fpsdk-toplevel-release-withros
+        buildname=fpsdk-toplevel-release-withros
         source /opt/${ROS_DISTRO}/setup.bash
-        make install INSTALL_PREFIX=${prefix} BUILD_TYPE=Release
+        make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Release BUILD_DIR=build/${buildname}
+        ${prefix}/bin/fpltool -h
+
+    - name: build using top-level cmake project (debug, with ROS)
+      run: |
+        buildname=fpsdk-toplevel-debug-withros
+        source /opt/${ROS_DISTRO}/setup.bash
+        make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Debug BUILD_DIR=build/${buildname}
         ${prefix}/bin/fpltool -h
 
 
