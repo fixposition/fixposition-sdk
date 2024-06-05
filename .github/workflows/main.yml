@@ -25,6 +25,8 @@ jobs:
       run: |
         sudo apt-get -y update
         sudo apt-get -y install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktrace-dev zlib1g-dev python3-pip git clang-format-12
+        sudo ln -s /usr/bin/clang-format-12 /usr/bin/clang-format
+        sudo ln -s /usr/bin/clang-format-diff-12 /usr/bin/clang-format-diff
         sudo python3 -m pip install pre-commit
 
     # Note: *after* installing git or we won't have a .git folder and e.g. pre-commit will fail
