@@ -36,6 +36,9 @@ jobs:
 
     - name: pre-commit checks
       run: |
+        pwd
+        ls -l
+        git status
         pre-commit run --all-files --hook-stage manual
 
     # ----- w/o ROS ----------------------------------------------------------------------------------------------------
