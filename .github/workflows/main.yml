@@ -34,7 +34,7 @@ jobs:
         sudo apt-get -y install build-essential cmake libyaml-cpp-dev libboost-dev zlib1g-dev
     # Runs a single command using the runners shell
     - name: build w/o ROS
-      run: make INSTALL_PREFIX=${GITHUB_WORKSPACE}/build-wo-ros
+      run: make install INSTALL_PREFIX=${GITHUB_WORKSPACE}/build-wo-ros
 
 
 #     - name: make ci

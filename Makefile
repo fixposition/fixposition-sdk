@@ -3,6 +3,7 @@
 .PHONY: default
 default:
 	@echo "Make what? Try 'make help'!"
+	@exit 1
 
 # Defaults
 BUILD_TYPE = Release
