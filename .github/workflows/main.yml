@@ -15,6 +15,9 @@ jobs:
       image: ros:noetic-ros-base
       env:
         ROS_DISTRO: noetic
+    defaults:
+      run:
+        shell: bash
 
     steps:
     - uses: actions/checkout@v3
