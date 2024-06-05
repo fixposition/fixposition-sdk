@@ -20,12 +20,12 @@ jobs:
         shell: bash
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: install packages
       run: |
         sudo apt-get -y update
-        sudo apt-get -y install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktrace-dev zlib1g-dev
+        sudo apt-get -y install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktrace-dev zlib1g-dev python3-pip
         sudo python3 -m pip install pre-commit
 
     - name: pre-commit checks
