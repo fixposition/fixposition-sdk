@@ -20,4 +20,4 @@ IncludeCategories:
     Priority:        1
     SortPriority:    2
     CaseSensitive:   false
-InsertBraces: true
+#InsertBraces: true # only since clang 15 :-(
