@@ -20,22 +20,17 @@ jobs:
         shell: bash
 
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
-        fetch-tags: true
 
-    - name: install packages 1
+    - name: install packages
       run: |
         sudo apt-get -y update
-
-    - name: install packages 2
-      run: |
         sudo apt-get -y install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktrace-dev zlib1g-dev python3-pip git
-
-    - name: install packages 3
-      run: |
         sudo python3 -m pip install pre-commit
+
+    - uses: actions/checkout@v4
+      # with:
+      #   fetch-depth: 0
+      #   fetch-tags: true
 
     - name: pre-commit checks
       run: |
