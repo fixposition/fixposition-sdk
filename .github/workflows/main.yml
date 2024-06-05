@@ -14,27 +14,51 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
 
-# This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
     container:
       image: ros:noetic-ros-base
       env:
         ROS_DISTRO: noetic
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
     - uses: actions/checkout@v3
-    # Install additional packages that we need to build
+
     - name: install packages
       run: |
         sudo apt-get -y update
         sudo apt-get -y install build-essential cmake libyaml-cpp-dev libboost-dev zlib1g-dev
-    # Runs a single command using the runners shell
-    - name: build w/o ROS
-      run: make install INSTALL_PREFIX=${GITHUB_WORKSPACE}/build-wo-ros
+
+    - name: build using top-level cmake project (release, without ROS)
+      run: |
+        prefix=${GITHUB_WORKSPACE}/fpsdk-toplevel-release-noros
+        make install INSTALL_PREFIX=${prefix} BUILD_TYPE=Release
+        ${prefix}/bin/fpltool -h
+
+    - name: build using top-level cmake project (debug, without ROS)
+      run: |
+        prefix=${GITHUB_WORKSPACE}/fpsdk-toplevel-debug-noros
+        make install INSTALL_PREFIX=${prefix} BUILD_TYPE=Release
+        ${prefix}/bin/fpltool -h
+
+    - name: build individual cmake projects (release, without ROS)
+      run: |
+        prefix=${GITHUB_WORKSPACE}/fpsdk-projs-release-noros
+        cmake -B fplib/build -S fplib -DCMAKE_INSTALL_PREFIX=${prefix} -DCMAKE_BUILD_TYPE=Release
+        cmake --build fplib/build
+        cmake --install fplib/build
+        cmake -B fpapps/build -S fpapps -DCMAKE_INSTALL_PREFIX=${prefix}
+        cmake --build fpapps/build
+        cmake --install fpapps/build
+        ${prefix}/bin/fpltool -h
+
+
+    - name: build using top-level cmake project (release, without ROS)
+      run: |
+        prefix=${GITHUB_WORKSPACE}/fpsdk-toplevel-release-withros
+        source /opt/${ROS_DISTRO}/setup.bash
+        make install INSTALL_PREFIX=${prefix} BUILD_TYPE=Release
+        ${prefix}/bin/fpltool -h
 
 
 #     - name: make ci
