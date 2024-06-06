@@ -8,22 +8,35 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: Math utilities
+ * @brief Fixposition SDK: Documentation
  */
 
-/* LIBC/STL */
+#ifndef __FP_DOC_HPP__
+#define __FP_DOC_HPP__
 
-/* EXTERNAL */
-
-/* PACKAGE */
-#include "fpcommon/math.hpp"
-
+/**
+ * @brief Fixposition SDK
+ */
 namespace fp {
-namespace common {
-namespace math {
 /* ****************************************************************************************************************** */
+// clang-format off
 
+/*!
+    @mainpage
+
+    @section FP_OVERVIEW Overview
+
+    @image html fpsdk-overview.drawio.svg
+
+    @section FP_PACKAGES Packages
+
+    - @subpage FPCOMMON_DOC
+    - @subpage FPROS1_DOC
+    - @subpage FPAPPS_DOC
+
+*/
+
+// clang-format on
 /* ****************************************************************************************************************** */
-}  // namespace math
-}  // namespace common
 }  // namespace fp
+#endif  // __FP_DOC_HPP__

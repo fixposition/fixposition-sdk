@@ -80,6 +80,9 @@ if (NOT FP_VERSION_IS_SET) # Do this only once. E.g. when running the top-level 
     #add_compile_definitions(FP_VERSION_NUMBER="${FP_VERSION_NUMBER}")
     add_compile_definitions(FP_VERSION_STRING="${FP_VERSION_STRING}")
 
+    # write version info to file
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/FP_VERSION_STRING "${FP_VERSION_STRING}")
+
     set(FP_VERSION_IS_SET ON)
 endif()
 

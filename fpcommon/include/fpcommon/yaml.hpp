@@ -9,6 +9,11 @@
  *
  * @file
  * @brief Fixposition SDK: YAML utilities
+ *
+ * @page FPCOMMON_YAML YAML utilities
+ *
+ * @todo add documentation
+ *
  */
 #ifndef __FPCOMMON_YAML_HPP__
 #define __FPCOMMON_YAML_HPP__
@@ -23,6 +28,9 @@
 
 namespace fp {
 namespace common {
+/**
+ * @brief YAML utilities
+ */
 namespace yaml {
 /* ****************************************************************************************************************** */
 
@@ -43,7 +51,7 @@ bool StringToYaml(const std::string& yaml_str, YAML::Node& yaml_node);
  *
  * @returns a, possibly empty, stringification of the YAML node
  */
-std::string YamlToString(const YAML::Node& yaml_nod);
+std::string YamlToString(const YAML::Node& yaml_node);
 
 /**
  * @brief Get keys in YAML
@@ -65,7 +73,7 @@ std::string YamlToString(const YAML::Node& yaml_nod);
  * @returns an alphabetically ordered list of all keys found in the parameter space, resp. an empty list if the param is
  *          an empty map or not a map
  */
-std::vector<std::string> GetKeysFromYaml(const YAML::Node& node, const std::string& key = "");
+std::vector<std::string> GetKeysFromYaml(const YAML::Node& yaml_node, const std::string& key = "");
 
 /* ****************************************************************************************************************** */
 }  // namespace yaml

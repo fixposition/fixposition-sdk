@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief fpltool: dump
+ * @brief Fixposition SDK: fpltool dump
  */
 
 /* LIBC/STL */
@@ -30,6 +30,7 @@
 #include "fpltool_dump.hpp"
 
 namespace fp {
+namespace apps {
 namespace fpltool {
 /* ****************************************************************************************************************** */
 
@@ -211,4 +212,5 @@ bool DoDump(const FpltoolArgs& args)
 
 /* ****************************************************************************************************************** */
 }  // namespace fpltool
+}  // namespace apps
 }  // namespace fp

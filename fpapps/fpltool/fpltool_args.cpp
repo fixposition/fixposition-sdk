@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief fpltool: params (command line arguments)
+ * @brief Fixposition SDK: fpltool params (command line arguments)
  */
 
 /* LIBC/STL */
@@ -27,6 +27,7 @@
 #include "fpltool_args.hpp"
 
 namespace fp {
+namespace apps {
 namespace fpltool {
 /* ****************************************************************************************************************** */
 
@@ -48,6 +49,7 @@ bool FpltoolArgs::LoadFromArgv(int argc, char** argv)
         // Command line options
         static const struct option long_opts[] = {
             // clang-format off
+            { "version",         no_argument,       NULL, 'V' },
             { "help",            no_argument,       NULL, 'h' },
             { "verbose",         no_argument,       NULL, 'v' },
             { "quiet",           no_argument,       NULL, 'q' },
@@ -61,7 +63,7 @@ bool FpltoolArgs::LoadFromArgv(int argc, char** argv)
             { "proc",            required_argument, NULL, 'D' },
             { NULL, 0, NULL, 0 },
         };  // clang-format on
-        const char* short_opts = ":hvqo:fxpPcS:D:";
+        const char* short_opts = ":hVvqo:fxpPcS:D:";
 
         // Process all command line options
         int opt_ix = 0;
@@ -70,7 +72,12 @@ bool FpltoolArgs::LoadFromArgv(int argc, char** argv)
             break;
         }
         switch (opt) {
+            case 'V':
+                std::fputs(VERSION_INFO, stdout);
+                exit(EXIT_SUCCESS);
+                break;
             case 'h':
+                std::fputs(VERSION_INFO, stdout);
                 std::fputs(USAGE_HELP, stdout);
                 exit(EXIT_SUCCESS);
                 break;
@@ -177,4 +184,5 @@ bool FpltoolArgs::LoadFromArgv(int argc, char** argv)
 
 /* ****************************************************************************************************************** */
 }  // namespace fpltool
+}  // namespace apps
 }  // namespace fp

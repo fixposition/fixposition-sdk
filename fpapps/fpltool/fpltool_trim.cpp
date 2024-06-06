@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief fpltool: trim
+ * @brief Fixposition SDK: fpltool trim
  */
 
 /* LIBC/STL */
@@ -29,6 +29,7 @@
 #include "fpltool_trim.hpp"
 
 namespace fp {
+namespace apps {
 namespace fpltool {
 /* ****************************************************************************************************************** */
 
@@ -244,4 +245,5 @@ bool DoTrim(const FpltoolArgs& args)
 
 /* ****************************************************************************************************************** */
 }  // namespace fpltool
+}  // namespace apps
 }  // namespace fp

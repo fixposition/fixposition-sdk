@@ -8,7 +8,12 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: time utilities
+ * @brief Fixposition SDK: Time utilities
+ *
+ * @page FPCOMMON_TIME Time utilities
+ *
+ * @todo add documentation
+ *
  */
 #ifndef __FPCOMMON_TIME_HPP__
 #define __FPCOMMON_TIME_HPP__
@@ -22,6 +27,9 @@
 
 namespace fp {
 namespace common {
+/**
+ * @brief Time utilities
+ */
 namespace time {
 /* ****************************************************************************************************************** */
 
@@ -51,15 +59,34 @@ void Sleep(const uint32_t duration);
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- * @brief Minimal ros::Time() implementation
+ * @brief Minimal ros::Time() implementation (that doesn't throw)
  */
 struct RosTime {
     RosTime();
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  sec   Time value seconds
+     * @param[in]  nsec   Time value nanoseconds
+     */
     RosTime(const uint32_t sec, const uint32_t nsec);
+
+    /**
+     * @brief Convert to seconds
+     *
+     * @returns the time value (time since epoch) in [s]
+     */
     double ToSec() const;
+
+    /**
+     * @brief Check if time is zero (invalid, unset)
+     *
+     * @returns true if time is zero (invalid, unset)
+     */
     bool IsZero() const;
-    uint32_t sec_;
-    uint32_t nsec_;
+
+    uint32_t sec_;   //!< Seconds part of time
+    uint32_t nsec_;  //!< Nanoseconds Nanosart of time (*should* be in range 0-999999999, but no guarantees)
 };
 
 /* ****************************************************************************************************************** */

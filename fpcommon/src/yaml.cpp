@@ -48,11 +48,11 @@ std::string YamlToString(const YAML::Node& yaml_node)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<std::string> GetKeysFromYaml(const YAML::Node& node, const std::string& key)
+std::vector<std::string> GetKeysFromYaml(const YAML::Node& yaml_node, const std::string& key)
 {
     std::vector<std::string> keys;
     try {
-        for (auto& entry : key.empty() ? node : node[key]) {
+        for (auto& entry : key.empty() ? yaml_node : yaml_node[key]) {
             keys.push_back(entry.first.as<std::string>().c_str());
         }
 

@@ -8,35 +8,33 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: fpltool dump
+ * @brief Fixposition SDK: fpltool documentation
  */
-#ifndef __FPLTOOL_FPLTOOL_DUMP_HPP__
-#define __FPLTOOL_FPLTOOL_DUMP_HPP__
 
-/* LIBC/STL */
-
-/* EXTERNAL */
-
-/* Fixposition SDK */
-
-/* PACKAGE */
-#include "fpltool_args.hpp"
+#ifndef __FPAPPS_DOC_HPP__
+#define __FPAPPS_DOC_HPP__
 
 namespace fp {
 namespace apps {
-namespace fpltool {
-/* ****************************************************************************************************************** */
-
 /**
- * @brief Run FpltoolArgs::Command::DUMP
- *
- * @param[in]  args  Arguments
+ * @brief fpltool
  */
+namespace fpltool {
+// clang-format off
+/* ****************************************************************************************************************** */
 
-bool DoDump(const FpltoolArgs& args);
+/*!
+    @page FPAPPS_FPLTOOL .fpl logfile tool
+
+    @section FPAPPS_FPLTOOL_OVERVIEW Overview
+
+    See FpltoolArgs::USAGE_HELP
+
+*/
 
 /* ****************************************************************************************************************** */
+// clang-format on
 }  // namespace fpltool
 }  // namespace apps
 }  // namespace fp
-#endif  // __FPLTOOL_FPLTOOL_DUMP_HPP__
+#endif  // __FPAPPS_DOC_HPP__

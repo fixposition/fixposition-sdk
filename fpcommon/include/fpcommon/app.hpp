@@ -8,7 +8,12 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: app utilities
+ * @brief Fixposition SDK: Utilities for apps
+ *
+ * @page FPCOMMON_APPS Utilities for apps
+ *
+ * @todo add documentation
+ *
  */
 #ifndef __FPCOMMON_APP_HPP__
 #define __FPCOMMON_APP_HPP__
@@ -21,6 +26,9 @@
 
 namespace fp {
 namespace common {
+/**
+ * @brief Utilities for apps
+ */
 namespace app {
 /* ****************************************************************************************************************** */
 

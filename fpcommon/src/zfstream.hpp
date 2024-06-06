@@ -1,4 +1,5 @@
 // clang-format off
+#ifndef _DOXYGEN_
 /*
  * A C++ I/O streams interface to the zlib gz* functions
  *
@@ -508,3 +509,4 @@ setcompression(int l, int s = Z_DEFAULT_STRATEGY)
 { return gzomanip2<int,int>(&setcompression, l, s); }
 
 #endif // ZFSTREAM_H
+#endif // !_DOXYGEN_
