@@ -120,6 +120,7 @@ jobs:
 
     - name: doxygen
       run: |
+        doxygen -u
         (
             cat Doxyfile
             echo "PROJECT_NUMBER = $(cat build/fpsdk-toplevel-release-noros/FP_VERSION_STRING)"
