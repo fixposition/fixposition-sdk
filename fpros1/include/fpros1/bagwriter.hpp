@@ -9,6 +9,11 @@
  *
  * @file
  * @brief Fixposition SDK: ROS1 bag writer
+ *
+ * @page FPROS1_BAGWRITER ROS1 bag writer
+ *
+ * @todo add documentation
+ *
  */
 #ifndef __FPROS1_BAGWRITER_HPP__
 #define __FPROS1_BAGWRITER_HPP__
@@ -30,9 +35,15 @@
 
 namespace fp {
 namespace ros1 {
+/**
+ * @brief ROS1 bag writer
+ */
 namespace bagwriter {
 /* ****************************************************************************************************************** */
 
+/**
+ * @brief ROS1 bag writer helper
+ */
 class BagWriter
 {
    public:
@@ -68,6 +79,7 @@ class BagWriter
     /**
      * @brief Write a message to the bag, do nothing if no bag is open
      *
+     * @tparam     T      ROS message type
      * @param[in]  msg    The message
      * @param[in]  topic  Topic name
      * @param[in]  time   Optional bag record time, if ros::Time() is given the time from the last written message
@@ -84,8 +96,17 @@ class BagWriter
         }
     }
 
-    // Same for using RosTime instead of ros::Time
-    using RosTime = fp::common::time::RosTime;
+    using RosTime = fp::common::time::RosTime;  //!< Shortcut
+
+    /**
+     * @brief Write a message to the bag, do nothing if no bag is open
+     *
+     * @tparam     T      ROS message type
+     * @param[in]  msg    The message
+     * @param[in]  topic  Topic name
+     * @param[in]  time   Optional bag record time, if ros::Time() is given the time from the last written message
+     *                    (see method above) is used
+     */
     template <typename T>
     void WriteMessage(const T& msg, const std::string& topic, const RosTime& time = {})
     {
@@ -110,21 +131,31 @@ class BagWriter
      *
      * @note No checks on the provided data are done!
      *
-     * @param[in]  data      The binary message data
-     * @param[in]  topic     The topic name
-     * @param[in]  rec_time  Optional bag record time, if ros::Time() is given the time from the last written message
+     * @param[in]  data   The binary message data
+     * @param[in]  topic  The topic name
+     * @param[in]  time   Optional bag record time, if not given the time from the last written message is used
      *
      * @returns true if message was added, false otherwise (message definition missing)
      */
     bool WriteMessage(const std::vector<uint8_t>& data, const std::string& topic, const ros::Time& time = {});
 
-    // Same for using RosTime instead of ros::Time
+    /**
+     * @brief Write raw binary (serialised) message
+     *
+     * @note No checks on the provided data are done!
+     *
+     * @param[in]  data   The binary message data
+     * @param[in]  topic  The topic name
+     * @param[in]  time   Optional bag record time, if not given the time from the last written message is used
+     *
+     * @returns true if message was added, false otherwise (message definition missing)
+     */
     bool WriteMessage(const std::vector<uint8_t>& data, const std::string& topic, const RosTime& time = {});
 
    private:
     std::unique_ptr<rosbag::Bag> bag_;                                  //!< Bag file handle
     ros::Time time_;                                                    //!< Last known bag record time
-    std::map<std::string, boost::shared_ptr<ros::M_string>> msg_defs_;  // Message definitions (connection headers)
+    std::map<std::string, boost::shared_ptr<ros::M_string>> msg_defs_;  //!< Message definitions (connection headers)
 };
 
 /* ****************************************************************************************************************** */

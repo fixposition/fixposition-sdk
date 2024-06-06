@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief fpltool: record
+ * @brief Fixposition SDK: fpltool record
  */
 
 /* LIBC/STL */
@@ -23,6 +23,7 @@
 #include "fpltool_record.hpp"
 
 namespace fp {
+namespace apps {
 namespace fpltool {
 /* ****************************************************************************************************************** */
 
@@ -36,4 +37,5 @@ bool DoRecord(const FpltoolArgs& args)
 
 /* ****************************************************************************************************************** */
 }  // namespace fpltool
+}  // namespace apps
 }  // namespace fp

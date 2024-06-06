@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: time utilities
+ * @brief Fixposition SDK: Time utilities
  */
 
 /* LIBC/STL */
@@ -58,6 +58,10 @@ RosTime::RosTime() : sec_{0}, nsec_{0}
 
 RosTime::RosTime(const uint32_t sec, const uint32_t nsec) : sec_{sec}, nsec_{nsec}
 {
+    while (nsec_ > 999999999) {
+        nsec_ -= 1000000000;
+        sec_ += 1;
+    }
 }
 
 double RosTime::ToSec() const

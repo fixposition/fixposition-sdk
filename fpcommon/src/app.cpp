@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: app utilities
+ * @brief Fixposition SDK: Utilities for apps
  */
 
 /* LIBC/STL */

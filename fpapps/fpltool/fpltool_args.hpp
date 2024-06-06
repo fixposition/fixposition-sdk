@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief fpltool: params (command line arguments)
+ * @brief Fixposition SDK: fpltool params (command line arguments)
  */
 #ifndef __FPLTOOL_FPLTOOL_PARAMS_HPP__
 #define __FPLTOOL_FPLTOOL_PARAMS_HPP__
@@ -26,22 +26,29 @@
 /* PACKAGE */
 
 namespace fp {
+namespace apps {
 namespace fpltool {
 /* ****************************************************************************************************************** */
 
+/**
+ * @brief fpltool arguments (parameters)
+ */
 class FpltoolArgs
 {
    public:
+    /**
+     * @brief Commands, modes of operation
+     */
     enum class Command {
         UNSPECIFIED,  //!< Bad command
         DUMP,         //!< Dump a log (for debugging)
         META,         //!< Get logfile meta data
         ROSBAG,       //!< Create ROS bag from log
-        TRIM,         //!< Trim fpl file
+        TRIM,         //!< Trim .fpl file
         RECORD,       //!< Record a log
     };
 
-    using LoggingLevel = fp::common::logging::LoggingLevel;
+    using LoggingLevel = fp::common::logging::LoggingLevel;  //!< Shortcut
 
     FpltoolArgs() /* clang-format off */ :
         command_       { Command::UNSPECIFIED },
@@ -56,6 +63,13 @@ class FpltoolArgs
         duration_      { 0 }  // clang-format on
           {};
 
+    /**
+     * @brief Load arguments from argv[]
+     *
+     * @param[in,out]  argc  Number of arguments
+     * @param[in,out]  argv  Command-line arguments
+     * @return
+     */
     bool LoadFromArgv(int argc, char** argv);
     // clang-format off
     Command                   command_;        //!< Command to execute
@@ -72,15 +86,28 @@ class FpltoolArgs
     std::vector<std::string>  argv_;           //!< argv[] of program
     // clang-format on
 
-    //! Help screen
+    //! Program and version info   @hideinitializer
+    static constexpr const char* VERSION_INFO = /* clang-format off */
+        "fpltool ("
+#ifdef NDEBUG
+        "release"
+#else
+        "debug"
+#endif
+        " " FP_VERSION_STRING ")\n"
+        "Copyright (c) Fixposition AG (www.fixposition.com) and contributors\n"
+        "License: MIT (see the LICENSE file included in source distribution)\n"
+        "\n";
+    // clang-format on
+
+    //! Help screen   @hideinitializer
     static constexpr const char* USAGE_HELP = /* clang-format off */
-        "fpltool (" FP_VERSION_STRING ") -- Copyright (c) Fixposition AG\n"
-        "\n"
         "Usage:\n"
         "\n"
         "    fpltool [<flags>] <command> [...]\n"
         "\n"
         "Where (availability of flags depends on <command>, see below):\n"
+        "    -V       -- Print program and version information, and exit\n"
         "    -v / -q  -- Increase / decrese logging verbosity, multiple flags accumulate\n"
         "    -p / -P  -- Show / don't show progress (default: automatic)\n"
         "    -f       -- Force overwrite output (default: refuse to overwrite existing output files)\n"
@@ -134,5 +161,6 @@ class FpltoolArgs
 
 /* ****************************************************************************************************************** */
 }  // namespace fpltool
+}  // namespace apps
 }  // namespace fp
 #endif  // __FPLTOOL_FPLTOOL_PARAMS_HPP__

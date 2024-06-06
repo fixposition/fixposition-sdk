@@ -8,22 +8,35 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: Math utilities
+ * @brief Fixposition SDK: ROS1 library documentation
  */
 
-/* LIBC/STL */
-
-/* EXTERNAL */
-
-/* PACKAGE */
-#include "fpcommon/math.hpp"
+#ifndef __FPROS1_DOC_HPP__
+#define __FPROS1_DOC_HPP__
 
 namespace fp {
-namespace common {
-namespace math {
+/**
+ * @brief Fixposition SDK: ROS1 library
+ */
+namespace ros1 {
+// clang-format off
 /* ****************************************************************************************************************** */
 
+/*!
+    @page FPROS1_DOC Fixposition SDK: ROS1 Library Documentation
+
+    @section FPROS1_OVERVIEW Overview
+
+    @todo add documentation
+
+    @section FPROS1_MODULES Modules
+
+    - @subpage FPROS1_BAGWRITER
+
+*/
+
 /* ****************************************************************************************************************** */
-}  // namespace math
-}  // namespace common
+// clang-format on
+}  // namespace ros1
 }  // namespace fp
+#endif  // __FPROS1_DOC_HPP__

@@ -8,7 +8,12 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: string utilities
+ * @brief Fixposition SDK: String utilities
+ *
+ * @page FPCOMMON_STRING String utilities
+ *
+ * @todo add documentation
+ *
  */
 #ifndef __FPCOMMON_STRING_HPP__
 #define __FPCOMMON_STRING_HPP__
@@ -25,6 +30,9 @@
 
 namespace fp {
 namespace common {
+/**
+ * @brief String utilities
+ */
 namespace string {
 /* ****************************************************************************************************************** */
 

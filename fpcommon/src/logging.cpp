@@ -8,7 +8,7 @@
  * \033ndverbatim
  *
  * @file
- * @brief Minimal logging
+ * @brief Fixposition SDK: Minimal logging
  */
 
 /* LIBC/STL */

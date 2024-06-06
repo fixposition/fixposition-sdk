@@ -8,7 +8,12 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: path utilities
+ * @brief Fixposition SDK: File and path utilities
+ *
+ * @page FPCOMMON_PATH File and path utilities
+ *
+ * @todo add documentation
+ *
  */
 #ifndef __FPCOMMON_PATH_HPP__
 #define __FPCOMMON_PATH_HPP__
@@ -25,6 +30,9 @@
 
 namespace fp {
 namespace common {
+/**
+ * @brief File and path utilities
+ */
 namespace path {
 /* ****************************************************************************************************************** */
 

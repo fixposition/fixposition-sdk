@@ -9,6 +9,11 @@
  *
  * @file
  * @brief Fixposition SDK: Minimal logging
+ *
+ * @page FPCOMMON_LOGGING Minimal logging
+ *
+ * @todo add documentation
+ *
  */
 #ifndef __FPCOMMON_LOGGING_HPP__
 #define __FPCOMMON_LOGGING_HPP__
@@ -25,27 +30,57 @@
 
 namespace fp {
 namespace common {
+/**
+ * @brief Minimal logging
+ */
 namespace logging {
 /* ****************************************************************************************************************** */
 
 /**
  * @name Printf() style logging
  *
- * For example: `INFO("Hello world, the numner is %d", 42);`
+ * For example: `INFO("Hello world, the number is %d", 42);`
  *
  * @{
  */
 // clang-format off
+/**
+ * @brief Print a fatal message   @hideinitializer
+ */
 #define FATAL(fmt, ...)   fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::FATAL,   "Fatal: "   fmt, ## __VA_ARGS__)
+/**
+ * @brief Print a error message   @hideinitializer
+ */
 #define ERROR(fmt, ...)   fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::ERROR,   "Error: "   fmt, ## __VA_ARGS__)
+/**
+ * @brief Print a warning message   @hideinitializer
+ */
 #define WARNING(fmt, ...) fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::WARNING, "Warning: " fmt, ## __VA_ARGS__)
+/**
+ * @brief Print a notice message   @hideinitializer
+ */
 #define NOTICE(fmt, ...)  fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::NOTICE,              fmt, ## __VA_ARGS__)
+/**
+ * @brief Print a info message   @hideinitializer
+ */
 #define INFO(fmt, ...)    fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::INFO,                fmt, ## __VA_ARGS__)
+/**
+ * @brief Print a debug message   @hideinitializer
+ */
 #define DEBUG(fmt, ...)   fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::DEBUG,               fmt, ## __VA_ARGS__)
+/**
+ * @brief Print a debug hexdump   @hideinitializer
+ */
 #define DEBUG_HEXDUMP(data, size, prefix, fmt, ...) fp::common::logging::LoggingHexdump(fp::common::logging::LoggingLevel::DEBUG, data, size, prefix, fmt, ## __VA_ARGS__)
-#ifndef NDEBUG // Only for non-Release builds
+#if !defined(NDEBUG) || defined(_DOXYGEN_) // Only for non-Release builds
+/**
+ * @brief Print a trace message (only debug builds, compile out in release builds)  @hideinitializer
+ */
 #  define TRACE(fmt, ...)   fp::common::logging::LoggingPrint(fp::common::logging::LoggingLevel::TRACE,               fmt, ## __VA_ARGS__)
-#define TRACE_HEXDUMP(data, size, prefix, fmt, ...) fp::common::logging::LoggingHexdump(fp::common::logging::LoggingLevel::TRACE, data, size, prefix, fmt, ## __VA_ARGS__)
+/**
+ * @brief Print a trace hexdump (only debug builds, compile out in release builds)   @hideinitializer
+ */
+#  define TRACE_HEXDUMP(data, size, prefix, fmt, ...) fp::common::logging::LoggingHexdump(fp::common::logging::LoggingLevel::TRACE, data, size, prefix, fmt, ## __VA_ARGS__)
 #else
 #  define TRACE(...)         /* nothing */
 #  define TRACE_HEXDUMP(...) /* nothing */
@@ -56,18 +91,39 @@ namespace logging {
 /**
  * @name C++ style logging
  *
- * For example, `INFO_S("Hello world, the numner is " << 42);`
+ * For example, `INFO_S("Hello world, the number is " << 42);`
  *
  * @{
  */
 // clang-format off
+/**
+ * @brief Print a fatal message   @hideinitializer
+ */
 #define FATAL_S(expr)   do { std::stringstream _ss; _ss << expr; FATAL(  "%s", _ss.str().c_str()); } while (false)
+/**
+ * @brief Print a error message   @hideinitializer
+ */
 #define ERROR_S(expr)   do { std::stringstream _ss; _ss << expr; ERROR(  "%s", _ss.str().c_str()); } while (false)
+/**
+ * @brief Print a warning message   @hideinitializer
+ */
 #define WARNING_S(expr) do { std::stringstream _ss; _ss << expr; WARNING("%s", _ss.str().c_str()); } while (false)
+/**
+ * @brief Print a debug message   @hideinitializer
+ */
 #define DEBUG_S(expr)   do { std::stringstream _ss; _ss << expr; DEBUG(  "%s", _ss.str().c_str()); } while (false)
+/**
+ * @brief Print a notice message   @hideinitializer
+ */
 #define NOTICE_S(expr)  do { std::stringstream _ss; _ss << expr; NOTICE( "%s", _ss.str().c_str()); } while (false)
+/**
+ * @brief Print a info message   @hideinitializer
+ */
 #define INFO_S(expr)    do { std::stringstream _ss; _ss << expr; INFO(   "%s", _ss.str().c_str()); } while (false)
-#ifndef NDEBUG // Only for non-Release builds
+#if !defined(NDEBUG) || defined(_DOXYGEN_) // Only for non-Release builds
+/**
+ * @brief Print a trace message (only debug builds, compile out in release builds)   @hideinitializer
+ */
 #  define TRACE_S(expr)   do { std::stringstream _ss; _ss << expr; TRACE(  "%s", _ss.str().c_str()); } while (false)
 #else
 #  define TRACE_S(...) /* nothing */
@@ -132,6 +188,12 @@ enum class LoggingColour {
  * @brief Logging parameters
  */
 struct LoggingParams {
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  level   Logging level
+     * @param[in]  colour  Logging colours
+     */
     LoggingParams(const LoggingLevel level = LoggingLevel::INFO, const LoggingColour colour = LoggingColour::AUTO);
     LoggingLevel level_;                             //!< Logging level
     LoggingColour colour_;                           //!< Level colours

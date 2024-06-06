@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief fpltool: meta
+ * @brief Fixposition SDK: fpltool meta
  */
 #ifndef __FPLTOOL_FPLTOOL_META_HPP__
 #define __FPLTOOL_FPLTOOL_META_HPP__
@@ -23,12 +23,19 @@
 #include "fpltool_args.hpp"
 
 namespace fp {
+namespace apps {
 namespace fpltool {
 /* ****************************************************************************************************************** */
 
+/**
+ * @brief Run FpltoolArgs::Command::META
+ *
+ * @param[in]  args  Arguments
+ */
 bool DoMeta(const FpltoolArgs& args);
 
 /* ****************************************************************************************************************** */
 }  // namespace fpltool
+}  // namespace apps
 }  // namespace fp
 #endif  // __FPLTOOL_FPLTOOL_META_HPP__

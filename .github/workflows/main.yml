@@ -25,7 +25,7 @@ jobs:
       run: |
         sudo apt-get -y update
         sudo apt-get -y install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktrace-dev zlib1g-dev \
-            python3-pip git wget python3-catkin-tools
+            python3-pip git wget python3-catkin-tools doxygen graphviz
         sudo python3 -m pip install pre-commit
         wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
         echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-17 main" > /etc/apt/sources.list.d/llvm.list
@@ -51,13 +51,13 @@ jobs:
       run: |
         buildname=fpsdk-toplevel-release-noros
         make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Release BUILD_DIR=build/${buildname}
-        install/${buildname}/bin/fpltool -h
+        install/${buildname}/bin/fpltool -V
 
     - name: build using top-level cmake project (debug, without ROS)
       run: |
         buildname=fpsdk-toplevel-debug-noros
         make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Debug BUILD_DIR=build/${buildname}
-        install/${buildname}/bin/fpltool -h
+        install/${buildname}/bin/fpltool -V
 
     - name: build individual cmake projects (release, without ROS)
       run: |
@@ -68,7 +68,7 @@ jobs:
         cmake -B build/${buildname}/fpapps -S fpapps -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
         cmake --build build/${buildname}/fpapps
         cmake --install build/${buildname}/fpapps
-        install/${buildname}/bin/fpltool -h
+        install/${buildname}/bin/fpltool -V
 
     # ----- with ROS ---------------------------------------------------------------------------------------------------
 
@@ -77,14 +77,14 @@ jobs:
         buildname=fpsdk-toplevel-release-withros
         source /opt/ros/${ROS_DISTRO}/setup.bash
         make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Release BUILD_DIR=build/${buildname}
-        install/${buildname}/bin/fpltool -h
+        install/${buildname}/bin/fpltool -V
 
     - name: build using top-level cmake project (debug, with ROS)
       run: |
         buildname=fpsdk-toplevel-debug-withros
         source /opt/ros/${ROS_DISTRO}/setup.bash
         make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Debug BUILD_DIR=build/${buildname}
-        install/${buildname}/bin/fpltool -h
+        install/${buildname}/bin/fpltool -V
 
     - name: build individual cmake projects (release, with ROS)
       run: |
@@ -99,19 +99,31 @@ jobs:
         cmake -B build/${buildname}/fpapps -S fpapps -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
         cmake --build build/${buildname}/fpapps
         cmake --install build/${buildname}/fpapps
-        install/${buildname}/bin/fpltool -h
+        install/${buildname}/bin/fpltool -V
 
     # ----- catkin -----------------------------------------------------------------------------------------------------
 
     - name: build using catkin (release)
       run: |
         mkdir src
-        mv fpapps fpcommon fpros1 src
+        ln -s ../fpapps src
+        ln -s ../fpcommon src
+        ln -s ../fpros1 src
         source /opt/ros/${ROS_DISTRO}/setup.bash
         catkin init
         catkin config --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release
         catkin build fpapps
         source devel/setup.bash
-        fpltool -h
+        fpltool -V
+
+    # ----- doxygen ----------------------------------------------------------------------------------------------------
+
+    - name: doxygen
+      run: |
+        doxygen -u
+        (
+            cat Doxyfile
+            echo "PROJECT_NUMBER = $(cat build/fpsdk-toplevel-release-noros/FP_VERSION_STRING)"
+        ) | doxygen -
 
 # eof

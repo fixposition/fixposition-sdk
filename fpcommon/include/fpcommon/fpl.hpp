@@ -9,6 +9,11 @@
  *
  * @file
  * @brief Fixposition SDK: .fpl logfile helpers
+ *
+ * @page FPCOMMON_FPL .fpl logfile utilities
+ *
+ * @todo add documentation
+ *
  */
 #ifndef __FPCOMMON_FPL_HPP__
 #define __FPCOMMON_FPL_HPP__
@@ -29,6 +34,9 @@
 
 namespace fp {
 namespace common {
+/**
+ * @brief .fpl logfile utilities
+ */
 namespace fpl {
 /* ****************************************************************************************************************** */
 
@@ -60,7 +68,7 @@ const char* FplTypeStr(const FplType type);
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- * One message in the log
+ * @brief One message in the log
  */
 class FplMessage
 {
@@ -128,6 +136,12 @@ class FplMessage
     static constexpr std::uint32_t MAX_SIZE = 1500000;  //!< Maximum message size
     static constexpr std::size_t MAX_NAME_LEN = 100;    //!< Maximum length of (file, topic, ...) names
 
+    /**
+     * @brief Make message a BLOB
+     *
+     * @param[in]  data  The data
+     * @param[in]  size  The size of the data
+     */
     void SetBlob(const uint8_t* data, const uint32_t size);
 
    private:
@@ -170,7 +184,7 @@ class FplParser
     /**
      * @brief Process data in parser, return message
      *
-     * @param[out]  msg  The detected message
+     * @param[out]  log_msg  The detected message
      *
      * @returns true if a message was detected, false otherwise (meaning: not enough data in parser). Note that also in
      *          the false case the \c msg may be modified.
@@ -244,6 +258,11 @@ class FplFileReader
  * @brief Helper for extracting meta data
  */
 struct LogMeta {
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  log_msg  .fpl log message
+     */
     LogMeta(const FplMessage& log_msg);
     bool valid_;                      //!< Data valid, successfully extracted from message
     std::string info_;                //!< Stringification of (some of the) data, for debugging
@@ -264,6 +283,11 @@ struct LogMeta {
  * @brief Helper for extracting recording status data
  */
 struct LogStatus {
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  log_msg  .fpl log message
+     */
     LogStatus(const FplMessage& log_msg);
     bool valid_;             //!< Data valid, successfully extracted from message
     std::string info_;       //!< Stringification of (some of the) data, for debugging
@@ -284,6 +308,11 @@ struct LogStatus {
  * @brief Helper for extracting ROS message definition (the relevant fields from the "connection header")
  */
 struct RosMsgDef {
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  log_msg  .fpl log message
+     */
     RosMsgDef(const FplMessage& log_msg);
     bool valid_;              //!< Data valid, successfully extracted from message
     std::string info_;        //!< Stringification of (some of the) data, for debugging
@@ -299,13 +328,18 @@ struct RosMsgDef {
  * @brief Helper for extracting a serialised ROS message
  */
 struct RosMsgBin {
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  log_msg  .fpl log message
+     */
     RosMsgBin(const FplMessage& log_msg);
-    using RosTime = fp::common::time::RosTime;
-    bool valid_;                     //!< Data valid, successfully extracted from message
-    std::string info_;               //!< Stringification of (some of the) data, for debugging
-    std::string topic_name_;         //!< The topic name
-    RosTime rec_time_;               //!< Recording timestamp
-    std::vector<uint8_t> msg_data_;  //!< Serialised ROS message data
+    using RosTime = fp::common::time::RosTime;  //!< Shortcut
+    bool valid_;                                //!< Data valid, successfully extracted from message
+    std::string info_;                          //!< Stringification of (some of the) data, for debugging
+    std::string topic_name_;                    //!< The topic name
+    RosTime rec_time_;                          //!< Recording timestamp
+    std::vector<uint8_t> msg_data_;             //!< Serialised ROS message data
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -314,13 +348,18 @@ struct RosMsgBin {
  * @brief Helper for extracting data of a stream message (NMEA, RTCM3, etc.)
  */
 struct StreamMsg {
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  log_msg  .fpl log message
+     */
     StreamMsg(const FplMessage& log_msg);
-    using RosTime = fp::common::time::RosTime;
-    bool valid_;                     //!< Data valid, successfully extracted from message
-    std::string info_;               //!< Stringification of (some of the) data, for debugging
-    RosTime rec_time_;               //!< Recording timestamp
-    std::string stream_name_;        //!< Stream name
-    std::vector<uint8_t> msg_data_;  //!< Message data
+    using RosTime = fp::common::time::RosTime;  //!< Shortcut
+    bool valid_;                                //!< Data valid, successfully extracted from message
+    std::string info_;                          //!< Stringification of (some of the) data, for debugging
+    RosTime rec_time_;                          //!< Recording timestamp
+    std::string stream_name_;                   //!< Stream name
+    std::vector<uint8_t> msg_data_;             //!< Message data
 };
 
 /* ****************************************************************************************************************** */

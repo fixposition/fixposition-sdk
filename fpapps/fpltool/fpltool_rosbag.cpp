@@ -9,7 +9,7 @@
  * \endverbatim
  *
  * @file
- * @brief fpltool: rosbag
+ * @brief Fixposition SDK: fpltool rosbag
  */
 
 /* LIBC/STL */
@@ -35,6 +35,7 @@
 #include "fpltool_rosbag.hpp"
 
 namespace fp {
+namespace apps {
 namespace fpltool {
 /* ****************************************************************************************************************** */
 #ifdef FP_USE_ROS1
@@ -201,4 +202,5 @@ bool DoRosbag(const FpltoolArgs& args)
 
 /* ****************************************************************************************************************** */
 }  // namespace fpltool
+}  // namespace apps
 }  // namespace fp

@@ -8,7 +8,12 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: math utilities
+ * @brief Fixposition SDK: Math utilities
+ *
+ * @page FPCOMMON_MATH Math utilities
+ *
+ * @todo add documentation
+ *
  */
 #ifndef __FPCOMMON_MATH_HPP__
 #define __FPCOMMON_MATH_HPP__
@@ -22,6 +27,9 @@
 
 namespace fp {
 namespace common {
+/**
+ * @brief Math utilities
+ */
 namespace math {
 /* ****************************************************************************************************************** */
 

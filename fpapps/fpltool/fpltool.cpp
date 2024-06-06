@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition fpl logfile tool
+ * @brief Fixposition SDK: fpltool main
  */
 
 /* LIBC/STL */
@@ -31,7 +31,7 @@
 
 /* ****************************************************************************************************************** */
 
-using namespace fp::fpltool;
+using namespace fp::apps::fpltool;
 
 int main(int argc, char** argv)
 {
