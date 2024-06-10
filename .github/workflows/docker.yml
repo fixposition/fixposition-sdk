@@ -4,8 +4,8 @@ on:
   # We build this only by manually triggering this job
   workflow_dispatch:
   # To be able to test on a branch, that branch must be added here, e.g:
-  push:
-    branches: [ add-trafo-and-tests ]
+  # push:
+  #   branches: [ add-trafo-and-tests ]
 
 jobs:
   build:
