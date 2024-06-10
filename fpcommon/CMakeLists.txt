@@ -43,12 +43,17 @@ else()
 endif()
 find_package(ZLIB REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(CapnProto REQUIRED)
+find_package(CapnProto REQUIRED)
+find_package(PROJ REQUIRED CONFIG)
 
 include_directories(include
     ${YAML_CPP_INCLUDE_DIR}
     ${Boost_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}
-    ${EIGEN3_INCLUDE_DIR})
+    ${EIGEN3_INCLUDE_DIR}
+    ${CAPNP_INCLUDE_DIR}
+)
 
 
 # SHARED LIBRARY =======================================================================================================
@@ -69,6 +74,8 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         ${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
         ${ZLIB_LIBRARIES}
+        ${CAPNP_LIBRARIES}
+        PROJ::proj
 )
 
 

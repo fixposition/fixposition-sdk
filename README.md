@@ -28,16 +28,13 @@ The SDK part of this repo refers to C++ libraries and apps.
 - ROS (tested with [noetic-ros-base](https://hub.docker.com/_/ros/))
     - Note that some parts can be built without ROS. However, in this case some functionality will be unavailable
       in the built libraries and apps.
-- yaml-cpp
-  (tested with 0.6.2 and 0.7.0)
-- boost
-  (tested with 0.71.0 and 0.74.0)
-- zlib1g
-  (tested with 1.2.11 and 1.2.13)
-- Eigen3
-  (tested with 3.3.7)
-- GTest
-  (tested with 1.13.0)
+- yaml-cpp        (tested with 0.6.2 and 0.7.0)
+- boost           (tested with 0.71.0 and 0.74.0)
+- zlib1g          (tested with 1.2.11 and 1.2.13)
+- Eigen3          (tested with 3.3.7)
+- GTest           (tested with 1.13.0)
+- PROJ            (tested with 9.4.1)
+- Cap'n Proto     (tested with 1.0.2)
 
 This should install the necessary dependencies on Ubuntu or Debian:
 

@@ -20,7 +20,7 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: build
       run: |
-        docker build -t ghcr.io/fixposition/fixposition/sdk:ci -f Dockerfile.ci .
+        ./docker.sh -d build
     - name: push
       run: |
-        docker push ghcr.io/fixposition/fixposition/sdk:ci
+        ./docker.sh -d push
