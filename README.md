@@ -34,6 +34,8 @@ The SDK part of this repo refers to C++ libraries and apps.
   (tested with 0.71.0 and 0.74.0)
 - zlib1g
   (tested with 1.2.11 and 1.2.13)
+- Eigen3
+  (tested with 3.3.7)
 
 This should install the necessary dependencies on Ubuntu or Debian:
 
