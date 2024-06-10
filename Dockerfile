@@ -57,4 +57,3 @@ RUN python3 -m pip install pre-commit && \
     bash -c 'mkdir /tmp/pc1; cd /tmp/pc1; cp ../.pre-commit-config.yaml .; git init; pre-commit install-hooks' && \
     sudo -u fixposition bash -c 'mkdir /tmp/pc2; cd /tmp/pc2; cp ../.pre-commit-config.yaml .; git init; pre-commit install-hooks' && \
     rm -rf /tmp/.pre-commit-config.yaml /tmp/pc1 /tmp/pc2
-
