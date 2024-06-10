@@ -12,4 +12,4 @@ repos:
       - id: clang-format
         args:
           - "-i"
-exclude: '(.*\.svg|.*/test/data/.*)'
+exclude: '(.*\.svg|.*/test/data/.*|\.devcontainer/.*|\.vscode/.*)'
