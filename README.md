@@ -53,7 +53,7 @@ The SDK part of this repo refers to C++ libraries and apps.
     The exact steps required depend on your system. You'll need the dependencies mentioned above installed system wide
     or otherwise tell CMake where to find them.
 
-    Refer to the [Dockerfile](./Dockerfile) on installing of the required dependencies on a Ubuntu 20.04.
+    Refer to the [Dockerfile](./Dockerfile) on installing the required dependencies on a Ubuntu 20.04.
 
 2. Source ROS environment (optional, but required for some functionality)
 
@@ -91,7 +91,7 @@ The SDK part of this repo refers to C++ libraries and apps.
 
 Alternatively, you can do `catkin build fpapps` in your ROS workspace.
 
-The packages can be build individually. See the instructions in the [fpcommon](fpcommon/README.md),
+The packages can be built individually. See the instructions in the [fpcommon](fpcommon/README.md),
 [fpros1](fpros1/README.md) and [fpapps](fpapps/README.md) packages.
 
 Refer to the CI workflow configuration ([ci.yaml](./.github/workflows/ci.yml)) for more options, such as different build
