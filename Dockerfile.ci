@@ -8,7 +8,8 @@ FROM ros:noetic-ros-base
 RUN DEBIAN_FRONTEND=noninteractive apt-get -y update && \
     DEBIAN_FRONTEND=noninteractive apt-get -y install \
         build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktrace-dev zlib1g-dev \
-        python3-pip git wget python3-catkin-tools doxygen graphviz libgtest-dev libeigen3-dev
+        python3-pip git wget python3-catkin-tools doxygen graphviz libgtest-dev libeigen3-dev \
+        libgtest-dev
 
 RUN wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | apt-key add - && \
     echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-17 main" > /etc/apt/sources.list.d/llvm.list && \
