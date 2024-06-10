@@ -1,4 +1,4 @@
-name: CI
+name: ci
 
 on:
   push:
@@ -43,7 +43,7 @@ jobs:
     - name: run tests (release, without ROS)
       run: |
         buildname=fpsdk-toplevel-release-noros
-        make test BUILD_TYPE=Release BUILD_DIR=build/${buildname}
+        make test INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Release BUILD_DIR=build/${buildname}
 
     - name: build using top-level cmake project (debug, without ROS)
       run: |
