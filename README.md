@@ -36,6 +36,8 @@ The SDK part of this repo refers to C++ libraries and apps.
   (tested with 1.2.11 and 1.2.13)
 - Eigen3
   (tested with 3.3.7)
+- GTest
+  (tested with 1.13.0)
 
 This should install the necessary dependencies on Ubuntu or Debian:
 

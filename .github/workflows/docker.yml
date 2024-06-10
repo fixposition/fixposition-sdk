@@ -23,4 +23,6 @@ jobs:
     - name: build
       run: |
         docker build -t ghcr.io/fixposition/fixposition/sdk:ci -f Dockerfile.ci .
+    - name: push
+      run: |
         docker push ghcr.io/fixposition/fixposition/sdk:ci
