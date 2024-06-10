@@ -1,9 +1,11 @@
 name: docker
 
 on:
+  # We build this only by manually triggering this job
   workflow_dispatch:
-  push:
-    branches: [ feature/docker-image-for-ci ]
+  # To be able to test on a branch, that branch must be added here, e.g:
+  # push:
+  #   branches: [ feature/docker-image-for-ci ]
 
 jobs:
   build:
@@ -11,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: login
-      uses: docker/login-action@v1
+      uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
