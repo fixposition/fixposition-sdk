@@ -54,7 +54,7 @@ jobs:
     - name: run tests (debug, without ROS)
       run: |
         buildname=fpsdk-toplevel-debug-noros
-        make test BUILD_TYPE=Debug BUILD_DIR=build/${buildname}
+        make test INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Debug BUILD_DIR=build/${buildname}
 
     - name: build individual cmake projects (release, without ROS)
       run: |
