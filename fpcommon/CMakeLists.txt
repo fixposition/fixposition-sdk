@@ -9,6 +9,7 @@ project(fpcommon
     DESCRIPTION "Fixposition SDK: Common Library"
 )
 
+
 # COMPILER SETUP =======================================================================================================
 
 set(CMAKE_CXX_STANDARD 14)
@@ -31,6 +32,7 @@ if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(NDEBUG)
 endif()
 
+
 # DEPENDENCIES =========================================================================================================
 
 find_package(yaml-cpp REQUIRED)
@@ -40,11 +42,14 @@ else()
     find_package(Boost REQUIRED)
 endif()
 find_package(ZLIB REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 include_directories(include
     ${YAML_CPP_INCLUDE_DIR}
     ${Boost_INCLUDE_DIRS}
-    ${ZLIB_INCLUDE_DIRS})
+    ${ZLIB_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIR})
+
 
 # SHARED LIBRARY =======================================================================================================
 
@@ -60,6 +65,7 @@ target_include_directories(${PROJECT_NAME}
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
         ${YAML_CPP_LIBRARIES}
+        ${EIGEN3_LIBRARIES}
     PRIVATE
         ${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
         ${ZLIB_LIBRARIES}
@@ -128,5 +134,20 @@ install(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
     DESTINATION lib/pkgconfig
 )
+
+
+# TESTS ================================================================================================================
+
+include(cmake/testing.cmake)
+
+add_gtest(TARGET app_test       SOURCES test/app_test.cpp       LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET fpl_test       SOURCES test/fpl_test.cpp       LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET logging_test   SOURCES test/logging_test.cpp   LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET math_test      SOURCES test/math_test.cpp      LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET path_test      SOURCES test/path_test.cpp      LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET string_test    SOURCES test/string_test.cpp    LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET time_test      SOURCES test/time_test.cpp      LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET trafo_test     SOURCES test/trafo_test.cpp     LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET yaml_test      SOURCES test/yaml_test.cpp      LINK_LIBS ${PROJECT_NAME})
 
 # ======================================================================================================================

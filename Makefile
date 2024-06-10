@@ -31,6 +31,7 @@ help:
 	@echo "    clean               Clean build directory"
 	@echo "    cmake               Configure packages"
 	@echo "    build               Build packages"
+	@echo "    test                Run tests"
 	@echo "    install             Install packages (into INSTALL_PREFIX path)"
 	@echo
 	@echo "Typically you want to do something like this:"
@@ -109,7 +110,9 @@ clean:
 .PHONY: cmake
 cmake: $(BUILD_DIR)/.make-cmake
 
-$(BUILD_DIR)/.make-cmake:
+deps = $(sort $(wildcard fpcommon/* fpcommon/*/* fpcommon/*/*/* fpros1/* fpros1/*/* fpros1/*/*/* fpapps/* fpapps/*/* fpapps/*/*/*))
+
+$(BUILD_DIR)/.make-cmake: $(deps)
 	@echo "$(HLW)***** Configure ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)$(CMAKE) -B $(BUILD_DIR) $(CMAKE_ARGS)
 	$(V)$(TOUCH) $@
@@ -124,7 +127,6 @@ $(BUILD_DIR)/.make-build: $(BUILD_DIR)/.make-cmake
 	$(V)$(CMAKE) --build $(BUILD_DIR)
 	$(V)$(TOUCH) $@
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 
 .PHONY: install
@@ -134,5 +136,12 @@ $(BUILD_DIR)/.make-install: $(BUILD_DIR)/.make-build
 	@echo "$(HLW)***** Install ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)$(CMAKE) --install $(BUILD_DIR)
 	$(V)$(TOUCH) $@
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+.PHONY: test
+test: $(BUILD_DIR)/.make-build
+	@echo "$(HLW)***** Test ($(BUILD_TYPE)) *****$(HLO)"
+	$(V)(cd $(BUILD_DIR)/fpcommon && ctest)
 
 ########################################################################################################################

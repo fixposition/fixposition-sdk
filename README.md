@@ -62,7 +62,7 @@ apt install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktra
     cmake -B build -DCMAKE_INSTALL_PREFIX=~/fpsdk
     ```
 
-    Additional parameters include: `-DCMAKE_BUILD_TYPE=Debug`, `-DROS_PACKAGE_PATH=/path/to/ros`
+    Additional parameters include: `-DCMAKE_BUILD_TYPE=Debug`, `-DROS_PACKAGE_PATH=/path/to/ros`, `-DBUILD_TESTING=OFF`
 
 3. Build
 
