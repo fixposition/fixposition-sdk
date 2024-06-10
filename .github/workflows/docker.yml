@@ -6,8 +6,6 @@ on:
   # To be able to test on a branch, that branch must be added here, e.g:
   # push:
   #   branches: [ some/branch ]
-  push:
-    branches: [ add-trafo-and-tests ]
 
 jobs:
   build:
