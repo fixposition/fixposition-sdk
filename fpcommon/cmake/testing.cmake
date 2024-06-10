@@ -1,4 +1,4 @@
-find_package(GTest)
+find_package(GTest 1.12.0)
 
 # Disable tests if GTest is not installed (or not installed properly)
 if ("${GTest_VERSION}" STREQUAL "")

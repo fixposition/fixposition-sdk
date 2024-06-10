@@ -43,9 +43,8 @@ else()
 endif()
 find_package(ZLIB REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(CapnProto REQUIRED)
-find_package(CapnProto REQUIRED)
-find_package(PROJ REQUIRED CONFIG)
+find_package(CapnProto 1.0.2 REQUIRED)
+find_package(PROJ 9.4.1 REQUIRED CONFIG)
 
 include_directories(include
     ${YAML_CPP_INCLUDE_DIR}
