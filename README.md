@@ -14,7 +14,7 @@ The SDK part of this repo refers to C++ libraries and apps.
 ---
 ## SDK
 
-[![CI](https://github.com/fixposition/fixposition_utility/actions/workflows/main.yml/badge.svg)](https://github.com/fixposition/fixposition_utility/actions/workflows/main.yml)
+[![CI](https://github.com/fixposition/fixposition_utility/actions/workflows/ci.yml/badge.svg)](https://github.com/fixposition/fixposition_utility/actions/workflows/ci.yml)
 
 ### Overview
 
