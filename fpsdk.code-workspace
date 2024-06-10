@@ -156,7 +156,15 @@
             "typeinfo": "cpp",
             "valarray": "cpp",
             "variant": "cpp",
-            "bit": "cpp"
+            "bit": "cpp",
+            "core": "cpp",
+            "splines": "cpp",
+            "any": "cpp",
+            "compare": "cpp",
+            "concepts": "cpp",
+            "numbers": "cpp",
+            "semaphore": "cpp",
+            "stop_token": "cpp"
         }
     },
 

@@ -86,7 +86,7 @@ struct RosTime {
     bool IsZero() const;
 
     uint32_t sec_;   //!< Seconds part of time
-    uint32_t nsec_;  //!< Nanoseconds Nanosart of time (*should* be in range 0-999999999, but no guarantees)
+    uint32_t nsec_;  //!< Nanoseconds part of time (*should* be in range 0-999999999)
 };
 
 /* ****************************************************************************************************************** */

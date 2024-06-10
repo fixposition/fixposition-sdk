@@ -1,6 +1,8 @@
 *~
 /build
 /*/build
+/install
+/*/install
 core
 core.*
 CMakeFiles/*

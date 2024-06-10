@@ -34,6 +34,10 @@ The SDK part of this repo refers to C++ libraries and apps.
   (tested with 0.71.0 and 0.74.0)
 - zlib1g
   (tested with 1.2.11 and 1.2.13)
+- Eigen3
+  (tested with 3.3.7)
+- GTest
+  (tested with 1.13.0)
 
 This should install the necessary dependencies on Ubuntu or Debian:
 
@@ -62,7 +66,7 @@ apt install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktra
     cmake -B build -DCMAKE_INSTALL_PREFIX=~/fpsdk
     ```
 
-    Additional parameters include: `-DCMAKE_BUILD_TYPE=Debug`, `-DROS_PACKAGE_PATH=/path/to/ros`
+    Additional parameters include: `-DCMAKE_BUILD_TYPE=Debug`, `-DROS_PACKAGE_PATH=/path/to/ros`, `-DBUILD_TESTING=OFF`
 
 3. Build
 
