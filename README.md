@@ -24,7 +24,7 @@ The SDK part of this repo refers to C++ libraries and apps.
 
 ### Dependencies
 
-- **Linux**, GCC, glibc, cmake, bash, ... (tested with Ubuntu 20.04 and Debian Bookworm)
+- **Linux**, GCC, glibc, cmake, bash, ... (tested with Ubuntu 20.04)
 - ROS (tested with [noetic-ros-base](https://hub.docker.com/_/ros/))
     - Note that some parts can be built without ROS. However, in this case some functionality will be unavailable
       in the built libraries and apps.
@@ -35,8 +35,6 @@ The SDK part of this repo refers to C++ libraries and apps.
 - GTest           (≥ 1.12.0, tested with 1.13.0)
 - PROJ            (≥ 9.0.0,  tested with 9.4.1)
 - Cap'n Proto     (≥ 1.0.2,  tested with 1.0.2)
-
-Refer to the [Dockerfile](./Dockerfile) on installing of the required dependencies.
 
 ### Building
 
@@ -50,13 +48,20 @@ Refer to the [Dockerfile](./Dockerfile) on installing of the required dependenci
 > ./fpsdk/bin/fpltool
 > ```
 
-1. Source ROS environment (optional, but required for some functionality)
+1. Setup build system, install dependencies
+
+    The exact steps required depend on your system. You'll need the dependencies mentioned above installed system wide
+    or otherwise tell CMake where to find them.
+
+    Refer to the [Dockerfile](./Dockerfile) on installing of the required dependencies on a Ubuntu 20.04.
+
+2. Source ROS environment (optional, but required for some functionality)
 
     ```sh
     source /opt/ros/noetic/setup.bash
     ```
 
-2. Configure
+3. Configure
 
     ```sh
     cmake -B build -DCMAKE_INSTALL_PREFIX=~/fpsdk
@@ -64,19 +69,19 @@ Refer to the [Dockerfile](./Dockerfile) on installing of the required dependenci
 
     Additional parameters include: `-DCMAKE_BUILD_TYPE=Debug`, `-DROS_PACKAGE_PATH=/path/to/ros`, `-DBUILD_TESTING=OFF`
 
-3. Build
+4. Build
 
     ```sh
     cmake --build build
     ```
 
-4. Install
+5. Install
 
     ```sh
     cmake --install build
     ```
 
-5. Enjoy!
+6. Enjoy!
 
     For example:
 
@@ -88,6 +93,9 @@ Alternatively, you can do `catkin build fpapps` in your ROS workspace.
 
 The packages can be build individually. See the instructions in the [fpcommon](fpcommon/README.md),
 [fpros1](fpros1/README.md) and [fpapps](fpapps/README.md) packages.
+
+Refer to the CI workflow configuration ([ci.yaml](./.github/workflows/ci.yml)) for more options, such as different build
+configurations or running tests.
 
 ---
 ## License
