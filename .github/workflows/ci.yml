@@ -12,7 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     container:
-      image: ros:noetic-ros-base
+      image: ghcr.io/fixposition/fixposition/sdk:ci
       env:
         ROS_DISTRO: noetic
     defaults:
@@ -20,19 +20,6 @@ jobs:
         shell: bash
 
     steps:
-
-    - name: install dependencies
-      run: |
-        sudo apt-get -y update
-        sudo apt-get -y install build-essential cmake libyaml-cpp-dev libboost-dev libboost-stacktrace-dev zlib1g-dev \
-            python3-pip git wget python3-catkin-tools doxygen graphviz libgtest-dev
-        sudo python3 -m pip install pre-commit
-        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-        echo "deb http://apt.llvm.org/focal/ llvm-toolchain-focal-17 main" > /etc/apt/sources.list.d/llvm.list
-        sudo apt-get -y update
-        sudo apt-get -y install clang-format-17
-        sudo ln -s /usr/bin/clang-format-17 /usr/bin/clang-format
-        sudo ln -s /usr/bin/clang-format-diff-17 /usr/bin/clang-format-diff
 
     # Note: *after* installing git or we won't have a .git folder and e.g. pre-commit will fail
     - uses: actions/checkout@v4
