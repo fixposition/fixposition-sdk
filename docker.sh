@@ -47,7 +47,6 @@ function main
         shift $(expr $OPTIND - 1)
     fi
 
-    notice "Hello"
     debug "SCRIPTDIR=${SCRIPTDIR} IMAGE=${IMAGE} asroot=${asroot}"
 
     local res=0

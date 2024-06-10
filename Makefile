@@ -48,11 +48,12 @@ help:
 
 ########################################################################################################################
 
-TOUCH  := touch
-MKDIR  := mkdir
-ECHO   := echo
-RM     := rm
-CMAKE  := cmake
+TOUCH      := touch
+MKDIR      := mkdir
+ECHO       := echo
+RM         := rm
+CMAKE      := cmake
+DOXYGEN    := doxygen
 
 ifeq ($(VERBOSE),1)
 V =
@@ -110,7 +111,7 @@ clean:
 .PHONY: cmake
 cmake: $(BUILD_DIR)/.make-cmake
 
-deps = $(sort $(wildcard fpcommon/* fpcommon/*/* fpcommon/*/*/* fpros1/* fpros1/*/* fpros1/*/*/* fpapps/* fpapps/*/* fpapps/*/*/*))
+deps = $(sort $(wildcard Makefile fpcommon/* fpcommon/*/* fpcommon/*/*/* fpros1/* fpros1/*/* fpros1/*/*/* fpapps/* fpapps/*/* fpapps/*/*/*))
 
 $(BUILD_DIR)/.make-cmake: $(deps)
 	@echo "$(HLW)***** Configure ($(BUILD_TYPE)) *****$(HLO)"
@@ -143,5 +144,18 @@ $(BUILD_DIR)/.make-install: $(BUILD_DIR)/.make-build
 test: $(BUILD_DIR)/.make-build
 	@echo "$(HLW)***** Test ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)(cd $(BUILD_DIR)/fpcommon && ctest)
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+.PHONY: doc
+doc: $(BUILD_DIR)/.make-doc
+
+$(BUILD_DIR)/.make-doc: $(deps)
+	@echo "$(HLW)***** Doc ($(BUILD_TYPE)) *****$(HLO)"
+	$(V)( \
+            cat Doxyfile; \
+            echo "PROJECT_NUMBER = $(cat $(BUILD_DIR)/FP_VERSION_STRING || echo 'unknown revision')"; \
+        ) | $(DOXYGEN) -
+	$(V)$(TOUCH) $@
 
 ########################################################################################################################

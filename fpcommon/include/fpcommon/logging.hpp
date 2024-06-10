@@ -139,10 +139,10 @@ namespace logging {
  * The logging levels loosely follow syslog levels (indicated in [] below, see also
  * https://en.wikipedia.org/wiki/Syslog)
  *
- * Libraries (fpcommon, fpros, ...) code shall only use WARNING and DEBUG.
+ * Libraries (fpcommon, fpros1, ...) code shall only use WARNING and DEBUG.
  */
 enum class LoggingLevel {
-    FATAL,    //!< [2/crit]    Hard errors, critical conditions (for apps) Cannot be silenced.
+    FATAL,    //!< [2/crit]    Hard errors, critical conditions (for apps). Cannot be silenced.
     ERROR,    //!< [3/err]     Errors (for apps)
     WARNING,  //!< [4/warning] Warnings (for libs and apps)
     NOTICE,   //!< [5/notice]  Significant stuff, for example headings (for apps)
@@ -151,10 +151,10 @@ enum class LoggingLevel {
     TRACE     //!< [7/debug]   Extra debugging, only compiled-in in non-Release builds
 };
 
-LoggingLevel& operator++(LoggingLevel& level);      //!< Pre-increment, increase verbosity
-LoggingLevel& operator--(LoggingLevel& level);      //!< Pre-decrement, decrease verbosity
-LoggingLevel operator++(LoggingLevel& level, int);  //!< Post-increment, increase verbosity
-LoggingLevel operator--(LoggingLevel& level, int);  //!< Post-decrement, decrease verbosity
+LoggingLevel& operator++(LoggingLevel& level);      //!< Increase verbosity (pre-increment)
+LoggingLevel& operator--(LoggingLevel& level);      //!< Decrease verbosity (pre-decrement)
+LoggingLevel operator++(LoggingLevel& level, int);  //!< Increase verbosity (post-increment)
+LoggingLevel operator--(LoggingLevel& level, int);  //!< Decrease verbosity (post-decrement)
 
 /**
  * @brief Stringify log level
@@ -181,7 +181,7 @@ enum class LoggingColour {
     AUTO = 0,  //!< Automatic (default), use colours if stderr is an interactive terminal
     YES,       //!< Use colours (terminal escape sequences)
     NO,        //!< Do not use colours
-    JOURNAL,   //!< Use systemd level indicators (instead of terminal colours)
+    JOURNAL,   //!< Use systemd journal level indicators (instead of terminal colours), useful for systemd services
 };
 
 /**
@@ -230,14 +230,14 @@ void LoggingPrint(const LoggingLevel level, const char* fmt, ...) PRINTF_ATTR(2)
 /**
  * @brief Print a hexdump
  *
- * @note Typically, use TRACE_HEXDUMP() or DEBUG_HEXDUMP() instead of this function.
+ * @note Typically, use DEBUG_HEXDUMP() or TRACE_HEXDUMP() instead of this function.
  *
  * @param[in]  level   Logging level
  * @param[in]  data    Pointer to start of data to dump
  * @param[in]  size    Size of data to dump
- * @param[in]  prefix  prefix to add to each line, can be NULL to omit
+ * @param[in]  prefix  Prefix to add to each line, can be NULL to omit
  * @param[in]  fmt     printf() style format string (for a first line to print), can be NULL to omit
- * @param[in]  ...     arguments to the format string
+ * @param[in]  ...     Arguments to the format string
  */
 void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const uint64_t size, const char* prefix,
     const char* fmt, ...) PRINTF_ATTR(5);
