@@ -187,7 +187,7 @@ class FplParser
      * @param[out]  log_msg  The detected message
      *
      * @returns true if a message was detected, false otherwise (meaning: not enough data in parser). Note that also in
-     *          the false case the \c msg may be modified.
+     *          the false case the \c log_msg may be modified.
      */
     bool Process(FplMessage& log_msg);
 
@@ -197,7 +197,7 @@ class FplParser
     std::size_t size_;                   //!< Current size of useful data in buf_ (counted from offs_)
     std::size_t file_pos_;               //!< Offset into "file", i.e. total number of bytes processed so far
     std::size_t file_seq_;               //!< Count of messages from "file"
-    void EmitBlob(FplMessage& log_msg);  //!< Helper for Process(()
+    void EmitBlob(FplMessage& log_msg);  //!< Helper for Process()
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

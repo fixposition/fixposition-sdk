@@ -217,12 +217,12 @@ Eigen::Vector3d EcefPoseToEnuEul(const Eigen::Vector3d& ecef_p, const Eigen::Mat
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Eigen::Vector3d QuatToEul(const Eigen::Quaterniond& q)
+Eigen::Vector3d QuatToEul(const Eigen::Quaterniond& quat)
 {
-    auto qw = q.w();
-    auto qx = q.x();
-    auto qy = q.y();
-    auto qz = q.z();
+    auto qw = quat.w();
+    auto qx = quat.x();
+    auto qy = quat.y();
+    auto qz = quat.z();
     auto eul0 = atan2(2 * (qx * qy + qw * qz), qw * qw + qx * qx - qy * qy - qz * qz);
     auto eul1 = asin(-2.0 * (qx * qz - qw * qy));
     auto eul2 = atan2(2 * (qy * qz + qw * qx), qw * qw - qx * qx - qy * qy + qz * qz);

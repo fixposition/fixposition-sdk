@@ -68,7 +68,7 @@ std::string Vsprintf(const char* fmt, va_list args);
 /**
  * @brief Format time
  *
- * @param[in]  fmt  Format, see strftime(3)
+ * @param[in]  fmt  Format, see strftime(3), can be NULL for a default "yyyy-mm-dd hh:mm:ss" format
  * @param[in]  ts   Posix timestamp [s] (time_t), or 0 for "now"
  * @param[in]  utc  Format as UTC (true) or localtime (false, default)
  *
@@ -226,7 +226,7 @@ bool StrToValue(const std::string& str, uint32_t& value);
  * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
  *       target value type result in a failure (return false). The output value is only modified on success.
  *
- * @param[in]  str    The string, decimal, hex ("0x...") or octal ("0..."), valid range: (INT64_MIN-1)..(INT64_MAX-1)
+ * @param[in]  str    The string, decimal, hex ("0x...") or octal ("0..."), valid range: (INT64_MIN+1)..(INT64_MAX-1)
  * @param[out] value  The value
  *
  * @returns true if the string could be converted, false otherwise

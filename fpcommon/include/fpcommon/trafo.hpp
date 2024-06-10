@@ -63,7 +63,7 @@ Eigen::Matrix3d RotEnuEcef(const double lat, const double lon);
 /**
  * @brief Calculate the rotation matrix from ECEF to ENU for a given reference position
  *
- * @param[in]  in_pos  Reference position in ECEF [m]
+ * @param[in]  ecef  Reference position in ECEF [m]
  *
  * @returns the rotation matrix from ECEF to ENU
  */
@@ -94,15 +94,15 @@ Eigen::Matrix3d RotNedEcef(const double lat, const double lon);
  * @brief Calculate the rotation matrix from ECEF to
  * NED for a given reference origin.
  *
- * @param[in]  in_pos  Reference position in ECEF [m]
- * @returns tje rRotation matrix from ECEF to NED
+ * @param[in]  ecef  Reference position in ECEF [m]
+ * @returns the rRotation matrix from ECEF to NED
  */
 Eigen::Matrix3d RotNedEcef(const Eigen::Vector3d& ecef);
 
 /**
  * @brief Transform ECEF coordinate to ENU with specified ENU-origin
  *
- * @param[in]  xyz  ECEF position to be transformed [m]
+ * @param[in]  ecef  ECEF position to be transformed [m]
  *
  * @param[in] wgs84llh_ref ENU-origin in geodetic coordinates (lat [rad], lon [rad], height [m])
  *
@@ -173,7 +173,7 @@ Eigen::Vector3d EcefPoseToEnuEul(const Eigen::Vector3d& ecef_p, const Eigen::Mat
  *
  * @returns the intrinsic Euler angles in ZYX (yaw, pitch, roll) order
  */
-Eigen::Vector3d QuatToEul(const Eigen::Quaterniond& q);
+Eigen::Vector3d QuatToEul(const Eigen::Quaterniond& quat);
 
 /**
  * @brief Rotation Matrix to intrinsic Euler Angles in ZYX (Yaw-Pitch-Roll) order in radian

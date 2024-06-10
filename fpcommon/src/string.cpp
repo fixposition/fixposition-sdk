@@ -74,7 +74,7 @@ std::string Strftime(const char* const fmt, const int64_t ts, const bool utc)
     }
     int len = 0;
     if (ok) {
-        len = strftime(str.data(), str.size(), fmt, &now);
+        len = strftime(str.data(), str.size(), fmt == NULL ? "%Y-%m-%d %H:%M:%S" : fmt, &now);
     }
     return std::string(str.data(), len);
 }

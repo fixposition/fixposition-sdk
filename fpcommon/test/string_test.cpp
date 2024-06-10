@@ -39,6 +39,7 @@ TEST(StringTest, Sprintf)
 TEST(StringTest, Strftime)
 {
     EXPECT_EQ(Strftime("%Y-%m-%d %H:%M:%S", 1, true), "1970-01-01 00:00:01");
+    EXPECT_EQ(Strftime(NULL, 2, true), "1970-01-01 00:00:02");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
