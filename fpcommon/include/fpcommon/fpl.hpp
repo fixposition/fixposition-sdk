@@ -289,7 +289,9 @@ struct LogStatus {
      * @param[in]  log_msg  .fpl log message
      */
     LogStatus(const FplMessage& log_msg);
-    bool valid_;             //!< Data valid, successfully extracted from message
+    bool valid_;  //!< Data valid, successfully extracted from message
+
+    // Version 1 and later
     std::string info_;       //!< Stringification of (some of the) data, for debugging
     std::string state_;      //!< Logging state: "stopped", "logging", "stopping"
     uint32_t queue_size_;    //!< Queue size
@@ -299,7 +301,16 @@ struct LogStatus {
     uint32_t log_errors_;    //!< Number of messages failed to log (failed to write/send)
     uint64_t log_size_;      //!< Total size of logged messages [bytes]
     uint32_t log_duration_;  //!< Duration of logging [s]
-    std::string yaml_;       //!< Raw status data YAML
+
+    // Version 2 and later
+    uint32_t log_time_posix_;   //!< Approximate time
+    std::string log_time_iso_;  //!< Approximate time
+    bool pos_avail_;            //!< Approximate sensor position values are available (true) or not (false)
+    double pos_lat_;            //!< Approximate sensor position latitude [deg]
+    double pos_lon_;            //!< Approximate sensor position longitude [deg]
+    double pos_height_;         //!< Approximate sensor position height [m]
+
+    std::string yaml_;  //!< Raw status data YAML
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

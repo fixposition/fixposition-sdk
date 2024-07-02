@@ -12,6 +12,7 @@
  */
 
 /* LIBC/STL */
+#include <cmath>
 #include <cstring>
 #include <fstream>
 
@@ -384,7 +385,8 @@ LogMeta::LogMeta(const FplMessage& log_msg)
         YAML::Node meta;
         if (fp::common::yaml::StringToYaml(yaml_, meta)) {
             try {
-                if (meta["meta_ver"].as<int>() == 1) {
+                const int meta_ver = meta["meta_ver"].as<int>();
+                if (meta_ver >= 1) {
                     // clang-format off
                     hw_uid_               = meta["hw_uid"].as<std::string>();
                     hw_product_           = meta["hw_product"].as<std::string>();
@@ -396,17 +398,17 @@ LogMeta::LogMeta(const FplMessage& log_msg)
                     log_filename_         = meta["log_filename"].as<std::string>();
                     yaml_ += "\n";
                     info_ =
-                        " hw_uid="             + hw_uid_ +
-                        " hw_product="         + hw_product_ +
-                        " sw_version="         + sw_version_ +
-                        " log_profile="        + log_profile_ +
-                        " log_target="         + log_target_ +
-                        " log_filename="       + log_filename_ +
-                        " log_start_time_iso=" + log_start_time_iso_;
+                         "hw_uid="         + hw_uid_ +
+                        " hw_product="     + hw_product_ +
+                        " sw_version="     + sw_version_ +
+                        " log_profile="    + log_profile_ +
+                        " log_target="     + log_target_ +
+                        " log_filename="   + log_filename_ +
+                        " log_start_time=" + log_start_time_iso_;
                     // clang-format on
                     ok = true;
                 } else {
-                    throw std::runtime_error("bad version");
+                    throw std::runtime_error("bad/unknown version");
                 }
             } catch (std::exception& ex) {
                 WARNING("LogMeta: bad meta data: %s", ex.what());
@@ -434,7 +436,8 @@ LogStatus::LogStatus(const FplMessage& log_msg)
         YAML::Node status;
         if (fp::common::yaml::StringToYaml(yaml_, status)) {
             try {
-                if (status["status_ver"].as<int>() == 1) {  // clang-format off
+                const int status_ver = status["status_ver"].as<int>();
+                if (status_ver >= 1) {  // clang-format off
                     state_        = status["state"].as<std::string>();
                     queue_size_   = status["queue_size"].as<uint32_t>();
                     queue_peak_   = status["queue_peak"].as<uint32_t>();
@@ -445,7 +448,7 @@ LogStatus::LogStatus(const FplMessage& log_msg)
                     log_duration_ = status["log_duration"].as<uint32_t>();
                     yaml_ += "\n";
                     info_ =
-                        " state="        + state_ +
+                         "state="        + state_ +
                         " queue_size="   + std::to_string(queue_size_) +
                         " queue_peak="   + std::to_string(queue_peak_) +
                         " queue_skip="   + std::to_string(queue_skip_) +
@@ -455,8 +458,20 @@ LogStatus::LogStatus(const FplMessage& log_msg)
                         " log_duration=" + std::to_string(log_duration_);  // clang-format on
                     ok = true;
                 } else {
-                    throw std::runtime_error("bad version");
+                    throw std::runtime_error("bad/unknown version");
                 }
+                if (status_ver >= 2) {
+                    log_time_posix_ = status["log_time_posix"].as<uint32_t>();
+                    log_time_iso_ = status["log_time_iso"].as<std::string>();
+                    pos_avail_ = status["pos_avail"].as<bool>();
+                    pos_lat_ = status["pos_lat"].as<double>();
+                    pos_lon_ = status["pos_lon"].as<double>();
+                    pos_height_ = status["pos_height"].as<double>();
+                    info_ += " log_time=" + log_time_iso_ +
+                             fp::common::string::Sprintf(" pos=%.6f/%.6f/%.0f", pos_avail_ ? pos_lat_ : NAN,
+                                 pos_avail_ ? pos_lon_ : NAN, pos_avail_ ? pos_height_ : NAN);
+                }
+
             } catch (std::exception& ex) {
                 WARNING("LogStatus: bad status data: %s", ex.what());
             }
