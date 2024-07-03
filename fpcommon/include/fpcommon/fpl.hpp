@@ -305,10 +305,15 @@ struct LogStatus {
     // Version 2 and later
     uint32_t log_time_posix_;   //!< Approximate time
     std::string log_time_iso_;  //!< Approximate time
-    bool pos_avail_;            //!< Approximate sensor position values are available (true) or not (false)
+    int8_t pos_source_;         //!< Approximate sensor position source (see POS_SOURCE_... below)
+    int8_t pos_fix_type_;       //!< Approximate sensor position fix type (see fp::common::types::GnssFixType)
     double pos_lat_;            //!< Approximate sensor position latitude [deg]
     double pos_lon_;            //!< Approximate sensor position longitude [deg]
     double pos_height_;         //!< Approximate sensor position height [m]
+
+    static constexpr int8_t POS_SOURCE_UNKNOWN = 0;
+    static constexpr int8_t POS_SOURCE_GNSS = 1;
+    static constexpr int8_t POS_SOURCE_FUSION = 2;
 
     std::string yaml_;  //!< Raw status data YAML
 };
