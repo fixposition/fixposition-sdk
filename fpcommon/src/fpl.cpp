@@ -25,6 +25,7 @@
 #include "fpcommon/path.hpp"
 #include "fpcommon/string.hpp"
 #include "fpcommon/time.hpp"
+#include "fpcommon/types.hpp"
 #include "fpcommon/yaml.hpp"
 
 namespace fp {
@@ -463,13 +464,20 @@ LogStatus::LogStatus(const FplMessage& log_msg)
                 if (status_ver >= 2) {
                     log_time_posix_ = status["log_time_posix"].as<uint32_t>();
                     log_time_iso_ = status["log_time_iso"].as<std::string>();
-                    pos_avail_ = status["pos_avail"].as<bool>();
+                    pos_source_ = status["pos_source"].as<int8_t>();
+                    pos_fix_type_ = status["pos_fix_type"].as<int8_t>();
                     pos_lat_ = status["pos_lat"].as<double>();
                     pos_lon_ = status["pos_lon"].as<double>();
                     pos_height_ = status["pos_height"].as<double>();
+                    using GnssFixType = fp::common::types::GnssFixType;
+                    const bool pos_avail = ((pos_source_ > POS_SOURCE_UNKNOWN) &&
+                                            ((GnssFixType)pos_fix_type_ > fp::common::types::GnssFixType::FIX_NOFIX));
+                    const char* pos_source_str =
+                        (pos_source_ == POS_SOURCE_GNSS ? "GNSS" : (pos_source_ == POS_SOURCE_FUSION ? "FUSION" : "?"));
                     info_ += " log_time=" + log_time_iso_ +
-                             fp::common::string::Sprintf(" pos=%.6f/%.6f/%.0f", pos_avail_ ? pos_lat_ : NAN,
-                                 pos_avail_ ? pos_lon_ : NAN, pos_avail_ ? pos_height_ : NAN);
+                             fp::common::string::Sprintf(" pos=%s/%s/%.6f/%.6f/%.0f", pos_source_str,
+                                 fp::common::types::GnssFixTypeStr((GnssFixType)pos_fix_type_),
+                                 pos_avail ? pos_lat_ : NAN, pos_avail ? pos_lon_ : NAN, pos_avail ? pos_height_ : NAN);
                 }
 
             } catch (std::exception& ex) {
