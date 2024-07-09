@@ -44,6 +44,7 @@ help:
 	@echo "- ROS_PACKAGE_PATH can be provided through catkin/ros env (recommended) or on the command line"
 	@echo "- Command line variables can be stored into a config.mk file, which is automatically loaded"
 	@echo "- When changing the INSTALL_PREFIX or config.mk, a 'make clean' will be required"
+	@echo "- 'make ci' runs the CI (more or less) like on Github. INSTALL_PREFIX and BUILD_TYPE have no effect here."
 	@echo
 
 ########################################################################################################################
@@ -167,5 +168,20 @@ $(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-cmake
             echo "OUTPUT_DIRECTORY = $(BUILD_DIR)"; \
         ) | $(DOXYGEN) -
 	$(V)$(TOUCH) $@
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+.PHONY: ci
+ci:
+	@echo "$(HLW)***** CI *****$(HLO)"
+ifeq ($(FPSDK_IMAGE),)
+	$(V)docker/docker.sh run deb-ci ./docker/ci.sh
+	$(V)docker/docker.sh run ros1-ci ./docker/ci.sh
+	$(V)docker/docker.sh run ros2-ci ./docker/ci.sh
+	@echo "$(HLW)CI done$(HLO)"
+else
+	@echo "This should not run inside Docker!"
+	false
+endif
 
 ########################################################################################################################

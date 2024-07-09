@@ -77,7 +77,7 @@ function pre_commit_check
 TITLES["build_toplevel_release_noros"]="Build top-level project (release, without ROS)"
 function build_toplevel_release_noros
 {
-    local buildname=toplevel-release-noros
+    local buildname=${FPSDK_IMAGE}_toplevel-release-noros
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -91,7 +91,7 @@ function build_toplevel_release_noros
 TITLES["test_toplevel_release_noros"]="Test top-level project (release, without ROS)"
 function test_toplevel_release_noros
 {
-    local buildname=toplevel-release-noros # re-using build
+    local buildname=${FPSDK_IMAGE}_toplevel-release-noros # re-using build
 
     cd ${FPSDK_SRC_DIR}
     make test \
@@ -105,7 +105,7 @@ function test_toplevel_release_noros
 TITLES["build_toplevel_debug_noros"]="Build top-level project (debug, without ROS)"
 function build_toplevel_debug_noros
 {
-    local buildname=toplevel-debug-noros
+    local buildname=${FPSDK_IMAGE}_toplevel-debug-noros
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -119,7 +119,7 @@ function build_toplevel_debug_noros
 TITLES["test_toplevel_debug_noros"]="Test top-level project (debug, without ROS)"
 function test_toplevel_debug_noros
 {
-    local buildname=toplevel-debug-noros # re-using build
+    local buildname=${FPSDK_IMAGE}_toplevel-debug-noros # re-using build
 
     cd ${FPSDK_SRC_DIR}
     make test \
@@ -133,7 +133,7 @@ function test_toplevel_debug_noros
 TITLES["build_projs_release_noros"]="Build individual projects (release, without ROS)"
 function build_projs_release_noros
 {
-    local buildname=toplevel-release-noros
+    local buildname=${FPSDK_IMAGE}_toplevel-release-noros
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -158,7 +158,7 @@ function build_projs_release_noros
 TITLES["doxygen_release_noros"]="Doxygen (release, without ROS)"
 function doxygen_release_noros
 {
-    local buildname=doxygen-release-noros
+    local buildname=${FPSDK_IMAGE}_doxygen-release-noros
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -173,7 +173,7 @@ function doxygen_release_noros
 TITLES["build_toplevel_release_ros1"]="Build top-level project (release, with ROS1)"
 function build_toplevel_release_ros1
 {
-    local buildname=toplevel-release-ros1
+    local buildname=${FPSDK_IMAGE}_toplevel-release-ros1
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -187,7 +187,7 @@ function build_toplevel_release_ros1
 TITLES["test_toplevel_release_ros1"]="Test top-level project (release, with ROS1)"
 function test_toplevel_release_ros1
 {
-    local buildname=toplevel-release-ros1 # re-using build
+    local buildname=${FPSDK_IMAGE}_toplevel-release-ros1 # re-using build
 
     cd ${FPSDK_SRC_DIR}
     make test \
@@ -201,7 +201,7 @@ function test_toplevel_release_ros1
 TITLES["build_toplevel_debug_ros1"]="Build top-level project (debug, with ROS1)"
 function build_toplevel_debug_ros1
 {
-    local buildname=toplevel-debug-ros1
+    local buildname=${FPSDK_IMAGE}_toplevel-debug-ros1
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -215,7 +215,7 @@ function build_toplevel_debug_ros1
 TITLES["test_toplevel_debug_ros1"]="Test top-level project (debug, with ROS1)"
 function test_toplevel_debug_ros1
 {
-    local buildname=toplevel-debug-ros1 # re-using build
+    local buildname=${FPSDK_IMAGE}_toplevel-debug-ros1 # re-using build
 
     cd ${FPSDK_SRC_DIR}
     make test \
@@ -229,7 +229,7 @@ function test_toplevel_debug_ros1
 TITLES["build_projs_release_ros1"]="Build individual projects (release, with ROS1)"
 function build_projs_release_ros1
 {
-    local buildname=toplevel-release-noros
+    local buildname=${FPSDK_IMAGE}_toplevel-release-noros
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -260,7 +260,7 @@ function build_projs_release_ros1
 TITLES["build_catkin_release"]="Build catkin (release, with ROS1)"
 function build_catkin_release
 {
-    local buildname=catkin-release
+    local buildname=${FPSDK_IMAGE}_catkin-release
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -282,7 +282,7 @@ function build_catkin_release
 TITLES["doxygen_release_ros1"]="Doxygen (release, with ROS1)"
 function doxygen_release_ros1
 {
-    local buildname=doxygen-release-ros1
+    local buildname=${FPSDK_IMAGE}_doxygen-release-ros1
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
