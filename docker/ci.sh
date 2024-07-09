@@ -320,7 +320,7 @@ if [ "${ROS_DISTRO}" = "noetic" ]; then
     # do_step doxygen_release_ros1          || true # continue
 
 elif [ "${ROS_DISTRO}" = "humble" ]; then
-    echo "===== ROS2 builds ====="
+    echo "===== ROS2 builds wtf ====="
     set -x
     set +u
     source /opt/ros/${ROS_DISTRO}/setup.bash
