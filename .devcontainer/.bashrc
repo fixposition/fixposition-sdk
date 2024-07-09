@@ -152,3 +152,8 @@ if [ -f ~/.bash-git-prompt/gitprompt.sh ]; then
     GIT_PROMPT_THEME=fpsdk
     source ~/.bash-git-prompt/gitprompt.sh
 fi
+
+# Source ROS environment
+if [ -n "${ROS_DISTRO}" ]; then
+    source /opt/ros/${ROS_DISTRO}/setup.bash
+fi

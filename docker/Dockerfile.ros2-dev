@@ -46,6 +46,20 @@ RUN <<EOF
 EOF
 
 RUN <<EOF
+    # Download and install yq
+    set -e
+    curl -L https://github.com/mikefarah/yq/releases/download/v4.44.2/yq_linux_amd64 -o /usr/local/bin/yq
+    chmod 0755 /usr/local/bin/yq
+EOF
+
+RUN <<EOF
+    # Download and install mcap
+    set -e
+    curl -L https://github.com/foxglove/mcap/releases/download/releases%2Fmcap-cli%2Fv0.0.47/mcap-linux-amd64 -o /usr/local/bin/mcap
+    chmod 0755 /usr/local/bin/mcap
+EOF
+
+RUN <<EOF
     # Install useful stuff
     set -e
     export DEBIAN_FRONTEND=noninteractive
@@ -60,6 +74,7 @@ RUN <<EOF
         chrpath \
         curl \
         evtest \
+        file \
         gdb \
         git-lfs \
         iproute2 \

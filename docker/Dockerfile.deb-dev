@@ -45,6 +45,20 @@ RUN <<EOF
     echo "fpsdk ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 EOF
 
+RUN <<EOF
+    # Download and install yq
+    set -e
+    curl -L https://github.com/mikefarah/yq/releases/download/v4.44.2/yq_linux_amd64 -o /usr/local/bin/yq
+    chmod 0755 /usr/local/bin/yq
+EOF
+
+RUN <<EOF
+    # Download and install mcap
+    set -e
+    curl -L https://github.com/foxglove/mcap/releases/download/releases%2Fmcap-cli%2Fv0.0.47/mcap-linux-amd64 -o /usr/local/bin/mcap
+    chmod 0755 /usr/local/bin/mcap
+EOF
+
 COPY <<EOF /etc/apt/sources.list.d/debian.list
     deb http://deb.debian.org/debian           bookworm            main non-free contrib non-free-firmware
     deb http://deb.debian.org/debian-security  bookworm-security   main non-free contrib non-free-firmware
@@ -68,6 +82,7 @@ RUN <<EOF
         chrpath \
         curl \
         evtest \
+        file \
         gdb \
         git-lfs \
         iproute2 \
