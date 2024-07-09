@@ -16,7 +16,8 @@ jobs:
             run:
                 shell: bash
         steps:
-            - uses: actions/checkout@v4
+            - name: Checkout
+              uses: actions/checkout@v4
             - name: Build
               run: |
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
@@ -30,7 +31,8 @@ jobs:
             run:
                 shell: bash
         steps:
-            - uses: actions/checkout@v4
+            - name: Checkout
+              uses: actions/checkout@v4
             - name: Build
               run: |
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
@@ -44,7 +46,8 @@ jobs:
             run:
                 shell: bash
         steps:
-            - uses: actions/checkout@v4
+            - name: Checkout
+              uses: actions/checkout@v4
             - name: CI
               run: |
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}

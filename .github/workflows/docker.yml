@@ -9,7 +9,7 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
-            - name: login
+            - name: Login
               uses: docker/login-action@v3
               with:
                   registry: ghcr.io
@@ -18,8 +18,10 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose build
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
                   docker compose push
+                  # Pushing again to make this the latest image shown as the default image in Github packages
+                  docker compose push ros1-dev

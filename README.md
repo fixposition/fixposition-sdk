@@ -40,7 +40,7 @@ The SDK part of this repo refers to C++ libraries and apps.
 
 > *tl;dr*
 > ```sh
-> ./docker/docker.sh pull ros1-dev
+> ./docker/docker.sh pull ros1-dev       # Or "docker.sh build ros1-dev" to build it locally
 > ./docker/docker.sh run ros1-dev bash
 > # Now inside Docker do:
 > make install INSTALL_PREFIX=fpsdk
