@@ -49,10 +49,9 @@ The SDK part of this repo refers to C++ libraries and apps.
 
 #### VSCode devcontainer
 
-Open the fpsdk.code-workspace and:
+Open the fpsdk.code-workspace, change to one of the provided devcontainers, and in a terminal do:
 
 ```sh
-source /opt/ros/noetic/setup.bash
 make install INSTALL_PREFIX=fpsdk
 ./fpsdk/bin/fpltool
 ```
