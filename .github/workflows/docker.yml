@@ -65,23 +65,3 @@ jobs:
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
                   docker compose push deb-base deb-ci deb-dev
-
-    # Pushing again to make this the latest image shown as the default image in Github packages
-    dummy:
-        runs-on: ubuntu-latest
-        needs:
-            - fpsdk-ros1
-            - fpsdk-ros2
-            - fpsdk-deb
-        steps:
-            - name: Login
-              uses: docker/login-action@v3
-              with:
-                  registry: ghcr.io
-                  username: ${{ github.actor }}
-                  password: ${{ secrets.GITHUB_TOKEN }}
-            - name: Push
-              run: |
-                  cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push ros1-dev
-

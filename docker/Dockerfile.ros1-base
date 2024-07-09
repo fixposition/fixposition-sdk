@@ -1,7 +1,8 @@
-# Fixposition SDK docker image: ROS1 base image with minimal stuff required to build
-
 # ROS Noetic (until May, 2025) base image (Ubuntu 20.04.6 LTS "Focal")
 FROM ros:noetic-ros-base
+
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS1 (Noetic, Ubuntu 20.04) base image with minimal stuff required to build"
+LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 RUN <<EOF
     # Install minimal dependencies to build stuff

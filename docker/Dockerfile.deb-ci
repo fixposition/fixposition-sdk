@@ -1,6 +1,7 @@
-# Fixposition SDK docker image: Debian image for Github CI jobs
-
 FROM ghcr.io/fixposition/fixposition/fixposition-sdk:deb-base
+
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian (Bookworm) image for Github CI jobs"
+LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 COPY .pre-commit-config.yaml /tmp
 RUN <<EOF

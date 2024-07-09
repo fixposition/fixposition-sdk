@@ -1,6 +1,7 @@
-# Fixposition SDK docker image: Debian base image with minimal stuff required to build
-
 FROM debian:bookworm
+
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian (Bookworm) base image with minimal stuff required to build"
+LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 RUN <<EOF
     # Install minimal dependencies to build stuff

@@ -1,6 +1,7 @@
-# Fixposition SDK docker image: ROS1 image for vscode devcontainer
-
 FROM ghcr.io/fixposition/fixposition/fixposition-sdk:ros1-base
+
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS1 (Noetic, Ubuntu 20.04) image for vscode devcontainer"
+LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 RUN <<EOF
     # Unminimize system

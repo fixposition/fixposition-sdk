@@ -1,6 +1,7 @@
-# Fixposition SDK docker image: ROS2 image for vscode devcontainer
-
 FROM ghcr.io/fixposition/fixposition/fixposition-sdk:ros2-base
+
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS2 (Humble, Ubuntu 22.04) image for vscode devcontainer"
+LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 RUN <<EOF
     # Unminimize system

@@ -1,7 +1,9 @@
-# Fixposition SDK docker image: ROS1 base image with minimal stuff required to build
 
 # ROS Humble (LTS until May 2027) base image (Ubuntu 22.04.6 LTS "Jammy")
 FROM ros:humble-ros-base
+
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS2 (Humble, Ubuntu 22.04) base image with minimal stuff required to build"
+LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 RUN <<EOF
     # Install minimal dependencies to build stuff
