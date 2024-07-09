@@ -1,0 +1,21 @@
+FROM ghcr.io/fixposition/fixposition/fixposition-sdk:deb-base
+
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian (Bookworm) image for Github CI jobs"
+LABEL org.opencontainers.image.source=https://github.com/fixposition
+
+COPY .pre-commit-config.yaml /tmp
+RUN <<EOF
+    # Install pre-commit hooks for root
+    tmpdir=$(mktemp -d)
+    cd ${tmpdir}
+    git init
+    cp /tmp/.pre-commit-config.yaml .
+    pre-commit install-hooks
+    cd /
+    rm -rf ${tmpdir}
+    rm /tmp/.pre-commit-config.yaml
+EOF
+
+# For debugging docker builds... (last layer!)
+ENV FPSDK_IMAGE=deb-ci
+RUN date > /fixposition-sdk-deb-ci

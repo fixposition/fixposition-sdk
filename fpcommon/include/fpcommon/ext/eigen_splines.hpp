@@ -7,9 +7,10 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wshadow"
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#if defined(__GNUC__) && (__GNUC__ >= 9)
+#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
 #include <unsupported/Eigen/Splines>
-#pragma GCC diagnostic pop
 #pragma GCC diagnostic pop
 // See exmplanation in eigen_core.hpp
 #if !EIGEN_VERSION_AT_LEAST(3, 4, 0) && defined(__GNUC__) && (__GNUC__ >= 9)

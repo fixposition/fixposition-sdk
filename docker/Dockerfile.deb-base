@@ -1,0 +1,128 @@
+FROM debian:bookworm
+
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian (Bookworm) base image with minimal stuff required to build"
+LABEL org.opencontainers.image.source=https://github.com/fixposition
+
+RUN <<EOF
+    # Install minimal dependencies to build stuff
+    set -e
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get -y update
+    apt-get -y --with-new-pkgs upgrade
+    apt-get -y --no-install-recommends install \
+        bison \
+        build-essential \
+        cmake \
+        curl \
+        flex \
+        git \
+        gnupg2 \
+        googletest \
+        graphviz \
+        libboost-dev \
+        libboost-stacktrace-dev \
+        libcurl4-openssl-dev \
+        libeigen3-dev \
+        libgtest-dev \
+        libsqlite3-dev \
+        libtiff-dev \
+        libyaml-cpp-dev \
+        pre-commit \
+        python3-pip \
+        sqlite3 \
+        zlib1g-dev
+    apt-get -y autoremove
+    apt-get clean
+EOF
+
+RUN <<EOF
+    # Install clang-format
+    set -e
+    curl https://apt.llvm.org/llvm-snapshot.gpg.key > /etc/apt/trusted.gpg.d/llvm.asc
+    echo "deb http://apt.llvm.org/bookworm/ llvm-toolchain-bookworm-17 main" > /etc/apt/sources.list.d/llvm.list
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get -y update
+    apt-get -y --no-install-recommends install \
+        clang-format-17
+    apt-get clean
+    ln -s /usr/bin/clang-format-17 /usr/bin/clang-format
+    ln -s /usr/bin/clang-format-diff-17 /usr/bin/clang-format-diff
+EOF
+
+# Prevent packages from installation that we build and install below. Installing multiple versions of the same
+# package can be tricky and we better prevent that from happening. It doesn't work for all packages, though. For
+# example, ros-noetic stuff insists on libgtest.
+COPY <<EOF /etc/apt/preferences.d/manually-built-and-installed
+Package: clang-format clang-format-13 clang-format-14 clang-format-15 clang-format-16
+Pin: origin *
+Pin-Priority: -1
+
+Package: capnproto libcapnp-* libcapnp-dev
+Pin: origin *
+Pin-Priority: -1
+
+Package: proj proj-ps-doc proj-data proj-rdnap proj-bin libproj15 libproj-dev
+Pin: origin *
+Pin-Priority: -1
+
+Package: doxygen doxygen-*
+Pin: origin *
+Pin-Priority: -1
+EOF
+
+RUN <<EOF
+    # Build and install capnp
+    set -e
+    curl -L https://capnproto.org/capnproto-c++-1.0.2.tar.gz -o /tmp/capnp.tar.gz
+    mkdir /tmp/capnp
+    cd /tmp/capnp
+    tar --strip-components=1 -xzvf ../capnp.tar.gz
+    cmake -B build -S . \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DBUILD_SHARED_LIBS=ON \
+        -DBUILD_TESTING=OFF
+    cmake --build build --parallel 4
+    cmake --install build
+    cd /
+    rm -rf /tmp/proj.tar.gz /tmp/proj
+EOF
+
+RUN <<EOF
+    # Build and install PROJ
+    set -e
+    curl -L https://download.osgeo.org/proj/proj-9.4.1.tar.gz -o /tmp/proj.tar.gz
+    mkdir /tmp/proj
+    cd /tmp/proj
+    tar --strip-components=1 -xzvf ../proj.tar.gz
+    cmake -B build -S . \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr/local \
+        -DBUILD_SHARED_LIBS=ON \
+        -DBUILD_TESTING=OFF
+        cmake --build build --parallel 4
+    cmake --install build
+    cd /
+    rm -rf /tmp/proj.tar.gz /tmp/proj
+EOF
+
+RUN <<EOF
+    # Build and install Doxygen
+    set -e
+    curl -L https://www.doxygen.nl/files/doxygen-1.11.0.src.tar.gz -o /tmp/doxygen.tar.gz
+    mkdir /tmp/doxygen
+    cd /tmp/doxygen
+    tar --strip-components=1 -xzvf ../doxygen.tar.gz
+    cmake -B build -S . \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_INSTALL_PREFIX=/usr/local
+    cmake --build build --parallel 4
+    cmake --install build
+    cd /
+    rm -rf /tmp/doxygen.tar.gz /tmp/doxygen
+EOF
+
+# For automation and debugging docker builds... (last layer!)
+ENV FPSDK_IMAGE=deb-base
+ENV ROS_DISTRO=
+RUN date > /fixposition-sdk-deb-base

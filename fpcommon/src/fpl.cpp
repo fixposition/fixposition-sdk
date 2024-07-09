@@ -464,8 +464,8 @@ LogStatus::LogStatus(const FplMessage& log_msg)
                 if (status_ver >= 2) {
                     log_time_posix_ = status["log_time_posix"].as<uint32_t>();
                     log_time_iso_ = status["log_time_iso"].as<std::string>();
-                    pos_source_ = status["pos_source"].as<int8_t>();
-                    pos_fix_type_ = status["pos_fix_type"].as<int8_t>();
+                    pos_source_ = status["pos_source"].as<int>();  // Note: Deliberatly using int, not uint8_t because
+                    pos_fix_type_ = status["pos_fix_type"].as<int>();  // yamlcpp seems to confuse that with char.
                     pos_lat_ = status["pos_lat"].as<double>();
                     pos_lon_ = status["pos_lon"].as<double>();
                     pos_height_ = status["pos_height"].as<double>();

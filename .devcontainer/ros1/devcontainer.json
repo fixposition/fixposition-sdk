@@ -1,0 +1,17 @@
+// https://aka.ms/devcontainer.json
+{
+    "dockerComposeFile": "../../docker/docker-compose.yaml",
+    "shutdownAction": "stopCompose",
+
+    "name": "Fixposition SDK (ROS1)", "service": "ros1-dev", "runServices": [ "ros1-dev" ],
+
+    // Use this user in the container, re-map IDs to local user automatically
+    "remoteUser": "fpsdk",
+    "updateRemoteUserUID": true,
+
+    // compare .services.ros1-dev.volumes in ../../docker/docker-compose.yaml
+    "workspaceFolder": "/home/fpsdk/fixposition_utility",
+
+    // Deliberately empty, see fpsdk.code-workspace instead
+    "customizations": {}
+}

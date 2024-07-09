@@ -1,23 +1,72 @@
 name: docker
 
 on:
-  # We build this only by manually triggering this job
-  workflow_dispatch:
+    # We build this only by manually triggering this job from the actions tab
+    workflow_dispatch:
 
+# Splitting into three jobs to make stuff build in parallel (on multiple runners)
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: login
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    - name: build
-      run: |
-        ./docker.sh -d build
-    - name: push
-      run: |
-        ./docker.sh -d push
+    # Note: job names should be unique across all workflows!
+
+    docker-fpsdk-ros1:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Login
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            # Pulling first, so that maybe it not everything has to be built...
+            - name: Build
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build ros1-base ros1-ci ros1-dev
+            - name: Push
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  docker compose push ros1-base ros1-ci ros1-dev
+
+    docker-fpsdk-ros2:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Login
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            # Pulling first, so that maybe it not everything has to be built...
+            - name: Build
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build ros2-base ros2-ci ros2-dev
+            - name: Push
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  docker compose push ros2-base ros2-ci ros2-dev
+
+    docker-fpsdk-deb:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Login
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            # Pulling first, so that maybe it not everything has to be built...
+            - name: Build
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build deb-base deb-ci deb-dev
+            - name: Push
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  docker compose push deb-base deb-ci deb-dev

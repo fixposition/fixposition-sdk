@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: tests for fp::common::fpl
+ * @brief Fixposition SDK: tests for fp::ros1::bagwriter
  */
 
 /* LIBC/STL */
@@ -17,14 +17,14 @@
 #include <gtest/gtest.h>
 
 /* PACKAGE */
-#include <fpcommon/fpl.hpp>
 #include <fpcommon/logging.hpp>
+#include <fpros1/bagwriter.hpp>
 
 namespace {
 /* ****************************************************************************************************************** */
-using namespace fp::common::fpl;
+using namespace fp::ros1::bagwriter;
 
-TEST(FplTest, Dummy)
+TEST(BagwriterTest, Dummy)
 {
     EXPECT_TRUE(true);
 }

@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: tests for fp::common::fpl
+ * @brief Fixposition SDK: tests for fp::common::types
  */
 
 /* LIBC/STL */
@@ -17,14 +17,14 @@
 #include <gtest/gtest.h>
 
 /* PACKAGE */
-#include <fpcommon/fpl.hpp>
 #include <fpcommon/logging.hpp>
+#include <fpcommon/types.hpp>
 
 namespace {
 /* ****************************************************************************************************************** */
-using namespace fp::common::fpl;
+using namespace fp::common::app;
 
-TEST(FplTest, Dummy)
+TEST(AppTest, Dummy)
 {
     EXPECT_TRUE(true);
 }

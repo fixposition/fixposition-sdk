@@ -44,6 +44,7 @@ help:
 	@echo "- ROS_PACKAGE_PATH can be provided through catkin/ros env (recommended) or on the command line"
 	@echo "- Command line variables can be stored into a config.mk file, which is automatically loaded"
 	@echo "- When changing the INSTALL_PREFIX or config.mk, a 'make clean' will be required"
+	@echo "- 'make ci' runs the CI (more or less) like on Github. INSTALL_PREFIX and BUILD_TYPE have no effect here."
 	@echo
 
 ########################################################################################################################
@@ -99,6 +100,12 @@ ifneq ($(ROS_PACKAGE_PATH),)
   CMAKE_ARGS += -DROS_PACKAGE_PATH=$(ROS_PACKAGE_PATH)
 endif
 
+ifeq ($(GITHUB_WORKSPACE),)
+  CMAKE_PARALLEL = 4
+else
+  CMAKE_PARALLEL = 1
+endif
+
 BUILD_DIR = build/$(BUILD_TYPE)
 
 # "All-in-one" targets
@@ -125,7 +132,7 @@ build: $(BUILD_DIR)/.make-build
 
 $(BUILD_DIR)/.make-build: $(BUILD_DIR)/.make-cmake
 	@echo "$(HLW)***** Build ($(BUILD_TYPE)) *****$(HLO)"
-	$(V)$(CMAKE) --build $(BUILD_DIR)
+	$(V)$(CMAKE) --build $(BUILD_DIR) --parallel $(CMAKE_PARALLEL)
 	$(V)$(TOUCH) $@
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -144,18 +151,37 @@ $(BUILD_DIR)/.make-install: $(BUILD_DIR)/.make-build
 test: $(BUILD_DIR)/.make-build
 	@echo "$(HLW)***** Test ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)(cd $(BUILD_DIR)/fpcommon && ctest)
+ifneq ($(ROS_PACKAGE_PATH),)
+	$(V)(cd $(BUILD_DIR)/fpros1 && ctest)
+endif
 
 # ----------------------------------------------------------------------------------------------------------------------
 
 .PHONY: doc
 doc: $(BUILD_DIR)/.make-doc
 
-$(BUILD_DIR)/.make-doc: $(deps)
+$(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-cmake
 	@echo "$(HLW)***** Doc ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)( \
             cat Doxyfile; \
             echo "PROJECT_NUMBER = $(cat $(BUILD_DIR)/FP_VERSION_STRING || echo 'unknown revision')"; \
+            echo "OUTPUT_DIRECTORY = $(BUILD_DIR)"; \
         ) | $(DOXYGEN) -
 	$(V)$(TOUCH) $@
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+.PHONY: ci
+ci:
+	@echo "$(HLW)***** CI *****$(HLO)"
+ifeq ($(FPSDK_IMAGE),)
+	$(V)docker/docker.sh run deb-ci ./docker/ci.sh
+	$(V)docker/docker.sh run ros1-ci ./docker/ci.sh
+	$(V)docker/docker.sh run ros2-ci ./docker/ci.sh
+	@echo "$(HLW)CI done$(HLO)"
+else
+	@echo "This should not run inside Docker!"
+	false
+endif
 
 ########################################################################################################################

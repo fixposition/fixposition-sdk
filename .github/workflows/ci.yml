@@ -1,125 +1,58 @@
 name: ci
 
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+    workflow_dispatch:
 
 jobs:
+    # Note: job names should be unique across all workflows!
 
-  build:
-    runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/fixposition/fixposition/sdk:ci
-      env:
-        ROS_DISTRO: noetic
-    defaults:
-      run:
-        shell: bash
+    ci-fpsdk-ros1:
+        runs-on: ubuntu-latest
+        container:
+            image: ghcr.io/fixposition/fixposition/fixposition-sdk:ros1-ci
+        defaults:
+            run:
+                shell: bash
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Build
+              run: |
+                  git config --global --add safe.directory ${GITHUB_WORKSPACE}
+                  ./docker/ci.sh
 
-    steps:
+    ci-fpsdk-deb:
+        runs-on: ubuntu-latest
+        container:
+            image: ghcr.io/fixposition/fixposition/fixposition-sdk:deb-ci
+        defaults:
+            run:
+                shell: bash
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Build
+              run: |
+                  git config --global --add safe.directory ${GITHUB_WORKSPACE}
+                  ./docker/ci.sh
 
-    # Note: *after* installing git or we won't have a .git folder and e.g. pre-commit will fail
-    - uses: actions/checkout@v4
-
-    - name: prepare things
-      run: |
-        git config --global --add safe.directory ${GITHUB_WORKSPACE}
-
-    - name: pre-commit checks
-      run: |
-        pre-commit run --all-files --hook-stage manual
-
-    # ----- w/o ROS ----------------------------------------------------------------------------------------------------
-
-    - name: build using top-level cmake project (release, without ROS)
-      run: |
-        buildname=fpsdk-toplevel-release-noros
-        make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Release BUILD_DIR=build/${buildname}
-        install/${buildname}/bin/fpltool -V
-
-    - name: run tests (release, without ROS)
-      run: |
-        buildname=fpsdk-toplevel-release-noros
-        make test INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Release BUILD_DIR=build/${buildname}
-
-    - name: build using top-level cmake project (debug, without ROS)
-      run: |
-        buildname=fpsdk-toplevel-debug-noros
-        make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Debug BUILD_DIR=build/${buildname}
-        install/${buildname}/bin/fpltool -V
-
-    - name: run tests (debug, without ROS)
-      run: |
-        buildname=fpsdk-toplevel-debug-noros
-        make test INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Debug BUILD_DIR=build/${buildname}
-
-    - name: build individual cmake projects (release, without ROS)
-      run: |
-        buildname=fpsdk-projs-release-noros
-        cmake -B build/${buildname}/fpcommon -S fpcommon -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
-        cmake --build build/${buildname}/fpcommon
-        cmake --install build/${buildname}/fpcommon
-        cmake -B build/${buildname}/fpapps -S fpapps -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
-        cmake --build build/${buildname}/fpapps
-        cmake --install build/${buildname}/fpapps
-        install/${buildname}/bin/fpltool -V
-
-    # ----- with ROS ---------------------------------------------------------------------------------------------------
-
-    - name: build using top-level cmake project (release, with ROS)
-      run: |
-        buildname=fpsdk-toplevel-release-withros
-        source /opt/ros/${ROS_DISTRO}/setup.bash
-        make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Release BUILD_DIR=build/${buildname}
-        install/${buildname}/bin/fpltool -V
-
-    - name: build using top-level cmake project (debug, with ROS)
-      run: |
-        buildname=fpsdk-toplevel-debug-withros
-        source /opt/ros/${ROS_DISTRO}/setup.bash
-        make install INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Debug BUILD_DIR=build/${buildname}
-        install/${buildname}/bin/fpltool -V
-
-    - name: build individual cmake projects (release, with ROS)
-      run: |
-        buildname=fpsdk-projs-release-noros
-        source /opt/ros/${ROS_DISTRO}/setup.bash
-        cmake -B build/${buildname}/fpcommon -S fpcommon -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
-        cmake --build build/${buildname}/fpcommon
-        cmake --install build/${buildname}/fpcommon
-        cmake -B build/${buildname}/fpros1 -S fpros1 -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
-        cmake --build build/${buildname}/fpros1
-        cmake --install build/${buildname}/fpros1
-        cmake -B build/${buildname}/fpapps -S fpapps -DCMAKE_INSTALL_PREFIX=install/${buildname} -DCMAKE_BUILD_TYPE=Release
-        cmake --build build/${buildname}/fpapps
-        cmake --install build/${buildname}/fpapps
-        install/${buildname}/bin/fpltool -V
-
-    # ----- catkin -----------------------------------------------------------------------------------------------------
-
-    - name: build using catkin (release)
-      run: |
-        mkdir src
-        ln -s ../fpapps src
-        ln -s ../fpcommon src
-        ln -s ../fpros1 src
-        source /opt/ros/${ROS_DISTRO}/setup.bash
-        catkin init
-        catkin config --cmake-args -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release
-        catkin build fpapps
-        source devel/setup.bash
-        fpltool -V
-
-    # ----- doxygen ----------------------------------------------------------------------------------------------------
-
-    # Reusing the build from above to get the version string generated by CMake
-    - name: doxygen
-      run: |
-        doxygen -u 2>&1 >/dev/null
-        buildname=fpsdk-toplevel-release-withros
-        make doc INSTALL_PREFIX=install/${buildname} BUILD_TYPE=Release BUILD_DIR=build/${buildname}
+    ci-fpsdk-ros2:
+        runs-on: ubuntu-latest
+        container:
+            image: ghcr.io/fixposition/fixposition/fixposition-sdk:ros2-ci
+        defaults:
+            run:
+                shell: bash
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: CI
+              run: |
+                  git config --global --add safe.directory ${GITHUB_WORKSPACE}
+                  ./docker/ci.sh
 
 # eof
