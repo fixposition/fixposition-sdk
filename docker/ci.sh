@@ -55,9 +55,9 @@ function do_step
 
     echo "::endgroup::"
     if [ ${res} -eq 0 ]; then
-        echo "::notice TITLES=${TITLES[$func]}::${FPSDK_IMAGE} ${func} success"
+        echo "::notice title=${TITLES[$func]}::${FPSDK_IMAGE} ${func} success"
     else
-        echo "::warning TITLES=${TITLES[$func]}::${FPSDK_IMAGE} ${func} failed"
+        echo "::warning title=${TITLES[$func]}::${FPSDK_IMAGE} ${func} failed"
     fi
 
     return ${res}
@@ -321,9 +321,11 @@ if [ "${ROS_DISTRO}" = "noetic" ]; then
 
 elif [ "${ROS_DISTRO}" = "humble" ]; then
     echo "===== ROS2 builds ====="
+    set -x
     set +u
     source /opt/ros/${ROS_DISTRO}/setup.bash
     set -u
+    set +x
 
     # TODO...
 fi
