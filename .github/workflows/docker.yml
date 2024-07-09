@@ -16,10 +16,6 @@ jobs:
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
             # Pulling first, so that maybe it not everything has to be built...
-            - name: Pull
-              run: |
-                  cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose pull
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
