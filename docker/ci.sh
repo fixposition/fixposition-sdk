@@ -323,7 +323,9 @@ if [ "${ROS_DISTRO}" = "noetic" ]; then
 
 elif [ "${ROS_DISTRO}" = "humble" ]; then
     echo "===== ROS2 builds ====="
+    set +u
     source /opt/ros/${ROS_DISTRO}/setup.bash
+    set -u
 
     # TODO...
 fi

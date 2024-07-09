@@ -82,6 +82,7 @@ RUN <<EOF
         netcat \
         openssh-client \
         pv \
+        ros-base
         rsync \
         sl \
         socat \
