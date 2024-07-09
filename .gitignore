@@ -15,3 +15,4 @@ CMakeCache.txt
 *.fpl.gz
 *.bag
 *.bak
+/.devcontainer/.bash_history.d

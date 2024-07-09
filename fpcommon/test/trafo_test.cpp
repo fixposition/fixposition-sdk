@@ -12,7 +12,6 @@
  */
 
 /* LIBC/STL */
-#include <algorithm>
 
 /* EXTERNAL */
 #include <gtest/gtest.h>

@@ -1,0 +1,20 @@
+# Fixposition SDK docker image: ROS1 image for Github CI jobs
+
+FROM ghcr.io/fixposition/fixposition/fixposition-sdk:ros1-base
+
+COPY .pre-commit-config.yaml /tmp
+RUN <<EOF
+    # Install pre-commit hooks for root
+    tmpdir=$(mktemp -d)
+    cd ${tmpdir}
+    git init
+    cp /tmp/.pre-commit-config.yaml .
+    pre-commit install-hooks
+    cd /
+    rm -rf ${tmpdir}
+    rm /tmp/.pre-commit-config.yaml
+EOF
+
+# For debugging docker builds... (last layer!)
+ENV FPSDK_IMAGE=ros1-ci
+RUN date > /fixposition-sdk-ros1-ci

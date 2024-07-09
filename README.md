@@ -20,7 +20,7 @@ The SDK part of this repo refers to C++ libraries and apps.
 
 - [fpcommon](fpcommon/README.md) c++ library with common functions
 - [fpros1](fpros1/README.md) c++ library with common ROS functions
-- [fpapps](fpapps/README.md) various apps
+- [fpapps](fpapps/README.md) various apps and examples using the above libraries
 
 ### Dependencies
 
@@ -33,29 +33,54 @@ The SDK part of this repo refers to C++ libraries and apps.
 - zlib1g          (≥ ?,      tested with 1.2.11)
 - Eigen3          (≥ ?,      tested with 3.3.7)
 - GTest           (≥ 1.12.0, tested with 1.13.0)
-- PROJ            (≥ 9.0.0,  tested with 9.4.1)
+- PROJ            (≥ 9.?.?,  tested with 9.4.1)
 - Cap'n Proto     (≥ 1.0.2,  tested with 1.0.2)
 
 ### Building
 
-> *tl;dr*:
->
+> *tl;dr*
 > ```sh
-> docker pull ghcr.io/fixposition/fixposition/sdk:ci  # or: ./docker.sh build
-> ./docker.sh run bash
-> source /opt/ros/noetic/setup.bash
+> ./docker/docker.sh pull ros1-dev
+> ./docker/docker.sh run ros1-dev bash
+> # Now inside Docker do:
 > make install INSTALL_PREFIX=fpsdk
-> ./fpsdk/bin/fpltool
+> ./fpsdk/bin/fpltool -h
 > ```
+
+#### VSCode devcontainer
+
+Open the fpsdk.code-workspace and:
+
+```sh
+source /opt/ros/noetic/setup.bash
+make install INSTALL_PREFIX=fpsdk
+./fpsdk/bin/fpltool
+```
+
+#### Command-line "devcontainer"
+
+```sh
+docker pull ghcr.io/fixposition/fixposition/fixposition-sdk:ci
+./docker.sh run bash
+source /opt/ros/noetic/setup.bash
+make install INSTALL_PREFIX=fpsdk
+./fpsdk/bin/fpltool
+```
+
+#### Manually
+
+This details the manual setup of the dependencies and building the SDK on a ROS1 system (e.g., Ubuntu 20.04 with ROS
+Noetic). It works similarly for ROS2 (e.g., Ubuntu 22.04 with ROS Humble) or non-ROS (e.g., Debian Bookworm) based
+systems.
+
 
 1. Setup build system, install dependencies
 
     The exact steps required depend on your system. You'll need the dependencies mentioned above installed system wide
     or otherwise tell CMake where to find them.
 
-    Refer to the [Dockerfile](./Dockerfile) on installing the required dependencies on a Ubuntu 20.04.
-
-2. Source ROS environment (optional, but required for some functionality)
+    Refer to the [docker/Dockerfile.ros1-base](Dockerfile.ros1-base) on installing the required dependencies on Ubuntu
+    20.04 with ROS Noetic.
 
     ```sh
     source /opt/ros/noetic/setup.bash

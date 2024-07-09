@@ -91,6 +91,9 @@
             "files.eol": "\n",
             "files.trimTrailingWhitespace": false
         },
+        "[yaml]": {
+            "editor.indentSize": 4
+        },
         "files.associations": {
             "cctype": "cpp",
             "clocale": "cpp",
@@ -167,7 +170,15 @@
             "stop_token": "cpp"
         }
     },
-
+    "extensions": {
+        "recommendations": [
+            "ms-vscode.cpptools",
+            "ms-vscode-remote.remote-ssh",
+            "ms-vscode-remote.remote-containers"
+        ],
+        "unwantedRecommendations": [
+        ]
+    },
 
     // Build and test tasks. Users can add more tasks in .vscode/tasks.json.
     "tasks": {

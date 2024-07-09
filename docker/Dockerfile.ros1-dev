@@ -1,0 +1,111 @@
+# Fixposition SDK docker image: ROS1 image for vscode devcontainer
+
+FROM ghcr.io/fixposition/fixposition/fixposition-sdk:ros1-base
+
+RUN <<EOF
+    # Unminimize system
+    set -e
+    yes | unminimize
+EOF
+
+# For devcontainer, see ../.devcontainer/devcontainer.json
+RUN adduser fpsdk
+
+COPY .pre-commit-config.yaml /tmp
+RUN <<EOF
+    # Install pre-commit hooks for user
+    tmpdir=$(mktemp -d)
+    cd ${tmpdir}
+    git init
+    cp /tmp/.pre-commit-config.yaml .
+    sudo -u fpsdk pre-commit install-hooks
+    cd /
+    rm -rf ${tmpdir}
+    rm /tmp/.pre-commit-config.yaml
+EOF
+
+# Set timezone, sane language and locale
+ENV TZ=Europe/Zurich
+ENV LANG=en_GB.UTF-8
+ENV LANGUAGE=en_GB
+ENV LC_ALL=C.UTF-8
+RUN <<EOF
+    # Setup timezone, locale, sudoers
+    set -e
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get -y update
+    apt-get -y --with-new-pkgs upgrade
+    apt-get -y install locales sudo
+    apt-get clean
+    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
+    echo $TZ > /etc/timezone
+    sed -i '/en_GB.UTF-8/s/^# //g' /etc/locale.gen
+    locale-gen
+    echo "fpsdk ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+EOF
+
+RUN <<EOF
+    # Install useful stuff
+    set -e
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get -y update
+    apt-get -y install \
+        ack \
+        bash-completion \
+        bind9-dnsutils \
+        bsdmainutils \
+        can-utils \
+        ccache \
+        chrpath \
+        curl \
+        evtest \
+        gdb \
+        git-lfs \
+        iproute2 \
+        iputils-ping \
+        less \
+        libevdev-dev \
+        libgpiod-dev \
+        libiio-dev \
+        lsb-release \
+        man \
+        man-db \
+        manpages \
+        manpages \
+        manpages-dev \
+        manpages-dev \
+        manpages-posix \
+        manpages-posix-dev \
+        moreutils \
+        ncdu \
+        netcat \
+        openssh-client \
+        pv \
+        rsync \
+        sl \
+        socat \
+        sudo \
+        strace \
+        systemd-journal-remote \
+        tcpdump \
+        tig \
+        vim \
+        wget \
+        xauth \
+        xxd
+        apt-get clean
+EOF
+
+COPY .devcontainer/fpsdk.bgptheme /tmp
+RUN <<EOF
+    # Install bash-git-prompt
+    set -e
+    sudo -u fpsdk git clone https://github.com/magicmonty/bash-git-prompt.git /home/fpsdk/.bash-git-prompt
+    sudo -u fpsdk git -C /home/fpsdk/.bash-git-prompt checkout 51080c22b2cebb63111379f4eacd22cda199684b
+    sudo -u fpsdk cp /tmp/fpsdk.bgptheme /home/fpsdk/.bash-git-prompt/themes
+    rm -f /tmp/fpsdk.bgptheme
+EOF
+
+# For debugging docker builds... (last layer!)
+ENV FPSDK_IMAGE=ros1-dev
+RUN date > /fixposition-sdk-ros1-dev

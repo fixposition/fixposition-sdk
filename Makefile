@@ -99,6 +99,12 @@ ifneq ($(ROS_PACKAGE_PATH),)
   CMAKE_ARGS += -DROS_PACKAGE_PATH=$(ROS_PACKAGE_PATH)
 endif
 
+ifeq ($(GITHUB_WORKSPACE),)
+  CMAKE_PARALLEL = 4
+else
+  CMAKE_PARALLEL = 1
+endif
+
 BUILD_DIR = build/$(BUILD_TYPE)
 
 # "All-in-one" targets
@@ -125,7 +131,7 @@ build: $(BUILD_DIR)/.make-build
 
 $(BUILD_DIR)/.make-build: $(BUILD_DIR)/.make-cmake
 	@echo "$(HLW)***** Build ($(BUILD_TYPE)) *****$(HLO)"
-	$(V)$(CMAKE) --build $(BUILD_DIR)
+	$(V)$(CMAKE) --build $(BUILD_DIR) --parallel $(CMAKE_PARALLEL)
 	$(V)$(TOUCH) $@
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -150,11 +156,12 @@ test: $(BUILD_DIR)/.make-build
 .PHONY: doc
 doc: $(BUILD_DIR)/.make-doc
 
-$(BUILD_DIR)/.make-doc: $(deps)
+$(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-cmake
 	@echo "$(HLW)***** Doc ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)( \
             cat Doxyfile; \
             echo "PROJECT_NUMBER = $(cat $(BUILD_DIR)/FP_VERSION_STRING || echo 'unknown revision')"; \
+            echo "OUTPUT_DIRECTORY = $(BUILD_DIR)"; \
         ) | $(DOXYGEN) -
 	$(V)$(TOUCH) $@
 

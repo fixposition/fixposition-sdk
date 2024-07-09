@@ -1,23 +1,25 @@
 name: docker
 
 on:
-  # We build this only by manually triggering this job
-  workflow_dispatch:
+    # We build this only by manually triggering this job from the actions tab
+    workflow_dispatch:
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - name: login
-      uses: docker/login-action@v3
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    - name: build
-      run: |
-        ./docker.sh -d build
-    - name: push
-      run: |
-        ./docker.sh -d push
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: login
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            - name: Build
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  docker compose build
+            - name: Push
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  docker compose push
