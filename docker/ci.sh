@@ -309,7 +309,9 @@ do_step pre_commit_check               || true # continue
 # Build ROS stuff last
 if [ "${ROS_DISTRO}" = "noetic" ]; then
     echo "===== ROS1 builds ====="
+    set +u
     source /opt/ros/${ROS_DISTRO}/setup.bash
+    set -u
 
     # do_step build_toplevel_release_ros1   || true # continue
     # do_step test_toplevel_release_ros1    || true # continue
@@ -320,12 +322,8 @@ if [ "${ROS_DISTRO}" = "noetic" ]; then
     # do_step doxygen_release_ros1          || true # continue
 
 elif [ "${ROS_DISTRO}" = "humble" ]; then
-    echo "===== ROS2 builds wtf ====="
-    set -x
-    set +u
+    echo "===== ROS2 builds ====="
     source /opt/ros/${ROS_DISTRO}/setup.bash
-    set -u
-    set +x
 
     # TODO...
 fi
