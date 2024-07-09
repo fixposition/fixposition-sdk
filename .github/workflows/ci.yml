@@ -8,7 +8,7 @@ on:
     workflow_dispatch:
 
 jobs:
-    fpsdk-ros1:
+    ci-fpsdk-ros1:
         runs-on: ubuntu-latest
         container:
             image: ghcr.io/fixposition/fixposition/fixposition-sdk:ros1-ci
@@ -23,7 +23,7 @@ jobs:
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
 
-    fpsdk-deb:
+    ci-fpsdk-deb:
         runs-on: ubuntu-latest
         container:
             image: ghcr.io/fixposition/fixposition/fixposition-sdk:deb-ci
@@ -38,7 +38,7 @@ jobs:
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
 
-    fpsdk-ros2:
+    ci-fpsdk-ros2:
         runs-on: ubuntu-latest
         container:
             image: ghcr.io/fixposition/fixposition/fixposition-sdk:ros2-ci

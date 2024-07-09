@@ -6,7 +6,7 @@ on:
 
 # Splitting into three jobs to make stuff build in parallel (on multiple runners)
 jobs:
-    fpsdk-ros1:
+    docker-fpsdk-ros1:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -27,7 +27,7 @@ jobs:
                   cd ${GITHUB_WORKSPACE}/docker
                   docker compose push ros1-base ros1-ci ros1-dev
 
-    fpsdk-ros2:
+    docker-fpsdk-ros2:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -48,7 +48,7 @@ jobs:
                   cd ${GITHUB_WORKSPACE}/docker
                   docker compose push ros2-base ros2-ci ros2-dev
 
-    fpsdk-deb:
+    docker-fpsdk-deb:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
