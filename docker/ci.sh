@@ -55,9 +55,9 @@ function do_step
 
     echo "::endgroup::"
     if [ ${res} -eq 0 ]; then
-        echo "::notice title=${TITLE}::${func} success"
+        echo "::notice title=${TITLE}::${FPSDK_IMAGE} ${func} success"
     else
-        echo "::warning title=${TITLE}::${func} failed"
+        echo "::warning title=${TITLE}::${FPSDK_IMAGE} ${func} failed"
     fi
 
     return ${res}
@@ -78,7 +78,7 @@ function pre_commit_check
 
 function build_toplevel_release_noros
 {
-    TITLE="Build using top-level cmake project (release, without ROS)"
+    TITLE="Build top-level project (release, without ROS)"
     local buildname=toplevel-release-noros
 
     cd ${FPSDK_SRC_DIR}
@@ -92,7 +92,7 @@ function build_toplevel_release_noros
 
 function test_toplevel_release_noros
 {
-    TITLE="Test using top-level cmake project (release, without ROS)"
+    TITLE="Test top-level project (release, without ROS)"
     local buildname=toplevel-release-noros # re-using build
 
     cd ${FPSDK_SRC_DIR}
@@ -106,7 +106,7 @@ function test_toplevel_release_noros
 
 function build_toplevel_debug_noros
 {
-    TITLE="Build using top-level cmake project (debug, without ROS)"
+    TITLE="Build top-level project (debug, without ROS)"
     local buildname=toplevel-debug-noros
 
     cd ${FPSDK_SRC_DIR}
@@ -120,7 +120,7 @@ function build_toplevel_debug_noros
 
 function test_toplevel_debug_noros
 {
-    TITLE="Test using top-level cmake project (debug, without ROS)"
+    TITLE="Test top-level project (debug, without ROS)"
     local buildname=toplevel-debug-noros # re-using build
 
     cd ${FPSDK_SRC_DIR}
@@ -134,7 +134,7 @@ function test_toplevel_debug_noros
 
 function build_projs_release_noros
 {
-    TITLE="Build individual cmake projects (release, without ROS)"
+    TITLE="Build individual projects (release, without ROS)"
     local buildname=toplevel-release-noros
 
     cd ${FPSDK_SRC_DIR}
@@ -174,7 +174,7 @@ function doxygen_release_noros
 
 function build_toplevel_release_ros1
 {
-    TITLE="Build using top-level cmake project (release, with ROS1)"
+    TITLE="Build top-level project (release, with ROS1)"
     local buildname=toplevel-release-ros1
 
     cd ${FPSDK_SRC_DIR}
@@ -188,7 +188,7 @@ function build_toplevel_release_ros1
 
 function test_toplevel_release_ros1
 {
-    TITLE="Test using top-level cmake project (release, with ROS1)"
+    TITLE="Test top-level project (release, with ROS1)"
     local buildname=toplevel-release-ros1 # re-using build
 
     source /opt/ros/${ROS_DISTRO}/setup.bash
@@ -203,7 +203,7 @@ function test_toplevel_release_ros1
 
 function build_toplevel_debug_ros1
 {
-    TITLE="Build using top-level cmake project (debug, with ROS1)"
+    TITLE="Build top-level project (debug, with ROS1)"
     local buildname=toplevel-debug-ros1
 
     cd ${FPSDK_SRC_DIR}
@@ -217,7 +217,7 @@ function build_toplevel_debug_ros1
 
 function test_toplevel_debug_ros1
 {
-    TITLE="Test using top-level cmake project (debug, with ROS1)"
+    TITLE="Test top-level project (debug, with ROS1)"
     local buildname=toplevel-debug-ros1 # re-using build
 
     cd ${FPSDK_SRC_DIR}
@@ -231,7 +231,7 @@ function test_toplevel_debug_ros1
 
 function build_projs_release_ros1
 {
-    TITLE="Build individual cmake projects (release, with ROS1)"
+    TITLE="Build individual projects (release, with ROS1)"
 
     local buildname=toplevel-release-noros
 
@@ -263,7 +263,7 @@ function build_projs_release_ros1
 
 function build_catkin_release
 {
-    TITLE="Build using catkin (release, with ROS1)"
+    TITLE="Build catkin (release, with ROS1)"
     local buildname=catkin-release
 
     cd ${FPSDK_SRC_DIR}

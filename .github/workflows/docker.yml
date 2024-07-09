@@ -4,8 +4,9 @@ on:
     # We build this only by manually triggering this job from the actions tab
     workflow_dispatch:
 
+# Splitting into three jobs to make stuff build in parallel (on multiple machines)
 jobs:
-    build:
+    fpsdk-ros1:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v4
@@ -19,10 +20,68 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build ros1-base ros1-ci ros1-dev
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push
-                  # Pushing again to make this the latest image shown as the default image in Github packages
+                  docker compose push ros1-base ros1-ci ros1-dev
+
+    fpsdk-ros2:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Login
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            # Pulling first, so that maybe it not everything has to be built...
+            - name: Build
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build ros2-base ros2-ci ros2-dev
+            - name: Push
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  docker compose push ros2-base ros2-ci ros2-dev
+
+    fpsdk-deb:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Login
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            # Pulling first, so that maybe it not everything has to be built...
+            - name: Build
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build deb-base deb-ci deb-dev
+            - name: Push
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  docker compose push deb-base deb-ci deb-dev
+
+    # Pushing again to make this the latest image shown as the default image in Github packages
+    dummy:
+        runs-on: ubuntu-latest
+        needs:
+            - fpsdk-ros1
+            - fpsdk-ros2
+            - fpsdk-deb
+        steps:
+            - name: Login
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            - name: Push
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
                   docker compose push ros1-dev
+
