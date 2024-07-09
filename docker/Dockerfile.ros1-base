@@ -16,7 +16,6 @@ RUN <<EOF
         cmake \
         flex \
         curl \
-        doxygen \
         git \
         graphviz \
         libboost-dev \

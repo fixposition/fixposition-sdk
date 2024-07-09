@@ -45,7 +45,7 @@ function do_step
     local func=$1
     local res=0
     echo "::group::${TITLE}"
-    echo "----------------------------------------------------------------------------------------------------"
+    echo "----- ${TITLE} -----"
     ((NSTEPS=${NSTEPS} + 1))
 
     if ! ${func}; then
@@ -191,7 +191,6 @@ function test_toplevel_release_ros1
     TITLE="Test top-level project (release, with ROS1)"
     local buildname=toplevel-release-ros1 # re-using build
 
-    source /opt/ros/${ROS_DISTRO}/setup.bash
     cd ${FPSDK_SRC_DIR}
     make test \
         INSTALL_PREFIX=install/${buildname} \
@@ -299,6 +298,7 @@ function doxygen_release_ros1
 ########################################################################################################################
 
 # Build stuff without ROS first
+echo "===== non-ROS builds ====="
 do_step pre_commit_check               || true # continue
 do_step build_toplevel_release_noros   || true # continue
 do_step test_toplevel_release_noros    || true # continue
@@ -309,6 +309,7 @@ do_step doxygen_release_noros          || true # continue
 
 # Build ROS stuff last
 if [ "${ROS_DISTRO}" = "noetic" ]; then
+    echo "===== ROS1 builds ====="
     source /opt/ros/${ROS_DISTRO}/setup.bash
 
     do_step build_toplevel_release_ros1   || true # continue
@@ -320,6 +321,7 @@ if [ "${ROS_DISTRO}" = "noetic" ]; then
     do_step doxygen_release_ros1          || true # continue
 
 elif [ "${ROS_DISTRO}" = "humble" ]; then
+    echo "===== ROS2 builds ====="
     source /opt/ros/${ROS_DISTRO}/setup.bash
 
     # TODO...
