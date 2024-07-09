@@ -39,13 +39,13 @@ echo "FPSDK_SRC_DIR=${FPSDK_SRC_DIR}"
 
 NERRORS=0
 NSTEPS=0
-TITLE=
+declare -A TITLES
 function do_step
 {
     local func=$1
     local res=0
-    echo "::group::${TITLE}"
-    echo "----- ${TITLE} -----"
+    echo "::group::${TITLES[$func]}"
+    echo "----- ${TITLES[$func]} -----"
     ((NSTEPS=${NSTEPS} + 1))
 
     if ! ${func}; then
@@ -55,9 +55,9 @@ function do_step
 
     echo "::endgroup::"
     if [ ${res} -eq 0 ]; then
-        echo "::notice title=${TITLE}::${FPSDK_IMAGE} ${func} success"
+        echo "::notice TITLES=${TITLES[$func]}::${FPSDK_IMAGE} ${func} success"
     else
-        echo "::warning title=${TITLE}::${FPSDK_IMAGE} ${func} failed"
+        echo "::warning TITLES=${TITLES[$func]}::${FPSDK_IMAGE} ${func} failed"
     fi
 
     return ${res}
@@ -66,9 +66,9 @@ function do_step
 
 ########################################################################################################################
 
+TITLES["pre_commit_check"]="Pre-commit checks"
 function pre_commit_check
 {
-    TITLE="Pre-commit checks"
 
     cd ${FPSDK_SRC_DIR}
     pre-commit run --all-files --hook-stage manual || return 1
@@ -76,9 +76,9 @@ function pre_commit_check
 
 ########################################################################################################################
 
+TITLES["build_toplevel_release_noros"]="Build top-level project (release, without ROS)"
 function build_toplevel_release_noros
 {
-    TITLE="Build top-level project (release, without ROS)"
     local buildname=toplevel-release-noros
 
     cd ${FPSDK_SRC_DIR}
@@ -90,9 +90,9 @@ function build_toplevel_release_noros
     install/${buildname}/bin/fpltool -V || return 1
 }
 
+TITLES["test_toplevel_release_noros"]="Test top-level project (release, without ROS)"
 function test_toplevel_release_noros
 {
-    TITLE="Test top-level project (release, without ROS)"
     local buildname=toplevel-release-noros # re-using build
 
     cd ${FPSDK_SRC_DIR}
@@ -104,9 +104,9 @@ function test_toplevel_release_noros
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+TITLES["build_toplevel_debug_noros"]="Build top-level project (debug, without ROS)"
 function build_toplevel_debug_noros
 {
-    TITLE="Build top-level project (debug, without ROS)"
     local buildname=toplevel-debug-noros
 
     cd ${FPSDK_SRC_DIR}
@@ -118,9 +118,9 @@ function build_toplevel_debug_noros
     install/${buildname}/bin/fpltool -V || return 1
 }
 
+TITLES["test_toplevel_debug_noros"]="Test top-level project (debug, without ROS)"
 function test_toplevel_debug_noros
 {
-    TITLE="Test top-level project (debug, without ROS)"
     local buildname=toplevel-debug-noros # re-using build
 
     cd ${FPSDK_SRC_DIR}
@@ -132,9 +132,9 @@ function test_toplevel_debug_noros
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+TITLES["build_projs_release_noros"]="Build individual projects (release, without ROS)"
 function build_projs_release_noros
 {
-    TITLE="Build individual projects (release, without ROS)"
     local buildname=toplevel-release-noros
 
     cd ${FPSDK_SRC_DIR}
@@ -157,9 +157,9 @@ function build_projs_release_noros
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+TITLES["doxygen_release_noros"]="Doxygen (release, without ROS)"
 function doxygen_release_noros
 {
-    TITLE="Doxygen (release, without ROS)"
     local buildname=doxygen-release-noros
 
     cd ${FPSDK_SRC_DIR}
@@ -172,9 +172,9 @@ function doxygen_release_noros
 
 ########################################################################################################################
 
+TITLES["build_toplevel_release_ros1"]="Build top-level project (release, with ROS1)"
 function build_toplevel_release_ros1
 {
-    TITLE="Build top-level project (release, with ROS1)"
     local buildname=toplevel-release-ros1
 
     cd ${FPSDK_SRC_DIR}
@@ -186,9 +186,9 @@ function build_toplevel_release_ros1
     install/${buildname}/bin/fpltool -V || return 1
 }
 
+TITLES["test_toplevel_release_ros1"]="Test top-level project (release, with ROS1)"
 function test_toplevel_release_ros1
 {
-    TITLE="Test top-level project (release, with ROS1)"
     local buildname=toplevel-release-ros1 # re-using build
 
     cd ${FPSDK_SRC_DIR}
@@ -200,9 +200,9 @@ function test_toplevel_release_ros1
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+TITLES["build_toplevel_debug_ros1"]="Build top-level project (debug, with ROS1)"
 function build_toplevel_debug_ros1
 {
-    TITLE="Build top-level project (debug, with ROS1)"
     local buildname=toplevel-debug-ros1
 
     cd ${FPSDK_SRC_DIR}
@@ -214,9 +214,9 @@ function build_toplevel_debug_ros1
     install/${buildname}/bin/fpltool -V || return 1
 }
 
+TITLES["test_toplevel_debug_ros1"]="Test top-level project (debug, with ROS1)"
 function test_toplevel_debug_ros1
 {
-    TITLE="Test top-level project (debug, with ROS1)"
     local buildname=toplevel-debug-ros1 # re-using build
 
     cd ${FPSDK_SRC_DIR}
@@ -228,10 +228,9 @@ function test_toplevel_debug_ros1
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+TITLES["build_projs_release_ros1"]="Build individual projects (release, with ROS1)"
 function build_projs_release_ros1
 {
-    TITLE="Build individual projects (release, with ROS1)"
-
     local buildname=toplevel-release-noros
 
     cd ${FPSDK_SRC_DIR}
@@ -260,9 +259,9 @@ function build_projs_release_ros1
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+TITLES["build_catkin_release"]="Build catkin (release, with ROS1)"
 function build_catkin_release
 {
-    TITLE="Build catkin (release, with ROS1)"
     local buildname=catkin-release
 
     cd ${FPSDK_SRC_DIR}
@@ -282,9 +281,9 @@ function build_catkin_release
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+TITLES["doxygen_release_ros1"]="Doxygen (release, with ROS1)"
 function doxygen_release_ros1
 {
-    TITLE="Doxygen (release, with ROS1)"
     local buildname=doxygen-release-ros1
 
     cd ${FPSDK_SRC_DIR}
@@ -300,38 +299,40 @@ function doxygen_release_ros1
 # Build stuff without ROS first
 echo "===== non-ROS builds ====="
 do_step pre_commit_check               || true # continue
-do_step build_toplevel_release_noros   || true # continue
-do_step test_toplevel_release_noros    || true # continue
-do_step build_toplevel_debug_noros     || true # continue
-do_step test_toplevel_debug_noros      || true # continue
-do_step build_projs_release_noros      || true # continue
-do_step doxygen_release_noros          || true # continue
+# do_step build_toplevel_release_noros   || true # continue
+# do_step test_toplevel_release_noros    || true # continue
+# do_step build_toplevel_debug_noros     || true # continue
+# do_step test_toplevel_debug_noros      || true # continue
+# do_step build_projs_release_noros      || true # continue
+# do_step doxygen_release_noros          || true # continue
 
 # Build ROS stuff last
 if [ "${ROS_DISTRO}" = "noetic" ]; then
     echo "===== ROS1 builds ====="
     source /opt/ros/${ROS_DISTRO}/setup.bash
 
-    do_step build_toplevel_release_ros1   || true # continue
-    do_step test_toplevel_release_ros1    || true # continue
-    do_step build_toplevel_debug_ros1     || true # continue
-    do_step test_toplevel_debug_ros1      || true # continue
-    do_step build_projs_release_ros1      || true # continue
-    do_step build_catkin_release          || true # continue
-    do_step doxygen_release_ros1          || true # continue
+    # do_step build_toplevel_release_ros1   || true # continue
+    # do_step test_toplevel_release_ros1    || true # continue
+    # do_step build_toplevel_debug_ros1     || true # continue
+    # do_step test_toplevel_debug_ros1      || true # continue
+    # do_step build_projs_release_ros1      || true # continue
+    # do_step build_catkin_release          || true # continue
+    # do_step doxygen_release_ros1          || true # continue
 
 elif [ "${ROS_DISTRO}" = "humble" ]; then
     echo "===== ROS2 builds ====="
+    set +u
     source /opt/ros/${ROS_DISTRO}/setup.bash
+    set -u
 
     # TODO...
 fi
 
 if [ ${NERRORS} -eq 0 ]; then
-    echo "::notice title=CI success::Successfully completed ${NSTEPS} steps"
+    echo "::notice TITLES=CI success::Successfully completed ${NSTEPS} steps"
     exit 0
 else
-    echo "::error title=CI failure::Failed ${NERRORS} of ${NSTEPS} steps"
+    echo "::error TITLES=CI failure::Failed ${NERRORS} of ${NSTEPS} steps"
 fi
 
 ########################################################################################################################
