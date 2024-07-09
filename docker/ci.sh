@@ -299,12 +299,12 @@ function doxygen_release_ros1
 # Build stuff without ROS first
 echo "===== non-ROS builds ====="
 do_step pre_commit_check               || true # continue
-# do_step build_toplevel_release_noros   || true # continue
-# do_step test_toplevel_release_noros    || true # continue
-# do_step build_toplevel_debug_noros     || true # continue
-# do_step test_toplevel_debug_noros      || true # continue
-# do_step build_projs_release_noros      || true # continue
-# do_step doxygen_release_noros          || true # continue
+do_step build_toplevel_release_noros   || true # continue
+do_step test_toplevel_release_noros    || true # continue
+do_step build_toplevel_debug_noros     || true # continue
+do_step test_toplevel_debug_noros      || true # continue
+do_step build_projs_release_noros      || true # continue
+do_step doxygen_release_noros          || true # continue
 
 # Build ROS stuff last
 if [ "${ROS_DISTRO}" = "noetic" ]; then
@@ -313,13 +313,13 @@ if [ "${ROS_DISTRO}" = "noetic" ]; then
     source /opt/ros/${ROS_DISTRO}/setup.bash
     set -u
 
-    # do_step build_toplevel_release_ros1   || true # continue
-    # do_step test_toplevel_release_ros1    || true # continue
-    # do_step build_toplevel_debug_ros1     || true # continue
-    # do_step test_toplevel_debug_ros1      || true # continue
-    # do_step build_projs_release_ros1      || true # continue
-    # do_step build_catkin_release          || true # continue
-    # do_step doxygen_release_ros1          || true # continue
+    do_step build_toplevel_release_ros1   || true # continue
+    do_step test_toplevel_release_ros1    || true # continue
+    do_step build_toplevel_debug_ros1     || true # continue
+    do_step test_toplevel_debug_ros1      || true # continue
+    do_step build_projs_release_ros1      || true # continue
+    do_step build_catkin_release          || true # continue
+    do_step doxygen_release_ros1          || true # continue
 
 elif [ "${ROS_DISTRO}" = "humble" ]; then
     echo "===== ROS2 builds ====="
