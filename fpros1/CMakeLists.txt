@@ -9,6 +9,7 @@ project(fpros1
     DESCRIPTION "Fixposition SDK: ROS1 library"
 )
 
+
 # COMPILER SETUP =======================================================================================================
 
 set(CMAKE_CXX_STANDARD 14)
@@ -26,6 +27,7 @@ endif()
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(NDEBUG)
 endif()
+
 
 # DEPENDENCIES =========================================================================================================
 
@@ -76,6 +78,7 @@ target_link_libraries(${PROJECT_NAME}
         fpcommon
         ${FP_ROS_LIBRARIES}
 )
+
 
 # INSTALL ==============================================================================================================
 
@@ -139,5 +142,13 @@ install(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
     DESTINATION lib/pkgconfig
 )
+
+
+# TESTS ================================================================================================================
+
+include(../fpcommon/cmake/testing.cmake)
+
+add_gtest(TARGET bagwriter_test SOURCES test/bagwriter_test.cpp LINK_LIBS ${PROJECT_NAME})
+
 
 # ======================================================================================================================

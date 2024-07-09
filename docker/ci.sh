@@ -54,10 +54,8 @@ function do_step
     fi
 
     echo "::endgroup::"
-    if [ ${res} -eq 0 ]; then
-        echo "::notice title=${TITLES[$func]}::${FPSDK_IMAGE} ${func} success"
-    else
-        echo "::warning title=${TITLES[$func]}::${FPSDK_IMAGE} ${func} failed"
+    if [ ${res} -ne 0 ]; then
+        echo "::warning title=${FPSDK_IMAGE} ${func} failed::${TITLES[$func]}"
     fi
 
     return ${res}

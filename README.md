@@ -60,11 +60,17 @@ make install INSTALL_PREFIX=fpsdk
 #### Command-line "devcontainer"
 
 ```sh
-docker pull ghcr.io/fixposition/fixposition/fixposition-sdk:ci
+docker pull ghcr.io/fixposition/fixposition/fixposition-sdk:ros1-dev
 ./docker.sh run bash
 source /opt/ros/noetic/setup.bash
 make install INSTALL_PREFIX=fpsdk
 ./fpsdk/bin/fpltool
+```
+
+To run all CI:
+
+```sh
+./docker/docker.sh run ros1-ci ./docker/ci.sh
 ```
 
 #### Manually

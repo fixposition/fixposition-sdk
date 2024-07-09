@@ -9,6 +9,7 @@ project(fpapps
     DESCRIPTION "Fixposition SDK: Apps"
 )
 
+
 # COMPILER SETUP =======================================================================================================
 
 set(CMAKE_CXX_STANDARD 14)
@@ -23,6 +24,7 @@ endif()
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(NDEBUG)
 endif()
+
 
 # DEPENDENCIES =========================================================================================================
 
@@ -44,6 +46,7 @@ endif()
 
 include_directories(include ${fpcommon_INCLUDE_DIRS} ${YAML_CPP_INCLUDE_DIR} ${fpros1_INCLUDE_DIRS})
 
+
 # SHARED LIBRARY =======================================================================================================
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#recommendations
@@ -55,6 +58,7 @@ if(FP_USE_ROS1)
     # cmake) a) does not work for indirect loading (app -> libfpros1 -> someroslib) and b) ROS does funny things
     # run-time (such as loading more libs)
 endif()
+
 
 # EXECUTABLES ==========================================================================================================
 
@@ -73,5 +77,6 @@ install(TARGETS fpltool
     LIBRARY DESTINATION ${PROJECT_LIBRARY_DIR}
     RUNTIME DESTINATION ${PROJECT_RUNTIME_DIR}
 )
+
 
 # ======================================================================================================================

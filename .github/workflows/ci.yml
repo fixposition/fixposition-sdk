@@ -8,6 +8,8 @@ on:
     workflow_dispatch:
 
 jobs:
+    # Note: job names should be unique across all workflows!
+
     ci-fpsdk-ros1:
         runs-on: ubuntu-latest
         container:

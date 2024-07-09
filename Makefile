@@ -150,6 +150,9 @@ $(BUILD_DIR)/.make-install: $(BUILD_DIR)/.make-build
 test: $(BUILD_DIR)/.make-build
 	@echo "$(HLW)***** Test ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)(cd $(BUILD_DIR)/fpcommon && ctest)
+ifneq ($(ROS_PACKAGE_PATH),)
+	$(V)(cd $(BUILD_DIR)/fpros1 && ctest)
+endif
 
 # ----------------------------------------------------------------------------------------------------------------------
 

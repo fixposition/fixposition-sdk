@@ -6,6 +6,8 @@ on:
 
 # Splitting into three jobs to make stuff build in parallel (on multiple runners)
 jobs:
+    # Note: job names should be unique across all workflows!
+
     docker-fpsdk-ros1:
         runs-on: ubuntu-latest
         steps:
