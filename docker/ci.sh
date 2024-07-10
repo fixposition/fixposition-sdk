@@ -393,7 +393,9 @@ function build_colcon_release
     ln -s ../../../fpapps .
     cd ..
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release || return 1
+    set +u
     source install/setup.bash || return 1
+    set -u
     fpltool -V || return 1
 }
 
