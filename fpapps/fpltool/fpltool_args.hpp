@@ -86,28 +86,15 @@ class FpltoolArgs
     std::vector<std::string>  argv_;           //!< argv[] of program
     // clang-format on
 
-    //! Program and version info   @hideinitializer
-    static constexpr const char* VERSION_INFO = /* clang-format off */
-        "fpltool ("
-#ifdef NDEBUG
-        "release"
-#else
-        "debug"
-#endif
-        " " FP_VERSION_STRING ")\n"
-        "Copyright (c) Fixposition AG (www.fixposition.com) and contributors\n"
-        "License: MIT (see the LICENSE file included in source distribution)\n"
-        "\n";
-    // clang-format on
-
     //! Help screen   @hideinitializer
     static constexpr const char* USAGE_HELP = /* clang-format off */
+        "\n"
         "Usage:\n"
         "\n"
         "    fpltool [<flags>] <command> [...]\n"
         "\n"
         "Where (availability of flags depends on <command>, see below):\n"
-        "    -V       -- Print program and version information, and exit\n"
+        "    -V       -- Print program, version and license information, and exit\n"
         "    -v / -q  -- Increase / decrese logging verbosity, multiple flags accumulate\n"
         "    -p / -P  -- Show / don't show progress (default: automatic)\n"
         "    -f       -- Force overwrite output (default: refuse to overwrite existing output files)\n"

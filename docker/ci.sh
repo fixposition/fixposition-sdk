@@ -67,9 +67,8 @@ function do_step
 TITLES["pre_commit_check"]="Pre-commit checks"
 function pre_commit_check
 {
-
     cd ${FPSDK_SRC_DIR}
-    pre-commit run --all-files --hook-stage manual || return 1
+    make pre-commit
 }
 
 ########################################################################################################################
@@ -364,11 +363,11 @@ function build_projs_release_ros2
     cmake --build build/${buildname}/fpcommon || return 1
     cmake --install build/${buildname}/fpcommon || return 1
 
-    cmake -B build/${buildname}/fpros2 -S fpros2 \
-        -DCMAKE_INSTALL_PREFIX=install/${buildname} \
-        -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpros2 || return 1
-    cmake --install build/${buildname}/fpros2 || return 1
+    # cmake -B build/${buildname}/fpros2 -S fpros2 \
+    #     -DCMAKE_INSTALL_PREFIX=install/${buildname} \
+    #     -DCMAKE_BUILD_TYPE=Release || return 1
+    # cmake --build build/${buildname}/fpros2 || return 1
+    # cmake --install build/${buildname}/fpros2 || return 1
 
     cmake -B build/${buildname}/fpapps -S fpapps \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
