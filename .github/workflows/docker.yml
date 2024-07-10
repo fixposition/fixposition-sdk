@@ -8,7 +8,7 @@ on:
 jobs:
     # Note: job names should be unique across all workflows!
 
-    docker-fpsdk-ros1:
+    docker-fpsdk-noetic:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -23,13 +23,13 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build ros1-base ros1-ci ros1-dev
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build noetic-base noetic-ci noetic-dev
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push ros1-base ros1-ci ros1-dev
+                  docker compose push noetic-base noetic-ci noetic-dev
 
-    docker-fpsdk-ros2:
+    docker-fpsdk-humble:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -44,13 +44,13 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build ros2-base ros2-ci ros2-dev
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build humble-base humble-ci humble-dev
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push ros2-base ros2-ci ros2-dev
+                  docker compose push humble-base humble-ci humble-dev
 
-    docker-fpsdk-deb:
+    docker-fpsdk-bookworm:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -65,8 +65,8 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build deb-base deb-ci deb-dev
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build bookworm-base bookworm-ci bookworm-dev
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push deb-base deb-ci deb-dev
+                  docker compose push bookworm-base bookworm-ci bookworm-dev

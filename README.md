@@ -40,8 +40,8 @@ The SDK part of this repo refers to C++ libraries and apps.
 
 > *tl;dr*
 > ```sh
-> ./docker/docker.sh pull ros1-dev       # Or "docker.sh build ros1-dev" to build it locally
-> ./docker/docker.sh run ros1-dev bash
+> ./docker/docker.sh pull noetic-dev       # Or "docker.sh build noetic-dev" to build it locally
+> ./docker/docker.sh run noetic-dev bash
 > # Now inside Docker do:
 > make install INSTALL_PREFIX=fpsdk
 > ./fpsdk/bin/fpltool -h
@@ -59,7 +59,7 @@ make install INSTALL_PREFIX=fpsdk
 #### Command-line "devcontainer"
 
 ```sh
-docker pull ghcr.io/fixposition/fixposition/fixposition-sdk:ros1-dev
+docker pull ghcr.io/fixposition/fixposition/fixposition-sdk:noetic-dev
 ./docker.sh run bash
 source /opt/ros/noetic/setup.bash
 make install INSTALL_PREFIX=fpsdk
@@ -69,7 +69,7 @@ make install INSTALL_PREFIX=fpsdk
 To run all CI:
 
 ```sh
-./docker/docker.sh run ros1-ci ./docker/ci.sh
+./docker/docker.sh run noetic-ci ./docker/ci.sh
 ```
 
 #### Manually
@@ -84,7 +84,7 @@ systems.
     The exact steps required depend on your system. You'll need the dependencies mentioned above installed system wide
     or otherwise tell CMake where to find them.
 
-    Refer to the [docker/Dockerfile.ros1-base](Dockerfile.ros1-base) on installing the required dependencies on Ubuntu
+    Refer to the [Dockerfile.noetic-base](docker/Dockerfile.noetic-base) on installing the required dependencies on Ubuntu
     20.04 with ROS Noetic.
 
     ```sh

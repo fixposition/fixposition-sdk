@@ -1,6 +1,6 @@
-FROM ghcr.io/fixposition/fixposition/fixposition-sdk:ros2-base
+FROM ghcr.io/fixposition/fixposition/fixposition-sdk:humble-base
 
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS2 (Humble, Ubuntu 22.04) image for vscode devcontainer"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Humble (Ubuntu 22.04) image for vscode devcontainer"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 RUN <<EOF
@@ -123,5 +123,5 @@ RUN <<EOF
 EOF
 
 # For debugging docker builds... (last layer!)
-ENV FPSDK_IMAGE=ros2-dev
-RUN date > /fixposition-sdk-ros2-dev
+ENV FPSDK_IMAGE=humble-dev
+RUN date > /fixposition-sdk-humble-dev

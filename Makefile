@@ -175,9 +175,9 @@ $(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-cmake
 ci:
 	@echo "$(HLW)***** CI *****$(HLO)"
 ifeq ($(FPSDK_IMAGE),)
-	$(V)docker/docker.sh run deb-ci ./docker/ci.sh
-	$(V)docker/docker.sh run ros1-ci ./docker/ci.sh
-	$(V)docker/docker.sh run ros2-ci ./docker/ci.sh
+	$(V)docker/docker.sh run bookworm-ci ./docker/ci.sh
+	$(V)docker/docker.sh run noetic-ci ./docker/ci.sh
+	$(V)docker/docker.sh run humble-ci ./docker/ci.sh
 	@echo "$(HLW)CI done$(HLO)"
 else
 	@echo "This should not run inside Docker!"
