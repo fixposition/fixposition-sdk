@@ -1,6 +1,6 @@
-FROM ghcr.io/fixposition/fixposition/fixposition-sdk:deb-base
+FROM ghcr.io/fixposition/fixposition/fixposition-sdk:bookworm-base
 
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian (Bookworm) image for vscode devcontainer"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Bookworm image for vscode devcontainer"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 # RUN <<EOF
@@ -131,5 +131,5 @@ RUN <<EOF
 EOF
 
 # For debugging docker builds... (last layer!)
-ENV FPSDK_IMAGE=deb-dev
-RUN date > /fixposition-sdk-deb-dev
+ENV FPSDK_IMAGE=bookworm-dev
+RUN date > /fixposition-sdk-bookworm-dev

@@ -1,6 +1,6 @@
-FROM ghcr.io/fixposition/fixposition/fixposition-sdk:ros2-base
+FROM ghcr.io/fixposition/fixposition/fixposition-sdk:bookworm-base
 
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS2 (Humble, Ubuntu 22.04) image for Github CI jobs"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Bookworm image for Github CI jobs"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 COPY .pre-commit-config.yaml /tmp
@@ -17,5 +17,5 @@ RUN <<EOF
 EOF
 
 # For debugging docker builds... (last layer!)
-ENV FPSDK_IMAGE=ros2-ci
-RUN date > /fixposition-sdk-ros2-ci
+ENV FPSDK_IMAGE=bookworm-ci
+RUN date > /fixposition-sdk-bookworm-ci

@@ -13,7 +13,7 @@ jobs:
     ci-fpsdk-ros1:
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/fixposition/fixposition/fixposition-sdk:ros1-ci
+            image: ghcr.io/fixposition/fixposition/fixposition-sdk:noetic-ci
         defaults:
             run:
                 shell: bash
@@ -28,7 +28,7 @@ jobs:
     ci-fpsdk-deb:
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/fixposition/fixposition/fixposition-sdk:deb-ci
+            image: ghcr.io/fixposition/fixposition/fixposition-sdk:bookworm-ci
         defaults:
             run:
                 shell: bash
@@ -43,7 +43,7 @@ jobs:
     ci-fpsdk-ros2:
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/fixposition/fixposition/fixposition-sdk:ros2-ci
+            image: ghcr.io/fixposition/fixposition/fixposition-sdk:humble-ci
         defaults:
             run:
                 shell: bash

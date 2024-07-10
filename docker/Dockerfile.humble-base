@@ -2,7 +2,7 @@
 # ROS Humble (LTS until May 2027) base image (Ubuntu 22.04.6 LTS "Jammy")
 FROM ros:humble-ros-base
 
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS2 (Humble, Ubuntu 22.04) base image with minimal stuff required to build"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Humble (Ubuntu 22.04) base image with minimal stuff required to build"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 RUN <<EOF
@@ -135,6 +135,6 @@ RUN <<EOF
 EOF
 
 # For debugging docker builds... (last layer!)
-ENV FPSDK_IMAGE=ros2-base
+ENV FPSDK_IMAGE=humble-base
 ENV ROS_DISTRO=humble
-RUN date > /fixposition-sdk-ros2-base
+RUN date > /fixposition-sdk-humble-base

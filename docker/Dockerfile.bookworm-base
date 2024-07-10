@@ -1,6 +1,6 @@
 FROM debian:bookworm
 
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian (Bookworm) base image with minimal stuff required to build"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Bookworm base image with minimal stuff required to build"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 RUN <<EOF
@@ -123,6 +123,6 @@ RUN <<EOF
 EOF
 
 # For automation and debugging docker builds... (last layer!)
-ENV FPSDK_IMAGE=deb-base
+ENV FPSDK_IMAGE=bookworm-base
 ENV ROS_DISTRO=
-RUN date > /fixposition-sdk-deb-base
+RUN date > /fixposition-sdk-bookworm-base

@@ -3,13 +3,13 @@
     "dockerComposeFile": "../../docker/docker-compose.yaml",
     "shutdownAction": "stopCompose",
 
-    "name": "Fixposition SDK (ROS2)", "service": "ros2-dev", "runServices": [ "ros2-dev" ],
+    "name": "Fixposition SDK (no ROS)", "service": "bookworm-dev", "runServices": [ "bookworm-dev" ],
 
     // Use this user in the container, re-map IDs to local user automatically
     "remoteUser": "fpsdk",
     "updateRemoteUserUID": true,
 
-    // compare .services.ros2-dev.volumes in ../../docker/docker-compose.yaml
+    // compare .services.bookworm-dev.volumes in ../../docker/docker-compose.yaml
     "workspaceFolder": "/home/fpsdk/fixposition_utility",
 
     // Deliberately empty, see fpsdk.code-workspace instead
