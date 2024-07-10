@@ -168,7 +168,9 @@
             "numbers": "cpp",
             "semaphore": "cpp",
             "stop_token": "cpp"
-        }
+        },
+        "workbench.remoteIndicator.showExtensionRecommendations": false,
+        "yaml.extension.recommendations": false
     },
     "extensions": {
         "recommendations": [
