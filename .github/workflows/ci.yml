@@ -10,7 +10,7 @@ on:
 jobs:
     # Note: job names should be unique across all workflows!
 
-    ci-fpsdk-ros1:
+    ci-fpsdk-noetic:
         runs-on: ubuntu-latest
         container:
             image: ghcr.io/fixposition/fixposition/fixposition-sdk:noetic-ci
@@ -25,7 +25,7 @@ jobs:
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
 
-    ci-fpsdk-deb:
+    ci-fpsdk-bookworm:
         runs-on: ubuntu-latest
         container:
             image: ghcr.io/fixposition/fixposition/fixposition-sdk:bookworm-ci
@@ -40,7 +40,7 @@ jobs:
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
 
-    ci-fpsdk-ros2:
+    ci-fpsdk-humble:
         runs-on: ubuntu-latest
         container:
             image: ghcr.io/fixposition/fixposition/fixposition-sdk:humble-ci

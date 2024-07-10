@@ -8,7 +8,7 @@ on:
 jobs:
     # Note: job names should be unique across all workflows!
 
-    docker-fpsdk-ros1:
+    docker-fpsdk-noetic:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -29,7 +29,7 @@ jobs:
                   cd ${GITHUB_WORKSPACE}/docker
                   docker compose push noetic-base noetic-ci noetic-dev
 
-    docker-fpsdk-ros2:
+    docker-fpsdk-humble:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -50,7 +50,7 @@ jobs:
                   cd ${GITHUB_WORKSPACE}/docker
                   docker compose push humble-base humble-ci humble-dev
 
-    docker-fpsdk-deb:
+    docker-fpsdk-bookworm:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
