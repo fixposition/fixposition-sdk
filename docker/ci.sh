@@ -69,7 +69,7 @@ function pre_commit_check
 {
     cd ${FPSDK_SRC_DIR}
     make pre-commit \
-        INSTALL_PREFIX=install/${buildname}
+        INSTALL_PREFIX=install/dummy
 }
 
 ########################################################################################################################
