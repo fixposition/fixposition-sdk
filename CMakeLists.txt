@@ -11,4 +11,8 @@ add_subdirectory(fpcommon)
 if(FP_USE_ROS1)
     add_subdirectory(fpros1)
 endif()
+# TODO: not working yet...
+# if(FP_USE_ROS2)
+#     add_subdirectory(fpros2)
+# endif()
 add_subdirectory(fpapps)

@@ -22,6 +22,7 @@
 /* Fixposition SDK */
 #include <fpcommon/logging.hpp>
 #include <fpcommon/string.hpp>
+#include <fpcommon/utils.hpp>
 
 /* PACKAGE */
 #include "fpltool_args.hpp"
@@ -33,6 +34,29 @@ namespace fpltool {
 
 using namespace fp::common::logging;
 using namespace fp::common::string;
+using namespace fp::common::utils;
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+static void PrintVersionInfo()
+{
+    std::fprintf(stdout, "fpltool (%s, %s)\n%s\n%s\n",
+#ifdef NDEBUG
+        "release",
+#else
+        "debug",
+#endif
+        GetVersionString(), GetCopyrightString(), GetLicenseString());
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+static void PrintHelpScreen()
+{
+    std::fputs(FpltoolArgs::USAGE_HELP, stdout);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 bool FpltoolArgs::LoadFromArgv(int argc, char** argv)
 {
@@ -73,12 +97,12 @@ bool FpltoolArgs::LoadFromArgv(int argc, char** argv)
         }
         switch (opt) {
             case 'V':
-                std::fputs(VERSION_INFO, stdout);
+                PrintVersionInfo();
                 exit(EXIT_SUCCESS);
                 break;
             case 'h':
-                std::fputs(VERSION_INFO, stdout);
-                std::fputs(USAGE_HELP, stdout);
+                PrintVersionInfo();
+                PrintHelpScreen();
                 exit(EXIT_SUCCESS);
                 break;
             case 'v':

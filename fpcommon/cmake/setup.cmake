@@ -24,14 +24,21 @@ endif()
 ########################################################################################################################
 # Check if we have ROS, and add to cmake path to that require(rosbag) works. User can either specify it as a cmake
 # argument or we can detect it from the environment
+# - ROS1 package path explicitly given on cmake command line. Not recommended. Enough to build, but not enough to run.
 if(NOT "${ROS_PACKAGE_PATH}" STREQUAL "")
     message(STATUS "fpsdk: Using ROS1 (cmake arg ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH})")
     list(APPEND CMAKE_PREFIX_PATH ${ROS_PACKAGE_PATH})
     set(FP_USE_ROS1 ON)
+# - ROS1 environment loaded. Recommended.
 elseif(NOT "$ENV{ROS_PACKAGE_PATH}" STREQUAL "")
     message(STATUS "fpsdk: Using ROS1 (environment ROS_PACKAGE_PATH=$ENV{ROS_PACKAGE_PATH})")
     list(APPEND CMAKE_PREFIX_PATH $ENV{ROS_PACKAGE_PATH})
     set(FP_USE_ROS1 ON)
+# - ROS2 environment loaded
+elseif("$ENV{ROS_VERSION}" STREQUAL "2")
+    set(FP_USE_ROS2 ON)
+    # TODO: Probably this also needs some stuff added to CMAKE_PREFIX_PATH. We're not currently using any ROS2 libs
+    #       anywhere in fpapps...
 else()
     message(STATUS "fpsdk: No ROS environment detected")
 endif()
@@ -91,6 +98,7 @@ endif()
 # Some debugging
 message(STATUS "fpsdk: CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 message(STATUS "fpsdk: CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
+message(STATUS "fpsdk: CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
 message(STATUS "fpsdk: FP_VERSION_NUMBER=${FP_VERSION_NUMBER}")
 message(STATUS "fpsdk: FP_VERSION_STRING=${FP_VERSION_STRING}")
 

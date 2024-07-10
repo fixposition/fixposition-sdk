@@ -14,8 +14,10 @@
 /* LIBC/STL */
 
 /* EXTERNAL */
-#include <fpcommon/logging.hpp>
 #include "fpros1/ext/topic_tools.hpp"
+
+/* Fixposition SDK */
+#include <fpcommon/logging.hpp>
 
 /* PACKAGE */
 #include "fpros1/bagwriter.hpp"

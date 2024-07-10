@@ -154,6 +154,7 @@ add_gtest(TARGET path_test      SOURCES test/path_test.cpp      LINK_LIBS ${PROJ
 add_gtest(TARGET string_test    SOURCES test/string_test.cpp    LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET time_test      SOURCES test/time_test.cpp      LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET trafo_test     SOURCES test/trafo_test.cpp     LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET utils_test     SOURCES test/utils_test.cpp     LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET yaml_test      SOURCES test/yaml_test.cpp      LINK_LIBS ${PROJECT_NAME})
 
 

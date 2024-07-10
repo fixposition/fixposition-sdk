@@ -40,6 +40,7 @@ namespace common {
     - @subpage FPCOMMON_TIME
     - @subpage FPCOMMON_TRAFO
     - @subpage FPCOMMON_TYPES
+    - @subpage FPCOMMON_UTILS
     - @subpage FPCOMMON_YAML
 
 */

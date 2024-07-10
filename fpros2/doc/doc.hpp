@@ -8,36 +8,35 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: ROS1 library documentation
+ * @brief Fixposition SDK: ROS2 library documentation
  */
 
-#ifndef __FPROS1_DOC_HPP__
-#define __FPROS1_DOC_HPP__
+#ifndef __FPROS2_DOC_HPP__
+#define __FPROS2_DOC_HPP__
 
 namespace fp {
 /**
- * @brief Fixposition SDK: ROS1 library
+ * @brief Fixposition SDK: ROS2 library
  */
-namespace ros1 {
+namespace ros2 {
 // clang-format off
 /* ****************************************************************************************************************** */
 
 /*!
-    @page FPROS1_DOC Fixposition SDK: ROS1 Library Documentation
+    @page FPROS2_DOC Fixposition SDK: ROS2 Library Documentation
 
-    @section FPROS1_OVERVIEW Overview
+    @section FPROS2_OVERVIEW Overview
 
     @todo add documentation
 
-    @section FPROS1_MODULES Modules
+    @section FPROS2_MODULES Modules
 
-    - @subpage FPROS1_BAGWRITER
-    - @subpage FPROS1_UTILS
+    - @subpage FPROS2_UTILS
 
 */
 
 /* ****************************************************************************************************************** */
 // clang-format on
-}  // namespace ros1
+}  // namespace ros2
 }  // namespace fp
 #endif  // __FPROS1_DOC_HPP__

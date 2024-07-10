@@ -36,30 +36,31 @@ if(NOT TARGET fpcommon)
     find_package(fpcommon REQUIRED)
 endif()
 
-set(FP_ROS_INCLUDE_DIRS "")
-set(FP_ROS_LIBRARIES "")
+set(FP_ROS1_INCLUDE_DIRS "")
+set(FP_ROS1_LIBRARIES "")
 
 find_package(roscpp REQUIRED)
-list(APPEND FP_ROS_INCLUDE_DIRS ${roscpp_INCLUDE_DIRS})
-list(APPEND FP_ROS_LIBRARIES ${roscpp_LIBRARIES})
+list(APPEND FP_ROS1_INCLUDE_DIRS ${roscpp_INCLUDE_DIRS})
+list(APPEND FP_ROS1_LIBRARIES ${roscpp_LIBRARIES})
 
 find_package(rosbag REQUIRED)
-list(APPEND FP_ROS_INCLUDE_DIRS ${rosbag_INCLUDE_DIRS})
-list(APPEND FP_ROS_LIBRARIES ${rosbag_LIBRARIES})
+list(APPEND FP_ROS1_INCLUDE_DIRS ${rosbag_INCLUDE_DIRS})
+list(APPEND FP_ROS1_LIBRARIES ${rosbag_LIBRARIES})
 
 find_package(std_msgs REQUIRED)
-list(APPEND FP_ROS_INCLUDE_DIRS ${std_msgs_INCLUDE_DIRS})
-list(APPEND FP_ROS_LIBRARIES ${std_msgs_LIBRARIES})
+list(APPEND FP_ROS1_INCLUDE_DIRS ${std_msgs_INCLUDE_DIRS})
+list(APPEND FP_ROS1_LIBRARIES ${std_msgs_LIBRARIES})
 
 find_package(topic_tools REQUIRED)
-list(APPEND FP_ROS_INCLUDE_DIRS ${topic_tools_INCLUDE_DIRS})
-list(APPEND FP_ROS_LIBRARIES ${topic_tools_LIBRARIES})
+list(APPEND FP_ROS1_INCLUDE_DIRS ${topic_tools_INCLUDE_DIRS})
+list(APPEND FP_ROS1_LIBRARIES ${topic_tools_LIBRARIES})
 
-list(REMOVE_DUPLICATES FP_ROS_INCLUDE_DIRS)
-list(REMOVE_DUPLICATES FP_ROS_LIBRARIES)
+list(REMOVE_DUPLICATES FP_ROS1_INCLUDE_DIRS)
+list(REMOVE_DUPLICATES FP_ROS1_LIBRARIES)
 
-message(STATUS "fpsdk: FP_ROS_INCLUDE_DIRS=${FP_ROS_INCLUDE_DIRS}")
-message(STATUS "fpsdk: FP_ROS_LIBRARIES=${FP_ROS_LIBRARIES}")
+message(STATUS "fpsdk: FP_ROS1_INCLUDE_DIRS=${FP_ROS1_INCLUDE_DIRS}")
+message(STATUS "fpsdk: FP_ROS1_LIBRARIES=${FP_ROS1_LIBRARIES}")
+
 
 # SHARED LIBRARY =======================================================================================================
 
@@ -70,13 +71,13 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-        ${FP_ROS_INCLUDE_DIRS}
+        ${FP_ROS1_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
         fpcommon
-        ${FP_ROS_LIBRARIES}
+        ${FP_ROS1_LIBRARIES}
 )
 
 
@@ -149,6 +150,7 @@ install(
 include(../fpcommon/cmake/testing.cmake)
 
 add_gtest(TARGET bagwriter_test SOURCES test/bagwriter_test.cpp LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET utils_test     SOURCES test/utils_test.cpp     LINK_LIBS ${PROJECT_NAME})
 
 
 # ======================================================================================================================

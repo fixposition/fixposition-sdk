@@ -33,7 +33,10 @@
             "output": true,
             "tmp": true,
             "*/build/**": true,
-            "fpsdk/**": true
+            "fpsdk/**": true,
+            "build/**": true,
+            "install/**": true,
+            "ws/**": true
         },
         // Exclude some things from the files watcher
         "files.watcherExclude": {
@@ -168,7 +171,9 @@
             "numbers": "cpp",
             "semaphore": "cpp",
             "stop_token": "cpp"
-        }
+        },
+        "workbench.remoteIndicator.showExtensionRecommendations": false,
+        "yaml.extension.recommendations": false
     },
     "extensions": {
         "recommendations": [
