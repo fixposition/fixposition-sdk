@@ -11,12 +11,18 @@ BUILD_TYPE = Release
 # User vars
 -include config.mk
 
+FP_USE_ROS1=
+FP_USE_ROS2=
 ifneq ($(MAKECMDGOALS),help)
     ifeq ($(INSTALL_PREFIX),)
         $(error Please provide a INSTALL_PREFIX. Try 'make help'!)
     endif
-    ifeq ($(ROS_PACKAGE_PATH),)
-        $(warning No ROS_PACKAGE_PATH! ROS functionality won't be compiled-in!)
+    ifneq ($(ROS_PACKAGE_PATH),)
+        FP_USE_ROS1=yes
+    else ifeq ($(ROS_VERSION),2)
+        FP_USE_ROS2=yes
+    else
+        $(info No ROS_PACKAGE_PATH (ROS1) and no ROS_VERSION (ROS2) found)
     endif
 endif
 
@@ -118,7 +124,11 @@ clean:
 .PHONY: cmake
 cmake: $(BUILD_DIR)/.make-cmake
 
-deps = $(sort $(wildcard Makefile fpcommon/* fpcommon/*/* fpcommon/*/*/* fpros1/* fpros1/*/* fpros1/*/*/* fpapps/* fpapps/*/* fpapps/*/*/*))
+deps = $(sort $(wildcard Makefile \
+    fpcommon/* fpcommon/*/* fpcommon/*/*/* \
+    fpros1/* fpros1/*/* fpros1/*/*/* \
+    fpros2/* fpros2/*/* fpros2/*/*/* \
+    fpapps/* fpapps/*/* fpapps/*/*/*))
 
 $(BUILD_DIR)/.make-cmake: $(deps)
 	@echo "$(HLW)***** Configure ($(BUILD_TYPE)) *****$(HLO)"
@@ -151,7 +161,7 @@ $(BUILD_DIR)/.make-install: $(BUILD_DIR)/.make-build
 test: $(BUILD_DIR)/.make-build
 	@echo "$(HLW)***** Test ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)(cd $(BUILD_DIR)/fpcommon && ctest)
-ifneq ($(ROS_PACKAGE_PATH),)
+ifneq ($(FP_USE_ROS1),)
 	$(V)(cd $(BUILD_DIR)/fpros1 && ctest)
 endif
 

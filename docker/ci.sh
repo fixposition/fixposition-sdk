@@ -363,6 +363,7 @@ function build_projs_release_ros2
     cmake --build build/${buildname}/fpcommon || return 1
     cmake --install build/${buildname}/fpcommon || return 1
 
+    # TODO: not working yet
     # cmake -B build/${buildname}/fpros2 -S fpros2 \
     #     -DCMAKE_INSTALL_PREFIX=install/${buildname} \
     #     -DCMAKE_BUILD_TYPE=Release || return 1

@@ -33,7 +33,10 @@
             "output": true,
             "tmp": true,
             "*/build/**": true,
-            "fpsdk/**": true
+            "fpsdk/**": true,
+            "build/**": true,
+            "install/**": true,
+            "ws/**": true
         },
         // Exclude some things from the files watcher
         "files.watcherExclude": {
