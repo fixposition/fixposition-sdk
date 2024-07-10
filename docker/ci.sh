@@ -68,8 +68,7 @@ TITLES["pre_commit_check"]="Pre-commit checks"
 function pre_commit_check
 {
     cd ${FPSDK_SRC_DIR}
-    make pre-commit \
-        INSTALL_PREFIX=install/dummy
+    make pre-commit
 }
 
 ########################################################################################################################

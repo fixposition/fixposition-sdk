@@ -13,7 +13,10 @@ BUILD_TYPE = Release
 
 FP_USE_ROS1=
 FP_USE_ROS2=
+ifneq ($(MAKECMDGOALS),)
 ifneq ($(MAKECMDGOALS),help)
+ifneq ($(MAKECMDGOALS),pre-commit)
+ifneq ($(MAKECMDGOALS),ci)
     ifeq ($(INSTALL_PREFIX),)
         $(error Please provide a INSTALL_PREFIX. Try 'make help'!)
     endif
@@ -24,6 +27,9 @@ ifneq ($(MAKECMDGOALS),help)
     else
         $(info No ROS_PACKAGE_PATH (ROS1) and no ROS_VERSION (ROS2) found)
     endif
+endif
+endif
+endif
 endif
 
 .PHONY: help
@@ -191,7 +197,7 @@ ifeq ($(FPSDK_IMAGE),)
 	@echo "$(HLW)CI done$(HLO)"
 else
 	@echo "This should not run inside Docker!"
-	false
+	@false
 endif
 
 # ----------------------------------------------------------------------------------------------------------------------
