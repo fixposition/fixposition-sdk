@@ -68,7 +68,8 @@ TITLES["pre_commit_check"]="Pre-commit checks"
 function pre_commit_check
 {
     cd ${FPSDK_SRC_DIR}
-    make pre-commit
+    make pre-commit \
+        INSTALL_PREFIX=install/${buildname}
 }
 
 ########################################################################################################################
@@ -469,6 +470,7 @@ if [ ${NERRORS} -eq 0 ]; then
     exit 0
 else
     echo "::error TITLES=CI failure::Failed ${NERRORS} of ${NSTEPS} steps"
+    exit 1
 fi
 
 ########################################################################################################################
