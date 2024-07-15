@@ -68,6 +68,35 @@ services:
         hostname: fpsdk-humble-dev-${USER}
         command: tail -f
 
+    jazzy-base:
+        image: ghcr.io/fixposition/fixposition/fixposition-sdk:jazzy-base
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.jazzy-base
+    jazzy-ci:
+        image: ghcr.io/fixposition/fixposition/fixposition-sdk:jazzy-ci
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.jazzy-ci
+        depends_on:
+            - jazzy-base
+    jazzy-dev:
+        image: ghcr.io/fixposition/fixposition/fixposition-sdk:jazzy-dev
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.jazzy-dev
+        depends_on:
+            - jazzy-base
+        volumes:
+            - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
+            - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
+            - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.:/home/fpsdk/fixposition_utility
+        cap_add:
+          - SYS_PTRACE
+        hostname: fpsdk-jazzy-dev-${USER}
+        command: tail -f
+
     # ------------------------------------------------------------------------------------------------------------------
 
     # Non-ROS base image based on Debian

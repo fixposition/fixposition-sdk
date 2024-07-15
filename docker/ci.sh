@@ -7,7 +7,7 @@ SCRIPTDIR=$(dirname $(readlink -f $0))
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-# Variables set in Dockerfile resp. from Github actions
+# Variables set in our Dockerfiles. Try to make it work in other environments.
 if [ -z "${FPSDK_IMAGE:-}" ]; then
     export FPSDK_IMAGE=other
     if [ -z "${ROS_DISTRO:-}" ]; then
@@ -15,6 +15,8 @@ if [ -z "${FPSDK_IMAGE:-}" ]; then
             export ROS_DISTRO=noetic
         elif [ -d /opt/ros/humble ]; then
             export ROS_DISTRO=humble
+        elif [ -d /opt/ros/jazzy ]; then
+            export ROS_DISTRO=jazzy
         else
             export ROS_DISTRO=
         fi
@@ -428,6 +430,7 @@ do_step build_projs_release_noros      || true # continue
 do_step doxygen_release_noros          || true # continue
 
 # Build ROS stuff resp. stuff with the ROS environment loaded last
+# - Either ROS 1
 if [ "${ROS_DISTRO}" = "noetic" ]; then
     echo "===== ROS1 builds ====="
     set +u
@@ -442,7 +445,8 @@ if [ "${ROS_DISTRO}" = "noetic" ]; then
     do_step build_catkin_release          || true # continue
     do_step doxygen_release_ros1          || true # continue
 
-elif [ "${ROS_DISTRO}" = "humble" ]; then
+# - Or ROS 2
+elif [ -n "${ROS_DISTRO} -a "${ROS_VERSION:-}" = "2" ]; then
     echo "===== ROS2 builds ====="
     set +u
     source /opt/ros/${ROS_DISTRO}/setup.bash
@@ -455,10 +459,6 @@ elif [ "${ROS_DISTRO}" = "humble" ]; then
     do_step build_projs_release_ros2      || true # continue
     do_step build_colcon_release          || true # continue
     do_step doxygen_release_ros2          || true # continue
-
-elif [ -n "${ROS_DISTRO}" ]; then
-    echo "::warning title=${FPSDK_IMAGE} failed::Unknown ROS_DISTRO=${ROS_DISTRO}"
-    ((NERRORS=${NERRORS} + 1))
 fi
 
 ########################################################################################################################

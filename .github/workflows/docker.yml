@@ -50,6 +50,27 @@ jobs:
                   cd ${GITHUB_WORKSPACE}/docker
                   docker compose push humble-base humble-ci humble-dev
 
+    docker-fpsdk-jazzy:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: Login
+              uses: docker/login-action@v3
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            # Pulling first, so that maybe it not everything has to be built...
+            - name: Build
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build jazzy-base jazzy-ci jazzy-dev
+            - name: Push
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  docker compose push jazzy-base jazzy-ci jazzy-dev
+
     docker-fpsdk-bookworm:
         runs-on: ubuntu-latest
         steps:
