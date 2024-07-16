@@ -55,4 +55,19 @@ jobs:
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
 
+    ci-fpsdk-jazzy:
+        runs-on: ubuntu-latest
+        container:
+            image: ghcr.io/fixposition/fixposition/fixposition-sdk:jazzy-ci
+        defaults:
+            run:
+                shell: bash
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+            - name: CI
+              run: |
+                  git config --global --add safe.directory ${GITHUB_WORKSPACE}
+                  ./docker/ci.sh
+
 # eof

@@ -1,9 +1,11 @@
-FROM ghcr.io/fixposition/fixposition/fixposition-sdk:noetic-base
+FROM ghcr.io/fixposition/fixposition/fixposition-sdk:humble-base
 
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Noetic (Ubuntu 20.04) image for vscode devcontainer"
+# Metadata for github packages
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Jazzy (Ubuntu 24.04) image for vscode devcontainer"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
-ENV FPSDK_IMAGE=noetic-dev
+# Variables used in our Docker build and CI scripts
+ENV FPSDK_IMAGE=jazzy-dev
 
 # Unminimize system
 COPY docker/scripts/unminimize_system.sh /tmp
@@ -41,7 +43,7 @@ RUN /tmp/install_mcap.sh && rm -f /tmp/install_mcap.sh
 
 # Install useful stuff
 COPY docker/scripts/install_aptdev.sh /tmp
-RUN /tmp/install_aptdev.sh && rm -f /tmp/install_aptdev.sh
+RUN /tmp/install_aptdev.sh && rm -f /tmp/install_aptdev.share
 
 # For debugging docker builds... (last layer!)
 RUN date > /fixposition-sdk-${FPSDK_IMAGE}

@@ -1,56 +1,41 @@
-
-# ROS Humble (LTS until May 2027) base image (Ubuntu 22.04.6 LTS "Jammy")
+# ROS Humble Hawksbill (LTS until May 2027) base image (Ubuntu 22.04.6 LTS "Jammy")
 FROM ros:humble-ros-base
 
+# Metadata for github packages
 LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Humble (Ubuntu 22.04) base image with minimal stuff required to build"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
-RUN <<EOF
-    # Install minimal dependencies to build stuff
-    set -e
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get -y update
-    apt-get -y --with-new-pkgs upgrade
-    apt-get -y --no-install-recommends install \
-        bison \
-        build-essential \
-        cmake \
-        flex \
-        curl \
-        git \
-        graphviz \
-        libboost-dev \
-        libboost-stacktrace-dev \
-        libcurl4-openssl-dev \
-        libeigen3-dev \
-        libsqlite3-dev \
-        libtiff-dev \
-        libyaml-cpp-dev \
-        pre-commit \
-        python3-pip \
-        sqlite3 \
-        zlib1g-dev
-    apt-get -y autoremove
-    apt-get clean
-EOF
+# Variables used in our Docker build and CI scripts
+ENV FPSDK_IMAGE=humble-base
+ENV ROS_DISTRO=humble
 
-RUN <<EOF
-    # Install clang-format
-    set -e
-    curl https://apt.llvm.org/llvm-snapshot.gpg.key > /etc/apt/trusted.gpg.d/llvm.asc
-    echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-17 main" > /etc/apt/sources.list.d/llvm.list
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get -y update
-    apt-get -y --no-install-recommends install \
-        clang-format-17
-    apt-get clean
-    ln -s /usr/bin/clang-format-17 /usr/bin/clang-format
-    ln -s /usr/bin/clang-format-diff-17 /usr/bin/clang-format-diff
-EOF
+# Install stuff
+COPY docker/scripts/install_aptbase.sh /tmp
+RUN /tmp/install_aptbase.sh && rm -f /tmp/install_aptbase.sh
 
-# Prevent packages from installation that we build and install below. Installing multiple versions of the same
-# package can be tricky and we better prevent that from happening. It doesn't work for all packages, though. For
-# example, ros-noetic stuff insists on libgtest.
+# Download, build and install clang-format
+COPY docker/scripts/install_clangformat.sh /tmp
+RUN /tmp/install_clangformat.sh && rm -f /tmp/install_clangformat.sh
+
+# Download, build and install googletest
+COPY docker/scripts/install_gtest.sh /tmp
+RUN /tmp/install_gtest.sh && rm -f /tmp/install_gtest.sh
+
+# Download, build and install capnp
+COPY docker/scripts/install_capnp.sh /tmp
+RUN /tmp/install_capnp.sh && rm -f /tmp/install_capnp.sh
+
+# Download, build and install PROJ
+COPY docker/scripts/install_proj.sh /tmp
+RUN /tmp/install_proj.sh && rm -f /tmp/install_proj.sh
+
+# Download, build and install Doxygen
+COPY docker/scripts/install_doxygen.sh /tmp
+RUN /tmp/install_doxygen.sh && rm -f /tmp/install_doxygen.sh
+
+# Prevent packages from installation that we build and installed above. Installing multiple versions of the same package
+# can be tricky and we better prevent that from happening. It doesn't work for all packages, though. For example,
+# ROS packages insist on libgtest.
 COPY <<EOF /etc/apt/preferences.d/manually-built-and-installed
 Package: clang-format clang-format-11 clang-format-12 clang-format-13 clang-format-14
 Pin: origin *
@@ -65,76 +50,5 @@ Pin: origin *
 Pin-Priority: -1
 EOF
 
-RUN <<EOF
-    # Build and install gtest
-    set -e
-    curl -L https://github.com/google/googletest/archive/refs/tags/v1.13.0.tar.gz -o /tmp/gtest.tar.gz
-    mkdir /tmp/gtest
-    cd /tmp/gtest
-    tar --strip-components=1 -xzvf ../gtest.tar.gz
-    cmake -B build -S . \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/usr/local \
-        -DBUILD_SHARED_LIBS=ON
-    cmake --build build --parallel 4
-    cmake --install build
-    cd /
-    rm -rf /tmp/gtest.tar.gz /tmp/gtest
-EOF
-
-RUN <<EOF
-    # Build and install capnp
-    set -e
-    curl -L https://capnproto.org/capnproto-c++-1.0.2.tar.gz -o /tmp/capnp.tar.gz
-    mkdir /tmp/capnp
-    cd /tmp/capnp
-    tar --strip-components=1 -xzvf ../capnp.tar.gz
-    cmake -B build -S . \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/usr/local \
-        -DBUILD_SHARED_LIBS=ON \
-        -DBUILD_TESTING=OFF
-        cmake --build build --parallel 4
-    cmake --install build
-    cd /
-    rm -rf /tmp/proj.tar.gz /tmp/proj
-EOF
-
-RUN <<EOF
-    # Build and install PROJ
-    set -e
-    curl -L https://download.osgeo.org/proj/proj-9.4.1.tar.gz -o /tmp/proj.tar.gz
-    mkdir /tmp/proj
-    cd /tmp/proj
-    tar --strip-components=1 -xzvf ../proj.tar.gz
-    cmake -B build -S . \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/usr/local \
-        -DBUILD_SHARED_LIBS=ON \
-        -DBUILD_TESTING=OFF
-    cmake --build build --parallel 4
-    cmake --install build
-    cd /
-    rm -rf /tmp/proj.tar.gz /tmp/proj
-EOF
-
-RUN <<EOF
-    # Build and install Doxygen
-    set -e
-    curl -L https://www.doxygen.nl/files/doxygen-1.11.0.src.tar.gz -o /tmp/doxygen.tar.gz
-    mkdir /tmp/doxygen
-    cd /tmp/doxygen
-    tar --strip-components=1 -xzvf ../doxygen.tar.gz
-    cmake -B build -S . \
-        -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/usr/local
-    cmake --build build --parallel 4
-    cmake --install build
-    cd /
-    rm -rf /tmp/doxygen.tar.gz /tmp/doxygen
-EOF
-
 # For debugging docker builds... (last layer!)
-ENV FPSDK_IMAGE=humble-base
-ENV ROS_DISTRO=humble
-RUN date > /fixposition-sdk-humble-base
+RUN date > /fixposition-sdk-${FPSDK_IMAGE}

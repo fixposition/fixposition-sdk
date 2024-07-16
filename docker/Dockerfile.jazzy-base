@@ -1,13 +1,13 @@
-# Debian Bookworm (LTS until (at least) June 2026)
-FROM debian:bookworm
+# ROS Jazzy Jalisco (LTS until May 2029) base image (Ubuntu 24.04.6 LTS "Noble")
+FROM ros:jazzy-ros-base
 
 # Metadata for github packages
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Bookworm base image with minimal stuff required to build"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Jazzy (Ubuntu 24.04) base image with minimal stuff required to build"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 # Variables used in our Docker build and CI scripts
-ENV FPSDK_IMAGE=bookworm-base
-ENV ROS_DISTRO=
+ENV FPSDK_IMAGE=jazzy-base
+ENV ROS_DISTRO=jazzy
 
 # Install stuff
 COPY docker/scripts/install_aptbase.sh /tmp
@@ -33,7 +33,7 @@ RUN /tmp/install_doxygen.sh && rm -f /tmp/install_doxygen.sh
 # can be tricky and we better prevent that from happening. It doesn't work for all packages, though. For example,
 # ROS packages insist on libgtest.
 COPY <<EOF /etc/apt/preferences.d/manually-built-and-installed
-Package: clang-format clang-format-13 clang-format-14 clang-format-15 clang-format-16
+Package: clang-format clang-format-11 clang-format-12 clang-format-13 clang-format-14
 Pin: origin *
 Pin-Priority: -1
 
@@ -44,11 +44,7 @@ Pin-Priority: -1
 Package: proj proj-ps-doc proj-data proj-rdnap proj-bin libproj15 libproj-dev
 Pin: origin *
 Pin-Priority: -1
-
-Package: doxygen doxygen-*
-Pin: origin *
-Pin-Priority: -1
 EOF
 
-# For automation and debugging docker builds... (last layer!)
+# For debugging docker builds... (last layer!)
 RUN date > /fixposition-sdk-${FPSDK_IMAGE}

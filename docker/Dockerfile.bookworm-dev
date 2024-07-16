@@ -1,135 +1,45 @@
 FROM ghcr.io/fixposition/fixposition/fixposition-sdk:bookworm-base
 
+# Metadata for github packages
 LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Bookworm image for vscode devcontainer"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
-# RUN <<EOF
-#     # Unminimize system
-#     set -e
-#     yes | unminimize
-# EOF
+# Variables used in our Docker build and CI scripts
+ENV FPSDK_IMAGE=bookworm-dev
 
-# For devcontainer, see ../.devcontainer/devcontainer.json
-RUN adduser fpsdk
+# Add user for devcontainer, see ../.devcontainer/devcontainer.json
+COPY docker/scripts/adduser_fpsdk.sh /tmp
+RUN /tmp/adduser_fpsdk.sh && rm -f /tmp/adduser_fpsdk.sh
 
+# Install pre-commit hooks (fpsdk user)
 COPY .pre-commit-config.yaml /tmp
-RUN <<EOF
-    # Install pre-commit hooks for user
-    tmpdir=$(mktemp -d)
-    cd ${tmpdir}
-    git init
-    cp /tmp/.pre-commit-config.yaml .
-    sudo -u fpsdk pre-commit install-hooks
-    cd /
-    rm -rf ${tmpdir}
-    rm /tmp/.pre-commit-config.yaml
-EOF
+COPY docker/scripts/install_precommithooks.sh /tmp
+RUN sudo -u fpsdk /tmp/install_precommithooks.sh && rm -f /tmp/install_precommithooks.sh /tmp/.pre-commit-config.yaml
+
+# Install git-bash-prompt (fpsdk user)
+COPY .devcontainer/fpsdk.bgptheme /tmp
+COPY docker/scripts/install_gitbashprompt.sh /tmp
+RUN sudo -u fpsdk /tmp/install_gitbashprompt.sh && rm -f /tmp/install_gitbashprompt.sh /tmp/.devcontainer/fpsdk.bgptheme
 
 # Set timezone, sane language and locale
 ENV TZ=Europe/Zurich
 ENV LANG=en_GB.UTF-8
 ENV LANGUAGE=en_GB
 ENV LC_ALL=C.UTF-8
-RUN <<EOF
-    # Setup timezone, locale, sudoers
-    set -e
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get -y update
-    apt-get -y --with-new-pkgs upgrade
-    apt-get -y install locales sudo
-    apt-get clean
-    ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
-    echo $TZ > /etc/timezone
-    sed -i '/en_GB.UTF-8/s/^# //g' /etc/locale.gen
-    locale-gen
-    echo "fpsdk ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
-EOF
+COPY docker/scripts/install_locales.sh /tmp
+RUN /tmp/install_locales.sh && rm -f /tmp/install_locales.sh
 
-RUN <<EOF
-    # Download and install yq
-    set -e
-    curl -L https://github.com/mikefarah/yq/releases/download/v4.44.2/yq_linux_amd64 -o /usr/local/bin/yq
-    chmod 0755 /usr/local/bin/yq
-EOF
+# Install yq
+COPY docker/scripts/install_yq.sh /tmp
+RUN /tmp/install_yq.sh && rm -f /tmp/install_yq.sh
 
-RUN <<EOF
-    # Download and install mcap
-    set -e
-    curl -L https://github.com/foxglove/mcap/releases/download/releases%2Fmcap-cli%2Fv0.0.47/mcap-linux-amd64 -o /usr/local/bin/mcap
-    chmod 0755 /usr/local/bin/mcap
-EOF
+# Install mcap
+COPY docker/scripts/install_mcap.sh /tmp
+RUN /tmp/install_mcap.sh && rm -f /tmp/install_mcap.sh
 
-COPY <<EOF /etc/apt/sources.list.d/debian.list
-    deb http://deb.debian.org/debian           bookworm            main non-free contrib non-free-firmware
-    deb http://deb.debian.org/debian-security  bookworm-security   main non-free contrib non-free-firmware
-    deb http://deb.debian.org/debian           bookworm-backports  main non-free contrib non-free-firmware
-    deb http://deb.debian.org/debian           bookworm-updates    main non-free contrib non-free-firmware
-EOF
-RUN <<EOF
-    # Install useful stuff
-    set -e
-    rm /etc/apt/sources.list.d/debian.sources
-
-    export DEBIAN_FRONTEND=noninteractive
-    apt-get -y update
-    apt-get -y install \
-        ack \
-        bash-completion \
-        bind9-dnsutils \
-        bsdmainutils \
-        can-utils \
-        ccache \
-        chrpath \
-        curl \
-        evtest \
-        file \
-        gdb \
-        git-lfs \
-        iproute2 \
-        iputils-ping \
-        less \
-        libevdev-dev \
-        libgpiod-dev \
-        libiio-dev \
-        lsb-release \
-        man \
-        man-db \
-        manpages \
-        manpages \
-        manpages-dev \
-        manpages-dev \
-        manpages-posix \
-        manpages-posix-dev \
-        moreutils \
-        ncdu \
-        netcat-openbsd \
-        openssh-client \
-        pv \
-        rsync \
-        sl \
-        socat \
-        sudo \
-        strace \
-        systemd-journal-remote \
-        tcpdump \
-        tig \
-        vim \
-        wget \
-        xauth \
-        xxd
-        apt-get clean
-EOF
-
-COPY .devcontainer/fpsdk.bgptheme /tmp
-RUN <<EOF
-    # Install bash-git-prompt
-    set -e
-    sudo -u fpsdk git clone https://github.com/magicmonty/bash-git-prompt.git /home/fpsdk/.bash-git-prompt
-    sudo -u fpsdk git -C /home/fpsdk/.bash-git-prompt checkout 51080c22b2cebb63111379f4eacd22cda199684b
-    sudo -u fpsdk cp /tmp/fpsdk.bgptheme /home/fpsdk/.bash-git-prompt/themes
-    rm -f /tmp/fpsdk.bgptheme
-EOF
+# Install useful stuff
+COPY docker/scripts/install_aptdev.sh /tmp
+RUN /tmp/install_aptdev.sh && rm -f /tmp/install_aptdev.share
 
 # For debugging docker builds... (last layer!)
-ENV FPSDK_IMAGE=bookworm-dev
-RUN date > /fixposition-sdk-bookworm-dev
+RUN date > /fixposition-sdk-${FPSDK_IMAGE}
