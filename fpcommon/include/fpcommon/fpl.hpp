@@ -311,9 +311,9 @@ struct LogStatus {
     double pos_lon_;            //!< Approximate sensor position longitude [deg]
     double pos_height_;         //!< Approximate sensor position height [m]
 
-    static constexpr int8_t POS_SOURCE_UNKNOWN = 0;
-    static constexpr int8_t POS_SOURCE_GNSS = 1;
-    static constexpr int8_t POS_SOURCE_FUSION = 2;
+    static constexpr int8_t POS_SOURCE_UNKNOWN = 0;  //!< Position source unknown resp. not available
+    static constexpr int8_t POS_SOURCE_GNSS = 1;     //!< Position source is GNSS
+    static constexpr int8_t POS_SOURCE_FUSION = 2;   //!< Position source is Fusion
 
     std::string yaml_;  //!< Raw status data YAML
 };
