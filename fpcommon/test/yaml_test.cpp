@@ -41,6 +41,6 @@ int main(int argc, char** argv)
             level++;
         }
     }
-    fp::common::logging::LoggingSetup(level);
+    fp::common::logging::LoggingSetParams(level);
     return RUN_ALL_TESTS();
 }

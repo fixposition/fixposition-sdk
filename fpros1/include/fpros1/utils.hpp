@@ -34,6 +34,22 @@ namespace ros1 {
 namespace utils {
 /* ****************************************************************************************************************** */
 
+/**
+ * @brief Redirect fp:common::logging to ROS console
+ *
+ * This configures the fp::common::logging facility to output via the ROS console. This does *not* configure the ROS
+ * console (logger level, logger name, etc.).
+ *
+ * The mapping of fp::common::logging::LoggingLevel to ros::console::levels is as follows:
+ *
+ * - TRACE and DEBUG --> DEBUG
+ * - INFO and NOTICE --> INFO
+ * - WARNING         --> WARN
+ * - ERROR           --> ERROR
+ * - FATAL           --> FATAL
+ */
+void RedirectLoggingToRosConsole();
+
 /* ****************************************************************************************************************** */
 }  // namespace utils
 }  // namespace ros1

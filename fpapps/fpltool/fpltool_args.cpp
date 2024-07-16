@@ -156,7 +156,7 @@ bool FpltoolArgs::LoadFromArgv(int argc, char** argv)
     }
 
     // Setup debugging
-    LoggingSetup({logging_});
+    LoggingSetParams({logging_});
 
     // There must a remaining argument, which is the command
     if (optind < argc) {
