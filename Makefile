@@ -188,17 +188,49 @@ $(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-cmake
 # ----------------------------------------------------------------------------------------------------------------------
 
 .PHONY: ci
-ci:
-	@echo "$(HLW)***** CI *****$(HLO)"
+ci: $(BUILD_DIR)/.ci-bookworm $(BUILD_DIR)/.ci-noetic $(BUILD_DIR)/.ci-humble $(BUILD_DIR)/.ci-jazzy
+
+$(BUILD_DIR)/.ci-bookworm: $(deps)
+	@echo "$(HLW)***** CI (bookworm) *****$(HLO)"
 ifeq ($(FPSDK_IMAGE),)
 	$(V)docker/docker.sh run bookworm-ci ./docker/ci.sh
-	$(V)docker/docker.sh run noetic-ci ./docker/ci.sh
-	$(V)docker/docker.sh run humble-ci ./docker/ci.sh
-	@echo "$(HLW)CI done$(HLO)"
+	$(V)$(TOUCH) $@
 else
-	@echo "This should not run inside Docker!"
+	@echo "This ($@) should not run inside Docker!"
 	@false
 endif
+
+$(BUILD_DIR)/.ci-noetic: $(deps)
+	@echo "$(HLW)***** CI (noetic) *****$(HLO)"
+ifeq ($(FPSDK_IMAGE),)
+	$(V)docker/docker.sh run noetic-ci ./docker/ci.sh
+	$(V)$(TOUCH) $@
+else
+	@echo "This ($@) should not run inside Docker!"
+	@false
+endif
+
+$(BUILD_DIR)/.ci-humble: $(deps)
+	@echo "$(HLW)***** CI (humble) *****$(HLO)"
+ifeq ($(FPSDK_IMAGE),)
+	$(V)docker/docker.sh run humble-ci ./docker/ci.sh
+	$(V)$(TOUCH) $@
+else
+	@echo "This ($@) should not run inside Docker!"
+	@false
+endif
+
+$(BUILD_DIR)/.ci-jazzy: $(deps)
+	@echo "$(HLW)***** CI (jazzy) *****$(HLO)"
+ifeq ($(FPSDK_IMAGE),)
+	$(V)docker/docker.sh run jazzy-ci ./docker/ci.sh
+	$(V)$(TOUCH) $@
+else
+	@echo "This ($@) should not run inside Docker!"
+	@false
+endif
+
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 
