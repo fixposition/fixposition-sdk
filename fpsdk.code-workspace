@@ -172,7 +172,7 @@
             "semaphore": "cpp",
             "stop_token": "cpp"
         },
-        "workbench.remoteIndicator.showExtensionRecommendations": false,
+        "workbench.remoteIndicator.showExtensionRecommendations": true,
         "yaml.extension.recommendations": false
     },
     "extensions": {
