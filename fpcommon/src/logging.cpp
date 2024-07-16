@@ -163,10 +163,17 @@ LoggingParams::LoggingParams(const LoggingLevel level, const LoggingColour colou
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-LoggingParams LoggingSetup(const LoggingParams& params)
+LoggingParams LoggingSetParams(const LoggingParams& params)
 {
     std::unique_lock<std::mutex> lock(g_mutex);
     g_params = params;
+    return g_params;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+LoggingParams LoggingGetParams()
+{
     return g_params;
 }
 

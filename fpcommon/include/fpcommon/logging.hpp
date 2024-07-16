@@ -208,13 +208,20 @@ struct LoggingParams {
  * Examples:
  *
  * @code{.cpp}
- * LoggingSetup({LoggingLevel::DEBUG});
- * LoggingSetup({LoggingLevel::DEBUG, LoggingColour::YES});
+ * LoggingSetParams({LoggingLevel::DEBUG});
+ * LoggingSetParams({LoggingLevel::DEBUG, LoggingColour::YES});
  * @endcode
  *
  * @returns a copy of the applied logging parameters
  */
-LoggingParams LoggingSetup(const LoggingParams& params);
+LoggingParams LoggingSetParams(const LoggingParams& params);
+
+/**
+ * @brief Get current logging params
+ *
+ * @returns a copy of the current logging params
+ */
+LoggingParams LoggingGetParams();
 
 /**
  * @brief Print a log message
