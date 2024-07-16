@@ -20,6 +20,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    libsqlite3-dev
     noetic.humble.jazzy.bookworm    libtiff-dev
     noetic.humble.jazzy.bookworm    libyaml-cpp-dev
+    noetic......................    python3-catkin-tools
     noetic.humble.jazzy.bookworm    python3-pip
     noetic.humble.jazzy.bookworm    sqlite3
     noetic.humble.jazzy.bookworm    sudo
