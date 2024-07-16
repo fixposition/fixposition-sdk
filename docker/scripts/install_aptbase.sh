@@ -23,6 +23,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic......................    python3-catkin-tools
     noetic.humble.jazzy.bookworm    python3-osrf-pycommon
     noetic.humble.jazzy.bookworm    python3-pip
+    noetic......................    ros-noetic-eigen-conversions
     noetic......................    ros-noetic-tf
     noetic......................    ros-noetic-tf-conversions
     noetic......................    ros-noetic-tf2-ros
