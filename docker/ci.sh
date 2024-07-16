@@ -446,7 +446,7 @@ if [ "${ROS_DISTRO}" = "noetic" ]; then
     do_step doxygen_release_ros1          || true # continue
 
 # - Or ROS 2
-elif [ -n "${ROS_DISTRO} -a "${ROS_VERSION:-}" = "2" ]; then
+elif [ -n "${ROS_DISTRO}" -a "${ROS_VERSION:-}" = "2" ]; then
     echo "===== ROS2 builds ====="
     set +u
     source /opt/ros/${ROS_DISTRO}/setup.bash
