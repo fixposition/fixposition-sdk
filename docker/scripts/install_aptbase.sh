@@ -13,15 +13,20 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    gawk
     noetic.humble.jazzy.bookworm    git
     noetic.humble.jazzy.bookworm    graphviz
-    noetic.humble.jazzy.bookworm    libboost-dev
-    noetic.humble.jazzy.bookworm    libboost-stacktrace-dev
+    noetic.humble.jazzy.bookworm    libboost-all-dev
     noetic.humble.jazzy.bookworm    libcurl4-openssl-dev
     noetic.humble.jazzy.bookworm    libeigen3-dev
     noetic.humble.jazzy.bookworm    libsqlite3-dev
     noetic.humble.jazzy.bookworm    libtiff-dev
     noetic.humble.jazzy.bookworm    libyaml-cpp-dev
     noetic......................    python3-catkin-tools
+    noetic.humble.jazzy.bookworm    python3-osrf-pycommon
     noetic.humble.jazzy.bookworm    python3-pip
+    noetic......................    ros-noetic-eigen-conversions
+    noetic......................    ros-noetic-tf
+    noetic......................    ros-noetic-tf-conversions
+    noetic......................    ros-noetic-tf2-ros
+    noetic......................    ros-noetic-tf2-tools
     noetic.humble.jazzy.bookworm    sqlite3
     noetic.humble.jazzy.bookworm    sudo
     noetic.humble.jazzy.bookworm    zlib1g-dev
@@ -29,7 +34,6 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     ..............jazzy.bookworm    googletest
     ..............jazzy.bookworm    libgtest-dev
     .......humble.jazzy.bookworm    pre-commit
-
 EOF
 )
 

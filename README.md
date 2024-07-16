@@ -19,7 +19,7 @@ The SDK part of this repo refers to C++ libraries and apps.
 ### Overview
 
 - [fpcommon](fpcommon/README.md) c++ library with common functions
-- [fpros1](fpros1/README.md) c++ library with common ROS functions
+- [fpros1](fpros1/README.md) c++ library with common ROS 1 functions
 - [fpapps](fpapps/README.md) various apps and examples using the above libraries
 
 ### Dependencies
