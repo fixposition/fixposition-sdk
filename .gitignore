@@ -17,3 +17,5 @@ CMakeCache.txt
 *.bak
 /.devcontainer/.bash_history.d
 /ws
+CATKIN_IGNORE
+COLCON_IGNORE

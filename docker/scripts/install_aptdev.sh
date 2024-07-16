@@ -28,6 +28,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    iproute2
     noetic.humble.jazzy.bookworm    iputils-ping
     noetic.humble.jazzy.bookworm    less
+    noetic.humble.jazzy.bookworm    libboost-doc
     noetic.humble.jazzy.bookworm    libevdev-dev
     noetic.humble.jazzy.bookworm    libgpiod-dev
     noetic.humble.jazzy.bookworm    libiio-dev
