@@ -1,11 +1,11 @@
-FROM ghcr.io/fixposition/fixposition/fixposition-sdk:jazzy-base
+FROM ghcr.io/fixposition/fixposition-sdk:jazzy-base
 
 # Metadata for github packages
 LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Jazzy (Ubuntu 24.04) image for Github CI jobs"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 # Variables used in our Docker build and CI scripts
-ENV FPSDK_IMAGE=humble-ci
+ENV FPSDK_IMAGE=jazzy-ci
 
 # Install pre-commit hooks (root user)
 COPY .pre-commit-config.yaml /tmp

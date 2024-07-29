@@ -7,6 +7,9 @@ LABEL org.opencontainers.image.source=https://github.com/fixposition
 ENV FPSDK_IMAGE=noetic-base
 ENV ROS_DISTRO=noetic
 
+# Remove automatic use of /ros_entrypoint.sh, we'll deal with this ourselves
+ENTRYPOINT []
+
 # Install stuff
 COPY docker/scripts/install_aptbase.sh /tmp
 RUN /tmp/install_aptbase.sh && rm -f /tmp/install_aptbase.sh
@@ -34,6 +37,9 @@ RUN /tmp/install_doxygen.sh && rm -f /tmp/install_doxygen.sh
 # Download, build and install pre-commit
 COPY docker/scripts/install_precommit.sh /tmp
 RUN /tmp/install_precommit.sh && rm -f /tmp/install_precommit.sh
+
+# Update ld cache for the installed libraries
+RUN /usr/sbin/ldconfig
 
 # Prevent packages from installation that we build and install below. Installing multiple versions of the same
 # package can be tricky and we better prevent that from happening. It doesn't work for all packages, though. For

@@ -3,7 +3,7 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  * \endverbatim
  *
@@ -12,7 +12,7 @@
  *
  * @page FPROS1_BAGWRITER ROS1 bag writer
  *
- * @todo add documentation
+ * API: fp::ros1::bagwriter
  *
  */
 #ifndef __FPROS1_BAGWRITER_HPP__

@@ -3,7 +3,7 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  * \endverbatim
  *
@@ -12,7 +12,7 @@
  *
  * @page FPCOMMON_TYPES Common types
  *
- * @todo add documentation
+ * API: fp::common::types
  *
  */
 #ifndef __FPCOMMON_TYPES_HPP__

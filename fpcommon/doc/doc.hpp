@@ -3,7 +3,7 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  * \endverbatim
  *
@@ -32,12 +32,16 @@ namespace common {
     @section FPCOMMON_MODULES Modules
 
     - @subpage FPCOMMON_APPS
+    - @subpage FPCOMMON_CAPNP
     - @subpage FPCOMMON_FPL
     - @subpage FPCOMMON_LOGGING
     - @subpage FPCOMMON_MATH
+    - @subpage FPCOMMON_PARSER
     - @subpage FPCOMMON_PATH
+    - @subpage FPCOMMON_STREAM
     - @subpage FPCOMMON_STRING
     - @subpage FPCOMMON_TIME
+    - @subpage FPCOMMON_THREAD
     - @subpage FPCOMMON_TRAFO
     - @subpage FPCOMMON_TYPES
     - @subpage FPCOMMON_UTILS

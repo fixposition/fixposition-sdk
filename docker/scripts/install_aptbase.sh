@@ -9,17 +9,20 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    build-essential
     noetic.humble.jazzy.bookworm    cmake
     noetic.humble.jazzy.bookworm    curl
+    noetic.humble.jazzy.bookworm    fakeroot
     noetic.humble.jazzy.bookworm    flex
     noetic.humble.jazzy.bookworm    gawk
     noetic.humble.jazzy.bookworm    git
     noetic.humble.jazzy.bookworm    graphviz
-    noetic.humble.jazzy.bookworm    libboost-all-dev
+    noetic.humble.jazzy.bookworm    libboost-all-dev                  # This is not small... :-/
     noetic.humble.jazzy.bookworm    libcurl4-openssl-dev
     noetic.humble.jazzy.bookworm    libeigen3-dev
     noetic.humble.jazzy.bookworm    libsqlite3-dev
     noetic.humble.jazzy.bookworm    libtiff-dev
     noetic.humble.jazzy.bookworm    libyaml-cpp-dev
+    noetic.humble.jazzy.bookworm    netbase
     noetic......................    python3-catkin-tools
+    noetic.humble.jazzy.bookworm    python-is-python3
     noetic.humble.jazzy.bookworm    python3-osrf-pycommon
     noetic.humble.jazzy.bookworm    python3-pip
     noetic......................    ros-noetic-eigen-conversions

@@ -3,7 +3,7 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  * \endverbatim
  *
@@ -14,8 +14,8 @@
 /* LIBC/STL */
 
 /* EXTERNAL */
+#include <fpros1/ext/ros_console.hpp>
 #include <gtest/gtest.h>
-#include "fpros1/ext/ros_console.hpp"
 
 /* PACKAGE */
 #include <fpcommon/logging.hpp>
@@ -31,7 +31,11 @@ TEST(UtilsTest, RedirectLoggingToRosConsole)
     ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Warn);
 
     // We're not actually testing much more than checking that this doesn't crash.
-    // Run the test with -v -v -v to make it a bit more interesting in the output.
+    // Run the test with -v -v -v and set ROS console level to Debug (above) to make it a bit more interesting in the
+    // output.
+    // clang-format off
+    //   clear; make INSTALL_PREFIX=fpsdk BUILD_TYPE=Debug build && ROSCONSOLE_FORMAT='${severity} ${time:%Y-%m-%d %H:%M:%S.%f} ${logger} - ${message}' build/Debug/fpros1/fpros1_utils_test -v -v -v
+    // clang-format on
 
     ROS_DEBUG("Hello, this is a ros debug before redirect...");
     ROS_INFO("Hello, this is a ros info before redirect...");

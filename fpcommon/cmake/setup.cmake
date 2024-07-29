@@ -36,7 +36,8 @@ elseif(NOT "$ENV{ROS_PACKAGE_PATH}" STREQUAL "")
     set(FP_USE_ROS1 ON)
 # - ROS2 environment loaded
 elseif("$ENV{ROS_VERSION}" STREQUAL "2")
-    set(FP_USE_ROS2 ON)
+    message(STATUS "fpsdk: Using ROS2")
+set(FP_USE_ROS2 ON)
     # TODO: Probably this also needs some stuff added to CMAKE_PREFIX_PATH. We're not currently using any ROS2 libs
     #       anywhere in fpapps...
 else()

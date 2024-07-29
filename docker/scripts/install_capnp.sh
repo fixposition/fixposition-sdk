@@ -4,6 +4,8 @@ set -eEu
 # Download, build and install capnp
 
 curl -L https://capnproto.org/capnproto-c++-1.0.2.tar.gz -o /tmp/capnp.tar.gz
+echo "a7517fd137ca3a81b11c7dd936708b6759caa7a3 /tmp/capnp.tar.gz" | sha1sum --check
+
 mkdir /tmp/capnp
 cd /tmp/capnp
 tar --strip-components=1 -xzvf ../capnp.tar.gz

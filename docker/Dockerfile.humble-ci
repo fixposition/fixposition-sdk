@@ -1,4 +1,4 @@
-FROM ghcr.io/fixposition/fixposition/fixposition-sdk:humble-base
+FROM ghcr.io/fixposition/fixposition-sdk:humble-base
 
 # Metadata for github packages
 LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Humble (Ubuntu 22.04) image for Github CI jobs"

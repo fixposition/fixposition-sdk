@@ -1,4 +1,4 @@
-FROM ghcr.io/fixposition/fixposition/fixposition-sdk:bookworm-base
+FROM ghcr.io/fixposition/fixposition-sdk:bookworm-base
 
 # Metadata for github packages
 LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Bookworm image for vscode devcontainer"

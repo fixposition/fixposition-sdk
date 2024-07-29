@@ -36,7 +36,8 @@
             "fpsdk/**": true,
             "build/**": true,
             "install/**": true,
-            "ws/**": true
+            "ws/**": true,
+            ".devcontainer/.vscode-server/**": true
         },
         // Exclude some things from the files watcher
         "files.watcherExclude": {
@@ -45,7 +46,7 @@
             "**/.git/logs/**": true,
             "**/.git/subtree-cache/**": true,
             "**/.git/worktrees/**": true,
-            "**/.vscode-cache": true
+            "**/.vscode-*/**": true
         },
 
         // Microsoft C++ extension (ms-vscode.cpptools)
@@ -54,7 +55,7 @@
         // see .vscode/c_cpp_properties.json-example for details
         // https://code.visualstudio.com/docs/cpp/customize-default-settings-cpp,
         // https://code.visualstudio.com/docs/cpp/c-cpp-properties-schema-reference)
-        "C_Cpp.default.includePath":           [ "${workspaceFolder}/**", "/opt/ros/noetic/include" ],
+        "C_Cpp.default.includePath":           [ "${workspaceFolder}/**", "/opt/ros/noetic/include", "/opt/ros/humble/include" ],
         "C_Cpp.default.defines":               [ "FP_USE_ROS1" ],
         //"C_Cpp.default.compileCommands":       "",
         //"C_Cpp.default.forcedIncludes":      [ ],
@@ -170,7 +171,12 @@
             "concepts": "cpp",
             "numbers": "cpp",
             "semaphore": "cpp",
-            "stop_token": "cpp"
+            "stop_token": "cpp",
+            "rtklib_stream.h": "c",
+            "rtklib_helpers_type.h": "c",
+            "rtklib_stuff.h": "c",
+            "future": "cpp",
+            "coroutine": "cpp"
         },
         "workbench.remoteIndicator.showExtensionRecommendations": true,
         "yaml.extension.recommendations": false

@@ -3,9 +3,9 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
- * \033ndverbatim
+ * \endverbatim
  *
  * @file
  * @brief Fixposition SDK: string utilities

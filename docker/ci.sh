@@ -37,6 +37,16 @@ else
 fi
 echo "FPSDK_SRC_DIR=${FPSDK_SRC_DIR}"
 
+# Optional single command-line argument to ci.sh to select only one (or some) step(s)
+STEP_FILT=${1:-}
+
+# Unset the ROS variables used to detect ROS (compare fpcommon/cmake/setup.cmake), so that we can run (the non-ROS
+# builds in) this script in a ROS devcontainer, too. We'll re-load the ROS environment later (below) based on
+# $ROS_DISTRO from the image ENV variables resp. set above.
+unset ROS_VERSION
+unset ROS_PACKAGE_PATH
+
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 NERRORS=0
@@ -45,9 +55,16 @@ declare -A TITLES
 function do_step
 {
     local func=$1
+
+    # Skip?
+    if [[ ! ${func} =~ ${STEP_FILT} ]]; then
+        echo "Skip ${TITLES[$func]}"
+        return 0
+    fi
+
     local res=0
-    echo "::group::${TITLES[$func]}"
-    echo "----- ${TITLES[$func]} -----"
+    echo "::group::${TITLES[$func]} ($func)"
+    echo "----- $func: ${TITLES[$func]} -----"
     ((NSTEPS=${NSTEPS} + 1))
 
     if ! ${func}; then
@@ -57,7 +74,7 @@ function do_step
 
     echo "::endgroup::"
     if [ ${res} -ne 0 ]; then
-        echo "::warning title=${FPSDK_IMAGE} ${func} failed::${TITLES[$func]}"
+        echo "::warning title=${FPSDK_IMAGE} ${func} failed::${TITLES[$func]} ($func)"
     fi
 
     return ${res}
@@ -78,7 +95,7 @@ function pre_commit_check
 TITLES["build_toplevel_release_noros"]="Build top-level project (release, without ROS)"
 function build_toplevel_release_noros
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-release-noros
+    local buildname=${FPSDK_IMAGE}_build_toplevel_release_noros
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -92,7 +109,7 @@ function build_toplevel_release_noros
 TITLES["test_toplevel_release_noros"]="Test top-level project (release, without ROS)"
 function test_toplevel_release_noros
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-release-noros # re-using build
+    local buildname=${FPSDK_IMAGE}_build_toplevel_release_noros # re-using build
 
     cd ${FPSDK_SRC_DIR}
     make test \
@@ -106,7 +123,7 @@ function test_toplevel_release_noros
 TITLES["build_toplevel_debug_noros"]="Build top-level project (debug, without ROS)"
 function build_toplevel_debug_noros
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-debug-noros
+    local buildname=${FPSDK_IMAGE}_build_toplevel_debug_noros
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -120,7 +137,7 @@ function build_toplevel_debug_noros
 TITLES["test_toplevel_debug_noros"]="Test top-level project (debug, without ROS)"
 function test_toplevel_debug_noros
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-debug-noros # re-using build
+    local buildname=${FPSDK_IMAGE}_build_toplevel_debug_noros # re-using build
 
     cd ${FPSDK_SRC_DIR}
     make test \
@@ -134,7 +151,7 @@ function test_toplevel_debug_noros
 TITLES["build_projs_release_noros"]="Build individual projects (release, without ROS)"
 function build_projs_release_noros
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-release-noros
+    local buildname=${FPSDK_IMAGE}_build_projs_release_noros
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -159,7 +176,7 @@ function build_projs_release_noros
 TITLES["doxygen_release_noros"]="Doxygen (release, without ROS)"
 function doxygen_release_noros
 {
-    local buildname=${FPSDK_IMAGE}_doxygen-release-noros
+    local buildname=${FPSDK_IMAGE}_doxygen_release_noros
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -174,7 +191,7 @@ function doxygen_release_noros
 TITLES["build_toplevel_release_ros1"]="Build top-level project (release, with ROS1)"
 function build_toplevel_release_ros1
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-release-ros1
+    local buildname=${FPSDK_IMAGE}_build_toplevel_release_ros1
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -188,7 +205,7 @@ function build_toplevel_release_ros1
 TITLES["test_toplevel_release_ros1"]="Test top-level project (release, with ROS1)"
 function test_toplevel_release_ros1
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-release-ros1 # re-using build
+    local buildname=${FPSDK_IMAGE}_build_toplevel_release_ros1 # re-using build
 
     cd ${FPSDK_SRC_DIR}
     make test \
@@ -202,7 +219,7 @@ function test_toplevel_release_ros1
 TITLES["build_toplevel_debug_ros1"]="Build top-level project (debug, with ROS1)"
 function build_toplevel_debug_ros1
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-debug-ros1
+    local buildname=${FPSDK_IMAGE}_build_toplevel_debug_ros1
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -216,7 +233,7 @@ function build_toplevel_debug_ros1
 TITLES["test_toplevel_debug_ros1"]="Test top-level project (debug, with ROS1)"
 function test_toplevel_debug_ros1
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-debug-ros1 # re-using build
+    local buildname=${FPSDK_IMAGE}_build_toplevel_debug_ros1 # re-using build
 
     cd ${FPSDK_SRC_DIR}
     make test \
@@ -230,7 +247,7 @@ function test_toplevel_debug_ros1
 TITLES["build_projs_release_ros1"]="Build individual projects (release, with ROS1)"
 function build_projs_release_ros1
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-release-noros
+    local buildname=${FPSDK_IMAGE}_build_projs_release_ros1
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -261,7 +278,7 @@ function build_projs_release_ros1
 TITLES["build_catkin_release"]="Build catkin (release, with ROS1)"
 function build_catkin_release
 {
-    local buildname=${FPSDK_IMAGE}_catkin-release
+    local buildname=${FPSDK_IMAGE}_build_catkin_release
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -270,10 +287,11 @@ function build_catkin_release
     ln -s ../../../fpcommon .
     ln -s ../../../fpros1 .
     ln -s ../../../fpapps .
+    ln -s ../../../ros1_fpsdk_demo .
     cd ..
     catkin init || return 1
     catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release || return 1
-    catkin build fpapps || return 1
+    catkin build || return 1
     source devel/setup.bash || return 1
     fpltool -V || return 1
 }
@@ -283,7 +301,7 @@ function build_catkin_release
 TITLES["doxygen_release_ros1"]="Doxygen (release, with ROS1)"
 function doxygen_release_ros1
 {
-    local buildname=${FPSDK_IMAGE}_doxygen-release-ros1
+    local buildname=${FPSDK_IMAGE}_doxygen_release_ros1
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -298,7 +316,7 @@ function doxygen_release_ros1
 TITLES["build_toplevel_release_ros2"]="Build top-level project (release, with ROS2)"
 function build_toplevel_release_ros2
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-release-ros2
+    local buildname=${FPSDK_IMAGE}_build_toplevel_release_ros2
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -312,7 +330,7 @@ function build_toplevel_release_ros2
 TITLES["test_toplevel_release_ros2"]="Test top-level project (release, with ROS2)"
 function test_toplevel_release_ros2
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-release-ros2 # re-using build
+    local buildname=${FPSDK_IMAGE}_build_toplevel_release_ros2 # re-using build
 
     cd ${FPSDK_SRC_DIR}
     make test \
@@ -326,7 +344,7 @@ function test_toplevel_release_ros2
 TITLES["build_toplevel_debug_ros2"]="Build top-level project (debug, with ROS2)"
 function build_toplevel_debug_ros2
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-debug-ros2
+    local buildname=${FPSDK_IMAGE}_build_toplevel_debug_ros2
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -340,7 +358,7 @@ function build_toplevel_debug_ros2
 TITLES["test_toplevel_debug_ros2"]="Test top-level project (debug, with ROS2)"
 function test_toplevel_debug_ros2
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-debug-ros2 # re-using build
+    local buildname=${FPSDK_IMAGE}_build_toplevel_debug_ros2 # re-using build
 
     cd ${FPSDK_SRC_DIR}
     make test \
@@ -354,7 +372,7 @@ function test_toplevel_debug_ros2
 TITLES["build_projs_release_ros2"]="Build individual projects (release, with ROS2)"
 function build_projs_release_ros2
 {
-    local buildname=${FPSDK_IMAGE}_toplevel-release-noros
+    local buildname=${FPSDK_IMAGE}_build_projs_release_ros2
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
@@ -386,14 +404,16 @@ function build_projs_release_ros2
 TITLES["build_colcon_release"]="Build colcon (release, with ROS2)"
 function build_colcon_release
 {
-    local buildname=${FPSDK_IMAGE}_catkin-release
+    local buildname=${FPSDK_IMAGE}_build_colcon_release
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
     mkdir -p build/${buildname}/src
     cd build/${buildname}/src
     ln -s ../../../fpcommon .
+    ln -s ../../../fpros2 .
     ln -s ../../../fpapps .
+    ln -s ../../../ros2_fpsdk_demo .
     cd ..
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release || return 1
     set +u
@@ -407,7 +427,7 @@ function build_colcon_release
 TITLES["doxygen_release_ros2"]="Doxygen (release, with ROS2)"
 function doxygen_release_ros2
 {
-    local buildname=${FPSDK_IMAGE}_doxygen-release-ros2
+    local buildname=${FPSDK_IMAGE}_doxygen_release_ros2
 
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}

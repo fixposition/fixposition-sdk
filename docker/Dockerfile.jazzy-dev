@@ -1,4 +1,4 @@
-FROM ghcr.io/fixposition/fixposition/fixposition-sdk:humble-base
+FROM ghcr.io/fixposition/fixposition-sdk:jazzy-base
 
 # Metadata for github packages
 LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Jazzy (Ubuntu 24.04) image for vscode devcontainer"

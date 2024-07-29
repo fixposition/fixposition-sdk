@@ -21,10 +21,13 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    ccache
     noetic.humble.jazzy.bookworm    chrpath
     noetic.humble.jazzy.bookworm    curl
+    noetic.humble.jazzy.bookworm    dlocate
     noetic.humble.jazzy.bookworm    evtest
     noetic.humble.jazzy.bookworm    file
+    noetic.humble.jazzy.bookworm    flip
     noetic.humble.jazzy.bookworm    gdb
     noetic.humble.jazzy.bookworm    git-lfs
+    noetic.humble.jazzy.bookworm    htop
     noetic.humble.jazzy.bookworm    iproute2
     noetic.humble.jazzy.bookworm    iputils-ping
     noetic.humble.jazzy.bookworm    less
@@ -32,6 +35,8 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    libevdev-dev
     noetic.humble.jazzy.bookworm    libgpiod-dev
     noetic.humble.jazzy.bookworm    libiio-dev
+    ....................bookworm    linux-perf
+    noetic.humble.jazzy.........    linux-tools-common                          # perf
     noetic.humble.jazzy.bookworm    lsb-release
     noetic.humble.jazzy.bookworm    man
     noetic.humble.jazzy.bookworm    man-db
@@ -46,6 +51,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble...............    netcat
     ..............jazzy.bookworm    netcat-openbsd
     noetic.humble.jazzy.bookworm    openssh-client
+    noetic.humble.jazzy.bookworm    psmisc
     noetic.humble.jazzy.bookworm    pv
     noetic.humble.jazzy.bookworm    sl
     noetic.humble.jazzy.bookworm    rsync
@@ -54,11 +60,11 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    systemd-journal-remote
     noetic.humble.jazzy.bookworm    tcpdump
     noetic.humble.jazzy.bookworm    tig
+    noetic.humble.jazzy.bookworm    valgrind
     noetic.humble.jazzy.bookworm    vim
     noetic.humble.jazzy.bookworm    wget
     noetic.humble.jazzy.bookworm    xauth
     noetic.humble.jazzy.bookworm    xxd
-
 EOF
 )
 

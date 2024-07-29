@@ -156,7 +156,7 @@ function do_run
     flags="${flags} --mount type=bind,src=/tmp/home-${hostname},dst=/tmp/home-${hostname}"
     flags="${flags} --env HOME=/tmp/home-${hostname}"
     flags="${flags} --workdir ${SCRIPTDIR}/.."
-    if docker run ${flags} ghcr.io/fixposition/fixposition/fixposition-sdk:${service} "$@"; then
+    if docker run ${flags} ghcr.io/fixposition/fixposition-sdk:${service} "$@"; then
         return 0
     else
         return 1

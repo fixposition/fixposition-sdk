@@ -3,8 +3,11 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
+ *
+ *  Parts copyright (c) 2008, Willow Garage, Inc., see time.cpp for details
+ *  Parts copyright (c) 2007-2020, T. Takasu, see time.cpp for details
  * \endverbatim
  *
  * @file
@@ -12,7 +15,7 @@
  *
  * @page FPCOMMON_TIME Time utilities
  *
- * @todo add documentation
+ * API: fp::common::time
  *
  */
 #ifndef __FPCOMMON_TIME_HPP__
@@ -59,7 +62,7 @@ void Sleep(const uint32_t duration);
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- * @brief Minimal ros::Time() implementation (that doesn't throw)
+ * @brief Minimal ros::Time() / rplcpp::Time implementation (that doesn't throw)
  */
 struct RosTime {
     RosTime();

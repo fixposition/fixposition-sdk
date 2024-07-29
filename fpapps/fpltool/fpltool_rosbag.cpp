@@ -3,7 +3,7 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
 
 * /__/  \__\
  * \endverbatim
@@ -16,9 +16,6 @@
 #include <string>
 
 /* EXTERNAL */
-#ifdef FP_USE_ROS1
-
-#endif
 
 /* Fixposition SDK */
 #include <fpcommon/app.hpp>
@@ -28,7 +25,7 @@
 #include <fpcommon/string.hpp>
 #ifdef FP_USE_ROS1
 #  include <fpros1/bagwriter.hpp>
-#  include <fpros1/ext/std_msgs.hpp>
+#  include <fpros1/ext/ros_msgs.hpp>
 #endif
 
 /* PACKAGE */

@@ -6,4 +6,5 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wshadow"
 #include <ros/ros.h>
+#pragma GCC diagnostic pop
 #endif  // __FPROS1_EXT_ROS_HPP__
