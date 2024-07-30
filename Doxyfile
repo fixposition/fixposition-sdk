@@ -54,7 +54,7 @@ PROJECT_NUMBER         =
 # for a project that appears at the top of each page and should give viewer a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "Collection of c++ libraries and apps that may be useful to use with Fixposition products"
+PROJECT_BRIEF          = "Collection of c++ libraries and apps for use with Fixposition products"
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
@@ -942,6 +942,7 @@ WARN_LOGFILE           =
 INPUT                  = doc \
                          fpcommon \
                          fpros1 \
+                         fpros2 \
                          fpapps
 
 # This tag can be used to specify the character encoding of the source files
@@ -1337,7 +1338,7 @@ HTML_EXTRA_FILES       =
 # The default value is: AUTO_LIGHT.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_COLORSTYLE        = AUTO_LIGHT
+HTML_COLORSTYLE        = TOGGLE
 
 # The HTML_COLORSTYLE_HUE tag controls the color of the HTML output. Doxygen
 # will adjust the colors in the style sheet and background images according to
@@ -1393,7 +1394,7 @@ HTML_DYNAMIC_SECTIONS  = NO
 # The default value is: YES.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_CODE_FOLDING      = YES
+HTML_CODE_FOLDING      = NO
 
 # If the HTML_COPY_CLIPBOARD tag is set to YES then doxygen will show an icon in
 # the top right corner of code and text fragments that allows the user to copy
@@ -1413,7 +1414,7 @@ HTML_COPY_CLIPBOARD    = YES
 # be stored separately.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_PROJECT_COOKIE    =
+HTML_PROJECT_COOKIE    = fixposition-sdk
 
 # With HTML_INDEX_NUM_ENTRIES one can control the preferred number of entries
 # shown in the various tree structured indices initially; the user can expand

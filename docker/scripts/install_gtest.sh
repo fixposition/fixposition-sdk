@@ -4,6 +4,8 @@ set -eEu
 # Download, build and install googletest
 
 curl -L https://github.com/google/googletest/archive/refs/tags/v1.13.0.tar.gz -o /tmp/gtest.tar.gz
+echo "bfa4b5131b6eaac06962c251742c96aab3f7aa78 /tmp/gtest.tar.gz" | sha1sum --check
+
 mkdir /tmp/gtest
 cd /tmp/gtest
 tar --strip-components=1 -xzvf ../gtest.tar.gz

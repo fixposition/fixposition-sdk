@@ -3,7 +3,7 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  * \endverbatim
  *
@@ -32,7 +32,12 @@ namespace fp {
 
     - @subpage FPCOMMON_DOC
     - @subpage FPROS1_DOC
+    - @subpage FPROS2_DOC
     - @subpage FPAPPS_DOC
+
+    @section FP_REFS References
+
+    - Fixposition SDK source code repository: https://github.com/fixposition/fixposition_utility
 
 */
 

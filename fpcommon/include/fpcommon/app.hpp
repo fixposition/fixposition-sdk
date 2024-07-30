@@ -3,7 +3,7 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  * \endverbatim
  *
@@ -12,13 +12,14 @@
  *
  * @page FPCOMMON_APPS Utilities for apps
  *
- * @todo add documentation
+ * API: fp::common::app
  *
  */
 #ifndef __FPCOMMON_APP_HPP__
 #define __FPCOMMON_APP_HPP__
 
 /* LIBC/STL */
+#include <cstdint>
 
 /* EXTERNAL */
 
@@ -62,6 +63,15 @@ class SigIntHelper
      * @returns true if signal was raised and we should abort, false otherwise
      */
     bool ShouldAbort();
+
+    /**
+     * @brief Wait (block) until signal is raised and we should abort
+     *
+     * @param[in]  millis  Wait at most this long [ms], 0 = forever
+     *
+     * @returns true if the signal was raised, fals if timeout expired
+     */
+    bool WaitAbort(const uint32_t millis = 0);
 };
 
 /**

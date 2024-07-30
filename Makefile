@@ -17,6 +17,8 @@ ifneq ($(MAKECMDGOALS),)
 ifneq ($(MAKECMDGOALS),help)
 ifneq ($(MAKECMDGOALS),pre-commit)
 ifneq ($(MAKECMDGOALS),ci)
+ifneq ($(MAKECMDGOALS),distclean)
+ifneq ($(MAKECMDGOALS),doc)
     ifeq ($(INSTALL_PREFIX),)
         $(error Please provide a INSTALL_PREFIX. Try 'make help'!)
     endif
@@ -27,6 +29,8 @@ ifneq ($(MAKECMDGOALS),ci)
     else
         $(info No ROS_PACKAGE_PATH (ROS1) and no ROS_VERSION (ROS2) found)
     endif
+endif
+endif
 endif
 endif
 endif
@@ -104,18 +108,26 @@ HLW=
 HLO=
 endif
 
+# Disable all built-in rules
+.SUFFIXES:
+
 ########################################################################################################################
 
+CMAKE_ARGS_BUILD :=
 CMAKE_ARGS := -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 ifneq ($(ROS_PACKAGE_PATH),)
   CMAKE_ARGS += -DROS_PACKAGE_PATH=$(ROS_PACKAGE_PATH)
 endif
 
+ifneq ($(VERBOSE),0)
+  CMAKE_ARGS_BUILD += --verbose
+endif
+
 ifeq ($(GITHUB_WORKSPACE),)
-  CMAKE_PARALLEL = 4
+  CMAKE_ARGS_BUILD = --parallel 4
 else
-  CMAKE_PARALLEL = 1
+  CMAKE_ARGS_BUILD = --parallel 1
 endif
 
 BUILD_DIR = build/$(BUILD_TYPE)
@@ -125,16 +137,20 @@ BUILD_DIR = build/$(BUILD_TYPE)
 clean:
 	$(V)$(RM) -rf $(BUILD_DIR)
 
+.PHONY: distclean
+distclean:
+	$(V)$(RM) -rf install build fpsdk
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 .PHONY: cmake
 cmake: $(BUILD_DIR)/.make-cmake
 
-deps = $(sort $(wildcard Makefile \
-    fpcommon/* fpcommon/*/* fpcommon/*/*/* \
-    fpros1/* fpros1/*/* fpros1/*/*/* \
-    fpros2/* fpros2/*/* fpros2/*/*/* \
-    fpapps/* fpapps/*/* fpapps/*/*/*))
+deps = $(sort $(wildcard Makefile doc/* Doxyfile \
+    fpcommon/* fpcommon/*/* fpcommon/*/*/* fpcommon/*/*/*/* \
+    fpros1/* fpros1/*/* fpros1/*/*/* fpros1/*/*/*/* \
+    fpros2/* fpros2/*/* fpros2/*/*/* fpros2/*/*/*/* \
+    fpapps/* fpapps/*/* fpapps/*/*/* fpapps/*/*/*/*))
 
 $(BUILD_DIR)/.make-cmake: $(deps)
 	@echo "$(HLW)***** Configure ($(BUILD_TYPE)) *****$(HLO)"
@@ -148,7 +164,7 @@ build: $(BUILD_DIR)/.make-build
 
 $(BUILD_DIR)/.make-build: $(BUILD_DIR)/.make-cmake
 	@echo "$(HLW)***** Build ($(BUILD_TYPE)) *****$(HLO)"
-	$(V)$(CMAKE) --build $(BUILD_DIR) --parallel $(CMAKE_PARALLEL)
+	$(V)$(CMAKE) --build $(BUILD_DIR)  $(CMAKE_ARGS_BUILD)
 	$(V)$(TOUCH) $@
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -180,7 +196,7 @@ $(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-cmake
 	@echo "$(HLW)***** Doc ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)( \
             cat Doxyfile; \
-            echo "PROJECT_NUMBER = $(cat $(BUILD_DIR)/FP_VERSION_STRING || echo 'unknown revision')"; \
+            echo "PROJECT_NUMBER = $$(cat $(BUILD_DIR)/FP_VERSION_STRING || echo 'unknown revision')"; \
             echo "OUTPUT_DIRECTORY = $(BUILD_DIR)"; \
         ) | $(DOXYGEN) -
 	$(V)$(TOUCH) $@

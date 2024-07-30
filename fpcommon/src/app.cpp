@@ -3,7 +3,7 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  * \endverbatim
  *
@@ -21,6 +21,7 @@
 /* PACKAGE */
 #include "fpcommon/app.hpp"
 #include "fpcommon/logging.hpp"
+#include "fpcommon/thread.hpp"
 
 namespace fp {
 namespace common {
@@ -29,6 +30,7 @@ namespace app {
 
 static bool g_siginit_abort = false;
 static sighandler_t g_sigint_old_handler = SIG_IGN;
+static fp::common::thread::BinarySemaphore g_sigint_sem;
 
 static void SigIntHandler(int signum)
 {
@@ -39,6 +41,8 @@ static void SigIntHandler(int signum)
         // Handle signal only once, next time let the original handler deal with it
         std::signal(SIGINT, g_sigint_old_handler == SIG_IGN ? SIG_DFL : g_sigint_old_handler);
         g_sigint_old_handler = SIG_IGN;
+
+        g_sigint_sem.Notify();
     }
 }
 
@@ -52,11 +56,29 @@ SigIntHelper::SigIntHelper()
 SigIntHelper::~SigIntHelper()
 {
     std::signal(SIGINT, g_sigint_old_handler == SIG_IGN ? SIG_DFL : g_sigint_old_handler);
+    g_sigint_sem.Notify();
 }
 
 bool SigIntHelper::ShouldAbort()
 {
     return g_siginit_abort;
+}
+
+bool SigIntHelper::WaitAbort(const uint32_t millis)
+{
+    // Wait with timeout
+    if (millis > 0) {
+        return g_sigint_sem.WaitFor(millis);
+    }
+    // Wait forever
+    else {
+        while (true) {
+            if (g_sigint_sem.WaitFor(1234)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

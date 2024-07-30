@@ -1,4 +1,4 @@
-FROM ghcr.io/fixposition/fixposition/fixposition-sdk:noetic-base
+FROM ghcr.io/fixposition/fixposition-sdk:noetic-base
 
 # Metadata for github packages
 LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Noetic (Ubuntu 20.04) base image for Github CI jobs"

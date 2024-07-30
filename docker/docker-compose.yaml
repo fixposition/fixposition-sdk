@@ -2,57 +2,96 @@ name: fixposition-sdk
 
 services:
 
+    # ----- no ROS -----------------------------------------------------------------------------------------------------
+
+    bookworm-base:
+        image: ghcr.io/fixposition/fixposition-sdk:bookworm-base
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.bookworm-base
+        command: tail -f
+    bookworm-ci:
+        image: ghcr.io/fixposition/fixposition-sdk:bookworm-ci
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.bookworm-ci
+        depends_on:
+            - bookworm-base
+        command: tail -f
+    bookworm-dev:
+        image: ghcr.io/fixposition/fixposition-sdk:bookworm-dev
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.bookworm-dev
+        depends_on:
+            - bookworm-base
+        volumes:
+            # Bash config
+            - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
+            - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
+            # Persistent stuff
+            - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
+            # Workspace
+            - ../.:/home/fpsdk/fixposition_utility
+        cap_add:
+          - SYS_PTRACE # Set kernel.yama.ptrace_scope = 0 in /etc/sysctl.d/10-ptrace.conf
+        hostname: fpsdk-bookworm-dev-${USER}
+        # Apparently required... (so that the container doesn't kill itself?)
+        command: tail -f
+
     # ----- ROS1 -------------------------------------------------------------------------------------------------------
 
     noetic-base:
-        image: ghcr.io/fixposition/fixposition/fixposition-sdk:noetic-base
+        image: ghcr.io/fixposition/fixposition-sdk:noetic-base
         build:
             context: ..
             dockerfile: docker/Dockerfile.noetic-base
+        command: tail -f
     noetic-ci:
-        image: ghcr.io/fixposition/fixposition/fixposition-sdk:noetic-ci
+        image: ghcr.io/fixposition/fixposition-sdk:noetic-ci
         build:
             context: ..
             dockerfile: docker/Dockerfile.noetic-ci
         depends_on:
             - noetic-base
+        command: tail -f
     noetic-dev:
-        image: ghcr.io/fixposition/fixposition/fixposition-sdk:noetic-dev
+        image: ghcr.io/fixposition/fixposition-sdk:noetic-dev
         build:
             context: ..
             dockerfile: docker/Dockerfile.noetic-dev
         depends_on:
             - noetic-base
         volumes:
-            # Bash config
             - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
-            # Persistent history
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
-            # Workspace
+            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
             - ../.:/home/fpsdk/fixposition_utility
         cap_add:
-          - SYS_PTRACE # Set kernel.yama.ptrace_scope = 0 in /etc/sysctl.d/10-ptrace.conf
+          - SYS_PTRACE
         hostname: fpsdk-noetic-dev-${USER}
-        # Apparently required... (so that the container doesn't kill itself?)
         command: tail -f
 
     # ----- ROS2 -------------------------------------------------------------------------------------------------------
 
     humble-base:
-        image: ghcr.io/fixposition/fixposition/fixposition-sdk:humble-base
+        image: ghcr.io/fixposition/fixposition-sdk:humble-base
         build:
             context: ..
             dockerfile: docker/Dockerfile.humble-base
+        command: tail -f
     humble-ci:
-        image: ghcr.io/fixposition/fixposition/fixposition-sdk:humble-ci
+        image: ghcr.io/fixposition/fixposition-sdk:humble-ci
         build:
             context: ..
             dockerfile: docker/Dockerfile.humble-ci
         depends_on:
             - humble-base
+        command: tail -f
     humble-dev:
-        image: ghcr.io/fixposition/fixposition/fixposition-sdk:humble-dev
+        image: ghcr.io/fixposition/fixposition-sdk:humble-dev
         build:
             context: ..
             dockerfile: docker/Dockerfile.humble-dev
@@ -62,6 +101,7 @@ services:
             - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
             - ../.:/home/fpsdk/fixposition_utility
         cap_add:
           - SYS_PTRACE
@@ -69,19 +109,21 @@ services:
         command: tail -f
 
     jazzy-base:
-        image: ghcr.io/fixposition/fixposition/fixposition-sdk:jazzy-base
+        image: ghcr.io/fixposition/fixposition-sdk:jazzy-base
         build:
             context: ..
             dockerfile: docker/Dockerfile.jazzy-base
+        command: tail -f
     jazzy-ci:
-        image: ghcr.io/fixposition/fixposition/fixposition-sdk:jazzy-ci
+        image: ghcr.io/fixposition/fixposition-sdk:jazzy-ci
         build:
             context: ..
             dockerfile: docker/Dockerfile.jazzy-ci
         depends_on:
             - jazzy-base
+        command: tail -f
     jazzy-dev:
-        image: ghcr.io/fixposition/fixposition/fixposition-sdk:jazzy-dev
+        image: ghcr.io/fixposition/fixposition-sdk:jazzy-dev
         build:
             context: ..
             dockerfile: docker/Dockerfile.jazzy-dev
@@ -91,40 +133,9 @@ services:
             - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
             - ../.:/home/fpsdk/fixposition_utility
         cap_add:
           - SYS_PTRACE
         hostname: fpsdk-jazzy-dev-${USER}
-        command: tail -f
-
-    # ------------------------------------------------------------------------------------------------------------------
-
-    # Non-ROS base image based on Debian
-    bookworm-base:
-        image: ghcr.io/fixposition/fixposition/fixposition-sdk:bookworm-base
-        build:
-            context: ..
-            dockerfile: docker/Dockerfile.bookworm-base
-    bookworm-ci:
-        image: ghcr.io/fixposition/fixposition/fixposition-sdk:bookworm-ci
-        build:
-            context: ..
-            dockerfile: docker/Dockerfile.bookworm-ci
-        depends_on:
-            - bookworm-base
-    bookworm-dev:
-        image: ghcr.io/fixposition/fixposition/fixposition-sdk:bookworm-dev
-        build:
-            context: ..
-            dockerfile: docker/Dockerfile.bookworm-dev
-        depends_on:
-            - bookworm-base
-        volumes:
-            - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
-            - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
-            - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
-            - ../.:/home/fpsdk/fixposition_utility
-        cap_add:
-          - SYS_PTRACE
-        hostname: fpsdk-bookworm-dev-${USER}
         command: tail -f

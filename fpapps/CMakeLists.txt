@@ -33,17 +33,19 @@ if(NOT TARGET fpcommon)
     find_package(fpcommon REQUIRED)
 endif()
 
+find_package(CapnProto 1.0.2 REQUIRED) # TODO: why needed?
+
 if(FP_USE_ROS1)
     if(NOT TARGET fpros1)
         find_package(fpros1 REQUIRED)
+        message(STATUS "fpapps: fpros1_INCLUDE_DIRS=${fpros1_INCLUDE_DIRS}")
+        message(STATUS "fpapps: fpros1_LIBRARIES=${fpros1_LIBRARIES}")
     endif()
     add_compile_definitions(FP_USE_ROS1)
-    message(STATUS "apps fpsdk: fpros1_INCLUDE_DIRS=${fpros1_INCLUDE_DIRS}")
-    message(STATUS "apps fpsdk: fpros1_LIBRARIES=${fpros1_LIBRARIES}")
 elseif(FP_USE_ROS2)
     add_compile_definitions(FP_USE_ROS2)
 else()
-    message(STATUS "fpsdk: No ROS available")
+    message(STATUS "fpapps: No ROS available")
 endif()
 
 include_directories(include ${fpcommon_INCLUDE_DIRS} ${YAML_CPP_INCLUDE_DIR} ${fpros1_INCLUDE_DIRS})
@@ -73,6 +75,12 @@ target_link_libraries(fpltool
 
 
 # INSTALL ==============================================================================================================
+
+include(GNUInstallDirs) # Provides nice relative paths wrt CMAKE_INSTALL_PREFIX
+set(PROJECT_RUNTIME_DIR ${CMAKE_INSTALL_FULL_BINDIR})
+set(PROJECT_LIBRARY_DIR ${CMAKE_INSTALL_FULL_LIBDIR})
+set(PROJECT_INCLUDE_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME})
+set(PROJECT_DATA_DIR    ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME})
 
 install(TARGETS fpltool
     EXPORT ${PROJECT_NAME}-targets

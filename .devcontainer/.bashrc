@@ -156,4 +156,18 @@ fi
 # Source ROS environment
 if [ -n "${ROS_DISTRO}" ]; then
     source /opt/ros/${ROS_DISTRO}/setup.bash
+    export ROSCONSOLE_STDOUT_LINE_BUFFERED=1
+    export ROSCONSOLE_FORMAT='${severity} ${time:%Y-%m-%d %H:%M:%S.%f} ${logger} - ${message}'
+    # export RCUTILS_LOGGING_BUFFERED_STREAM=1
+    # export RCUTILS_LOGGING_USE_STDOUT=1
+    export RCUTILS_COLORIZED_OUTPUT=1
+    case "${ROS_DISTRO}" in
+        jazzy|rolling)
+            export RCUTILS_CONSOLE_OUTPUT_FORMAT="{severity} {date_time_with_ms} {name} - {message}"
+            ;;
+        *)
+            export RCUTILS_CONSOLE_OUTPUT_FORMAT="{severity} {time} {name} - {message}"
+            ;;
+    esac
+
 fi

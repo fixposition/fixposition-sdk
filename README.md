@@ -15,11 +15,13 @@ The SDK part of this repo refers to C++ libraries and apps.
 ## SDK
 
 [![CI](https://github.com/fixposition/fixposition_utility/actions/workflows/ci.yml/badge.svg)](https://github.com/fixposition/fixposition_utility/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/Documentation-781808])](https://fixposition.github.io/fixposition_utility/fixposition-sdk-docs)
 
 ### Overview
 
 - [fpcommon](fpcommon/README.md) c++ library with common functions
 - [fpros1](fpros1/README.md) c++ library with common ROS 1 functions
+- [fpros2](fpros2/README.md) c++ library with common ROS 2 functions
 - [fpapps](fpapps/README.md) various apps and examples using the above libraries
 
 ### Dependencies
@@ -59,7 +61,7 @@ make install INSTALL_PREFIX=fpsdk
 #### Command-line "devcontainer"
 
 ```sh
-docker pull ghcr.io/fixposition/fixposition/fixposition-sdk:noetic-dev
+docker pull ghcr.io/fixposition/fixposition-sdk:noetic-dev
 ./docker.sh run bash
 source /opt/ros/noetic/setup.bash
 make install INSTALL_PREFIX=fpsdk
@@ -76,16 +78,13 @@ To run all CI:
 
 This details the manual setup of the dependencies and building the SDK on a ROS1 system (e.g., Ubuntu 20.04 with ROS
 Noetic). It works similarly for ROS2 (e.g., Ubuntu 22.04 with ROS Humble) or non-ROS (e.g., Debian Bookworm) based
-systems.
+systems. Refer to the [Docker configration files and scripts](./docker) on installing the required dependencies.
 
 
 1. Setup build system, install dependencies
 
     The exact steps required depend on your system. You'll need the dependencies mentioned above installed system wide
     or otherwise tell CMake where to find them.
-
-    Refer to the [Dockerfile.noetic-base](docker/Dockerfile.noetic-base) on installing the required dependencies on Ubuntu
-    20.04 with ROS Noetic.
 
     ```sh
     source /opt/ros/noetic/setup.bash
@@ -124,8 +123,8 @@ Alternatively, you can do `catkin build fpapps` in your ROS workspace.
 The packages can be built individually. See the instructions in the [fpcommon](fpcommon/README.md),
 [fpros1](fpros1/README.md) and [fpapps](fpapps/README.md) packages.
 
-Refer to the CI workflow configuration ([ci.yaml](./.github/workflows/ci.yml)) for more options, such as different build
-configurations or running tests.
+Refer to the CI workflow configuration ([ci.yaml](./.github/workflows/ci.yml)) and the CI script
+([ci.sh](./docker/ci.sh)) for more options, such as different build configurations or running tests.
 
 ---
 ## License

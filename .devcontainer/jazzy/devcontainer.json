@@ -9,7 +9,7 @@
     "remoteUser": "fpsdk",
     "updateRemoteUserUID": true,
 
-    // compare .services.humble-dev.volumes in ../../docker/docker-compose.yaml
+    // compare .services.jazzy-dev.volumes in ../../docker/docker-compose.yaml
     "workspaceFolder": "/home/fpsdk/fixposition_utility",
 
     // Deliberately empty, see fpsdk.code-workspace instead

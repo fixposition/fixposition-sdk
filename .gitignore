@@ -16,6 +16,14 @@ CMakeCache.txt
 *.bag
 *.bak
 /.devcontainer/.bash_history.d
+/.devcontainer/.vscode-server
 /ws
+/ws2
+/ros_ws
+/ros1_ws
+/ros2_ws
 CATKIN_IGNORE
 COLCON_IGNORE
+.catkin_tools
+/log
+/src

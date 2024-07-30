@@ -3,7 +3,7 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  * \endverbatim
  *
@@ -12,13 +12,14 @@
  *
  * @page FPROS1_UTILS ROS1 utilities
  *
- * @todo add documentation
+ * API: fp::ros1::utils
  *
  */
 #ifndef __FPROS1_UTILS_HPP__
 #define __FPROS1_UTILS_HPP__
 
 /* LIBC/STL */
+#include <cstring>
 
 /* EXTERNAL */
 
@@ -49,6 +50,56 @@ namespace utils {
  * - FATAL           --> FATAL
  */
 void RedirectLoggingToRosConsole();
+
+/**
+ * @brief Loads a parameter from the ROS parameter server (int)
+ *
+ * @param[in]  name   The parameter name
+ * @param[out] value  The value
+ *
+ * @returns true if parameter found and loaded, false otherwise
+ */
+bool LoadRosParam(const std::string& name, int& value);
+
+/**
+ * @brief Loads a parameter from the ROS parameter server (string)
+ *
+ * @param[in]  name   The parameter name
+ * @param[out] value  The value
+ *
+ * @returns true if parameter found and loaded, false otherwise
+ */
+bool LoadRosParam(const std::string& name, std::string& value);
+
+/**
+ * @brief Loads a parameter from the ROS parameter server (bool)
+ *
+ * @param[in]  name   The parameter name
+ * @param[out] value  The value
+ *
+ * @returns true if parameter found and loaded, false otherwise
+ */
+bool LoadRosParam(const std::string& name, bool& value);
+
+/**
+ * @brief Loads a parameter from the ROS parameter server (float)
+ *
+ * @param[in]  name   The parameter name
+ * @param[out] value  The value
+ *
+ * @returns true if parameter found and loaded, false otherwise
+ */
+bool LoadRosParam(const std::string& name, float& value);
+
+/**
+ * @brief Loads a parameter from the ROS parameter server (double)
+ *
+ * @param[in]  name   The parameter name
+ * @param[out] value  The value
+ *
+ * @returns true if parameter found and loaded, false otherwise
+ */
+bool LoadRosParam(const std::string& name, double& value);
 
 /* ****************************************************************************************************************** */
 }  // namespace utils

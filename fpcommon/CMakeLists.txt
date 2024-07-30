@@ -21,15 +21,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(NDEBUG)
-else()
+endif()
+if (NOT CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_definitions(BOOST_STACKTRACE_USE_BACKTRACE)
     add_compile_definitions(BOOST_STACKTRACE_USE_ADDR2LINE)
     set(FP_BOOST_STACKTRACE 1)
-endif()
-if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_compile_definitions(NDEBUG)
 endif()
 
 
@@ -70,19 +68,20 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         ${YAML_CPP_LIBRARIES}
         ${EIGEN3_LIBRARIES}
+        ${CAPNP_LIBRARIES}
     PRIVATE
         ${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
         ${ZLIB_LIBRARIES}
-        ${CAPNP_LIBRARIES}
         PROJ::proj
 )
-
 
 # INSTALL ==============================================================================================================
 
 include(GNUInstallDirs) # Provides nice relative paths wrt CMAKE_INSTALL_PREFIX
+set(PROJECT_RUNTIME_DIR ${CMAKE_INSTALL_FULL_BINDIR})
 set(PROJECT_LIBRARY_DIR ${CMAKE_INSTALL_FULL_LIBDIR})
 set(PROJECT_INCLUDE_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME})
+set(PROJECT_DATA_DIR    ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME})
 
 # Headers
 install(DIRECTORY include/${PROJECT_NAME}/
@@ -147,12 +146,16 @@ install(
 include(cmake/testing.cmake)
 
 add_gtest(TARGET app_test       SOURCES test/app_test.cpp       LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET capnp_test     SOURCES test/capnp_test.cpp     LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET fpl_test       SOURCES test/fpl_test.cpp       LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET logging_test   SOURCES test/logging_test.cpp   LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET math_test      SOURCES test/math_test.cpp      LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET parser_test    SOURCES test/parser_test.cpp    LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET path_test      SOURCES test/path_test.cpp      LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET stream_test    SOURCES test/stream_test.cpp    LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET string_test    SOURCES test/string_test.cpp    LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET time_test      SOURCES test/time_test.cpp      LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET thread_test    SOURCES test/thread_test.cpp    LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET trafo_test     SOURCES test/trafo_test.cpp     LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET utils_test     SOURCES test/utils_test.cpp     LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET yaml_test      SOURCES test/yaml_test.cpp      LINK_LIBS ${PROJECT_NAME})

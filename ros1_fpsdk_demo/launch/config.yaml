@@ -1,0 +1,4 @@
+worker1_interval: 1.5
+worker2_interval: 3.0
+timer1_interval:  2.0
+timer2_interval:  4.0

@@ -3,7 +3,7 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  * \endverbatim
  *
@@ -23,9 +23,21 @@ namespace {
 /* ****************************************************************************************************************** */
 using namespace fp::common::logging;
 
-TEST(LoggingTest, Dummy)
+TEST(LoggingTest, LoggingPrint)
 {
-    EXPECT_TRUE(true);
+    DEBUG("This is fpcommon debug...");
+    INFO("This is fpcommon info...");
+    // WARNING("This is fpcommon warning...");
+
+    DEBUG_S("This"
+            << " is"
+            << " fpcommon"
+            << " debug");
+    INFO_S("This"
+           << " is"
+           << " fpcommon"
+           << " debug");
+    // WARNING_S("This" << " is" << " fpcommon" << " warning");
 }
 
 /* ****************************************************************************************************************** */

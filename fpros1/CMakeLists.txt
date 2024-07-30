@@ -21,9 +21,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
-    add_compile_definitions(NDEBUG)
-endif()
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(NDEBUG)
 endif()
@@ -35,6 +32,8 @@ endif()
 if(NOT TARGET fpcommon)
     find_package(fpcommon REQUIRED)
 endif()
+
+find_package(CapnProto 1.0.2 REQUIRED) # TODO: why needed?
 
 set(FP_ROS1_INCLUDE_DIRS "")
 set(FP_ROS1_LIBRARIES "")
@@ -84,8 +83,10 @@ target_link_libraries(${PROJECT_NAME}
 # INSTALL ==============================================================================================================
 
 include(GNUInstallDirs) # Provides nice relative paths wrt CMAKE_INSTALL_PREFIX
+set(PROJECT_RUNTIME_DIR ${CMAKE_INSTALL_FULL_BINDIR})
 set(PROJECT_LIBRARY_DIR ${CMAKE_INSTALL_FULL_LIBDIR})
 set(PROJECT_INCLUDE_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME})
+set(PROJECT_DATA_DIR    ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME})
 
 # Headers
 install(DIRECTORY include/${PROJECT_NAME}/

@@ -3,7 +3,7 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  * \endverbatim
  *
@@ -39,7 +39,7 @@ const char* GetCopyrightString()
 
 const char* GetLicenseString()
 {
-    return "License: MIT (see the LICENSE file included in source distribution)";
+    return "License: see the LICENSE files included in the source distribution";
 }
 
 /* ****************************************************************************************************************** */

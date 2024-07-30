@@ -3,12 +3,12 @@
  * ___    ___
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
- *  /  /\  \   License: MIT (see the LICENSE file)
+ *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
- * \033ndverbatim
+ * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: Minimal logging
+ * @brief Fixposition SDK: Logging
  */
 
 /* LIBC/STL */
@@ -100,14 +100,14 @@ bool LoggingIsLevel(const LoggingLevel level)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static void LoggingDefaultFn(const LoggingParams& params, const char* str)
+static void LoggingDefaultFn(const LoggingParams& params, const LoggingLevel level, const char* str)
 {
     const char* prefix = NULL;
     const char* suffix = NULL;
 
-    switch (g_params.colour_) {
+    switch (params.colour_) {
         case LoggingColour::YES:
-            switch (params.level_) {  // clang-format off
+            switch (level) {  // clang-format off
                 case LoggingLevel::TRACE:   prefix = "\033[0;35m"; suffix = "\033[m\n"; break;
                 case LoggingLevel::DEBUG:   prefix = "\033[0;36m"; suffix = "\033[m\n"; break;
                 case LoggingLevel::INFO:    prefix = NULL;         suffix = "\n";       break;
@@ -191,7 +191,7 @@ void LoggingPrint(const LoggingLevel level, const char* fmt, ...)
     std::vsnprintf(g_line, sizeof(g_line), fmt, args);
     va_end(args);
 
-    g_params.fn_(level, g_line);
+    g_params.fn_(g_params, level, g_line);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -209,7 +209,7 @@ void LoggingHexdump(
         va_start(args, fmt);
         std::vsnprintf(g_line, sizeof(g_line), fmt, args);
         va_end(args);
-        g_params.fn_(level, g_line);
+        g_params.fn_(g_params, level, g_line);
     }
 
     const char i2hex[] = "0123456789abcdef";
@@ -239,7 +239,7 @@ void LoggingHexdump(
         }
         std::snprintf(
             g_line, sizeof(g_line), "%s0x%04" PRIx64 " %05" PRIu64 "  %s", prefix != NULL ? prefix : "", ix, ix, str);
-        g_params.fn_(level, g_line);
+        g_params.fn_(g_params, level, g_line);
 
         ix += 16;
     }
