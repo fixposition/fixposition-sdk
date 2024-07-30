@@ -105,7 +105,7 @@ jobs:
             # https://github.com/actions/upload-pages-artifact (This, not actions/upload-artifact, wich doesn't work for
             # pages deployment. Both actions make the artefact show up as a job artefact.
             - name: Upload pages artefact
-              if: github.ref == 'refs/pull/26/merge'
+              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/27/merge' }}
               uses: actions/upload-pages-artifact@v3
               with:
                   path: github-pages
@@ -115,12 +115,12 @@ jobs:
 
             # https://github.com/actions/configure-pages
             - name: Configure pages
-              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/26/merge' }}
+              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/27/merge' }}
               uses: actions/configure-pages@v5
 
             # https://github.com/actions/deploy-pages
             - name: Deploy pages
-              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/26/merge' }}
+              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/27/merge' }}
               uses: actions/deploy-pages@v4
               with:
                   artifact_name: github-pages
