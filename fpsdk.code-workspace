@@ -37,7 +37,8 @@
             "build/**": true,
             "install/**": true,
             "ws/**": true,
-            ".devcontainer/.vscode-server/**": true
+            ".devcontainer/.vscode-server/**": true,
+            ".devcontainer/.bash_history.d/history": true,
         },
         // Exclude some things from the files watcher
         "files.watcherExclude": {

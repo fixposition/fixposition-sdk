@@ -16,10 +16,10 @@
 /* LIBC/STL */
 
 /* EXTERNAL */
-#include <fpros1/ext/ros.hpp>
+#include <fpsdk_ros1/ext/ros.hpp>
 
 /* Fixposition SDK */
-#include <fpcommon/thread.hpp>
+#include <fpsdk_common/thread.hpp>
 
 /* PACKAGE */
 
@@ -52,8 +52,8 @@ class DemoNode
    private:
     const DemoParams params_;
     ros::NodeHandle nh_;
-    fp::common::thread::Thread worker1_;
-    fp::common::thread::Thread worker2_;
+    fpsdk::common::thread::Thread worker1_;
+    fpsdk::common::thread::Thread worker2_;
     ros::Timer timer1_;
     ros::Timer timer2_;
     ros::Publisher publisher_;

@@ -156,7 +156,7 @@ void DemoNode::Stop()
 
 void DemoNode::Worker1(void* /*arg*/)
 {
-    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Worker1() start 0x%" PRIxMAX, fp::common::thread::ThisThreadId());
+    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Worker1() start 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     while (!worker1_.ShouldAbort()) {
         RCLCPP_DEBUG(this->get_logger(), "DemoNode::Worker1() ...");
         auto msg = std_msgs::msg::String();
@@ -172,7 +172,7 @@ void DemoNode::Worker1(void* /*arg*/)
 
 void DemoNode::Worker2(void* /*arg*/)
 {
-    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Worker2() start 0x%" PRIxMAX, fp::common::thread::ThisThreadId());
+    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Worker2() start 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     while (!worker2_.ShouldAbort()) {
         RCLCPP_DEBUG(this->get_logger(), "DemoNode::Worker2() ...");
         auto msg = std_msgs::msg::String();
@@ -188,7 +188,7 @@ void DemoNode::Worker2(void* /*arg*/)
 
 void DemoNode::Timer1()
 {
-    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Timer1() 0x%" PRIxMAX, fp::common::thread::ThisThreadId());
+    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Timer1() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     auto msg = std_msgs::msg::String();
     msg.data = "timer1...";
     publisher_->publish(msg);
@@ -198,7 +198,7 @@ void DemoNode::Timer1()
 
 void DemoNode::Timer2()
 {
-    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Timer2() 0x%" PRIxMAX, fp::common::thread::ThisThreadId());
+    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Timer2() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     auto msg = std_msgs::msg::String();
     msg.data = "timer2...";
     publisher_->publish(msg);

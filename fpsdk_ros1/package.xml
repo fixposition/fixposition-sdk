@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<package format="2">
+    <name>fpsdk_ros1</name>
+    <version>1.0.0</version>
+    <description>Fixposition SDK: ROS1 library</description>
+    <maintainer email="support@fixposition.com">Fixposition Support</maintainer>
+    <license>MIT</license>
+    <export>
+        <build_type>cmake</build_type>
+    </export>
+    <depend>fpsdk_common</depend>
+    <depend>roscpp</depend>
+    <depend>rosbag</depend>
+    <depend>std_msgs</depend>
+    <depend>topic_tools</depend>
+</package>

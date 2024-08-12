@@ -31,11 +31,11 @@ endif()
 find_package(ament_cmake REQUIRED) # https://docs.ros.org/en/humble/How-To-Guides/Ament-CMake-Documentation.html
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(fpcommon REQUIRED)
-find_package(fpros2 REQUIRED)
+find_package(fpsdk_common REQUIRED)
+find_package(fpsdk_ros2 REQUIRED)
 find_package(CapnProto 1.0.2 REQUIRED) # TODO: why needed?
 
-include_directories(include ${rclcpp_INCLUDE_DIRS} ${rmw_INCLUDE_DIRS} ${fpcommon_INCLUDE_DIRS} ${fpros2_INCLUDE_DIRS})
+include_directories(include ${rclcpp_INCLUDE_DIRS} ${rmw_INCLUDE_DIRS} ${fpsdk_common_INCLUDE_DIRS} ${fpsdk_ros2_INCLUDE_DIRS})
 
 
 # SHARED LIBRARY =======================================================================================================
@@ -44,8 +44,8 @@ add_library(${PROJECT_NAME}_lib SHARED
     src/node.cpp
 )
 
-#target_link_libraries(${PROJECT_NAME}_lib fpcommon fpros2)
-ament_target_dependencies(${PROJECT_NAME}_lib rclcpp fpcommon fpros2 std_msgs)
+#target_link_libraries(${PROJECT_NAME}_lib fpsdk_common fpsdk_ros2)
+ament_target_dependencies(${PROJECT_NAME}_lib rclcpp fpsdk_common fpsdk_ros2 std_msgs)
 
 
 # EXECUTABLES ==========================================================================================================
@@ -54,8 +54,8 @@ add_executable(${PROJECT_NAME}_node
     src/node_main.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_lib fpcommon fpros2)
-ament_target_dependencies(${PROJECT_NAME}_node rclcpp fpcommon fpros2)
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_lib fpsdk_common fpsdk_ros2)
+ament_target_dependencies(${PROJECT_NAME}_node rclcpp fpsdk_common fpsdk_ros2)
 
 install(TARGETS
     ${PROJECT_NAME}_lib ${PROJECT_NAME}_node

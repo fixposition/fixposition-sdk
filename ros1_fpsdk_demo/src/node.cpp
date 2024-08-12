@@ -16,15 +16,15 @@
 #include <functional>
 
 /* EXTERNAL */
-#include <fpros1/ext/ros.hpp>
-#include <fpros1/ext/ros_callback_queue.hpp>
-#include <fpros1/ext/ros_msgs.hpp>
+#include <fpsdk_ros1/ext/ros.hpp>
+#include <fpsdk_ros1/ext/ros_callback_queue.hpp>
+#include <fpsdk_ros1/ext/ros_msgs.hpp>
 
 /* Fixposition SDK */
-#include <fpcommon/app.hpp>
-#include <fpcommon/logging.hpp>
-#include <fpcommon/thread.hpp>
-#include <fpros1/utils.hpp>
+#include <fpsdk_common/app.hpp>
+#include <fpsdk_common/logging.hpp>
+#include <fpsdk_common/thread.hpp>
+#include <fpsdk_ros1/utils.hpp>
 
 /* PACKAGE */
 #include "ros1_fpsdk_demo/node.hpp"
@@ -46,19 +46,19 @@ bool DemoParams::LoadFromRos(const std::string& ns)
 {
     bool ok = true;
 
-    if (!fp::ros1::utils::LoadRosParam(ns + "/worker1_interval", worker1_interval_)) {
+    if (!fpsdk::ros1::utils::LoadRosParam(ns + "/worker1_interval", worker1_interval_)) {
         ROS_WARN("DemoParams: worker1_interval param missing");
         ok = false;
     }
-    if (!fp::ros1::utils::LoadRosParam(ns + "/worker2_interval", worker2_interval_)) {
+    if (!fpsdk::ros1::utils::LoadRosParam(ns + "/worker2_interval", worker2_interval_)) {
         ROS_WARN("DemoParams: worker2_interval param missing");
         ok = false;
     }
-    if (!fp::ros1::utils::LoadRosParam(ns + "/timer1_interval", timer1_interval_)) {
+    if (!fpsdk::ros1::utils::LoadRosParam(ns + "/timer1_interval", timer1_interval_)) {
         ROS_WARN("DemoParams: timer1_interval param missing");
         ok = false;
     }
-    if (!fp::ros1::utils::LoadRosParam(ns + "/timer2_interval", timer2_interval_)) {
+    if (!fpsdk::ros1::utils::LoadRosParam(ns + "/timer2_interval", timer2_interval_)) {
         ROS_WARN("DemoParams: timer2_interval param missing");
         ok = false;
     }
@@ -132,7 +132,7 @@ void DemoNode::Stop()
 
 void DemoNode::Worker1(void* /*arg*/)
 {
-    ROS_DEBUG("DemoNode::Worker1() start 0x%" PRIxMAX, fp::common::thread::ThisThreadId());
+    ROS_DEBUG("DemoNode::Worker1() start 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     while (!worker1_.ShouldAbort()) {
         ROS_DEBUG("DemoNode::Worker1() ...");
         std_msgs::String msg;
@@ -147,7 +147,7 @@ void DemoNode::Worker1(void* /*arg*/)
 
 void DemoNode::Worker2(void* /*arg*/)
 {
-    ROS_DEBUG("DemoNode::Worker2() start 0x%" PRIxMAX, fp::common::thread::ThisThreadId());
+    ROS_DEBUG("DemoNode::Worker2() start 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     while (!worker2_.ShouldAbort()) {
         ROS_DEBUG("DemoNode::Worker2() ...");
         std_msgs::String msg;
@@ -162,7 +162,7 @@ void DemoNode::Worker2(void* /*arg*/)
 
 void DemoNode::Timer1(const ros::TimerEvent& /*event*/)
 {
-    ROS_DEBUG("DemoNode::Timer1() 0x%" PRIxMAX, fp::common::thread::ThisThreadId());
+    ROS_DEBUG("DemoNode::Timer1() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     std_msgs::String msg;
     msg.data = "timer1...";
     publisher_.publish(msg);
@@ -172,7 +172,7 @@ void DemoNode::Timer1(const ros::TimerEvent& /*event*/)
 
 void DemoNode::Timer2(const ros::TimerEvent& /*event*/)
 {
-    ROS_DEBUG("DemoNode::Timer2() 0x%" PRIxMAX, fp::common::thread::ThisThreadId());
+    ROS_DEBUG("DemoNode::Timer2() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     std_msgs::String msg;
     msg.data = "timer2...";
     publisher_.publish(msg);
