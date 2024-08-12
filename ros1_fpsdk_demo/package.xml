@@ -6,8 +6,8 @@
     <maintainer email="support@fixposition.com">Fixposition Support</maintainer>
     <license>MIT</license>
     <buildtool_depend>catkin</buildtool_depend>
-    <depend>fpcommon</depend>
-    <depend>fpros1</depend>
+    <depend>fpsdk_common</depend>
+    <depend>fpsdk_ros1</depend>
     <depend>roscpp</depend>
     <depend>std_msgs</depend>
 </package>

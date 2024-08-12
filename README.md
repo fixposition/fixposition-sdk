@@ -19,10 +19,10 @@ The SDK part of this repo refers to C++ libraries and apps.
 
 ### Overview
 
-- [fpcommon](fpcommon/README.md) c++ library with common functions
-- [fpros1](fpros1/README.md) c++ library with common ROS 1 functions
-- [fpros2](fpros2/README.md) c++ library with common ROS 2 functions
-- [fpapps](fpapps/README.md) various apps and examples using the above libraries
+- [fpsdk_common](fpsdk_common/README.md) c++ library with common functions
+- [fpsdk_ros1](fpsdk_ros1/README.md) c++ library with common ROS 1 functions
+- [fpsdk_ros2](fpsdk_ros2/README.md) c++ library with common ROS 2 functions
+- [fpsdk_apps](fpsdk_apps/README.md) various apps and examples using the above libraries
 
 ### Dependencies
 
@@ -118,10 +118,10 @@ systems. Refer to the [Docker configration files and scripts](./docker) on insta
     ~/fpsdk/bin/fpltool -h
     ```
 
-Alternatively, you can do `catkin build fpapps` in your ROS workspace.
+Alternatively, you can do `catkin build fpsdk_apps` in your ROS workspace.
 
-The packages can be built individually. See the instructions in the [fpcommon](fpcommon/README.md),
-[fpros1](fpros1/README.md) and [fpapps](fpapps/README.md) packages.
+The packages can be built individually. See the instructions in the [fpsdk_common](fpsdk_common/README.md),
+[fpsdk_ros1](fpsdk_ros1/README.md) and [fpsdk_apps](fpsdk_apps/README.md) packages.
 
 Refer to the CI workflow configuration ([ci.yaml](./.github/workflows/ci.yml)) and the CI script
 ([ci.sh](./docker/ci.sh)) for more options, such as different build configurations or running tests.

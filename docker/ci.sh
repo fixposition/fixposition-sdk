@@ -40,16 +40,16 @@ echo "FPSDK_SRC_DIR=${FPSDK_SRC_DIR}"
 # Optional single command-line argument to ci.sh to select only one (or some) step(s)
 STEP_FILT=${1:-}
 
-# Unset the ROS variables used to detect ROS (compare fpcommon/cmake/setup.cmake), so that we can run (the non-ROS
+# Unset the ROS variables used to detect ROS (compare fpsdk_common/cmake/setup.cmake), so that we can run (the non-ROS
 # builds in) this script in a ROS devcontainer, too. We'll re-load the ROS environment later (below) based on
 # $ROS_DISTRO from the image ENV variables resp. set above.
 unset ROS_VERSION
 unset ROS_PACKAGE_PATH
 
-
 # ----------------------------------------------------------------------------------------------------------------------
 
-NERRORS=0
+ERROR_COUNT=0
+ERROR_NAMES=
 NSTEPS=0
 declare -A TITLES
 function do_step
@@ -69,7 +69,8 @@ function do_step
 
     if ! ${func}; then
         res=1
-        ((NERRORS=${NERRORS} + 1))
+        ((ERROR_COUNT=${ERROR_COUNT} + 1))
+        ERROR_NAMES="${ERROR_NAMES} ${func}"
     fi
 
     echo "::endgroup::"
@@ -156,17 +157,17 @@ function build_projs_release_noros
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
 
-    cmake -B build/${buildname}/fpcommon -S fpcommon \
+    cmake -B build/${buildname}/fpsdk_common -S fpsdk_common \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpcommon || return 1
-    cmake --install build/${buildname}/fpcommon || return 1
+    cmake --build build/${buildname}/fpsdk_common || return 1
+    cmake --install build/${buildname}/fpsdk_common || return 1
 
-    cmake -B build/${buildname}/fpapps -S fpapps \
+    cmake -B build/${buildname}/fpsdk_apps -S fpsdk_apps \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpapps || return 1
-    cmake --install build/${buildname}/fpapps || return 1
+    cmake --build build/${buildname}/fpsdk_apps || return 1
+    cmake --install build/${buildname}/fpsdk_apps || return 1
 
     install/${buildname}/bin/fpltool -V || return 1
 }
@@ -252,23 +253,23 @@ function build_projs_release_ros1
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
 
-    cmake -B build/${buildname}/fpcommon -S fpcommon \
+    cmake -B build/${buildname}/fpsdk_common -S fpsdk_common \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpcommon || return 1
-    cmake --install build/${buildname}/fpcommon || return 1
+    cmake --build build/${buildname}/fpsdk_common || return 1
+    cmake --install build/${buildname}/fpsdk_common || return 1
 
-    cmake -B build/${buildname}/fpros1 -S fpros1 \
+    cmake -B build/${buildname}/fpsdk_ros1 -S fpsdk_ros1 \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpros1 || return 1
-    cmake --install build/${buildname}/fpros1 || return 1
+    cmake --build build/${buildname}/fpsdk_ros1 || return 1
+    cmake --install build/${buildname}/fpsdk_ros1 || return 1
 
-    cmake -B build/${buildname}/fpapps -S fpapps \
+    cmake -B build/${buildname}/fpsdk_apps -S fpsdk_apps \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpapps || return 1
-    cmake --install build/${buildname}/fpapps || return 1
+    cmake --build build/${buildname}/fpsdk_apps || return 1
+    cmake --install build/${buildname}/fpsdk_apps || return 1
 
     install/${buildname}/bin/fpltool -V || return 1
 }
@@ -284,9 +285,9 @@ function build_catkin_release
     rm -rf build/${buildname}
     mkdir -p build/${buildname}/src
     cd build/${buildname}/src
-    ln -s ../../../fpcommon .
-    ln -s ../../../fpros1 .
-    ln -s ../../../fpapps .
+    ln -s ../../../fpsdk_common .
+    ln -s ../../../fpsdk_ros1 .
+    ln -s ../../../fpsdk_apps .
     ln -s ../../../ros1_fpsdk_demo .
     cd ..
     catkin init || return 1
@@ -377,24 +378,24 @@ function build_projs_release_ros2
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
 
-    cmake -B build/${buildname}/fpcommon -S fpcommon \
+    cmake -B build/${buildname}/fpsdk_common -S fpsdk_common \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpcommon || return 1
-    cmake --install build/${buildname}/fpcommon || return 1
+    cmake --build build/${buildname}/fpsdk_common || return 1
+    cmake --install build/${buildname}/fpsdk_common || return 1
 
     # TODO: not working yet
-    # cmake -B build/${buildname}/fpros2 -S fpros2 \
+    # cmake -B build/${buildname}/fpsdk_ros2 -S fpsdk_ros2 \
     #     -DCMAKE_INSTALL_PREFIX=install/${buildname} \
     #     -DCMAKE_BUILD_TYPE=Release || return 1
-    # cmake --build build/${buildname}/fpros2 || return 1
-    # cmake --install build/${buildname}/fpros2 || return 1
+    # cmake --build build/${buildname}/fpsdk_ros2 || return 1
+    # cmake --install build/${buildname}/fpsdk_ros2 || return 1
 
-    cmake -B build/${buildname}/fpapps -S fpapps \
+    cmake -B build/${buildname}/fpsdk_apps -S fpsdk_apps \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpapps || return 1
-    cmake --install build/${buildname}/fpapps || return 1
+    cmake --build build/${buildname}/fpsdk_apps || return 1
+    cmake --install build/${buildname}/fpsdk_apps || return 1
 
     install/${buildname}/bin/fpltool -V || return 1
 }
@@ -410,9 +411,9 @@ function build_colcon_release
     rm -rf build/${buildname}
     mkdir -p build/${buildname}/src
     cd build/${buildname}/src
-    ln -s ../../../fpcommon .
-    ln -s ../../../fpros2 .
-    ln -s ../../../fpapps .
+    ln -s ../../../fpsdk_common .
+    ln -s ../../../fpsdk_ros2 .
+    ln -s ../../../fpsdk_apps .
     ln -s ../../../ros2_fpsdk_demo .
     cd ..
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release || return 1
@@ -484,11 +485,11 @@ fi
 ########################################################################################################################
 
 # Are we happy?
-if [ ${NERRORS} -eq 0 ]; then
+if [ ${ERROR_COUNT} -eq 0 ]; then
     echo "::notice TITLES=CI success::Successfully completed ${NSTEPS} steps"
     exit 0
 else
-    echo "::error TITLES=CI failure::Failed ${NERRORS} of ${NSTEPS} steps"
+    echo "::error TITLES=CI failure::Failed ${ERROR_COUNT} of ${NSTEPS} steps: ${ERROR_NAMES}"
     exit 1
 fi
 

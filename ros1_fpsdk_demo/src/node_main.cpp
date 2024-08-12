@@ -16,15 +16,15 @@
 #include <functional>
 
 /* EXTERNAL */
-#include <fpros1/ext/ros.hpp>
-#include <fpros1/ext/ros_callback_queue.hpp>
-#include <fpros1/ext/ros_msgs.hpp>
+#include <fpsdk_ros1/ext/ros.hpp>
+#include <fpsdk_ros1/ext/ros_callback_queue.hpp>
+#include <fpsdk_ros1/ext/ros_msgs.hpp>
 
 /* Fixposition SDK */
-#include <fpcommon/app.hpp>
-#include <fpcommon/logging.hpp>
-#include <fpcommon/thread.hpp>
-#include <fpros1/utils.hpp>
+#include <fpsdk_common/app.hpp>
+#include <fpsdk_common/logging.hpp>
+#include <fpsdk_common/thread.hpp>
+#include <fpsdk_ros1/utils.hpp>
 
 /* PACKAGE */
 #include "ros1_fpsdk_demo/node.hpp"
@@ -34,9 +34,9 @@
 int main(int argc, char** argv)
 {
 #ifndef NDEBUG
-    fp::common::app::StacktraceHelper stacktrace;
+    fpsdk::common::app::StacktraceHelper stacktrace;
 #endif
-    ROS_INFO("main() 0x%" PRIxMAX, fp::common::thread::ThisThreadId());
+    ROS_INFO("main() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
 
     bool ok = true;
 
@@ -45,12 +45,12 @@ int main(int argc, char** argv)
     ros::NodeHandle nh("~");
 
     // Redirect Fixposition SDK logging to ROS console
-    fp::ros1::utils::RedirectLoggingToRosConsole();
-    DEBUG("This is a message from fpcommon's logging, redirected to the ROS console");  // logger: "ros1.fpros1"
-    ROS_DEBUG("This is a proper ROS console message");                                  // logger: "ros.ros1_fpsdk_demo"
+    fpsdk::ros1::utils::RedirectLoggingToRosConsole();
+    DEBUG("This is a message from fpsdk_common's logging, redirected to the ROS console");  // logger: "ros1.fpsdk_ros1"
+    ROS_DEBUG("This is a proper ROS console message");  // logger: "ros.ros1_fpsdk_demo"
 
     // Handle CTRL-C / SIGINT ourselves
-    fp::common::app::SigIntHelper sigint;
+    fpsdk::common::app::SigIntHelper sigint;
 
     // Load params
     Ros1FpsdkDemo::DemoParams params;

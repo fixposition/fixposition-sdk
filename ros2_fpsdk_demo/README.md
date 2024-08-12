@@ -6,8 +6,8 @@ An example ROS2 package with a node demonstrating the use of the Fixpositon SDK.
 ## Dependencies
 
 - [Fixposition SDK dependencies](../README.md#dependencies)
-- [fpcommon](../fpcommon/README.md)
-- [fpros2](../fpros2/README.md)
+- [fpsdk_common](../fpsdk_common/README.md)
+- [fpsdk_ros2](../fpsdk_ros2/README.md)
 
 
 ---
@@ -18,8 +18,8 @@ Setup a new ROS2 workspace and build the demo and its dependencies:
 ```sh
 mkdir -p ws/src
 cd ws/src
-ln -s ../../fpcommon .
-ln -s ../../fpros2 .
+ln -s ../../fpsdk_common .
+ln -s ../../fpsdk_ros2 .
 ln -s ../../ros2_fpsdk_demo .
 cd ..
 colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug

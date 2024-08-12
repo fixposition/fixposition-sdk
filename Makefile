@@ -71,6 +71,7 @@ ECHO       := echo
 RM         := rm
 CMAKE      := cmake
 DOXYGEN    := doxygen
+NICE       := nice
 
 ifeq ($(VERBOSE),1)
 V =
@@ -125,9 +126,11 @@ ifneq ($(VERBOSE),0)
 endif
 
 ifeq ($(GITHUB_WORKSPACE),)
-  CMAKE_ARGS_BUILD = --parallel 4
+  CMAKE_ARGS_BUILD = --parallel $(shell nproc --ignore=4)
+  NICE_BUILD=$(NICE) -19
 else
   CMAKE_ARGS_BUILD = --parallel 1
+  NICE_BUILD=
 endif
 
 BUILD_DIR = build/$(BUILD_TYPE)
@@ -147,10 +150,10 @@ distclean:
 cmake: $(BUILD_DIR)/.make-cmake
 
 deps = $(sort $(wildcard Makefile doc/* Doxyfile \
-    fpcommon/* fpcommon/*/* fpcommon/*/*/* fpcommon/*/*/*/* \
-    fpros1/* fpros1/*/* fpros1/*/*/* fpros1/*/*/*/* \
-    fpros2/* fpros2/*/* fpros2/*/*/* fpros2/*/*/*/* \
-    fpapps/* fpapps/*/* fpapps/*/*/* fpapps/*/*/*/*))
+    fpsdk_common/* fpsdk_common/*/* fpsdk_common/*/*/* fpsdk_common/*/*/*/* \
+    fpsdk_ros1/* fpsdk_ros1/*/* fpsdk_ros1/*/*/* fpsdk_ros1/*/*/*/* \
+    fpsdk_ros2/* fpsdk_ros2/*/* fpsdk_ros2/*/*/* fpsdk_ros2/*/*/*/* \
+    fpsdk_apps/* fpsdk_apps/*/* fpsdk_apps/*/*/* fpsdk_apps/*/*/*/*))
 
 $(BUILD_DIR)/.make-cmake: $(deps)
 	@echo "$(HLW)***** Configure ($(BUILD_TYPE)) *****$(HLO)"
@@ -164,7 +167,7 @@ build: $(BUILD_DIR)/.make-build
 
 $(BUILD_DIR)/.make-build: $(BUILD_DIR)/.make-cmake
 	@echo "$(HLW)***** Build ($(BUILD_TYPE)) *****$(HLO)"
-	$(V)$(CMAKE) --build $(BUILD_DIR)  $(CMAKE_ARGS_BUILD)
+	$(V)$(NICE_BUILD) $(CMAKE) --build $(BUILD_DIR)  $(CMAKE_ARGS_BUILD)
 	$(V)$(TOUCH) $@
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -182,9 +185,9 @@ $(BUILD_DIR)/.make-install: $(BUILD_DIR)/.make-build
 .PHONY: test
 test: $(BUILD_DIR)/.make-build
 	@echo "$(HLW)***** Test ($(BUILD_TYPE)) *****$(HLO)"
-	$(V)(cd $(BUILD_DIR)/fpcommon && ctest)
+	$(V)(cd $(BUILD_DIR)/fpsdk_common && ctest)
 ifneq ($(FP_USE_ROS1),)
-	$(V)(cd $(BUILD_DIR)/fpros1 && ctest)
+	$(V)(cd $(BUILD_DIR)/fpsdk_ros1 && ctest)
 endif
 
 # ----------------------------------------------------------------------------------------------------------------------

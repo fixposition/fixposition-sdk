@@ -27,8 +27,8 @@ endif()
 
 # DEPENDENCIES =========================================================================================================
 
-find_package(fpcommon REQUIRED)
-find_package(fpros1 REQUIRED)
+find_package(fpsdk_common REQUIRED)
+find_package(fpsdk_ros1 REQUIRED)
 find_package(CapnProto 1.0.2 REQUIRED) # TODO: why needed?
 find_package(catkin REQUIRED COMPONENTS
     roscpp
@@ -44,7 +44,7 @@ catkin_package(
     std_msgs
 )
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${fpcommon_INCLUDE_DIRS} ${fpros1_INCLUDE_DIRS})
+include_directories(include ${catkin_INCLUDE_DIRS} ${fpsdk_common_INCLUDE_DIRS} ${fpsdk_ros1_INCLUDE_DIRS})
 
 
 # SHARED LIBRARY =======================================================================================================
@@ -53,7 +53,7 @@ add_library(${PROJECT_NAME}_lib SHARED
     src/node.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}_lib ${catkin_LIBRARIES} fpcommon fpros1)
+target_link_libraries(${PROJECT_NAME}_lib ${catkin_LIBRARIES} fpsdk_common fpsdk_ros1)
 
 
 # EXECUTABLES ==========================================================================================================
@@ -61,7 +61,7 @@ target_link_libraries(${PROJECT_NAME}_lib ${catkin_LIBRARIES} fpcommon fpros1)
 add_executable(${PROJECT_NAME}_node
     src/node_main.cpp
 )
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_lib ${catkin_LIBRARIES} fpcommon fpros1)
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_lib ${catkin_LIBRARIES} fpsdk_common fpsdk_ros1)
 
 
 # INSTALL ==============================================================================================================

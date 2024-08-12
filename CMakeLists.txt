@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-include(fpcommon/cmake/setup.cmake)
+include(fpsdk_common/cmake/setup.cmake)
 
 project(fpsdk
     LANGUAGES CXX
@@ -7,11 +7,11 @@ project(fpsdk
     DESCRIPTION "Fixposition SDK"
 )
 
-add_subdirectory(fpcommon)
+add_subdirectory(fpsdk_common)
 if(FP_USE_ROS1)
-    add_subdirectory(fpros1)
+    add_subdirectory(fpsdk_ros1)
 endif()
 if(FP_USE_ROS2)
-    add_subdirectory(fpros2)
+    add_subdirectory(fpsdk_ros2)
 endif()
-add_subdirectory(fpapps)
+add_subdirectory(fpsdk_apps)

@@ -20,10 +20,10 @@
 #include <rclcpp/rclcpp.hpp>
 
 /* Fixposition SDK */
-#include <fpcommon/app.hpp>
-#include <fpcommon/logging.hpp>
-#include <fpcommon/thread.hpp>
-#include <fpros2/utils.hpp>
+#include <fpsdk_common/app.hpp>
+#include <fpsdk_common/logging.hpp>
+#include <fpsdk_common/thread.hpp>
+#include <fpsdk_ros2/utils.hpp>
 
 /* PACKAGE */
 #include "ros2_fpsdk_demo/node.hpp"
@@ -33,10 +33,10 @@
 int main(int argc, char* argv[])
 {
 #ifndef NDEBUG
-    fp::common::app::StacktraceHelper stacktrace;
+    fpsdk::common::app::StacktraceHelper stacktrace;
 #endif
     auto logger = rclcpp::get_logger("node_main");
-    RCLCPP_INFO(logger, "main() 0x%" PRIxMAX, fp::common::thread::ThisThreadId());
+    RCLCPP_INFO(logger, "main() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
 
     bool ok = true;
 
@@ -44,12 +44,12 @@ int main(int argc, char* argv[])
     rclcpp::init(argc, argv);
 
     // Redirect Fixposition SDK logging to ROS console
-    fp::ros2::utils::RedirectLoggingToRosConsole();
-    DEBUG("This is a message from fpcommon's logging, redirected to the ROS console");  // logger: "fpros2"
-    RCLCPP_DEBUG(logger, "This is a proper ROS console message");                       // logger: "node_main"
+    fpsdk::ros2::utils::RedirectLoggingToRosConsole();
+    DEBUG("This is a message from fpsdk_common's logging, redirected to the ROS console");  // logger: "fpsdk_ros2"
+    RCLCPP_DEBUG(logger, "This is a proper ROS console message");                           // logger: "node_main"
 
     // Handle CTRL-C / SIGINT ourselves
-    fp::common::app::SigIntHelper sigint;
+    fpsdk::common::app::SigIntHelper sigint;
 
     // Create node. This doesn't do much yet.
     auto node = std::make_shared<Ros2FpsdkDemo::DemoNode>();

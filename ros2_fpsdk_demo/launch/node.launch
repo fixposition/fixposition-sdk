@@ -3,7 +3,7 @@
     <arg name="node_name"   default="ros2_fpsdk_demo_node" description="Node name"/> <!--  -->
     <arg name="launcher"    default=""                     description="Launch node via this (node launch-prefix)"/>
     <node name="$(var node_name)" pkg="ros2_fpsdk_demo" exec="ros2_fpsdk_demo_node" output="screen" respawn="false" launch-prefix="$(var launcher)"
-        ros_args="--log-level $(var node_name):=debug --log-level node_main:=debug --log-level fpros2:=debug">
+        ros_args="--log-level $(var node_name):=debug --log-level node_main:=debug --log-level fpsdk_ros2:=debug">
         <param from="$(find-pkg-share ros2_fpsdk_demo)/launch/config.yaml"/>
         <param name="some_numeric_param" value="100.2"/>
     </node>
