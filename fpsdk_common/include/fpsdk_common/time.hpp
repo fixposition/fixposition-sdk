@@ -64,7 +64,8 @@ void Sleep(const uint32_t duration);
 /**
  * @brief Minimal ros::Time() / rplcpp::Time implementation (that doesn't throw)
  */
-struct RosTime {
+struct RosTime
+{
     RosTime();
     /**
      * @brief Constructor

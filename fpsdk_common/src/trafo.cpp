@@ -12,13 +12,19 @@
  */
 
 /* LIBC/STL */
+#include <exception>
 
 /* EXTERNAL */
+#include <proj/coordinateoperation.hpp>
+#include <proj/crs.hpp>
+#include <proj/io.hpp>
+#include <proj/util.hpp>
 
 /* PACKAGE */
-#include "fpsdk_common/trafo.hpp"
-
+#include "fpsdk_common/logging.hpp"
 #include "fpsdk_common/math.hpp"
+#include "fpsdk_common/string.hpp"
+#include "fpsdk_common/trafo.hpp"
 
 namespace fpsdk {
 namespace common {
@@ -26,6 +32,7 @@ namespace trafo {
 /* ****************************************************************************************************************** */
 
 using namespace fpsdk::common::math;
+using namespace fpsdk::common::string;
 
 /**
  * @details
@@ -253,6 +260,110 @@ Eigen::Vector3d LlhDegToRad(const Eigen::Vector3d& llh_deg)
 Eigen::Vector3d LlhRadToDeg(const Eigen::Vector3d& llh_rad)
 {
     return Eigen::Vector3d(RadToDeg(llh_rad.x()), RadToDeg(llh_rad.y()), llh_rad.z());
+}
+
+/* ****************************************************************************************************************** */
+
+using namespace NS_PROJ::crs;
+using namespace NS_PROJ::io;
+using namespace NS_PROJ::operation;
+using namespace NS_PROJ::util;
+
+struct TransformerHelper
+{
+    TransformerHelper(CoordinateOperationNNPtr op) /* clang-format off */ :
+        proj_ctx_        { proj_context_create() },
+        transformer_     { op->coordinateTransformer(proj_ctx_) }  // clang-format on
+    {
+    }
+    ~TransformerHelper()
+    {
+        proj_context_destroy(proj_ctx_);
+        proj_ctx_ = NULL;
+    }
+
+    PJ_CONTEXT* proj_ctx_;
+    CoordinateTransformerNNPtr transformer_;
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+Transformer::Transformer()
+{
+}
+
+Transformer::~Transformer()
+{
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Transformer::Init(const std::string& src_name, const std::string& dst_name)
+{
+    if (h_) {
+        return false;
+    }
+
+    bool ok = true;
+
+    try {
+        // Check names
+        if (!StrStartsWith(src_name, "EPSG:") || !StrStartsWith(dst_name, "EPSG:")) {
+            throw std::runtime_error("no epsg identifiers");
+        }
+
+        // Cf. https://proj.org/en/9.4/development/quickstart_cpp.html
+        auto db_ctx = DatabaseContext::create();
+        auto auth_generic = AuthorityFactory::create(db_ctx, std::string());
+        auto coord_opt_ctx = CoordinateOperationContext::create(auth_generic, nullptr, 0.0);
+        auto auth_epsg = AuthorityFactory::create(db_ctx, "EPSG");
+
+        auto src_crs = auth_epsg->createCoordinateReferenceSystem(src_name.substr(5));
+        auto dst_crs = auth_epsg->createCoordinateReferenceSystem(dst_name.substr(5));
+
+        auto op_list = CoordinateOperationFactory::create()->createOperations(src_crs, dst_crs, coord_opt_ctx);
+        TRACE("Transformer: %s (%s) -> %s (%s): %" PRIuMAX " ops", src_name.c_str(), src_crs->nameStr().c_str(),
+            dst_name.c_str(), dst_crs->nameStr().c_str(), op_list.size());
+        if (op_list.empty()) {
+            throw std::runtime_error("no operation available");
+        }
+
+        h_ = std::make_unique<TransformerHelper>(op_list[0]);
+
+    } catch (std::exception& e) {
+        WARNING("Transformer::Init() %s -> %s: %s", src_name.c_str(), dst_name.c_str(), e.what());
+        ok = false;
+    }
+
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Transformer::Transform(Eigen::Vector3d& inout)
+{
+    if (h_) {
+        const PJ_COORD src = { { inout.x(), inout.y(), inout.z(), std::numeric_limits<double>::infinity() } };
+        const PJ_COORD dst = h_->transformer_->transform(src);
+        inout.x() = dst.v[0];
+        inout.y() = dst.v[1];
+        inout.z() = dst.v[2];
+        return true;
+    }
+    return false;
+}
+
+bool Transformer::Transform(const Eigen::Vector3d& in, Eigen::Vector3d& out)
+{
+    if (h_) {
+        const PJ_COORD src = { { in.x(), in.y(), in.z(), std::numeric_limits<double>::infinity() } };
+        const PJ_COORD dst = h_->transformer_->transform(src);
+        out.x() = dst.v[0];
+        out.y() = dst.v[1];
+        out.z() = dst.v[2];
+        return true;
+    }
+    return false;
 }
 
 /* ****************************************************************************************************************** */

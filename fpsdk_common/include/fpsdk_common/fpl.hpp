@@ -257,7 +257,8 @@ class FplFileReader
 /**
  * @brief Helper for extracting meta data
  */
-struct LogMeta {
+struct LogMeta
+{
     /**
      * @brief Constructor
      *
@@ -282,7 +283,8 @@ struct LogMeta {
 /**
  * @brief Helper for extracting recording status data
  */
-struct LogStatus {
+struct LogStatus
+{
     /**
      * @brief Constructor
      *
@@ -323,7 +325,8 @@ struct LogStatus {
 /**
  * @brief Helper for extracting ROS message definition (the relevant fields from the "connection header")
  */
-struct RosMsgDef {
+struct RosMsgDef
+{
     /**
      * @brief Constructor
      *
@@ -343,7 +346,8 @@ struct RosMsgDef {
 /**
  * @brief Helper for extracting a serialised ROS message
  */
-struct RosMsgBin {
+struct RosMsgBin
+{
     /**
      * @brief Constructor
      *
@@ -363,7 +367,8 @@ struct RosMsgBin {
 /**
  * @brief Helper for extracting data of a stream message (NMEA, RTCM3, etc.)
  */
-struct StreamMsg {
+struct StreamMsg
+{
     /**
      * @brief Constructor
      *

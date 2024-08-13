@@ -8,6 +8,7 @@ AllowShortFunctionsOnASingleLine: false
 BreakBeforeBraces: Custom
 BraceWrapping:
     AfterClass: true
+    AfterStruct: true
     AfterFunction: true
 IndentPPDirectives: AfterHash
 PPIndentWidth: 2
@@ -20,4 +21,6 @@ IncludeCategories:
     Priority:        1
     SortPriority:    2
     CaseSensitive:   false
+SortIncludes: CaseInsensitive
 InsertBraces: true
+Cpp11BracedListStyle: false

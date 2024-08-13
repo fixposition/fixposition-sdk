@@ -116,7 +116,8 @@ bool BagWriter::WriteMessage(const std::vector<uint8_t>& data, const std::string
         return false;
     }
 
-    struct ShapeShifterReadHelper { /* clang-format off */
+    struct ShapeShifterReadHelper
+    { /* clang-format off */
         ShapeShifterReadHelper(const uint8_t* data, const uint32_t size) : data_{data}, size_{size} {}
         const uint8_t* data_;
         const uint32_t size_;

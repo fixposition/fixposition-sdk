@@ -19,6 +19,7 @@
 #define __FPSDK_COMMON_TRAFO_HPP__
 
 /* LIBC/STL */
+#include <memory>
 
 /* EXTERNAL */
 #include "fpsdk_common/ext/eigen_core.hpp"
@@ -198,6 +199,57 @@ Eigen::Vector3d LlhDegToRad(const Eigen::Vector3d& llh_deg);
  * @return Eigen::Vector3d llh in degrees
  */
 Eigen::Vector3d LlhRadToDeg(const Eigen::Vector3d& llh_rad);
+
+// forward declaration
+struct TransformerHelper;
+
+/**
+ * @brief "Universal" coordinate transformer, backed by PROJ
+ */
+class Transformer
+{
+   public:
+    Transformer();
+    ~Transformer();
+
+    /**
+     * @brief Initialise transformer
+     *
+     * @param[in]  src_name  Name of the source CRS, currently only "EPSG:<id>" is supported)
+     * @param[in]  dst_name  Name of the destination CRS, currently only "EPSG:<id>" is supported)
+     *
+     * @return
+     */
+    bool Init(const std::string& src_name, const std::string& dst_name);
+
+    /**
+     * @brief Transform coordinates
+     *
+     * @param[in,out]  inout  Coordinates to transform, will be replaced with result
+     *
+     * @returns true on success, false otherwise
+     */
+    bool Transform(Eigen::Vector3d& inout);
+
+    /**
+     * @brief Transform coordinates
+     *
+     * @param[in]   in   Coordinates to transform
+     * @param[out]  out  Transformed coordinates
+     *
+     * @returns true on success, false otherwise
+     */
+    bool Transform(const Eigen::Vector3d& in, Eigen::Vector3d& out);
+
+    // No copy, no move
+    Transformer& operator=(const Transformer&) = delete;
+    Transformer(const Transformer&) = delete;
+    Transformer(Transformer&&) = delete;
+    Transformer& operator=(Transformer&&) = delete;
+
+   private:
+    std::unique_ptr<TransformerHelper> h_;  //!< PROJ stuff
+};
 
 /* ****************************************************************************************************************** */
 }  // namespace trafo

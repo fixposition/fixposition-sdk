@@ -29,7 +29,7 @@ std::vector<uint8_t> MessageToUnpacked(::capnp::MessageBuilder& capnp_msg)
 {
     const kj::Array<::capnp::word> words = ::capnp::messageToFlatArray(capnp_msg);
     const kj::ArrayPtr<const kj::byte> bytes = words.asBytes();
-    return {bytes.begin(), bytes.begin() + bytes.size()};
+    return { bytes.begin(), bytes.begin() + bytes.size() };
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -39,7 +39,7 @@ std::vector<uint8_t> MessageToPacked(::capnp::MessageBuilder& capnp_msg)
     kj::VectorOutputStream stream;
     ::capnp::writePackedMessage(stream, capnp_msg);
     const kj::ArrayPtr<const kj::byte> array = stream.getArray();
-    return {array.begin(), array.begin() + array.size()};
+    return { array.begin(), array.begin() + array.size() };
 }
 
 /* ****************************************************************************************************************** */

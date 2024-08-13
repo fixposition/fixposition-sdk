@@ -107,7 +107,7 @@ int FplMessage::Parse(const uint8_t* data, const uint32_t size)
         return 0;  // nada
     }
 
-    message_ = {data, data + total_size};
+    message_ = { data, data + total_size };
     payload_size_ = payload_size;
     payload_type_ = FplType::UNSPECIFIED;
     const uint16_t payload_type = ((uint16_t)message_[3] << 8) | (uint16_t)message_[2];
@@ -382,7 +382,7 @@ LogMeta::LogMeta(const FplMessage& log_msg)
     if ((log_msg.PayloadType() == FplType::LOGMETA) && (payload_size > 1)) {
         const uint8_t* payload = log_msg.PayloadData();
         const uint32_t yaml_len = strlen((const char*)payload);
-        yaml_ = {(const char*)payload, std::min(payload_size, yaml_len)};
+        yaml_ = { (const char*)payload, std::min(payload_size, yaml_len) };
         YAML::Node meta;
         if (fpsdk::common::yaml::StringToYaml(yaml_, meta)) {
             try {
@@ -433,7 +433,7 @@ LogStatus::LogStatus(const FplMessage& log_msg)
         const uint8_t* payload = log_msg.PayloadData();
         // strlen() because there may be multiple trailing \0 (due to padding)
         const uint32_t yaml_len = strlen((const char*)payload);
-        yaml_ = {(const char*)payload, std::min(payload_size, yaml_len)};
+        yaml_ = { (const char*)payload, std::min(payload_size, yaml_len) };
         YAML::Node status;
         if (fpsdk::common::yaml::StringToYaml(yaml_, status)) {
             try {
@@ -563,7 +563,7 @@ RosMsgBin::RosMsgBin(const FplMessage& log_msg)
             const uint32_t msg_offs = name_offs + topic_name_.size() + 1;
             const uint8_t* msg_bin = &payload[msg_offs];
             const uint32_t msg_size = payload_size - msg_offs;
-            msg_data_ = {msg_bin, msg_bin + msg_size};
+            msg_data_ = { msg_bin, msg_bin + msg_size };
         }
     } else {
         ok = false;
@@ -613,7 +613,7 @@ StreamMsg::StreamMsg(const FplMessage& log_msg)
         const uint32_t frame_offs = size_offs + sizeof(frame_size);
         if (ok && (payload_size >= (frame_offs + frame_size))) {
             const uint8_t* frame_bin = &payload[frame_offs];
-            msg_data_ = {frame_bin, frame_bin + frame_size};
+            msg_data_ = { frame_bin, frame_bin + frame_size };
         } else {
             ok = false;
         }
