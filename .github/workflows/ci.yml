@@ -8,7 +8,7 @@ on:
     workflow_dispatch:
 
 jobs:
-    # Note: job names should be unique across all workflows!
+    # Note: job names should be unique across all workflows (e.g. to reference them as pull request checks)!
 
     ci-fpsdk-bookworm:
         runs-on: ubuntu-latest
@@ -92,35 +92,35 @@ jobs:
               run: |
                   echo "github.ref: ${{ github.ref }}"
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
-                  make doc INSTALL_PREFIX=install BUILD_TYPE=Release
+                  buildname=doc-release
+                  make doc INSTALL_PREFIX=install BUILD_TYPE=Release BUILD_DIR=build/${buildname}
                   mkdir -p github-pages/fixposition-sdk-docs
-                  rsync -rav build/Release/doc/ github-pages/fixposition-sdk-docs/
+                  rsync -rav build/${buildname}/doc/ github-pages/fixposition-sdk-docs/
                   touch github-pages/fixposition-sdk-docs/.nojekyll
                   echo '<a href="fixposition-sdk-docs/">Fixposition SDK documentation</a>' >> github-pages/index.html
 
             # ...we can add more content here... e.g. actions/download-artifact from other jobs
 
-            ##### Archive generated HTML as artefact
+            ##### Archive generated HTML as artefacts
 
             # https://github.com/actions/upload-pages-artifact (This, not actions/upload-artifact, wich doesn't work for
             # pages deployment. Both actions make the artefact show up as a job artefact.
             - name: Upload pages artefact
-              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/28/merge' }}
+              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/29/merge' }}
               uses: actions/upload-pages-artifact@v3
               with:
                   path: github-pages
-                  if-no-files-found: error
 
             ##### Deploy to fixposition.github.io/fixposition_utility (only on main branch)
 
             # https://github.com/actions/configure-pages
             - name: Configure pages
-              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/28/merge' }}
+              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/29/merge' }}
               uses: actions/configure-pages@v5
 
             # https://github.com/actions/deploy-pages
             - name: Deploy pages
-              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/28/merge' }}
+              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/29/merge' }}
               uses: actions/deploy-pages@v4
               with:
                   artifact_name: github-pages

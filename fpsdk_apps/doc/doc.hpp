@@ -33,6 +33,9 @@ namespace apps {
 
     - @subpage FPSDK_APPS_FPLTOOL
 
+    @section FPSDK_APPS_LICENSE License
+
+    @include fpsdk_apps/LICENSE
 */
 
 /* ****************************************************************************************************************** */

@@ -33,6 +33,10 @@ namespace ros2 {
 
     - @subpage FPSDK_ROS2_UTILS
 
+    @section FPSDK_ROS1_LICENSE License
+
+    @include fpsdk_ros1/LICENSE
+
 */
 
 /* ****************************************************************************************************************** */

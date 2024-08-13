@@ -6,7 +6,7 @@ on:
 
 # Splitting into three jobs to make stuff build in parallel (on multiple runners)
 jobs:
-    # Note: job names should be unique across all workflows!
+    # Note: job names should be unique across all workflows (e.g. to reference them as pull request checks)!
 
     docker-fpsdk-bookworm:
         runs-on: ubuntu-latest

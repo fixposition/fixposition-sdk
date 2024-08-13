@@ -26,9 +26,12 @@ namespace fpsdk {
 
     @section FPSDK_OVERVIEW Overview
 
+    This is the reference documentation of the Fixposition SDK API. For examples and building instructions see the
+    provided apps (e.g. the "fpltool" in fpsdk_apps/fpltool/), the CI scripts or the various README.md files.
+
     @image html fpsdk-overview.drawio.svg
 
-    @section FP_PACKAGES Packages
+    @section FPSDK_PACKAGES Packages
 
     - @subpage FPSDK_COMMON_DOC
     - @subpage FPSDK_ROS1_DOC
@@ -38,6 +41,10 @@ namespace fpsdk {
     @section FP_REFS References
 
     - Fixposition SDK source code repository: https://github.com/fixposition/fixposition_utility
+
+    @section FPSDK_LICENSE Licenses
+
+    See the LICENSE files of the individual packages, included in the documentation linked above.
 
 */
 
