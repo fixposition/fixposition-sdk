@@ -34,6 +34,10 @@ namespace ros1 {
     - @subpage FPSDK_ROS1_BAGWRITER
     - @subpage FPSDK_ROS1_UTILS
 
+    @section FPSDK_ROS1_LICENSE License
+
+    @include fpsdk_ros1/LICENSE
+
 */
 
 /* ****************************************************************************************************************** */

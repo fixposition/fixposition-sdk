@@ -2,11 +2,10 @@
 
 This library contains various common functionality. This is used for example by the [fpsdk_apps](../fpsdk_apps/README).
 
-
 ---
 ## Dependencies
 
-- [Fixposition SDK dependencies](../README.md#dependencies)
+- [Fixposition SDK dependencies](../fpsdk_doc/README.md#dependencies)
 - This does *not* need any ROS
 
 

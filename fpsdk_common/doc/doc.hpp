@@ -47,6 +47,10 @@ namespace common {
     - @subpage FPSDK_COMMON_UTILS
     - @subpage FPSDK_COMMON_YAML
 
+    @section FPSDK_COMMON_LICENSE License
+
+    @include fpsdk_common/LICENSE
+
 */
 
 /* ****************************************************************************************************************** */
