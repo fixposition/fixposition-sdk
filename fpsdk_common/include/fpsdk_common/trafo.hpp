@@ -207,7 +207,13 @@ Eigen::Vector3d LlhRadToDeg(const Eigen::Vector3d& llh_rad);
 class Transformer
 {
    public:
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  name   Optional name, for debugging
+     */
     Transformer(const std::string& name = "");
+
     ~Transformer();
 
     /**
@@ -223,7 +229,7 @@ class Transformer
      *
      * @returns true on success, false otherwise (bad params, missing data, ...)
      */
-    bool Init(const std::string& src_name, const std::string& dst_name);
+    bool Init(const std::string& source_crs, const std::string& target_crs);
 
     /**
      * @brief Transform coordinates
