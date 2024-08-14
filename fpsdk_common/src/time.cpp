@@ -52,11 +52,11 @@ void Sleep(const uint32_t duration)
 
 /* ****************************************************************************************************************** */
 
-RosTime::RosTime() : sec_{0}, nsec_{0}
+RosTime::RosTime() : sec_{ 0 }, nsec_{ 0 }
 {
 }
 
-RosTime::RosTime(const uint32_t sec, const uint32_t nsec) : sec_{sec}, nsec_{nsec}
+RosTime::RosTime(const uint32_t sec, const uint32_t nsec) : sec_{ sec }, nsec_{ nsec }
 {
     while (nsec_ > 999999999) {
         nsec_ -= 1000000000;

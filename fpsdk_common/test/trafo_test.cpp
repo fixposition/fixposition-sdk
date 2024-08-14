@@ -72,55 +72,39 @@ ROTATIONS:
 
 YAML::Node TEST_DATA;
 
-TEST(TrafoTest, LoadYaml)
+static bool LoadTestData()
 {
-    EXPECT_TRUE(fpsdk::common::yaml::StringToYaml(TEST_DATA_YAML, TEST_DATA));
+    return (TEST_DATA.size() > 0 ? true : fpsdk::common::yaml::StringToYaml(TEST_DATA_YAML, TEST_DATA));
 }
+
+#define EXPECT_NEAR_EIGEN_VECTOR3D(v1, v2, e)   \
+    do {                                        \
+        EXPECT_NEAR((v1).x(), (v2).x(), e.x()); \
+        EXPECT_NEAR((v1).y(), (v2).y(), e.y()); \
+        EXPECT_NEAR((v1).z(), (v2).z(), e.z()); \
+    } while (0)
+
+static const Eigen::Vector3d ECEF_ERR = { 5e-4, 5e-4, 5e-4 };
+static const Eigen::Vector3d LLH_ERR = { 1e-8, 1e-8, 5e-4 };
+
+#define DEBUG_EIGEN_VECTOR3D(n, v) DEBUG("%s %.10g %.10g %.10g", n, (v).x(), (v).y(), (v).z())
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static constexpr double ECEF_ERR = 5e-4;
-static constexpr double RAD_ERR = 1e-8;
-
-static void CompareEigenVec(const Eigen::VectorXd& vec1, const Eigen::VectorXd& vec2, const double err = ECEF_ERR)
+TEST(TrafoTest, LlhEcef)
 {
-    EXPECT_EQ(vec1.size(), vec2.size());
-    for (int ix = 0; ix < vec1.size(); ix++) {
-        EXPECT_NEAR(vec1[ix], vec2[ix], err);
-    }
-}
-
-static void CompareLlh(const Eigen::Vector3d& vec1, const Eigen::Vector3d& vec2)
-{
-    EXPECT_EQ(vec1.size(), vec2.size());
-    EXPECT_NEAR(vec1.x(), vec2.x(), RAD_ERR);
-    EXPECT_NEAR(vec1.y(), vec2.y(), RAD_ERR);
-    EXPECT_NEAR(vec1.z(), vec2.z(), ECEF_ERR);
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-class LlhEcefTest : public ::testing::Test
-{
-   public:
-    EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+    EXPECT_TRUE(LoadTestData());
     std::vector<Eigen::Vector3d> llh_vec_;
     std::vector<Eigen::Vector3d> ecef_vec_;
-
-    virtual void SetUp() final
-    {
-        for (auto elem : TEST_DATA["LLH_ECEF"]) {
-            Eigen::Vector3d llh(elem["LLH"].as<std::vector<double>>().data());
-            Eigen::Vector3d ecef(elem["ECEF"].as<std::vector<double>>().data());
-            llh_vec_.push_back(llh);
-            ecef_vec_.push_back(ecef);
-        }
+    for (auto elem : TEST_DATA["LLH_ECEF"]) {
+        Eigen::Vector3d llh(elem["LLH"].as<std::vector<double>>().data());
+        Eigen::Vector3d ecef(elem["ECEF"].as<std::vector<double>>().data());
+        llh_vec_.push_back(llh);
+        ecef_vec_.push_back(ecef);
     }
-};
-
-TEST_F(LlhEcefTest, LlhEcef)
-{
     const size_t num_tests = llh_vec_.size();
+    EXPECT_GT(num_tests, 0);
+
     for (size_t i = 0; i < num_tests; ++i) {
         const Eigen::Vector3d llh = LlhDegToRad(llh_vec_.at(i));
         const Eigen::Vector3d ecef = ecef_vec_.at(i);
@@ -128,10 +112,10 @@ TEST_F(LlhEcefTest, LlhEcef)
         const Eigen::Vector3d resllh = TfWgs84LlhEcef(ecef);
         const Eigen::Vector3d resecef = TfEcefWgs84Llh(llh);
 
-        DEBUG_S("Res LLH  " << LlhRadToDeg(resllh).transpose().format(Eigen::IOFormat(15)));
-        DEBUG_S("Res ECEF " << resecef.transpose().format(Eigen::IOFormat(15)));
-        CompareLlh(llh, resllh);
-        CompareEigenVec(ecef, resecef);
+        DEBUG_EIGEN_VECTOR3D("Res LLH ", LlhRadToDeg(resllh));
+        DEBUG_EIGEN_VECTOR3D("Res ECEF", resecef);
+        EXPECT_NEAR_EIGEN_VECTOR3D(llh, resllh, LLH_ERR);
+        EXPECT_NEAR_EIGEN_VECTOR3D(ecef, resecef, ECEF_ERR);
     }
 }
 
@@ -141,27 +125,25 @@ class EnuEcefTest : public ::testing::Test
 {
    public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+
+TEST(TrafoTest, EnuEcef)
+{
+    EXPECT_TRUE(LoadTestData());
     std::vector<Eigen::Vector3d> llh_vec_;
     std::vector<Eigen::Vector3d> enu_vec_;
     std::vector<Eigen::Vector3d> ecef_vec_;
-
-    virtual void SetUp() final
-    {
-        YAML::Node ENU_ECEF = TEST_DATA["ENU_ECEF"];
-        for (auto elem : ENU_ECEF) {
-            Eigen::Vector3d llh(elem["LLH"].as<std::vector<double>>().data());
-            Eigen::Vector3d enu(elem["ENU"].as<std::vector<double>>().data());
-            Eigen::Vector3d ecef(elem["ECEF"].as<std::vector<double>>().data());
-            llh_vec_.push_back(llh);
-            enu_vec_.push_back(enu);
-            ecef_vec_.push_back(ecef);
-        }
+    for (auto elem : TEST_DATA["ENU_ECEF"]) {
+        Eigen::Vector3d llh(elem["LLH"].as<std::vector<double>>().data());
+        Eigen::Vector3d enu(elem["ENU"].as<std::vector<double>>().data());
+        Eigen::Vector3d ecef(elem["ECEF"].as<std::vector<double>>().data());
+        llh_vec_.push_back(llh);
+        enu_vec_.push_back(enu);
+        ecef_vec_.push_back(ecef);
     }
-};
-
-TEST_F(EnuEcefTest, TfEnuEcef)
-{
     const size_t num_tests = llh_vec_.size();
+    EXPECT_GT(num_tests, 0);
+
     for (size_t i = 0; i < num_tests; ++i) {
         const Eigen::Vector3d llh = LlhDegToRad(llh_vec_.at(i));
         const Eigen::Vector3d enu = enu_vec_.at(i);
@@ -169,14 +151,10 @@ TEST_F(EnuEcefTest, TfEnuEcef)
 
         const Eigen::Vector3d resenu = TfEnuEcef(ecef, llh);
 
-        DEBUG_S("Res ENU  " << resenu.transpose().format(Eigen::IOFormat(15)));
-        CompareEigenVec(enu, resenu);
+        DEBUG_EIGEN_VECTOR3D("Res ENU ", resenu);
+        EXPECT_NEAR_EIGEN_VECTOR3D(enu, resenu, ECEF_ERR);
     }
-}
 
-TEST_F(EnuEcefTest, TfEcefEnu)
-{
-    const size_t num_tests = llh_vec_.size();
     for (size_t i = 0; i < num_tests; ++i) {
         const Eigen::Vector3d llh = LlhDegToRad(llh_vec_.at(i));
         const Eigen::Vector3d enu = enu_vec_.at(i);
@@ -184,8 +162,8 @@ TEST_F(EnuEcefTest, TfEcefEnu)
 
         const Eigen::Vector3d resecef = TfEcefEnu(enu, llh);
 
-        DEBUG_S("Res ECEF  " << resecef.transpose().format(Eigen::IOFormat(15)));
-        CompareEigenVec(ecef, resecef);
+        DEBUG_EIGEN_VECTOR3D("Res ECEF", resecef);
+        EXPECT_NEAR_EIGEN_VECTOR3D(ecef, resecef, ECEF_ERR);
     }
 }
 
@@ -195,27 +173,25 @@ class NedEcefTest : public ::testing::Test
 {
    public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+
+TEST(TrafoTest, NedEcef)
+{
+    EXPECT_TRUE(LoadTestData());
     std::vector<Eigen::Vector3d> llh_vec_;
     std::vector<Eigen::Vector3d> ned_vec_;
     std::vector<Eigen::Vector3d> ecef_vec_;
-
-    virtual void SetUp() override
-    {
-        YAML::Node NED_ECEF = TEST_DATA["NED_ECEF"];
-        for (auto elem : NED_ECEF) {
-            Eigen::Vector3d llh(elem["LLH"].as<std::vector<double>>().data());
-            Eigen::Vector3d ned(elem["NED"].as<std::vector<double>>().data());
-            Eigen::Vector3d ecef(elem["ECEF"].as<std::vector<double>>().data());
-            llh_vec_.push_back(llh);
-            ned_vec_.push_back(ned);
-            ecef_vec_.push_back(ecef);
-        }
+    for (auto elem : TEST_DATA["NED_ECEF"]) {
+        Eigen::Vector3d llh(elem["LLH"].as<std::vector<double>>().data());
+        Eigen::Vector3d ned(elem["NED"].as<std::vector<double>>().data());
+        Eigen::Vector3d ecef(elem["ECEF"].as<std::vector<double>>().data());
+        llh_vec_.push_back(llh);
+        ned_vec_.push_back(ned);
+        ecef_vec_.push_back(ecef);
     }
-};
-
-TEST_F(NedEcefTest, TestNedEcef)
-{
     const size_t num_tests = llh_vec_.size();
+    EXPECT_GT(num_tests, 0);
+
     for (size_t i = 0; i < num_tests; ++i) {
         const Eigen::Vector3d llh = LlhDegToRad(llh_vec_.at(i));
         const Eigen::Vector3d ned = ned_vec_.at(i);
@@ -223,14 +199,10 @@ TEST_F(NedEcefTest, TestNedEcef)
 
         const Eigen::Vector3d resned = TfNedEcef(ecef, llh);
 
-        DEBUG_S("Res NED  " << LlhRadToDeg(resned).transpose().format(Eigen::IOFormat(15)));
-        CompareEigenVec(ned, resned);
+        DEBUG_EIGEN_VECTOR3D("Res NED ", LlhRadToDeg(resned));
+        EXPECT_NEAR_EIGEN_VECTOR3D(ned, resned, ECEF_ERR);
     }
-}
 
-TEST_F(NedEcefTest, TfEcefNed)
-{
-    const size_t num_tests = llh_vec_.size();
     for (size_t i = 0; i < num_tests; ++i) {
         const Eigen::Vector3d llh = LlhDegToRad(llh_vec_.at(i));
         const Eigen::Vector3d ned = ned_vec_.at(i);
@@ -238,8 +210,8 @@ TEST_F(NedEcefTest, TfEcefNed)
 
         const Eigen::Vector3d resecef = TfEcefNed(ned, llh);
 
-        DEBUG_S("Res ECEF  " << resecef.transpose().format(Eigen::IOFormat(15)));
-        CompareEigenVec(ecef, resecef);
+        DEBUG_EIGEN_VECTOR3D("Res ECEF", resecef);
+        EXPECT_NEAR_EIGEN_VECTOR3D(ecef, resecef, ECEF_ERR);
     }
 }
 
@@ -249,28 +221,26 @@ class RotationConversionTest : public ::testing::Test
 {
    public:
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+};
+
+TEST(TrafoTest, QuatEul)
+{
+    EXPECT_TRUE(LoadTestData());
     std::vector<Eigen::Matrix<double, 3, 3, Eigen::RowMajor>> rotmat_vec_;
     std::vector<Eigen::Vector4d> q_vec_;
     std::vector<Eigen::Vector3d> eul_vec_;
     std::vector<Eigen::Vector3d> eul_deg_vec_;
-
-    virtual void SetUp() override
-    {
-        YAML::Node ROTATIONS = TEST_DATA["ROTATIONS"];
-        for (auto elem : ROTATIONS) {
-            Eigen::Matrix<double, 3, 3, Eigen::RowMajor> rotmat(elem["ROTMAT"].as<std::vector<double>>().data());
-            Eigen::Vector4d q(elem["Q"].as<std::vector<double>>().data());
-            Eigen::Vector3d eul(elem["EUL"].as<std::vector<double>>().data());
-            rotmat_vec_.push_back(rotmat);
-            q_vec_.push_back(q);
-            eul_vec_.push_back(eul);
-        }
+    for (auto elem : TEST_DATA["ROTATIONS"]) {
+        Eigen::Matrix<double, 3, 3, Eigen::RowMajor> rotmat(elem["ROTMAT"].as<std::vector<double>>().data());
+        Eigen::Vector4d q(elem["Q"].as<std::vector<double>>().data());
+        Eigen::Vector3d eul(elem["EUL"].as<std::vector<double>>().data());
+        rotmat_vec_.push_back(rotmat);
+        q_vec_.push_back(q);
+        eul_vec_.push_back(eul);
     }
-};
-
-TEST_F(RotationConversionTest, TestQuatEul)
-{
     const size_t num_tests = rotmat_vec_.size();
+    EXPECT_GT(num_tests, 0);
+
     for (size_t i = 0; i < num_tests; ++i) {
         const Eigen::Vector4d q = q_vec_.at(i);
         const Eigen::Quaterniond quat(q(0), q(1), q(2), q(3));
@@ -278,10 +248,68 @@ TEST_F(RotationConversionTest, TestQuatEul)
 
         const Eigen::Vector3d eul_test = QuatToEul(quat);
 
-        DEBUG_S("Eul " << eul.transpose() << " Eul_Test " << eul_test.transpose());
+        DEBUG_EIGEN_VECTOR3D("Eul     ", eul);
+        DEBUG_EIGEN_VECTOR3D("Eul_Test", eul_test);
 
         // compare quat, might be 1 0 0 0 or -1 0 0 0
         EXPECT_LE((eul_test - eul).norm(), 1e-5);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(TrafoTest, Trafo)
+{
+    const Eigen::Vector3d p1_wgs84_llh = { 47.4002984167, 8.45036571389, 459.410 };
+    const Eigen::Vector3d p1_wgs84_xyz = { 4278387.47, 635620.71, 4672340.04 };
+    const Eigen::Vector3d p1_ch1903_enu = { 2676373.211, 1250433.955,
+        459.410 };  // ell height!, orthometric height should be ~412
+    const Eigen::Vector3d p1_etrs89_xyz = { 4278387.47, 635620.71,
+        4672340.04 };  // same as wgs84, at this position and accuracy
+    const Eigen::Vector3d err = { 1e-3, 1e-3, 1e-3 };
+    DEBUG_EIGEN_VECTOR3D("p1_wgs84_llh", p1_wgs84_llh);
+    DEBUG_EIGEN_VECTOR3D("p1_wgs84_xyz", p1_wgs84_xyz);
+    DEBUG_EIGEN_VECTOR3D("p1_ch1903_enu", p1_ch1903_enu);
+    DEBUG_EIGEN_VECTOR3D("p1_etrs89_xyz", p1_etrs89_xyz);
+    DEBUG_EIGEN_VECTOR3D("err", err);
+
+    // https://epsg.io/4326 WGS 84 lat/lon/height
+    // https://epsg.io/2056 Swiss CH1903+ / LV95 east/north/up
+    {
+        Transformer trafo("wgs84_llh_to_ch1903_enu");
+        EXPECT_TRUE(trafo.Init("EPSG:4326", "EPSG:2056"));
+
+        Eigen::Vector3d p;
+        EXPECT_TRUE(trafo.Transform(p1_wgs84_llh, p));
+        EXPECT_NEAR_EIGEN_VECTOR3D(p1_ch1903_enu, p, err);
+        p = p1_wgs84_llh;
+        EXPECT_TRUE(trafo.Transform(p));
+        EXPECT_NEAR_EIGEN_VECTOR3D(p1_ch1903_enu, p, err);
+        DEBUG_EIGEN_VECTOR3D("p1_wgs84_llh -> ch1903_enu", p);
+    }
+
+    // https://epsg.io/4326 WGS 84 lat/lon/height
+    // https://epsg.io/4978 WGS 84 ECEF x/y/z
+    {
+        Transformer trafo("wgs84_llh_to_wgs84_xyz");
+        EXPECT_TRUE(trafo.Init("EPSG:4326", "EPSG:4978"));
+
+        Eigen::Vector3d p;
+        EXPECT_TRUE(trafo.Transform(p1_wgs84_llh, p));
+        EXPECT_NEAR_EIGEN_VECTOR3D(p1_wgs84_xyz, p, err);
+        DEBUG_EIGEN_VECTOR3D("p1_wgs84_llh -> wgs84_xyz", p);
+    }
+
+    // https://epsg.io/4326 WGS 84 lat/lon/height
+    // https://epsg.io/4936 ETRS89 XYZ
+    {
+        Transformer trafo("wgs84_llh_to_etrs89_xyz");
+        EXPECT_TRUE(trafo.Init("EPSG:4326", "EPSG:4936"));
+
+        Eigen::Vector3d p;
+        EXPECT_TRUE(trafo.Transform(p1_wgs84_llh, p));
+        EXPECT_NEAR_EIGEN_VECTOR3D(p1_etrs89_xyz, p, err);
+        DEBUG_EIGEN_VECTOR3D("p1_wgs84_llh -> etrs89_xyz", p);
     }
 }
 

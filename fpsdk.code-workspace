@@ -67,6 +67,7 @@
         "C_Cpp.default.browse.path":           [ "${workspaceFolder}/**" ],
         //"C_Cpp.default.configurationProvider": "b2.catkin_tools",
         "C_Cpp.default.browse.databaseFilename": "${workspaceFolder}/.vscode-cache/browse.db",
+        "C_Cpp.default.compileCommands":         "${workspaceFolder}/build/Debug/compile_commands.json",
         "C_Cpp.default.browse.limitSymbolsToIncludedHeaders": false,
         //"C_Cpp.clang_format_style": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120 }",
         "editor.formatOnSave": false,
@@ -177,7 +178,8 @@
             "rtklib_helpers_type.h": "c",
             "rtklib_stuff.h": "c",
             "future": "cpp",
-            "coroutine": "cpp"
+            "coroutine": "cpp",
+            "codecvt": "cpp"
         },
         "workbench.remoteIndicator.showExtensionRecommendations": true,
         "yaml.extension.recommendations": false
@@ -187,7 +189,8 @@
             "ms-vscode.cpptools",
             "ms-vscode.cmake-tools",
             "ms-vscode-remote.remote-ssh",
-            "ms-vscode-remote.remote-containers"
+            "ms-vscode-remote.remote-containers",
+            "twxs.cmake"
         ],
         "unwantedRecommendations": [
         ]
@@ -215,16 +218,22 @@
         "tasks": [
             // -----------------------------------------------------------------------------------------
             {
-                "label": "make",
+                "label": "Fixposition SDK: build",
                 "group":{ "kind": "build", "isDefault": true },
-                "command": "make", "args": [ "install", "INSTALL_PREFIX=${workspaceFolder}/fpsdk", "ROS_PACKAGE_PATH=/opt/ros/noetic/share", "BUILD_TYPE=Debug" ]
+                "command": "make", "args": [ "build", "INSTALL_PREFIX=${workspaceFolder}/fpsdk", "BUILD_TYPE=Debug" ],
+                "problemMatcher": [ "$gcc" ]
             },
             {
-                "label": "make clean",
-                "group": "build",
-                "command": "make", "args": [ "clean" ]
+                "label": "Fixposition SDK: test",
+                "group": "test",
+                "command": "make", "args": [ "test", "BUILD_TYPE=Debug" ],
+                "problemMatcher": [ "$gcc" ]
             },
-            // see more useful things in .vscode/tasks.json-example
+            {
+                "label": "Fixposition SDK: clean",
+                "group": "build",
+                "command": "make", "args": [ "clean", "BUILD_TYPE=Debug" ]
+            },
             // -----------------------------------------------------------------------------------------
             {
                 "label": "debug workspaceFolder path",
@@ -243,39 +252,29 @@
         // https://code.visualstudio.com/docs/cpp/launch-json-reference
         "configurations": [
             {
-                "name": "debug fpltool",
+                "name": "Fixposition SDK: debug fpltool",
                 "type": "cppdbg", "request": "launch", "MIMode": "gdb", "miDebuggerPath" : "gdb",
-                "stopAtEntry": false,
-                "preLaunchTask" : "make",
-                "program": "${workspaceFolder}/fpsdk/bin/fpltool",
-                "args": [ ],
+                "stopAtEntry": true,
+                "preLaunchTask" : "Fixposition SDK: build",
+                "program": "${workspaceFolder}/build/Debug/fpsdk_apps/fpltool",
+                "args": [ "-v", "-v" ],
                 "cwd": "${workspaceFolder}"
             },
-
-            // {
-            //     "name": "debug cfggui",
-            //     "type": "cppdbg", "request": "launch", "MIMode": "gdb", "miDebuggerPath" : "gdb",
-            //     "stopAtEntry": false,
-            //     "preLaunchTask": "make cfggui-debug",
-            //     "program": "${workspaceFolder}/output/cfggui-debug",
-            //     "args": [ ],
-            //     "cwd": "${workspaceFolder}",
-            //     //"miDebuggerArgs": "-ex source .gdbinit", // nope... :-/
-            //     "setupCommands": [
-            //         { "text": "-enable-pretty-printing", "description": "enable pretty printing", "ignoreFailures": true }, // needs setup code in ~/.gdbinit!
-            //         { "text": "handle SIGPIPE nostop noprint pass", "description": "ignore SIGPIPE", "ignoreFailures": true },
-            //         { "text": "source ${workspaceFolder}/.gdbinit", "description": "load local .gdbinit", "ignoreFailures": false }
-            //         // ubloxcfg/.gdbinit for more...
-            //         // //{ "text": "add-natvis ${workspaceFolder}/3rdparty/imgui/imgui.natvis", "description": "imgui natvis", "ignoreFailures": true }
-            //         // // "-exec info skip" to show in debug console
-            //         // { "text": "skip -rfunction Im(Vec2|Vec4|Strv|Vector|Span)::.+", "description": "skip trivial ImGui functions", "ignoreFailures": true },
-            //         // { "text": "skip -rfunction Ff::Vec2::.+", "description": "skip trivial Ff functions", "ignoreFailures": true },
-            //         // // https://sourceware.org/gdb/onlinedocs/gdb/Skipping-Over-Functions-and-Files.html
-            //         // // FIXME: doesn't work :-(
-            //         // { "text": "skip -rfunction ^std::__cxx11::(allocator|basic_string)<.*>::", "description": "skip string ctor/dtor", "ignoreFailures": true },
-            //         // { "text": "skip -rfunction ^std::__cxx11::([a-zA-z0-9_]+)<.*>::", "description": "skip std ctor/dtor", "ignoreFailures": true },
-            //     ]
-            // }
+            {
+                "name": "Fixposition SDK: debug trafo_test",
+                "type": "cppdbg", "request": "launch", "MIMode": "gdb", "miDebuggerPath" : "gdb",
+                "stopAtEntry": true,
+                "preLaunchTask" : "Fixposition SDK: build",
+                "program": "${workspaceFolder}/build/Debug/fpsdk_common/fpsdk_common_trafo_test",
+                "args": [ "-v", "-v", "-v", "-v" ],
+                "cwd": "${workspaceFolder}",
+                "setupCommands": [
+                    { "text": "set auto-load safe-path ${workspaceFolder}", "description": "", "ignoreFailures": true },
+                    { "text": "-enable-pretty-printing", "description": "enable pretty printing", "ignoreFailures": true },
+                    { "text": "handle SIGPIPE nostop noprint pass", "description": "ignore SIGPIPE", "ignoreFailures": true },
+                    { "text": "source ${workspaceFolder}/.devcontainer/.gdb/gdbinit", "description": "load local gdbinit", "ignoreFailures": false }
+                ]
+            }
         ],
         "compounds": []
     }

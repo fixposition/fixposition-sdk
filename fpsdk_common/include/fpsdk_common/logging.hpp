@@ -201,7 +201,8 @@ using LoggingPrintFunc = void (*)(const LoggingParams&, const LoggingLevel, cons
 /**
  * @brief Logging parameters
  */
-struct LoggingParams {
+struct LoggingParams
+{
     /**
      * @brief Constructor
      *

@@ -12,13 +12,16 @@
  */
 
 /* LIBC/STL */
+#include <exception>
 
 /* EXTERNAL */
+#include <proj.h>
 
 /* PACKAGE */
-#include "fpsdk_common/trafo.hpp"
-
+#include "fpsdk_common/logging.hpp"
 #include "fpsdk_common/math.hpp"
+#include "fpsdk_common/string.hpp"
+#include "fpsdk_common/trafo.hpp"
 
 namespace fpsdk {
 namespace common {
@@ -26,6 +29,7 @@ namespace trafo {
 /* ****************************************************************************************************************** */
 
 using namespace fpsdk::common::math;
+using namespace fpsdk::common::string;
 
 /**
  * @details
@@ -253,6 +257,100 @@ Eigen::Vector3d LlhDegToRad(const Eigen::Vector3d& llh_deg)
 Eigen::Vector3d LlhRadToDeg(const Eigen::Vector3d& llh_rad)
 {
     return Eigen::Vector3d(RadToDeg(llh_rad.x()), RadToDeg(llh_rad.y()), llh_rad.z());
+}
+
+/* ****************************************************************************************************************** */
+
+Transformer::Transformer(const std::string& name) /* clang-format off */ :
+    name_      { name },
+    pj_init_   { false },
+    pj_ctx_    { NULL },
+    pj_tf_     { NULL }  // clang-format on
+{
+}
+
+Transformer::~Transformer()
+{
+    if (pj_init_) {
+        pj_init_ = false;
+        proj_destroy((PJ*)pj_tf_);
+        proj_context_destroy((PJ_CONTEXT*)pj_ctx_);
+        pj_tf_ = NULL;
+        pj_ctx_ = NULL;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+static void ProjLogger(void* data, int level, const char* msg)
+{
+    const char* name = (const char*)data;
+    switch (level) { /* clang-format off */
+        case PJ_LOG_ERROR: WARNING("Transformer(%s) %s", name, msg); break;
+        case PJ_LOG_DEBUG: DEBUG("Transformer(%s) %s", name, msg); break;
+        default:
+        case PJ_LOG_TRACE: TRACE("Transformer(%s) %s", name, msg); break;
+    }  // clang-format on
+}
+
+bool Transformer::Init(const std::string& source_crs, const std::string& target_crs)
+{
+    if (pj_init_) {
+        return false;
+    }
+    DEBUG("Transformer(%s) [%s] [%s]", name_.c_str(), source_crs.c_str(), target_crs.c_str());
+
+    TRACE("Transformer(%s) create proj context", name_.c_str());
+    PJ_CONTEXT* ctx = proj_context_create();
+#ifdef NDEBUG
+    proj_log_level(ctx, PJ_LOG_DEBUG);
+#else
+    proj_log_level(ctx, PJ_LOG_TRACE);
+#endif
+    proj_log_func(ctx, (void*)name_.c_str(), ProjLogger);
+
+    TRACE("Transformer(%s) create proj transformer", name_.c_str());
+    PJ* tf = proj_create_crs_to_crs(ctx, source_crs.c_str(), target_crs.c_str(), NULL);
+
+    if (tf == NULL) {
+        const int err = proj_context_errno(ctx);
+        const char* err_str = proj_context_errno_string(ctx, err);
+        WARNING("Transformer(%s) %s -> %s: %s", name_.c_str(), source_crs.c_str(), target_crs.c_str(), err_str);
+        proj_context_destroy(ctx);
+        return false;
+    }
+
+    pj_ctx_ = (void*)ctx;
+    pj_tf_ = (void*)tf;
+    pj_init_ = true;
+    TRACE("Transformer(%s) init ok", name_.c_str());
+    return true;
+}
+
+bool Transformer::Transform(Eigen::Vector3d& inout, const bool inv)
+{
+    if (pj_init_) {
+        const PJ_COORD src = { { inout.x(), inout.y(), inout.z(), std::numeric_limits<double>::infinity() } };
+        const PJ_COORD dst = proj_trans((PJ*)pj_tf_, inv ? PJ_INV : PJ_FWD, src);
+        inout.x() = dst.v[0];
+        inout.y() = dst.v[1];
+        inout.z() = dst.v[2];
+        return true;
+    }
+    return false;
+}
+
+bool Transformer::Transform(const Eigen::Vector3d& in, Eigen::Vector3d& out, const bool inv)
+{
+    if (pj_init_) {
+        const PJ_COORD src = { { in.x(), in.y(), in.z(), std::numeric_limits<double>::infinity() } };
+        const PJ_COORD dst = proj_trans((PJ*)pj_tf_, inv ? PJ_INV : PJ_FWD, src);
+        out.x() = dst.v[0];
+        out.y() = dst.v[1];
+        out.z() = dst.v[2];
+        return true;
+    }
+    return false;
 }
 
 /* ****************************************************************************************************************** */

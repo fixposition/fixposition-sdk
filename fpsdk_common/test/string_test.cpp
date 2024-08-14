@@ -125,7 +125,7 @@ TEST(StringTest, StrSplit)
 
 TEST(StringTest, StrJoin)
 {
-    const std::vector<std::string> vec = {"foo", "bar", "baz"};
+    const std::vector<std::string> vec = { "foo", "bar", "baz" };
     EXPECT_EQ(StrJoin(vec, ","), "foo,bar,baz");
     EXPECT_EQ(StrJoin(vec, ""), "foobarbaz");
     EXPECT_EQ(StrJoin(vec, "--"), "foo--bar--baz");
@@ -135,7 +135,7 @@ TEST(StringTest, StrJoin)
 
 TEST(StringTest, MakeUnique)
 {
-    std::vector<std::string> vec = {"foo", "bar", "", "foo", "baz", "", "abc"};
+    std::vector<std::string> vec = { "foo", "bar", "", "foo", "baz", "", "abc" };
     MakeUnique(vec);
     EXPECT_EQ(vec.size(), (std::size_t)5);
     EXPECT_EQ(vec.at(0), "foo");

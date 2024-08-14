@@ -18,6 +18,8 @@
 /* PACKAGE */
 #include "fpsdk_common/stream.hpp"
 
+#include "fpsdk_common/logging.hpp"
+
 namespace fpsdk {
 namespace common {
 namespace stream {

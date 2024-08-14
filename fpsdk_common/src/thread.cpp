@@ -30,7 +30,7 @@ namespace thread {
 
 Thread::Thread(
     const std::string& name, Thread::ThreadFunc func, void* arg, Thread::PrepFunc prep, Thread::CleanFunc clean)
-    : name_{name}, func_{func}, arg_{arg}, prep_{prep}, clean_{clean}, abort_{false}, running_{false}
+    : name_{ name }, func_{ func }, arg_{ arg }, prep_{ prep }, clean_{ clean }, abort_{ false }, running_{ false }
 {
 }
 

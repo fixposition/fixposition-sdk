@@ -19,6 +19,8 @@
 #define __FPSDK_COMMON_TRAFO_HPP__
 
 /* LIBC/STL */
+#include <memory>
+#include <string>
 
 /* EXTERNAL */
 #include "fpsdk_common/ext/eigen_core.hpp"
@@ -198,6 +200,70 @@ Eigen::Vector3d LlhDegToRad(const Eigen::Vector3d& llh_deg);
  * @return Eigen::Vector3d llh in degrees
  */
 Eigen::Vector3d LlhRadToDeg(const Eigen::Vector3d& llh_rad);
+
+/**
+ * @brief "Universal" coordinate transformer, backed by PROJ
+ */
+class Transformer
+{
+   public:
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  name   Optional name, for debugging
+     */
+    Transformer(const std::string& name = "");
+
+    ~Transformer();
+
+    /**
+     * @brief Initialise transformer
+     *
+     * The source and target CRS specification can be anything that proj_create_crs_to_crs() understands (see
+     * https://proj.org/en/9.4/development/reference/functions.html#c.proj_create_crs_to_crs). You may have to change
+     * the PROJ configuration (proj.ini) and/or update some PROJ data yourself to support some CRS. See the PROJ
+     * documentation for details (see https://proj.org/en/9.4/resource_files.html).
+     *
+     * @param[in]  source_crs  Source coordinate reference system, e.g. "EPSG:4326"
+     * @param[in]  target_crs  Target coordinate reference system, e.g. "EPSG:2056"
+     *
+     * @returns true on success, false otherwise (bad params, missing data, ...)
+     */
+    bool Init(const std::string& source_crs, const std::string& target_crs);
+
+    /**
+     * @brief Transform coordinates
+     *
+     * @param[in,out]  inout  Coordinates to transform, will be replaced with result
+     * @param[in]      inv    Do the inverse transformation (true), default is forward (false)
+     *
+     * @returns true on success, false otherwise
+     */
+    bool Transform(Eigen::Vector3d& inout, const bool inv = false);
+
+    /**
+     * @brief Transform coordinates
+     *
+     * @param[in]   in   Coordinates to transform
+     * @param[out]  out  Transformed coordinates
+     * @param[in]   inv  Do the inverse transformation (true), default is forward (false)
+     *
+     * @returns true on success, false otherwise
+     */
+    bool Transform(const Eigen::Vector3d& in, Eigen::Vector3d& out, const bool inv = false);
+
+    // No copy, no move
+    Transformer& operator=(const Transformer&) = delete;
+    Transformer(const Transformer&) = delete;
+    Transformer(Transformer&&) = delete;
+    Transformer& operator=(Transformer&&) = delete;
+
+   private:
+    const std::string name_;  //!< Name, for debugging
+    bool pj_init_;            //!< Proj is initialised
+    void* pj_ctx_;            //!< Proj context
+    void* pj_tf_;             //!< Proj transformation object
+};
 
 /* ****************************************************************************************************************** */
 }  // namespace trafo

@@ -17,6 +17,7 @@ CMakeCache.txt
 *.bak
 /.devcontainer/.bash_history.d
 /.devcontainer/.vscode-server
+.devcontainer/.gdb/__pycache__
 /ws
 /ws2
 /ros_ws

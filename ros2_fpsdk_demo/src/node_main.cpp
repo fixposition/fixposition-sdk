@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
 #else
             // Use multiple spinner threads. Callback execute in one of them.
             // TODO: this doesn't seem to work
-            rclcpp::executors::MultiThreadedExecutor executor{rclcpp::ExecutorOptions(), 4};
+            rclcpp::executors::MultiThreadedExecutor executor{ rclcpp::ExecutorOptions(), 4 };
             executor.add_node(node);
             while (rclcpp::ok() && !sigint.ShouldAbort()) {
                 executor.spin_once(std::chrono::milliseconds(345));

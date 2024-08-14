@@ -74,7 +74,7 @@ int main(int argc, char** argv)
             }
 #else
             // Use multiple spinner threads. Callback execute in one of them.
-            ros::AsyncSpinner spinner{4};
+            ros::AsyncSpinner spinner{ 4 };
             spinner.start();
             sigint.WaitAbort();
             spinner.stop();
