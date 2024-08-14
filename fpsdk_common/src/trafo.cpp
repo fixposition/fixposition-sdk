@@ -15,10 +15,7 @@
 #include <exception>
 
 /* EXTERNAL */
-#include <proj/coordinateoperation.hpp>
-#include <proj/crs.hpp>
-#include <proj/io.hpp>
-#include <proj/util.hpp>
+#include <proj.h>
 
 /* PACKAGE */
 #include "fpsdk_common/logging.hpp"
@@ -264,87 +261,77 @@ Eigen::Vector3d LlhRadToDeg(const Eigen::Vector3d& llh_rad)
 
 /* ****************************************************************************************************************** */
 
-using namespace NS_PROJ::crs;
-using namespace NS_PROJ::io;
-using namespace NS_PROJ::operation;
-using namespace NS_PROJ::util;
-
-struct TransformerHelper
-{
-    TransformerHelper(CoordinateOperationNNPtr op) /* clang-format off */ :
-        proj_ctx_        { proj_context_create() },
-        transformer_     { op->coordinateTransformer(proj_ctx_) }  // clang-format on
-    {
-    }
-    ~TransformerHelper()
-    {
-        proj_context_destroy(proj_ctx_);
-        proj_ctx_ = NULL;
-    }
-
-    PJ_CONTEXT* proj_ctx_;
-    CoordinateTransformerNNPtr transformer_;
-};
-
-// ---------------------------------------------------------------------------------------------------------------------
-
-Transformer::Transformer()
+Transformer::Transformer(const std::string& name) /* clang-format off */ :
+    name_      { name },
+    pj_init_   { false },
+    pj_ctx_    { NULL },
+    pj_tf_     { NULL }  // clang-format on
 {
 }
 
 Transformer::~Transformer()
 {
+    if (pj_init_) {
+        pj_init_ = false;
+        proj_destroy((PJ*)pj_tf_);
+        proj_context_destroy((PJ_CONTEXT*)pj_ctx_);
+        pj_tf_ = NULL;
+        pj_ctx_ = NULL;
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Transformer::Init(const std::string& src_name, const std::string& dst_name)
+static void ProjLogger(void* data, int level, const char* msg)
 {
-    if (h_) {
+    const char* name = (const char*)data;
+    switch (level) { /* clang-format off */
+        case PJ_LOG_ERROR: WARNING("Transformer(%s) %s", name, msg); break;
+        case PJ_LOG_DEBUG: DEBUG("Transformer(%s) %s", name, msg); break;
+        default:
+        case PJ_LOG_TRACE: TRACE("Transformer(%s) %s", name, msg); break;
+    }  // clang-format on
+}
+
+bool Transformer::Init(const std::string& source_crs, const std::string& target_crs)
+{
+    if (pj_init_) {
+        return false;
+    }
+    DEBUG("Transformer(%s) [%s] [%s]", name_.c_str(), source_crs.c_str(), target_crs.c_str());
+
+    TRACE("Transformer(%s) create proj context", name_.c_str());
+    PJ_CONTEXT* ctx = proj_context_create();
+#ifdef NDEBUG
+    proj_log_level(ctx, PJ_LOG_DEBUG);
+#else
+    proj_log_level(ctx, PJ_LOG_TRACE);
+#endif
+    proj_log_func(ctx, (void*)name_.c_str(), ProjLogger);
+
+    TRACE("Transformer(%s) create proj transformer", name_.c_str());
+    PJ* tf = proj_create_crs_to_crs(ctx, source_crs.c_str(), target_crs.c_str(), NULL);
+
+    if (tf == NULL) {
+        const int err = proj_context_errno(ctx);
+        const char* err_str = proj_context_errno_string(ctx, err);
+        WARNING("Transformer(%s) %s -> %s: %s", name_.c_str(), source_crs.c_str(), target_crs.c_str(), err_str);
+        proj_context_destroy(ctx);
         return false;
     }
 
-    bool ok = true;
-
-    try {
-        // Check names
-        if (!StrStartsWith(src_name, "EPSG:") || !StrStartsWith(dst_name, "EPSG:")) {
-            throw std::runtime_error("no epsg identifiers");
-        }
-
-        // Cf. https://proj.org/en/9.4/development/quickstart_cpp.html
-        auto db_ctx = DatabaseContext::create();
-        auto auth_generic = AuthorityFactory::create(db_ctx, std::string());
-        auto coord_opt_ctx = CoordinateOperationContext::create(auth_generic, nullptr, 0.0);
-        auto auth_epsg = AuthorityFactory::create(db_ctx, "EPSG");
-
-        auto src_crs = auth_epsg->createCoordinateReferenceSystem(src_name.substr(5));
-        auto dst_crs = auth_epsg->createCoordinateReferenceSystem(dst_name.substr(5));
-
-        auto op_list = CoordinateOperationFactory::create()->createOperations(src_crs, dst_crs, coord_opt_ctx);
-        TRACE("Transformer: %s (%s) -> %s (%s): %" PRIuMAX " ops", src_name.c_str(), src_crs->nameStr().c_str(),
-            dst_name.c_str(), dst_crs->nameStr().c_str(), op_list.size());
-        if (op_list.empty()) {
-            throw std::runtime_error("no operation available");
-        }
-
-        h_ = std::make_unique<TransformerHelper>(op_list[0]);
-
-    } catch (std::exception& e) {
-        WARNING("Transformer::Init() %s -> %s: %s", src_name.c_str(), dst_name.c_str(), e.what());
-        ok = false;
-    }
-
-    return ok;
+    pj_ctx_ = (void*)ctx;
+    pj_tf_ = (void*)tf;
+    pj_init_ = true;
+    TRACE("Transformer(%s) init ok", name_.c_str());
+    return true;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-
-bool Transformer::Transform(Eigen::Vector3d& inout)
+bool Transformer::Transform(Eigen::Vector3d& inout, const bool inv)
 {
-    if (h_) {
+    if (pj_init_) {
         const PJ_COORD src = { { inout.x(), inout.y(), inout.z(), std::numeric_limits<double>::infinity() } };
-        const PJ_COORD dst = h_->transformer_->transform(src);
+        const PJ_COORD dst = proj_trans((PJ*)pj_tf_, inv ? PJ_INV : PJ_FWD, src);
         inout.x() = dst.v[0];
         inout.y() = dst.v[1];
         inout.z() = dst.v[2];
@@ -353,11 +340,11 @@ bool Transformer::Transform(Eigen::Vector3d& inout)
     return false;
 }
 
-bool Transformer::Transform(const Eigen::Vector3d& in, Eigen::Vector3d& out)
+bool Transformer::Transform(const Eigen::Vector3d& in, Eigen::Vector3d& out, const bool inv)
 {
-    if (h_) {
+    if (pj_init_) {
         const PJ_COORD src = { { in.x(), in.y(), in.z(), std::numeric_limits<double>::infinity() } };
-        const PJ_COORD dst = h_->transformer_->transform(src);
+        const PJ_COORD dst = proj_trans((PJ*)pj_tf_, inv ? PJ_INV : PJ_FWD, src);
         out.x() = dst.v[0];
         out.y() = dst.v[1];
         out.z() = dst.v[2];

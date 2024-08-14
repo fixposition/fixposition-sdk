@@ -266,16 +266,17 @@ TEST(TrafoTest, Trafo)
         459.410 };  // ell height!, orthometric height should be ~412
     const Eigen::Vector3d p1_etrs89_xyz = { 4278387.47, 635620.71,
         4672340.04 };  // same as wgs84, at this position and accuracy
+    const Eigen::Vector3d err = { 1e-3, 1e-3, 1e-3 };
     DEBUG_EIGEN_VECTOR3D("p1_wgs84_llh", p1_wgs84_llh);
     DEBUG_EIGEN_VECTOR3D("p1_wgs84_xyz", p1_wgs84_xyz);
     DEBUG_EIGEN_VECTOR3D("p1_ch1903_enu", p1_ch1903_enu);
     DEBUG_EIGEN_VECTOR3D("p1_etrs89_xyz", p1_etrs89_xyz);
-    const Eigen::Vector3d err = { 1e-3, 1e-3, 1e-3 };
+    DEBUG_EIGEN_VECTOR3D("err", err);
 
     // https://epsg.io/4326 WGS 84 lat/lon/height
     // https://epsg.io/2056 Swiss CH1903+ / LV95 east/north/up
     {
-        Transformer trafo;
+        Transformer trafo("wgs84_llh_to_ch1903_enu");
         EXPECT_TRUE(trafo.Init("EPSG:4326", "EPSG:2056"));
 
         Eigen::Vector3d p;
@@ -290,7 +291,7 @@ TEST(TrafoTest, Trafo)
     // https://epsg.io/4326 WGS 84 lat/lon/height
     // https://epsg.io/4978 WGS 84 ECEF x/y/z
     {
-        Transformer trafo;
+        Transformer trafo("wgs84_llh_to_wgs84_xyz");
         EXPECT_TRUE(trafo.Init("EPSG:4326", "EPSG:4978"));
 
         Eigen::Vector3d p;
@@ -302,7 +303,7 @@ TEST(TrafoTest, Trafo)
     // https://epsg.io/4326 WGS 84 lat/lon/height
     // https://epsg.io/4936 ETRS89 XYZ
     {
-        Transformer trafo;
+        Transformer trafo("wgs84_llh_to_etrs89_xyz");
         EXPECT_TRUE(trafo.Init("EPSG:4326", "EPSG:4936"));
 
         Eigen::Vector3d p;
