@@ -286,10 +286,10 @@ static void ProjLogger(void* data, int level, const char* msg)
 {
     const char* name = (const char*)data;
     switch (level) { /* clang-format off */
-        case PJ_LOG_ERROR: WARNING("Transformer(%s) %s", name, msg); break;
-        case PJ_LOG_DEBUG: DEBUG("Transformer(%s) %s", name, msg); break;
+        case PJ_LOG_ERROR: WARNING("Transformer(%s) PROJ: %s", name, msg); break;
+        case PJ_LOG_DEBUG: DEBUG("Transformer(%s) PROJ: %s", name, msg); break;
         default:
-        case PJ_LOG_TRACE: TRACE("Transformer(%s) %s", name, msg); break;
+        case PJ_LOG_TRACE: TRACE("Transformer(%s) PROJ: %s", name, msg); break;
     }  // clang-format on
 }
 
@@ -325,6 +325,20 @@ bool Transformer::Init(const std::string& source_crs, const std::string& target_
     pj_init_ = true;
     TRACE("Transformer(%s) init ok", name_.c_str());
     return true;
+}
+
+bool Transformer::Transform(const Eigen::Vector4d& in, Eigen::Vector4d& out, const bool inv)
+{
+    if (pj_init_) {
+        const PJ_COORD src = { { in.x(), in.y(), in.z(), in.w() } };
+        const PJ_COORD dst = proj_trans((PJ*)pj_tf_, inv ? PJ_INV : PJ_FWD, src);
+        out.x() = dst.v[0];
+        out.y() = dst.v[1];
+        out.z() = dst.v[2];
+        out.w() = dst.v[3];
+        return true;
+    }
+    return false;
 }
 
 bool Transformer::Transform(Eigen::Vector3d& inout, const bool inv)

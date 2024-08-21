@@ -23,7 +23,7 @@ namespace common {
 /* ****************************************************************************************************************** */
 
 /*!
-    @page FPSDK_COMMON_DOC Fixposition SDK: Common Library Documentation
+    @page FPSDK_COMMON_DOC Fixposition SDK: Common Library
 
     @section FPSDK_COMMON_OVERVIEW Overview
 

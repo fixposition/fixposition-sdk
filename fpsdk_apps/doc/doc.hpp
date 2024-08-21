@@ -23,7 +23,7 @@ namespace apps {
 /* ****************************************************************************************************************** */
 
 /*!
-    @page FPSDK_APPS_DOC Fixposition SDK: Apps Documentation
+    @page FPSDK_APPS_DOC Fixposition SDK: Apps
 
     @section FPSDK_APPS_OVERVIEW Overview
 

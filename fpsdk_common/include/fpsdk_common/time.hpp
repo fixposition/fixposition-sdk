@@ -6,8 +6,7 @@
  *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  *
- *  Parts copyright (c) 2008, Willow Garage, Inc., see time.cpp for details
- *  Parts copyright (c) 2007-2020, T. Takasu, see time.cpp for details
+ *  Parts copyright (c) 2008, Willow Garage, Inc., see time.cpp and the LICENSE file for details
  * \endverbatim
  *
  * @file
@@ -15,7 +14,7 @@
  *
  * @page FPSDK_COMMON_TIME Time utilities
  *
- * API: fpsdk::common::time
+ * **API**: fpsdk_common/time.hpp and fpsdk::common::time
  *
  */
 #ifndef __FPSDK_COMMON_TIME_HPP__

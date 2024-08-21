@@ -66,8 +66,8 @@ endif()
 
 # EXECUTABLES ==========================================================================================================
 
-file(GLOB FPL_TOOL_CPP_FILES fpltool/*.cpp)
-add_executable(fpltool ${FPL_TOOL_CPP_FILES})
+file(GLOB FPLTOOL_CPP_FILES fpltool/*.cpp)
+add_executable(fpltool ${FPLTOOL_CPP_FILES})
 target_link_libraries(fpltool
     fpsdk_common
     $<$<BOOL:${FP_USE_ROS1}>:fpsdk_ros1>

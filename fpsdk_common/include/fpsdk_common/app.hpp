@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_APPS Utilities for apps
  *
- * API: fpsdk::common::app
+ * **API**: fpsdk_common/app.hpp and fpsdk::common::app
  *
  */
 #ifndef __FPSDK_COMMON_APP_HPP__

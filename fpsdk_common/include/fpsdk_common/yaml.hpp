@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_YAML YAML utilities
  *
- * API: fpsdk::common::yaml
+ * **API**: fpsdk_common/yaml.hpp and fpsdk::common::yaml
  *
  */
 #ifndef __FPSDK_COMMON_YAML_HPP__

@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: fpltool params (command line arguments)
+ * @brief Fixposition SDK: fpltool args (command line arguments)
  */
 
 /* LIBC/STL */
@@ -20,7 +20,6 @@
 #include <unistd.h>
 
 /* Fixposition SDK */
-#include <fpsdk_common/logging.hpp>
 #include <fpsdk_common/string.hpp>
 #include <fpsdk_common/utils.hpp>
 

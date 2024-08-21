@@ -23,7 +23,7 @@ namespace ros1 {
 /* ****************************************************************************************************************** */
 
 /*!
-    @page FPSDK_ROS1_DOC Fixposition SDK: ROS1 Library Documentation
+    @page FPSDK_ROS1_DOC Fixposition SDK: ROS1 Library
 
     @section FPSDK_ROS1_OVERVIEW Overview
 

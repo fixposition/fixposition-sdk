@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_TYPES Common types
  *
- * API: fpsdk::common::types
+ * **API**: fpsdk_common/types.hpp and fpsdk::common::types
  *
  */
 #ifndef __FPSDK_COMMON_TYPES_HPP__

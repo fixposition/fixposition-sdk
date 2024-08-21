@@ -8,10 +8,10 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: fpltool params (command line arguments)
+ * @brief Fixposition SDK: fpltool args (command line arguments)
  */
-#ifndef __FPLTOOL_FPLTOOL_PARAMS_HPP__
-#define __FPLTOOL_FPLTOOL_PARAMS_HPP__
+#ifndef __FPSDK_APPS_FPLTOOL_FPLTOOL_ARGS_HPP__
+#define __FPSDK_APPS_FPLTOOL_FPLTOOL_ARGS_HPP__
 
 /* LIBC/STL */
 #include <cstdint>
@@ -39,7 +39,8 @@ class FpltoolArgs
     /**
      * @brief Commands, modes of operation
      */
-    enum class Command {
+    enum class Command
+    {
         UNSPECIFIED,  //!< Bad command
         DUMP,         //!< Dump a log (for debugging)
         META,         //!< Get logfile meta data
@@ -150,4 +151,4 @@ class FpltoolArgs
 }  // namespace fpltool
 }  // namespace apps
 }  // namespace fpsdk
-#endif  // __FPLTOOL_FPLTOOL_PARAMS_HPP__
+#endif  // __FPSDK_APPS_FPLTOOL_FPLTOOL_ARGS_HPP__

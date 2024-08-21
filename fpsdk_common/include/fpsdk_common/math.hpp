@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_MATH Math utilities
  *
- * API: fpsdk::common::math
+ * **API**: fpsdk_common/math.hpp and fpsdk::common::math
  *
  */
 #ifndef __FPSDK_COMMON_MATH_HPP__
@@ -21,6 +21,7 @@
 /* LIBC/STL */
 #include <algorithm>
 #include <cmath>
+#include <cstdint>
 
 /* EXTERNAL */
 
@@ -80,6 +81,16 @@ constexpr inline T RadToDeg(T radians)
     static_assert(::std::is_floating_point<T>::value, "Value must be float or double");
     return radians * 180.0 / M_PI;
 }
+
+/**
+ * @brief Round to desired number of fractional digits (of precision)
+ *
+ * @param[in]  value   The value
+ * @param[in]  digits  Number of digits (0-12), param clamped to range
+ *
+ * @returns the value rounded to the given number of fractional digits, or the original value if it is not finite
+ */
+double RoundToFracDigits(const double value, const int digits);
 
 /* ****************************************************************************************************************** */
 }  // namespace math

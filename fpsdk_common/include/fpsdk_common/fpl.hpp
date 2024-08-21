@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_FPL .fpl logfile utilities
  *
- * API: fpsdk::common::fpl
+ * **API**: fpsdk_common/fpl.hpp and fpsdk::common::fpl
  *
  */
 #ifndef __FPSDK_COMMON_FPL_HPP__
@@ -43,7 +43,8 @@ namespace fpl {
 /**
  * @brief FplMessage types
  */
-enum class FplType : uint16_t {  // clang-format off
+enum class FplType : uint16_t
+{  // clang-format off
     UNSPECIFIED  = 0x0000,  //!< Invalid
     ROSMSGDEF    = 0x0101,  //!< Message definition for a topic (a.k.a. "connection header" in rosbag speak)
     ROSMSGBIN    = 0x0102,  //!< Serialised ROS message with timestamp
@@ -133,7 +134,7 @@ class FplMessage
     uint64_t file_size_;  //!< Size in the logfile of the log message
     uint64_t file_seq_;   //!< Message sequence counter in logfile
 
-    static constexpr std::uint32_t MAX_SIZE = 1500000;  //!< Maximum message size
+    static constexpr std::uint32_t MAX_SIZE = 2000000;  //!< Maximum message size
     static constexpr std::size_t MAX_NAME_LEN = 100;    //!< Maximum length of (file, topic, ...) names
 
     /**

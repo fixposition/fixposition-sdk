@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_THREAD Thread helpers
  *
- * API: fpsdk::common::thread
+ * **API**: fpsdk_common/thread.hpp and fpsdk::common::thread
  *
  */
 #ifndef __FPSDK_COMMON_THREAD_HPP__

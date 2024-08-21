@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_PATH File and path utilities
  *
- * API: fpsdk::common::path
+ * **API**: fpsdk_common/path.hpp and fpsdk::common::path
  *
  */
 #ifndef __FPSDK_COMMON_PATH_HPP__

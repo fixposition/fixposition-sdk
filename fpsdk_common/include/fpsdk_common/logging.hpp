@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_LOGGING Logging
  *
- * API: fpsdk::common::logging
+ * **API**: fpsdk_common/logging.hpp and fpsdk::common::logging
  *
  */
 #ifndef __FPSDK_COMMON_LOGGING_HPP__
@@ -148,7 +148,8 @@ namespace logging {
  *
  * Libraries (fpsdk_common, fpsdk_ros1, ...) code shall only use WARNING and DEBUG.
  */
-enum class LoggingLevel {
+enum class LoggingLevel
+{
     FATAL,    //!< [2/crit]    Hard errors, critical conditions (for apps). Cannot be silenced.
     ERROR,    //!< [3/err]     Errors (for apps)
     WARNING,  //!< [4/warning] Warnings (for libs and apps)
@@ -184,7 +185,8 @@ bool LoggingIsLevel(const LoggingLevel level);
 /**
  * @brief Logging "colours"
  */
-enum class LoggingColour {
+enum class LoggingColour
+{
     AUTO = 0,  //!< Automatic (default), use colours if stderr is an interactive terminal
     YES,       //!< Use colours (terminal escape sequences)
     NO,        //!< Do not use colours
