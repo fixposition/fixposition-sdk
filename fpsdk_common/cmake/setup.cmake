@@ -49,12 +49,17 @@ endif()
 # Get version info from GIT, unless explicitly given by the user (cmake command line)
 # TODO: This is executed only once on configuration of the project. That's of course wrong. We'd have to execute this
 # always, write/update some.hpp that can be included and properly dependency-managed. There are things like
-# https://github.com/andrew-hardin/cmake-git-version-tracking/tree/master, but they're quite involved, too. So perhaps
-# we should just supply -DFP_VERSION_NUMBER it by the release CI and otherwise just use 0.0.0
+# https://github.com/andrew-hardin/cmake-git-version-tracking/tree/master, but they're quite involved, too.
 
 if (NOT FP_VERSION_IS_SET) # Do this only once. E.g. when running the top-level CMakeLists.txt
+    # - Version supplied on cmake command line (-DFP_VERSION_NUMBER=x.x.x)
     if (FP_VERSION_NUMBER)
         set(FP_VERSION_STRING "${FP_VERSION_NUMBER}")
+    # - Version supplied from VERSION file (release tarballs), but ignore file if fpsdk is a git repo
+    elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../VERSION AND NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../.git)
+        file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/../../VERSION FP_VERSION_NUMBER LIMIT_COUNT 1)
+        set(FP_VERSION_STRING "${FP_VERSION_NUMBER}")
+    # - Version from git
     else()
         execute_process(
             COMMAND git -C ${CMAKE_CURRENT_LIST_DIR} describe --dirty --tags --always --exact-match --all --long
