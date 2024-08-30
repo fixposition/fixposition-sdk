@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_STREAM Streams
  *
- * API: fpsdk::common::stream
+ * **API**: fpsdk_common/stream.hpp and fpsdk::common::stream
  *
  */
 #ifndef __FPSDK_COMMON_STREAM_HPP__

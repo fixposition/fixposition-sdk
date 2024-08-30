@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_TYPES Common types
  *
- * API: fpsdk::common::types
+ * **API**: fpsdk_common/types.hpp and fpsdk::common::types
  *
  */
 #ifndef __FPSDK_COMMON_TYPES_HPP__
@@ -51,7 +51,8 @@ constexpr typename std::underlying_type<T>::type EnumToVal(T enum_val)
 /**
  * @brief GNSS fix types
  */
-enum class GnssFixType : int8_t {
+enum class GnssFixType : int8_t
+{
     // clang-format off
     FIX_UNKNOWN        =  0,  //!< Unknown fix
     FIX_NOFIX          =  1,  //!< No fix
@@ -64,7 +65,7 @@ enum class GnssFixType : int8_t {
     FIX_RTK_FIXED      =  8,  //!< RTK fixed fix (implies 3D fix)
     FIX_RTK_FLOAT_DR   =  9,  //!< RTK float fix + dead-reckoning (implies 3D_DR fix)
     FIX_RTK_FIXED_DR   = 10,  //!< RTK fixed fix + dead-reckoning (implies 3D_DR fix)
-    // clang-format on
+                            // clang-format on
 };
 
 /**

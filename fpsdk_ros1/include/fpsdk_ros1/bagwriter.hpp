@@ -12,7 +12,7 @@
  *
  * @page FPSDK_ROS1_BAGWRITER ROS1 bag writer
  *
- * API: fpsdk::ros1::bagwriter
+ * **API**: fpsdk_ros1/bagwriter.hpp and fpsdk::ros1::bagwriter
  *
  */
 #ifndef __FPSDK_ROS1_BAGWRITER_HPP__

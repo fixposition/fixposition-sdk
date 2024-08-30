@@ -10,8 +10,8 @@
  * @file
  * @brief Fixposition SDK: fpltool meta
  */
-#ifndef __FPLTOOL_FPLTOOL_META_HPP__
-#define __FPLTOOL_FPLTOOL_META_HPP__
+#ifndef __FPSDK_APPS_FPLTOOL_FPLTOOL_META_HPP__
+#define __FPSDK_APPS_FPLTOOL_FPLTOOL_META_HPP__
 
 /* LIBC/STL */
 
@@ -38,4 +38,4 @@ bool DoMeta(const FpltoolArgs& args);
 }  // namespace fpltool
 }  // namespace apps
 }  // namespace fpsdk
-#endif  // __FPLTOOL_FPLTOOL_META_HPP__
+#endif  // __FPSDK_APPS_FPLTOOL_FPLTOOL_META_HPP__

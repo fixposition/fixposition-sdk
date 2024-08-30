@@ -11,8 +11,8 @@
  * @brief Fixposition SDK: fpltool documentation
  */
 
-#ifndef __FPSDK_APPS_DOC_HPP__
-#define __FPSDK_APPS_DOC_HPP__
+#ifndef __FPSDK_APPS_FPLTOOL_FPLTOOL_DOC_HPP__
+#define __FPSDK_APPS_FPLTOOL_FPLTOOL_DOC_HPP__
 
 namespace fpsdk {
 namespace apps {
@@ -37,4 +37,4 @@ namespace fpltool {
 }  // namespace fpltool
 }  // namespace apps
 }  // namespace fpsdk
-#endif  // __FPSDK_APPS_DOC_HPP__
+#endif  // __FPSDK_APPS_FPLTOOL_FPLTOOL_DOC_HPP__

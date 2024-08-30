@@ -10,6 +10,8 @@ BraceWrapping:
     AfterClass: true
     AfterStruct: true
     AfterFunction: true
+    AfterEnum: true
+    AfterUnion: true
 IndentPPDirectives: AfterHash
 PPIndentWidth: 2
 IncludeCategories:

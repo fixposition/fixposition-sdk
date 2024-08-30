@@ -26,7 +26,8 @@
             ".vscode-cache": true,
             "**/*~": true,
             ".vstags": true,
-            "core": true
+            "core": true,
+            ".devcontainer/.vscode-server/**": true
         },
         // Exclude things from search (this automatically uses files.exclude + what you add here)
         "search.exclude": {
@@ -56,7 +57,9 @@
         // see .vscode/c_cpp_properties.json-example for details
         // https://code.visualstudio.com/docs/cpp/customize-default-settings-cpp,
         // https://code.visualstudio.com/docs/cpp/c-cpp-properties-schema-reference)
-        "C_Cpp.default.includePath":           [ "${workspaceFolder}/**", "/opt/ros/noetic/include", "/opt/ros/humble/include" ],
+        "C_Cpp.default.includePath":           [
+            "${workspaceFolder}/fpsdk_common/**", "${workspaceFolder}/fpsdk_ros1/**", "${workspaceFolder}/fpsdk_ros2/**", "${workspaceFolder}/fpsdk_apps/**",
+            "/opt/ros/noetic/include", "/opt/ros/humble/include", "/opt/ros/jazzy/include" ],
         "C_Cpp.default.defines":               [ "FP_USE_ROS1" ],
         //"C_Cpp.default.compileCommands":       "",
         //"C_Cpp.default.forcedIncludes":      [ ],
@@ -70,6 +73,9 @@
         "C_Cpp.default.compileCommands":         "${workspaceFolder}/build/Debug/compile_commands.json",
         "C_Cpp.default.browse.limitSymbolsToIncludedHeaders": false,
         //"C_Cpp.clang_format_style": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120 }",
+        "C_Cpp.files.exclude": {
+            ".devcontainer/.vscode-server/**": true
+        },
         "editor.formatOnSave": false,
 
         "cmake.configureOnOpen": false,

@@ -12,7 +12,7 @@
  *
  * @page FPSDK_ROS1_UTILS ROS1 utilities
  *
- * API: fpsdk::ros1::utils
+ * **API**: fpsdk_ros1/utils.hpp and fpsdk::ros1::utils
  *
  */
 #ifndef __FPSDK_ROS1_UTILS_HPP__

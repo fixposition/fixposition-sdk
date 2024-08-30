@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_TRAFO Transformation utilities
  *
- * API: fpsdk::common::trafo
+ * **API**: fpsdk_common/trafo.hpp and fpsdk::common::trafo
  *
  */
 #ifndef __FPSDK_COMMON_TRAFO_HPP__
@@ -251,6 +251,17 @@ class Transformer
      * @returns true on success, false otherwise
      */
     bool Transform(const Eigen::Vector3d& in, Eigen::Vector3d& out, const bool inv = false);
+
+    /**
+     * @brief Transform coordinates (with time)
+     *
+     * @param[in]   in   Coordinates to transform (with time)
+     * @param[out]  out  Transformed coordinates (with time)
+     * @param[in]   inv  Do the inverse transformation (true), default is forward (false)
+     *
+     * @returns true on success, false otherwise
+     */
+    bool Transform(const Eigen::Vector4d& in, Eigen::Vector4d& out, const bool inv = false);
 
     // No copy, no move
     Transformer& operator=(const Transformer&) = delete;

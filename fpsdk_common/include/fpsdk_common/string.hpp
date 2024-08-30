@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_STRING String utilities
  *
- * API: fpsdk::common::string
+ * **API**: fpsdk_common/string.hpp and fpsdk::common::string
  *
  */
 #ifndef __FPSDK_COMMON_STRING_HPP__

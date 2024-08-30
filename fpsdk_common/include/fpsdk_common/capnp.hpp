@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_CAPNP Cap'n Proto utilities
  *
- * API: fpsdk::common::capnp
+ * **API**: fpsdk_common/capnp.hpp and fpsdk::common::capnp
  *
  */
 #ifndef __FPSDK_COMMON_CAPNP_HPP__

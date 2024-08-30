@@ -301,7 +301,7 @@ TEST(TrafoTest, Trafo)
     }
 
     // https://epsg.io/4326 WGS 84 lat/lon/height
-    // https://epsg.io/4936 ETRS89 XYZ
+    // https://epsg.io/4936 ETRS89 x/y/z
     {
         Transformer trafo("wgs84_llh_to_etrs89_xyz");
         EXPECT_TRUE(trafo.Init("EPSG:4326", "EPSG:4936"));
@@ -311,7 +311,30 @@ TEST(TrafoTest, Trafo)
         EXPECT_NEAR_EIGEN_VECTOR3D(p1_etrs89_xyz, p, err);
         DEBUG_EIGEN_VECTOR3D("p1_wgs84_llh -> etrs89_xyz", p);
     }
+
+    // TODO: more tests, trafo with time, etc.
+    // https://epsg.io/4936 ETRS89 ECEF xyz
+    // https://epsg.io/4978 WGS 84 ECEF xyz
+    // https://epsg.io/7789 ITRF2014 xyz
+    // https://epsg.io/9988 ITRF2020 xyz
+    // https://epsg.io/8401 ETRF2014 xyz
+    // https://epsg.io/7930 ETRF2000 xyz
+    // https://epsg.io/7922 ETRF93 xyz
 }
+
+#if 0
+#  define INFO_VV(n, v1, v2)                                                                                  \
+      INFO("%-20s v1: %.3f %.3f %.3f  v2: %.3f %.3f %.3f  d=%.3f", n, (v1).x(), (v1).y(), (v1).z(), (v2).x(), \
+          (v2).y(), (v2).z(), (v1 - v2).norm())
+#  define INFO_V(n, v1) INFO("%-20s v1: %.3f %.3f %.3f  %.3f", n, (v1).x(), (v1).y(), (v1).z(), (v1).norm());
+
+#  define INFO_V4V4(n, v1, v2)                                                                                  \
+      INFO("%-20s  v1: %.3f %.3f %.3f (%.1f)  v2: %.3f %.3f %.3f (%.1f)  d=%.3f (%.1f)", n, (v1).x(), (v1).y(), \
+          (v1).z(), (v1).w(), (v2).x(), (v2).y(), (v2).z(), (v2).w(), (v1 - v2).head<3>().norm(), (v2).w() - (v1).w())
+
+#  define INFO_V4(n, v1) \
+      INFO("%-20s v1: %.3f %.3f %.3f  %.3f (%.1f)", n, (v1).x(), (v1).y(), (v1).z(), (v1).head<3>().norm(), (v1).w());
+#endif
 
 /* ****************************************************************************************************************** */
 }  // namespace

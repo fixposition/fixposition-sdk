@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_PARSER Parser
  *
- * API: fpsdk::common::parser
+ * **API**: fpsdk_common/parser.hpp and fpsdk::common::parser
  *
  */
 #ifndef __FPSDK_COMMON_PARSER_HPP__
