@@ -65,7 +65,7 @@ enum class GnssFixType : int8_t
     FIX_RTK_FIXED      =  8,  //!< RTK fixed fix (implies 3D fix)
     FIX_RTK_FLOAT_DR   =  9,  //!< RTK float fix + dead-reckoning (implies 3D_DR fix)
     FIX_RTK_FIXED_DR   = 10,  //!< RTK fixed fix + dead-reckoning (implies 3D_DR fix)
-    // clang-format on
+                            // clang-format on
 };
 
 /**
