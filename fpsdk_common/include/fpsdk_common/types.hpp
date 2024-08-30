@@ -51,7 +51,8 @@ constexpr typename std::underlying_type<T>::type EnumToVal(T enum_val)
 /**
  * @brief GNSS fix types
  */
-enum class GnssFixType : int8_t {
+enum class GnssFixType : int8_t
+{
     // clang-format off
     FIX_UNKNOWN        =  0,  //!< Unknown fix
     FIX_NOFIX          =  1,  //!< No fix
