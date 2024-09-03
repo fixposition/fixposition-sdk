@@ -260,6 +260,7 @@ Eigen::Vector3d LlhRadToDeg(const Eigen::Vector3d& llh_rad)
 }
 
 /* ****************************************************************************************************************** */
+#if FP_USE_PROJ
 
 Transformer::Transformer(const std::string& name) /* clang-format off */ :
     name_      { name },
@@ -302,11 +303,11 @@ bool Transformer::Init(const std::string& source_crs, const std::string& target_
 
     TRACE("Transformer(%s) create proj context", name_.c_str());
     PJ_CONTEXT* ctx = proj_context_create();
-#ifdef NDEBUG
+#  ifdef NDEBUG
     proj_log_level(ctx, PJ_LOG_DEBUG);
-#else
+#  else
     proj_log_level(ctx, PJ_LOG_TRACE);
-#endif
+#  endif
     proj_log_func(ctx, (void*)name_.c_str(), ProjLogger);
 
     TRACE("Transformer(%s) create proj transformer", name_.c_str());
@@ -366,6 +367,8 @@ bool Transformer::Transform(const Eigen::Vector3d& in, Eigen::Vector3d& out, con
     }
     return false;
 }
+
+#endif  // FP_USE_PROJ
 
 /* ****************************************************************************************************************** */
 }  // namespace trafo

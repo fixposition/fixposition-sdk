@@ -42,7 +42,23 @@ endif()
 find_package(ZLIB REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(CapnProto 1.0.2 REQUIRED)
-find_package(PROJ 9.4.1 REQUIRED CONFIG)
+
+# PROJ is optional, unless explicitly requested with -DUSE_PROJ=ON
+if (USE_PROJ STREQUAL "ON")
+    find_package(PROJ 9.4.1 REQUIRED CONFIG)
+elseif(USE_PROJ STREQUAL "OFF")
+else()
+    find_package(PROJ 9.4.1 CONFIG QUIET)
+endif()
+if (${PROJ_FOUND})
+    message(STATUS "fpsdk: Using PROJ (${PROJ_VERSION})")
+    set(FP_USE_PROJ ON)
+    add_compile_definitions(FP_USE_PROJ=1)
+else()
+    message(STATUS "fpsdk: No PROJ found")
+    set(FP_USE_PROJ OFF)
+    add_compile_definitions(FP_USE_PROJ=0)
+endif()
 
 include_directories(include
     ${YAML_CPP_INCLUDE_DIR}
@@ -72,8 +88,9 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         ${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
         ${ZLIB_LIBRARIES}
-        PROJ::proj
+        $<$<BOOL:${FP_USE_PROJ}>:PROJ::proj>
 )
+
 
 # INSTALL ==============================================================================================================
 
