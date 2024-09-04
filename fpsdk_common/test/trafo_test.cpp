@@ -257,6 +257,7 @@ TEST(TrafoTest, QuatEul)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+#if FP_USE_PROJ
 
 TEST(TrafoTest, Trafo)
 {
@@ -322,19 +323,22 @@ TEST(TrafoTest, Trafo)
     // https://epsg.io/7922 ETRF93 xyz
 }
 
-#if 0
-#  define INFO_VV(n, v1, v2)                                                                                  \
-      INFO("%-20s v1: %.3f %.3f %.3f  v2: %.3f %.3f %.3f  d=%.3f", n, (v1).x(), (v1).y(), (v1).z(), (v2).x(), \
-          (v2).y(), (v2).z(), (v1 - v2).norm())
-#  define INFO_V(n, v1) INFO("%-20s v1: %.3f %.3f %.3f  %.3f", n, (v1).x(), (v1).y(), (v1).z(), (v1).norm());
+#  if 0
+#    define INFO_VV(n, v1, v2)                                                                                  \
+        INFO("%-20s v1: %.3f %.3f %.3f  v2: %.3f %.3f %.3f  d=%.3f", n, (v1).x(), (v1).y(), (v1).z(), (v2).x(), \
+            (v2).y(), (v2).z(), (v1 - v2).norm())
+#    define INFO_V(n, v1) INFO("%-20s v1: %.3f %.3f %.3f  %.3f", n, (v1).x(), (v1).y(), (v1).z(), (v1).norm());
 
-#  define INFO_V4V4(n, v1, v2)                                                                                  \
-      INFO("%-20s  v1: %.3f %.3f %.3f (%.1f)  v2: %.3f %.3f %.3f (%.1f)  d=%.3f (%.1f)", n, (v1).x(), (v1).y(), \
-          (v1).z(), (v1).w(), (v2).x(), (v2).y(), (v2).z(), (v2).w(), (v1 - v2).head<3>().norm(), (v2).w() - (v1).w())
+#    define INFO_V4V4(n, v1, v2)                                                                                  \
+        INFO("%-20s  v1: %.3f %.3f %.3f (%.1f)  v2: %.3f %.3f %.3f (%.1f)  d=%.3f (%.1f)", n, (v1).x(), (v1).y(), \
+            (v1).z(), (v1).w(), (v2).x(), (v2).y(), (v2).z(), (v2).w(), (v1 - v2).head<3>().norm(),               \
+            (v2).w() - (v1).w())
 
-#  define INFO_V4(n, v1) \
-      INFO("%-20s v1: %.3f %.3f %.3f  %.3f (%.1f)", n, (v1).x(), (v1).y(), (v1).z(), (v1).head<3>().norm(), (v1).w());
-#endif
+#    define INFO_V4(n, v1) \
+        INFO("%-20s v1: %.3f %.3f %.3f  %.3f (%.1f)", n, (v1).x(), (v1).y(), (v1).z(), (v1).head<3>().norm(), (v1).w());
+#  endif
+
+#endif  // FP_USE_PROJ
 
 /* ****************************************************************************************************************** */
 }  // namespace

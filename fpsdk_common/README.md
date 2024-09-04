@@ -13,7 +13,7 @@ This library contains various common functionality. This is used for example by 
 ## Build
 
 > While this package can be built individually, it's recommended to build the entire SDK as described
-> [here](../README.md#building).
+> [here](../fpsdk_doc/README.md#building).
 
 To build and install:
 

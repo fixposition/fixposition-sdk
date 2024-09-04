@@ -14,7 +14,7 @@ This contains various apps (tools, utilities). See below for details.
 ## Build
 
 > While this package can be built individually, it's recommended to build the entire SDK as described
-> [here](../README.md#building).
+> [here](../fpsdk_doc/README.md#building).
 
 ```sh
 source /opt/ros/noetic/setup.bash # optional, but recommoneded, and required for ROS functionalities

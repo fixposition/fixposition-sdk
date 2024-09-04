@@ -16,20 +16,27 @@
 ---
 ## Dependencies
 
+For building the libraries and apps:
+
 - **Linux**, GCC, glibc, cmake, bash, etc. (tested with Ubuntu 22.04 and 24.04 and Debian Bookworm)
 - yaml-cpp        (≥ ?,      tested with 0.6.2)
 - boost           (≥ ?,      tested with 0.71.0)
 - zlib1g          (≥ ?,      tested with 1.2.11)
 - Eigen3          (≥ ?,      tested with 3.3.7)
-- GTest           (≥ 1.12.0, tested with 1.13.0)
-- PROJ            (≥ 9.?.?,  tested with 9.4.1)
 - Cap'n Proto     (≥ 1.0.2,  tested with 1.0.2)
-- ROS1 (tested with Noetic) resp. ROS2 (tested with Humble and Jazzy)
-    - Note that some parts can be built without ROS. However, in this case some functionality will be unavailable
-      in the built libraries and apps.
+- PROJ (*)        (≥ 9.?.?,  tested with 9.4.1)
+- ROS1 (*)        (Noetic,   tested with Noetic), or
+- ROS2 (*)        (Humble,   tested with Humble and Jazzy)
+
+(*) Optional dependencies. Without these some functionality will be unavailable in the built libraries and apps.
+
+For development additionally:
+
+- clang-format (≥ 17, tested with 17)
+- Doxygen      (≥ 1.11.0, tested with 1.11.0)
+- GTest        (≥ 1.12.0, tested with 1.12.1 and 1.13.0)
 
 <img src="fpsdk-overview.drawio.svg" width="400">
-
 
 ---
 ## Building
@@ -90,7 +97,14 @@ systems. Refer to the [Docker configration files and scripts](./docker) on insta
     cmake -B build -DCMAKE_INSTALL_PREFIX=~/fpsdk
     ```
 
-    Additional parameters include: `-DCMAKE_BUILD_TYPE=Debug`, `-DROS_PACKAGE_PATH=/path/to/ros`, `-DBUILD_TESTING=OFF`
+    Additional parameters include (see CMakeList.txt files of the projects for details):
+
+    - Build type: `-DCMAKE_BUILD_TYPE=Debug` or `-DCMAKE_BUILD_TYPE=Release` (default)
+    - Force ROS1 package path: `-DROS_PACKAGE_PATH=/path/to/ros` (default: auto-detect)
+    - Explicitly enable or disable testing: `-DBUILD_TESTING=OFF` or `-DBUILD_TESTING=ON`. Default is to automatically
+      enable testing if a suitable GTest library is found.
+    - Explicitly enable or disable use of PROJ library: `-DUSE_PROJ=ON` or `-DUSE_PROJ=OFF`. Default is to
+      automatically use the PROJ library if a suitable version is found
 
 4. Build
 
