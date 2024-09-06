@@ -24,7 +24,7 @@ else()
         set(BUILD_TESTING OFF)
     else()
         message(STATUS "fpsdk: Using GTest (${GTest_VERSION})")
-        set(BUILD_TESTING OFF)
+        set(BUILD_TESTING ON)
     endif()
 
 endif()
