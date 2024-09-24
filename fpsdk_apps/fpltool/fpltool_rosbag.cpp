@@ -4,8 +4,7 @@
  * \  \  /  /
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
  *  /  /\  \   License: see the LICENSE file
-
-* /__/  \__\
+ * /__/  \__\
  * \endverbatim
  *
  * @file
@@ -42,6 +41,15 @@ using namespace fpsdk::common::fpl;
 using namespace fpsdk::common::string;
 using namespace fpsdk::common::path;
 using namespace fpsdk::ros1::bagwriter;
+
+
+std::string TopicName(const std::string& in_topic) {
+    if (in_topic == "/fusion_optim/imu_biases") {
+        return "/imu/biases";
+    } else {
+        return in_topic;
+    }
+}
 
 bool DoRosbag(const FpltoolArgs& args)
 {
@@ -122,7 +130,7 @@ bool DoRosbag(const FpltoolArgs& args)
             case FplType::ROSMSGDEF: {
                 const RosMsgDef rosmsgdef(log_msg);
                 if (rosmsgdef.valid_) {
-                    bag.AddMsgDef(rosmsgdef.topic_name_, rosmsgdef.msg_name_, rosmsgdef.msg_md5_, rosmsgdef.msg_def_);
+                    bag.AddMsgDef(TopicName(rosmsgdef.topic_name_), rosmsgdef.msg_name_, rosmsgdef.msg_md5_, rosmsgdef.msg_def_);
                 } else {
                     WARNING("Invalid ROSMSGDEF");
                     ok = false;
@@ -133,7 +141,7 @@ bool DoRosbag(const FpltoolArgs& args)
                 if (!skip) {
                     const RosMsgBin rosmsgbin(log_msg);
                     if (!rosmsgbin.valid_ ||
-                        !bag.WriteMessage(rosmsgbin.msg_data_, rosmsgbin.topic_name_, rosmsgbin.rec_time_)) {
+                        !bag.WriteMessage(rosmsgbin.msg_data_, TopicName(rosmsgbin.topic_name_), rosmsgbin.rec_time_)) {
                         WARNING("Invalid ROSMSGBIN");
                         ok = false;
                     }
