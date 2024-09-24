@@ -42,8 +42,8 @@ using namespace fpsdk::common::string;
 using namespace fpsdk::common::path;
 using namespace fpsdk::ros1::bagwriter;
 
-
-std::string TopicName(const std::string& in_topic) {
+std::string TopicName(const std::string& in_topic)
+{
     if (in_topic == "/fusion_optim/imu_biases") {
         return "/imu/biases";
     } else {
@@ -130,7 +130,8 @@ bool DoRosbag(const FpltoolArgs& args)
             case FplType::ROSMSGDEF: {
                 const RosMsgDef rosmsgdef(log_msg);
                 if (rosmsgdef.valid_) {
-                    bag.AddMsgDef(TopicName(rosmsgdef.topic_name_), rosmsgdef.msg_name_, rosmsgdef.msg_md5_, rosmsgdef.msg_def_);
+                    bag.AddMsgDef(
+                        TopicName(rosmsgdef.topic_name_), rosmsgdef.msg_name_, rosmsgdef.msg_md5_, rosmsgdef.msg_def_);
                 } else {
                     WARNING("Invalid ROSMSGDEF");
                     ok = false;
