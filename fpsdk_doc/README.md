@@ -23,10 +23,10 @@ For building the libraries and apps:
 - boost           (≥ ?,      tested with 0.71.0)
 - zlib1g          (≥ ?,      tested with 1.2.11)
 - Eigen3          (≥ ?,      tested with 3.3.7)
-- Cap'n Proto     (≥ 1.0.2,  tested with 1.0.2)
-- PROJ (*)        (≥ 9.?.?,  tested with 9.4.1)
-- ROS1 (*)        (Noetic,   tested with Noetic), or
-- ROS2 (*)        (Humble,   tested with Humble and Jazzy)
+- Cap'n Proto (*) (≥ 1.0.2,  tested with 1.0.2)
+- PROJ        (*) (≥ 9.?.?,  tested with 9.4.1)
+- ROS1        (*) (Noetic,   tested with Noetic), or
+- ROS2        (*) (Humble,   tested with Humble and Jazzy)
 
 (*) Optional dependencies. Without these some functionality will be unavailable in the built libraries and apps.
 
@@ -43,10 +43,10 @@ For development additionally:
 
 > *tl;dr*
 > ```sh
-> ./docker/docker.sh pull noetic-dev       # Or "docker.sh build noetic-dev" to build it locally
+> ./docker/docker.sh pull noetic-dev       # Or "docker.sh build noetic-dev" to build the image locally
 > ./docker/docker.sh run noetic-dev bash
 > # Now inside Docker do:
-> make install INSTALL_PREFIX=fpsdk
+> make install
 > ./fpsdk/bin/fpltool -h
 > ```
 
@@ -55,7 +55,7 @@ For development additionally:
 Open the fpsdk.code-workspace, change to one of the provided devcontainers, and in a terminal do:
 
 ```sh
-make install INSTALL_PREFIX=fpsdk
+make install
 ./fpsdk/bin/fpltool
 ```
 
@@ -65,7 +65,7 @@ make install INSTALL_PREFIX=fpsdk
 docker pull ghcr.io/fixposition/fixposition-sdk:noetic-dev
 ./docker.sh run bash
 source /opt/ros/noetic/setup.bash
-make install INSTALL_PREFIX=fpsdk
+make install
 ./fpsdk/bin/fpltool
 ```
 
@@ -103,8 +103,10 @@ systems. Refer to the [Docker configration files and scripts](./docker) on insta
     - Force ROS1 package path: `-DROS_PACKAGE_PATH=/path/to/ros` (default: auto-detect)
     - Explicitly enable or disable testing: `-DBUILD_TESTING=OFF` or `-DBUILD_TESTING=ON`. Default is to automatically
       enable testing if a suitable GTest library is found.
-    - Explicitly enable or disable use of PROJ library: `-DUSE_PROJ=ON` or `-DUSE_PROJ=OFF`. Default is to
+    - Explicitly enable or disable use of the PROJ library: `-DUSE_PROJ=ON` or `-DUSE_PROJ=OFF`. Default is to
       automatically use the PROJ library if a suitable version is found
+    - Explicitly enable or disable use of the CapnProto library: `-DUSE_CAPNP=ON` or `-DUSE_CAPNP=OFF`. Default is to
+      automatically use the CapnProto library if a suitable version is found
 
 4. Build
 
@@ -141,8 +143,6 @@ Refer to the CI workflow configuration ([ci.yaml](./.github/workflows/ci.yml)) a
 make doc INSTALL_PREFIX=dummy BUILD_TYPE=Release
 (cd build/Release/doc && python -m http.server 8000)
 ```
-
-
 
 ---
 ## License

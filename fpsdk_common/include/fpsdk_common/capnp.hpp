@@ -39,6 +39,8 @@ namespace common {
 namespace capnp {
 /* ****************************************************************************************************************** */
 
+#if FP_USE_CAPNP
+
 /**
  * @brief Serialise capnp message (unpacked)
  *
@@ -114,6 +116,8 @@ std::string MessageToJson(const T& message, const bool pretty = false)
     kj::String json_str = json.encode(message);
     return json_str.cStr();
 }
+
+#endif  // FP_USE_CAPNP
 
 /* ****************************************************************************************************************** */
 }  // namespace capnp

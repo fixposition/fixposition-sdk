@@ -16,12 +16,12 @@ IndentPPDirectives: AfterHash
 PPIndentWidth: 2
 IncludeCategories:
   - Regex:           '^<.*'
-    Priority:        1
-    SortPriority:    1
+    Priority:        -1
+    SortPriority:    -2
     CaseSensitive:   false
   - Regex:           '^".*'
-    Priority:        1
-    SortPriority:    2
+    Priority:        -1
+    SortPriority:    -1
     CaseSensitive:   false
 SortIncludes: CaseInsensitive
 InsertBraces: true

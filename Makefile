@@ -5,42 +5,33 @@ default:
 	@echo "Make what? Try 'make help'!"
 	@exit 1
 
-# Defaults
-BUILD_TYPE = Release
+# Defaults (keep in sync with help screen below)
+BUILD_TYPE     = Debug
+INSTALL_PREFIX = fpsdk
+BUILD_TESTING  =
 
 # User vars
 -include config.mk
 
+# Check if we have ROS
 FP_USE_ROS1=
 FP_USE_ROS2=
-ifneq ($(MAKECMDGOALS),)
-ifneq ($(MAKECMDGOALS),help)
-ifneq ($(MAKECMDGOALS),pre-commit)
-ifneq ($(MAKECMDGOALS),ci)
-ifneq ($(MAKECMDGOALS),distclean)
-ifneq ($(MAKECMDGOALS),doc)
-    ifeq ($(INSTALL_PREFIX),)
-        $(error Please provide a INSTALL_PREFIX. Try 'make help'!)
-    endif
-    ifneq ($(ROS_PACKAGE_PATH),)
-        FP_USE_ROS1=yes
-    else ifeq ($(ROS_VERSION),2)
-        FP_USE_ROS2=yes
-    else
-        $(info No ROS_PACKAGE_PATH (ROS1) and no ROS_VERSION (ROS2) found)
-    endif
+ifneq ($(ROS_PACKAGE_PATH),)
+	FP_USE_ROS1=yes
+else ifeq ($(ROS_VERSION),2)
+	FP_USE_ROS2=yes
+# else
+# 	$(info No ROS_PACKAGE_PATH (ROS1) and no ROS_VERSION (ROS2) found)
 endif
-endif
-endif
-endif
-endif
-endif
+
+# A unique ID for this exact config we're using
+configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING)" | md5sum | cut -d " " -f1)
 
 .PHONY: help
 help:
 	@echo "Usage:"
 	@echo
-	@echo "    make <target> INSTALL_PREFIX=... [BUILD_TYPE=Release|Debug] [VERBOSE=1]"
+	@echo "    make <target> [INSTALL_PREFIX=...] [BUILD_TYPE=Debug|Release] [BUILD_TESTING=|ON|OFF] [VERBOSE=1]"
 	@echo
 	@echo "Where possible <target>s are:"
 	@echo
@@ -49,17 +40,17 @@ help:
 	@echo "    build               Build packages"
 	@echo "    test                Run tests"
 	@echo "    install             Install packages (into INSTALL_PREFIX path)"
+	@echo "    doc                 Generate documentation (into build directory)"
 	@echo
 	@echo "Typically you want to do something like this:"
 	@echo
-	@echo "     source /opt/ros/noetic/setup.bash"
+	@echo "     source /opt/ros/noetic/setup.bash  # if you have ROS..."
 	@echo "     make install INSTALL_PREFIX=~/fpsdk"
 	@echo
 	@echo "Notes:"
 	@echo
 	@echo "- ROS_PACKAGE_PATH can be provided through catkin/ros env (recommended) or on the command line"
 	@echo "- Command line variables can be stored into a config.mk file, which is automatically loaded"
-	@echo "- When changing the INSTALL_PREFIX or config.mk, a 'make clean' will be required"
 	@echo "- 'make ci' runs the CI (more or less) like on Github. INSTALL_PREFIX and BUILD_TYPE have no effect here."
 	@echo
 
@@ -72,6 +63,7 @@ RM         := rm
 CMAKE      := cmake
 DOXYGEN    := doxygen
 NICE       := nice
+CAT        := cat
 
 ifeq ($(VERBOSE),1)
 V =
@@ -120,6 +112,11 @@ CMAKE_ARGS += -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 ifneq ($(ROS_PACKAGE_PATH),)
   CMAKE_ARGS += -DROS_PACKAGE_PATH=$(ROS_PACKAGE_PATH)
 endif
+ifneq ($(BUILD_TESTING),)
+  CMAKE_ARGS += -DBUILD_TESTING=$(BUILD_TESTING)
+endif
+
+MAKEFLAGS = --no-print-directory
 
 ifneq ($(VERBOSE),0)
   CMAKE_ARGS_BUILD += --verbose
@@ -144,6 +141,30 @@ clean:
 distclean:
 	$(V)$(RM) -rf install build fpsdk
 
+$(BUILD_DIR):
+	$(V)$(MKDIR) -p $@
+
+# Detect changed build config
+ifneq ($(MAKECMDGOALS),)
+ifneq ($(MAKECMDGOALS),help)
+ifneq ($(MAKECMDGOALS),pre-commit)
+ifneq ($(MAKECMDGOALS),ci)
+ifneq ($(MAKECMDGOALS),distclean)
+ifneq ($(MAKECMDGOALS),doc)
+builddiruid=$(shell $(CAT) $(BUILD_DIR)/.make-uid 2>/dev/null || echo "none")
+ifneq ($(builddiruid),$(configuid))
+    $(shell $(RM) -f $(BUILD_DIR)/.make-uid)
+endif
+endif
+endif
+endif
+endif
+endif
+endif
+
+$(BUILD_DIR)/.make-uid: | $(BUILD_DIR)
+	$(V)$(ECHO) $(configuid) > $@
+
 # ----------------------------------------------------------------------------------------------------------------------
 
 .PHONY: cmake
@@ -155,7 +176,7 @@ deps = $(sort $(wildcard Makefile fpsdk_doc/* Doxyfile \
     fpsdk_ros2/* fpsdk_ros2/*/* fpsdk_ros2/*/*/* fpsdk_ros2/*/*/*/* \
     fpsdk_apps/* fpsdk_apps/*/* fpsdk_apps/*/*/* fpsdk_apps/*/*/*/*))
 
-$(BUILD_DIR)/.make-cmake: $(deps)
+$(BUILD_DIR)/.make-cmake: $(deps) $(BUILD_DIR)/.make-uid
 	@echo "$(HLW)***** Configure ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)$(CMAKE) -B $(BUILD_DIR) $(CMAKE_ARGS)
 	$(V)$(TOUCH) $@
@@ -165,7 +186,7 @@ $(BUILD_DIR)/.make-cmake: $(deps)
 .PHONY: build
 build: $(BUILD_DIR)/.make-build
 
-$(BUILD_DIR)/.make-build: $(BUILD_DIR)/.make-cmake
+$(BUILD_DIR)/.make-build: $(BUILD_DIR)/.make-cmake $(BUILD_DIR)/.make-uid
 	@echo "$(HLW)***** Build ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)$(NICE_BUILD) $(CMAKE) --build $(BUILD_DIR)  $(CMAKE_ARGS_BUILD)
 	$(V)$(TOUCH) $@
@@ -188,6 +209,9 @@ test: $(BUILD_DIR)/.make-build
 	$(V)(cd $(BUILD_DIR)/fpsdk_common && ctest)
 ifneq ($(FP_USE_ROS1),)
 	$(V)(cd $(BUILD_DIR)/fpsdk_ros1 && ctest)
+endif
+ifneq ($(FP_USE_ROS2),)
+	$(V)(cd $(BUILD_DIR)/fpsdk_ros2 && ctest)
 endif
 
 # ----------------------------------------------------------------------------------------------------------------------

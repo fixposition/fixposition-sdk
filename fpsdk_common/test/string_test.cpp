@@ -344,6 +344,8 @@ TEST(StringTest, StrToValue_float)
         { "123456e-3",          123.456f, true  }, // Valid scientific value
         { "-123.456",          -123.456f, true  }, // Valid negative decimal value
         { "-123456e-3",        -123.456f, true  }, // Valid negative scientific value
+        { "0",                    0.0f,   true  },
+        { "0.0",                  0.0f,   true  },
         { " 123",                 0.0f,   false }, // Spurious whitespace
         { "123 ",                 0.0f,   false }, // Spurious whitespace
         { "",                     0.0f,   false }, // Empty string
@@ -373,6 +375,8 @@ TEST(StringTest, StrToValue_double)
         { "123456e-3",          123.456, true  }, // Valid scientific value
         { "-123.456",          -123.456, true  }, // Valid negative decimal value
         { "-123456e-3",        -123.456, true  }, // Valid negative scientific value
+        { "0",                    0.0,   true  },
+        { "0.0",                  0.0,   true  },
         { " 123",                 0.0,   false }, // Spurious whitespace
         { "123 ",                 0.0,   false }, // Spurious whitespace
         { "",                     0.0,   false }, // Empty string
