@@ -1,7 +1,7 @@
 # User requested to build testing (-DBUILD_TESTING=ON), abort if no suitable version available
 if (BUILD_TESTING STREQUAL "ON")
 
-    find_package(GTest 1.12.2 REQUIRED)
+    find_package(GTest 1.12.0 REQUIRED)
     # GTest doesn't seem to have a normal cmake config file, so we have to check and abort ourselves.. :-/
     if ("${GTest_VERSION}" STREQUAL "")
         message(FATAL_ERROR "Unsupported GTest version")
