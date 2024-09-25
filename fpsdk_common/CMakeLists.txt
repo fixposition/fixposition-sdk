@@ -53,11 +53,9 @@ endif()
 if (${CapnProto_FOUND})
     message(STATUS "fpsdk: Using CapnProto (${CapnProto_VERSION})")
     set(FP_USE_CAPNP ON)
-    #add_compile_definitions(FP_USE_CAPNP=1)
 else()
     message(STATUS "fpsdk: No CapnProto found")
     set(FP_USE_CAPNP OFF)
-    #add_compile_definitions(FP_USE_CAPNP=1)
 endif()
 
 # PROJ is optional, unless explicitly requested with -DUSE_PROJ=ON
@@ -70,11 +68,9 @@ endif()
 if (${PROJ_FOUND})
     message(STATUS "fpsdk: Using PROJ (${PROJ_VERSION})")
     set(FP_USE_PROJ ON)
-    #add_compile_definitions(FP_USE_PROJ=1)
 else()
     message(STATUS "fpsdk: No PROJ found")
     set(FP_USE_PROJ OFF)
-    #add_compile_definitions(FP_USE_PROJ=0)
 endif()
 
 include_directories(include
