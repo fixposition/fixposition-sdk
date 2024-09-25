@@ -41,7 +41,24 @@ else()
 endif()
 find_package(ZLIB REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package(CapnProto 1.0.2 REQUIRED)
+find_package (Threads REQUIRED)
+
+# CapnProto is optional, unless explicitly requested with -DUSE_CAPNP=ON
+if (USE_CAPNP STREQUAL "ON")
+    find_package(CapnProto 1.0.2 REQUIRED)
+elseif(USE_CAPNP STREQUAL "OFF")
+else()
+    find_package(CapnProto 1.0.2 CONFIG QUIET)
+endif()
+if (${CapnProto_FOUND})
+    message(STATUS "fpsdk: Using CapnProto (${CapnProto_VERSION})")
+    set(FP_USE_CAPNP ON)
+    #add_compile_definitions(FP_USE_CAPNP=1)
+else()
+    message(STATUS "fpsdk: No CapnProto found")
+    set(FP_USE_CAPNP OFF)
+    #add_compile_definitions(FP_USE_CAPNP=1)
+endif()
 
 # PROJ is optional, unless explicitly requested with -DUSE_PROJ=ON
 if (USE_PROJ STREQUAL "ON")
@@ -53,11 +70,11 @@ endif()
 if (${PROJ_FOUND})
     message(STATUS "fpsdk: Using PROJ (${PROJ_VERSION})")
     set(FP_USE_PROJ ON)
-    add_compile_definitions(FP_USE_PROJ=1)
+    #add_compile_definitions(FP_USE_PROJ=1)
 else()
     message(STATUS "fpsdk: No PROJ found")
     set(FP_USE_PROJ OFF)
-    add_compile_definitions(FP_USE_PROJ=0)
+    #add_compile_definitions(FP_USE_PROJ=0)
 endif()
 
 include_directories(include
@@ -65,7 +82,6 @@ include_directories(include
     ${Boost_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
-    ${CAPNP_INCLUDE_DIR}
 )
 
 
@@ -73,6 +89,18 @@ include_directories(include
 
 file(GLOB CPP_FILES src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${CPP_FILES})
+
+if (FP_USE_CAPNP)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FP_USE_CAPNP=1)
+else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FP_USE_CAPNP=0)
+endif()
+
+if (FP_USE_PROJ)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FP_USE_PROJ=1)
+else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FP_USE_PROJ=0)
+endif()
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
@@ -84,10 +112,11 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         ${YAML_CPP_LIBRARIES}
         ${EIGEN3_LIBRARIES}
-        ${CAPNP_LIBRARIES}
+        $<$<BOOL:${FP_USE_CAPNP}>:CapnProto::capnp>
     PRIVATE
         ${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
         ${ZLIB_LIBRARIES}
+        Threads::Threads
         $<$<BOOL:${FP_USE_PROJ}>:PROJ::proj>
 )
 

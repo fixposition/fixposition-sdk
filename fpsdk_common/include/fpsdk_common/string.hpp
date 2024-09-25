@@ -252,7 +252,7 @@ bool StrToValue(const std::string& str, uint64_t& value);
  * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
  *       target value type result in a failure (return false). The output value is only modified on success.
  *
- * @param[in]  str    The string, anything %f understands
+ * @param[in]  str    The string, anything %f understands (but not infinite or NaN)
  * @param[out] value  The value
  *
  * @returns true if the string could be converted, false otherwise
@@ -265,7 +265,7 @@ bool StrToValue(const std::string& str, float& value);
  * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
  *       target value type result in a failure (return false). The output value is only modified on success.
  *
- * @param[in]  str    The string, anything %f understands
+ * @param[in]  str    The string, anything %f understands (but not infinite or NaN)
  * @param[out] value  The value
  *
  * @returns true if the string could be converted, false otherwise

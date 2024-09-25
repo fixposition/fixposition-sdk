@@ -45,20 +45,22 @@ if(BUILD_TESTING)
         cmake_parse_arguments(ADD_GTEST "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
 
         # Make targets
-        add_executable(${PROJECT_NAME}_${ADD_GTEST_TARGET}
+        add_executable(${GTEST_PREFIX}_${ADD_GTEST_TARGET}
             ${ADD_GTEST_SOURCES}
         )
 
         target_include_directories(${GTEST_PREFIX}_${ADD_GTEST_TARGET}
-            PRIVATE ${ADD_GTEST_INCLUDE_DIRS}
+            PRIVATE
+                ${ADD_GTEST_INCLUDE_DIRS}
         )
         target_link_directories(${GTEST_PREFIX}_${ADD_GTEST_TARGET}
-            PRIVATE ${ADD_GTEST_LINK_DIRS}
+            PRIVATE
+                ${ADD_GTEST_LINK_DIRS}
         )
         target_link_libraries(${GTEST_PREFIX}_${ADD_GTEST_TARGET}
             PRIVATE
-            GTest::gtest_main
-            ${ADD_GTEST_LINK_LIBS}
+                GTest::gtest_main
+                ${ADD_GTEST_LINK_LIBS}
         )
 
         # Discover tests

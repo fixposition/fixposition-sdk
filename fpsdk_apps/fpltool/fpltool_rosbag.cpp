@@ -42,7 +42,7 @@ using namespace fpsdk::common::string;
 using namespace fpsdk::common::path;
 using namespace fpsdk::ros1::bagwriter;
 
-const std::string TopicName(const std::string& in_topic)
+static std::string TopicName(const std::string& in_topic)
 {
     if (in_topic == "/fusion_optim/imu_biases") {
         return "/imu/biases";

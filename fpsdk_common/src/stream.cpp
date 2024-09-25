@@ -16,9 +16,8 @@
 /* EXTERNAL */
 
 /* PACKAGE */
-#include "fpsdk_common/stream.hpp"
-
 #include "fpsdk_common/logging.hpp"
+#include "fpsdk_common/stream.hpp"
 
 namespace fpsdk {
 namespace common {

@@ -347,7 +347,7 @@ bool StrToValue(const std::string& str, float& value)
     int num = 0;
     int count = std::sscanf(str.data(), "%f%n", &value_tmp, &num);
 
-    if ((count == 1) && ((std::size_t)num == str.size()) && std::isnormal(value_tmp)) {
+    if ((count == 1) && ((std::size_t)num == str.size()) && std::isfinite(value_tmp)) {
         value = value_tmp;
         return true;
     } else {
@@ -365,7 +365,7 @@ bool StrToValue(const std::string& str, double& value)
     int num = 0;
     int count = std::sscanf(str.data(), "%lf%n", &value_tmp, &num);
 
-    if ((count == 1) && ((std::size_t)num == str.size()) && std::isnormal(value_tmp)) {
+    if ((count == 1) && ((std::size_t)num == str.size()) && std::isfinite(value_tmp)) {
         value = value_tmp;
         return true;
     } else {

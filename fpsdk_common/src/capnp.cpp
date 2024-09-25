@@ -25,6 +25,8 @@ namespace common {
 namespace capnp {
 /* ****************************************************************************************************************** */
 
+#if FP_USE_CAPNP
+
 std::vector<uint8_t> MessageToUnpacked(::capnp::MessageBuilder& capnp_msg)
 {
     const kj::Array<::capnp::word> words = ::capnp::messageToFlatArray(capnp_msg);
@@ -41,6 +43,8 @@ std::vector<uint8_t> MessageToPacked(::capnp::MessageBuilder& capnp_msg)
     const kj::ArrayPtr<const kj::byte> array = stream.getArray();
     return { array.begin(), array.begin() + array.size() };
 }
+
+#endif  // FP_USE_CAPNP
 
 /* ****************************************************************************************************************** */
 }  // namespace capnp

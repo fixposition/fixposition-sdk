@@ -189,6 +189,49 @@ function doxygen_release_noros
 
 ########################################################################################################################
 
+TITLES["build_toplevel_release_noros_mindeps"]="Build top-level project (release, without ROS, minimal deps)"
+function build_toplevel_release_noros_mindeps
+{
+    local buildname=${FPSDK_IMAGE}_build_toplevel_release_noros_mindeps
+
+    cmake -B build/${buildname} -S . \
+        -DCMAKE_INSTALL_PREFIX=install/${buildname} \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DUSE_PROJ=OFF -DUSE_CAPNP=OFF || return 1
+    cmake --build build/${buildname} || return 1
+    cmake --install build/${buildname} || return 1
+
+    install/${buildname}/bin/fpltool -V || return 1
+}
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+TITLES["build_projs_release_noros_mindeps"]="Build individual projects (release, without ROS, minimal deps)"
+function build_projs_release_noros_mindeps
+{
+    local buildname=${FPSDK_IMAGE}_build_projs_release_noros_mindeps
+
+    cd ${FPSDK_SRC_DIR}
+    rm -rf build/${buildname}
+
+    cmake -B build/${buildname}/fpsdk_common -S fpsdk_common \
+        -DCMAKE_INSTALL_PREFIX=install/${buildname} \
+        -DCMAKE_BUILD_TYPE=Release \
+        -DUSE_PROJ=OFF -DUSE_CAPNP=OFF || return 1
+    cmake --build build/${buildname}/fpsdk_common || return 1
+    cmake --install build/${buildname}/fpsdk_common || return 1
+
+    cmake -B build/${buildname}/fpsdk_apps -S fpsdk_apps \
+        -DCMAKE_INSTALL_PREFIX=install/${buildname} \
+        -DCMAKE_BUILD_TYPE=Release || return 1
+    cmake --build build/${buildname}/fpsdk_apps || return 1
+    cmake --install build/${buildname}/fpsdk_apps || return 1
+
+    install/${buildname}/bin/fpltool -V || return 1
+}
+
+########################################################################################################################
+
 TITLES["build_toplevel_release_ros1"]="Build top-level project (release, with ROS1)"
 function build_toplevel_release_ros1
 {
@@ -449,6 +492,9 @@ do_step build_toplevel_debug_noros     || true # continue
 do_step test_toplevel_debug_noros      || true # continue
 do_step build_projs_release_noros      || true # continue
 do_step doxygen_release_noros          || true # continue
+
+do_step build_toplevel_release_noros_mindeps   || true # continue
+do_step build_projs_release_noros_mindeps      || true # continue
 
 # Build ROS stuff resp. stuff with the ROS environment loaded last
 # - Either ROS 1
