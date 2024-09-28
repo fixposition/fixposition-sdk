@@ -18,7 +18,7 @@
 
 For building the libraries and apps:
 
-- **Linux**, GCC, glibc, cmake, bash, etc. (tested with Ubuntu 22.04 and 24.04 and Debian Bookworm)
+- **Linux**, GCC, glibc, cmake, bash, etc. (tested with Ubuntu 22.04, Ubuntu 24.04 and Debian Bookworm)
 - yaml-cpp        (≥ ?,      tested with 0.6.2)
 - boost           (≥ ?,      tested with 0.71.0)
 - zlib1g          (≥ ?,      tested with 1.2.11)
@@ -88,7 +88,9 @@ systems. Refer to the [Docker configration files and scripts](./docker) on insta
     or otherwise tell CMake where to find them.
 
     ```sh
-    source /opt/ros/noetic/setup.bash
+    sudo apt install  libyaml-cpp-dev libboost-all-dev zlib1g-dev libeigen3-dev                     # For building...
+    sudo apt install libgtest-dev clang-format doxygen pre-commit                                   # For development...
+    source /opt/ros/noetic/setup.bash                                                               # If you have ROS1...
     ```
 
 3. Configure

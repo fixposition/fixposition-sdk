@@ -15,7 +15,9 @@
 #include <exception>
 
 /* EXTERNAL */
-#include <proj.h>
+#if FP_USE_PROJ
+#  include <proj.h>
+#endif
 
 /* PACKAGE */
 #include "fpsdk_common/logging.hpp"

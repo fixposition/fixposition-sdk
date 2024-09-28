@@ -24,10 +24,12 @@
 #include <vector>
 
 /* EXTERNAL */
-#include <capnp/compat/json.h>
-#include <capnp/message.h>
-#include <capnp/serialize-packed.h>
-#include <capnp/serialize.h>
+#if FP_USE_CAPNP
+#  include <capnp/compat/json.h>
+#  include <capnp/message.h>
+#  include <capnp/serialize-packed.h>
+#  include <capnp/serialize.h>
+#endif
 
 /* PACKAGE */
 

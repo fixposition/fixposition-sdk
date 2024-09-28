@@ -14,8 +14,10 @@
 /* LIBC/STL */
 
 /* EXTERNAL */
-#include <capnp/serialize-packed.h>
-#include <capnp/serialize.h>
+#if FP_USE_CAPNP
+#  include <capnp/serialize-packed.h>
+#  include <capnp/serialize.h>
+#endif
 
 /* PACKAGE */
 #include "fpsdk_common/capnp.hpp"
