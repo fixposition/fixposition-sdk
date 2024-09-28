@@ -29,13 +29,13 @@ TEST(LoggingTest, LoggingPrint)
     INFO("This is fpsdk_common info...");
     // WARNING("This is fpsdk_common warning...");
 
-    DEBUG_S("This"
-            << " is"
-            << " fpsdk_common"
+    DEBUG_S("This"              // thank you, clang-format
+            << " is"            // thank you, clang-format
+            << " fpsdk_common"  // thank you, clang-format
             << " debug");
-    INFO_S("This"
-           << " is"
-           << " fpsdk_common"
+    INFO_S("This"              // thank you, clang-format
+           << " is"            // thank you, clang-format
+           << " fpsdk_common"  // thank you, clang-format
            << " debug");
     // WARNING_S("This" << " is" << " fpsdk_common" << " warning");
 }
