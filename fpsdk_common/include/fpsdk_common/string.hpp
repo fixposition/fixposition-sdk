@@ -21,6 +21,7 @@
 /* LIBC/STL */
 #include <cinttypes>
 #include <cstdarg>
+#include <functional>
 #include <string>
 #include <vector>
 
@@ -139,6 +140,17 @@ std::vector<std::string> StrSplit(const std::string& str, const std::string& sep
 std::string StrJoin(const std::vector<std::string>& strs, const std::string& sep);
 
 /**
+ * @brief Map strings
+ *
+ * @param[in]  strs  List of strings to map
+ * @param[in]  map   Map function
+ *
+ * @returns the mapped list of strings
+ */
+std::vector<std::string> StrMap(
+    const std::vector<std::string>& strs, std::function<std::string(const std::string&)> map);
+
+/**
  * @brief Remove duplicates
  *
  * @param[in]  strs  List of strings
@@ -195,7 +207,59 @@ bool StrEndsWith(const std::string& str, const std::string& suffix);
 bool StrContains(const std::string& str, const std::string& sub);
 
 /**
- * @brief Convert string to value (int32_t, int)
+ * @brief Convert string to value (int8_t)
+ *
+ * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
+ *       target value type result in a failure (return false). The output value is only modified on success.
+ *
+ * @param[in]  str    The string, decimal, hex ("0x...") or octal ("0..."), valid range: INT8_MIN..INT8_MAX
+ * @param[out] value  The value
+ *
+ * @returns true if the string could be converted, false otherwise
+ */
+bool StrToValue(const std::string& str, int8_t& value);
+
+/**
+ * @brief Convert string to value (uint8_t)
+ *
+ * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
+ *       target value type result in a failure (return false). The output value is only modified on success.
+ *
+ * @param[in]  str    The string, decimal, hex ("0x...") or octal ("0..."), valid range: 0..UINT8_MAX
+ * @param[out] value  The value
+ *
+ * @returns true if the string could be converted, false otherwise
+ */
+bool StrToValue(const std::string& str, uint8_t& value);
+
+/**
+ * @brief Convert string to value (int16_t)
+ *
+ * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
+ *       target value type result in a failure (return false). The output value is only modified on success.
+ *
+ * @param[in]  str    The string, decimal, hex ("0x...") or octal ("0..."), valid range: INT16_MIN..INT16_MAX
+ * @param[out] value  The value
+ *
+ * @returns true if the string could be converted, false otherwise
+ */
+bool StrToValue(const std::string& str, int16_t& value);
+
+/**
+ * @brief Convert string to value (uint16_t)
+ *
+ * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
+ *       target value type result in a failure (return false). The output value is only modified on success.
+ *
+ * @param[in]  str    The string, decimal, hex ("0x...") or octal ("0..."), valid range: 0..UINT16_MAX
+ * @param[out] value  The value
+ *
+ * @returns true if the string could be converted, false otherwise
+ */
+bool StrToValue(const std::string& str, uint16_t& value);
+
+/**
+ * @brief Convert string to value (int32_t)
  *
  * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
  *       target value type result in a failure (return false). The output value is only modified on success.
@@ -208,7 +272,7 @@ bool StrContains(const std::string& str, const std::string& sub);
 bool StrToValue(const std::string& str, int32_t& value);
 
 /**
- * @brief Convert string to value (uint32_t, unsigned int)
+ * @brief Convert string to value (uint32_t)
  *
  * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
  *       target value type result in a failure (return false). The output value is only modified on success.
