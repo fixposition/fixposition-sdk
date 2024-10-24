@@ -155,6 +155,18 @@ std::string StrJoin(const std::vector<std::string>& strs, const std::string& sep
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::vector<std::string> StrMap(
+    const std::vector<std::string>& strs, std::function<std::string(const std::string&)> map)
+{
+    std::vector<std::string> res;
+    for (auto& str : strs) {
+        res.push_back(map(str));
+    }
+    return res;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void MakeUnique(std::vector<std::string>& strs)
 {
     std::unordered_map<std::string, bool> seen;
@@ -289,6 +301,50 @@ static bool StrToValueUnsigned(const std::string& str, uint64_t& value)
 
     // Number of values found must be 1 and the entire string must have been used (no trailing stuff)
     return ((count == 1) && ((std::size_t)num == str.size()));
+}
+
+bool StrToValue(const std::string& str, int8_t& value)
+{
+    int64_t value_tmp = 0;
+    if (StrToValueSigned(str, value_tmp) && (value_tmp >= INT8_MIN) && (value_tmp <= INT8_MAX)) {
+        value = value_tmp;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool StrToValue(const std::string& str, uint8_t& value)
+{
+    uint64_t value_tmp = 0;
+    if (StrToValueUnsigned(str, value_tmp) && (value_tmp <= UINT8_MAX)) {
+        value = value_tmp;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool StrToValue(const std::string& str, int16_t& value)
+{
+    int64_t value_tmp = 0;
+    if (StrToValueSigned(str, value_tmp) && (value_tmp >= INT16_MIN) && (value_tmp <= INT16_MAX)) {
+        value = value_tmp;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+bool StrToValue(const std::string& str, uint16_t& value)
+{
+    uint64_t value_tmp = 0;
+    if (StrToValueUnsigned(str, value_tmp) && (value_tmp <= UINT16_MAX)) {
+        value = value_tmp;
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool StrToValue(const std::string& str, int32_t& value)

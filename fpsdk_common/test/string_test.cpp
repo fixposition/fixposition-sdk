@@ -133,6 +133,17 @@ TEST(StringTest, StrJoin)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+TEST(StringTest, StrMap)
+{
+    const auto res = StrMap({ "foo", "bar", "baz" }, [](const auto in) { return "-" + in + "-"; });
+    EXPECT_EQ(res.size(), 3);
+    EXPECT_EQ(res[0], "-foo-");
+    EXPECT_EQ(res[1], "-bar-");
+    EXPECT_EQ(res[2], "-baz-");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(StringTest, MakeUnique)
 {
     std::vector<std::string> vec = { "foo", "bar", "", "foo", "baz", "", "abc" };
@@ -210,22 +221,161 @@ TEST(StringTest, StrContains)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(StringTest, StrToValue_int32)
+TEST(StringTest, StrToValue_int8)
 {
     // clang-format off
-    const struct { const char* str; int32_t value; bool res; } tests[] = {
+    const struct { const char* str; int8_t value; bool res; } tests[] = {
+        { "123",          123, true  }, // Valid decimal value
+        { "077",          077, true  }, // Valid octal value
+        { "0x12",        0x12, true  }, // Valid hex value
+        { "-123",        -123, true  }, // Valid negative decimal value
+        { "127",          127, true  }, // Max range (INT8_MAX)
+        { "-128",        -128, true  }, // Min range (INT8_MIN)
+        { "128",            0, false }, // Out of range (INT8_MAX + 1)
+        { "-129",           0, false }, // Out of range (INT8_MIN - 1)
+        { " 123",           0, false }, // Spurious whitespace
+        { "123 ",           0, false }, // Spurious whitespace
+        { "080",            0, false }, // Illegal octal
+        { "0xag",           0, false }, // Illegal hex
+        { "",               0, false }, // Empty string
+        { "  ",             0, false }, // No value
+        { "abc",            0, false }, // Not a value
+    };  // clang-format on
+
+    const int8_t canary = 0x55;
+    for (auto& test : tests) {
+        int8_t value = canary;
+        const bool res = StrToValue(test.str, value);
+        EXPECT_EQ(res, test.res);
+        if (res) {
+            EXPECT_EQ(value, test.value);
+        } else {
+            EXPECT_EQ(value, canary);
+        }
+    }
+}
+
+TEST(StringTest, StrToValue_uint8)
+{
+    // clang-format off
+    const struct { const char* str; uint8_t value; bool res; } tests[] = {
+        { "123",          123, true  }, // Valid decimal value
+        { "077",          077, true  }, // Valid octal value
+        { "0x12",        0x12, true  }, // Valid hex value
+        { "255",          255, true  }, // Max range (UINT8_MAX)
+        { "0",              0, true  }, // Min range (UINT8_MIN)
+        { "256",            0, false }, // Out of range (UINT8_MAX + 1)
+        { "-1",             0, false }, // Out of range (UINT8_MIN - 1)
+        { "-123",           0, false }, // Negative value
+        { " 123",           0, false }, // Spurious whitespace
+        { "123 ",           0, false }, // Spurious whitespace
+        { "0800",           0, false }, // Illegal octal
+        { "0xabg",          0, false }, // Illegal hex
+        { "",               0, false }, // Empty string
+        { "  ",             0, false }, // No value
+        { "abc",            0, false }, // Not a value
+    };  // clang-format on
+
+    const uint8_t canary = 0x55;
+    for (auto& test : tests) {
+        uint8_t value = canary;
+        const bool res = StrToValue(test.str, value);
+        EXPECT_EQ(res, test.res);
+        if (res) {
+            EXPECT_EQ(value, test.value);
+        } else {
+            EXPECT_EQ(value, canary);
+        }
+    }
+}
+
+TEST(StringTest, StrToValue_int16)
+{
+    // clang-format off
+    const struct { const char* str; int16_t value; bool res; } tests[] = {
         { "123",          123, true  }, // Valid decimal value
         { "0777",        0777, true  }, // Valid octal value
         { "0x123",      0x123, true  }, // Valid hex value
         { "-123",        -123, true  }, // Valid negative decimal value
-        { "2147483648",     0, false }, // Out of range (INT32_MAX + 1)
-        { "-2147483649",    0, false }, // Out of range (INT32_MIN - 1)
+        { "32767",      32767, true  }, // Max range (INT16_MAX)
+        { "-32768",    -32768, true  }, // Min range (INT16_MIN)
+        { "32768",          0, false }, // Out of range (INT16_MAX + 1)
+        { "-32769",         0, false }, // Out of range (INT16_MIN - 1)
         { " 123",           0, false }, // Spurious whitespace
         { "123 ",           0, false }, // Spurious whitespace
         { "0800",           0, false }, // Illegal octal
+        { "0xabg",          0, false }, // Illegal hex
         { "",               0, false }, // Empty string
         { "  ",             0, false }, // No value
         { "abc",            0, false }, // Not a value
+    };  // clang-format on
+
+    const int16_t canary = 0x5555;
+    for (auto& test : tests) {
+        int16_t value = canary;
+        const bool res = StrToValue(test.str, value);
+        EXPECT_EQ(res, test.res);
+        if (res) {
+            EXPECT_EQ(value, test.value);
+        } else {
+            EXPECT_EQ(value, canary);
+        }
+    }
+}
+
+TEST(StringTest, StrToValue_uint16)
+{
+    // clang-format off
+    const struct { const char* str; uint16_t value; bool res; } tests[] = {
+        { "123",          123, true  }, // Valid decimal value
+        { "0777",        0777, true  }, // Valid octal value
+        { "0x123",      0x123, true  }, // Valid hex value
+        { "65535",      65535, true  }, // Max range (UINT16_MAX)
+        { "0",              0, true  }, // Max range (UINT16_MIN)
+        { "65536",          0, false }, // Out of range (UINT16_MAX + 1)
+        { "-1",             0, false }, // Out of range (UINT16_MIN - 1)
+        { "-123",           0, false }, // Negative value
+        { " 123",           0, false }, // Spurious whitespace
+        { "123 ",           0, false }, // Spurious whitespace
+        { "0800",           0, false }, // Illegal octal
+        { "0xabg",          0, false }, // Illegal hex
+        { "",               0, false }, // Empty string
+        { "  ",             0, false }, // No value
+        { "abc",            0, false }, // Not a value
+    };  // clang-format on
+
+    const uint16_t canary = 0x5555;
+    for (auto& test : tests) {
+        uint16_t value = canary;
+        const bool res = StrToValue(test.str, value);
+        EXPECT_EQ(res, test.res);
+        if (res) {
+            EXPECT_EQ(value, test.value);
+        } else {
+            EXPECT_EQ(value, canary);
+        }
+    }
+}
+
+TEST(StringTest, StrToValue_int32)
+{
+    // clang-format off
+    const struct { const char* str; int32_t value; bool res; } tests[] = {
+        { "123",                123, true  }, // Valid decimal value
+        { "0777",              0777, true  }, // Valid octal value
+        { "0x123",            0x123, true  }, // Valid hex value
+        { "-123",              -123, true  }, // Valid negative decimal value
+        { "2147483647",  2147483647, true  }, // Max range (INT32_MAX)
+        { "0",                    0, true  }, // Min range (INT32_MIN)
+        { "2147483648",           0, false }, // Out of range (INT32_MAX + 1)
+        { "-2147483649",          0, false }, // Out of range (INT32_MIN - 1)
+        { " 123",                 0, false }, // Spurious whitespace
+        { "123 ",                 0, false }, // Spurious whitespace
+        { "0800",                 0, false }, // Illegal octal
+        { "0xabg",                0, false }, // Illegal hex
+        { "",                     0, false }, // Empty string
+        { "  ",                   0, false }, // No value
+        { "abc",                  0, false }, // Not a value
     };  // clang-format on
 
     const int32_t canary = 0x55555555;
@@ -245,17 +395,21 @@ TEST(StringTest, StrToValue_uint32)
 {
     // clang-format off
     const struct { const char* str; uint32_t value; bool res; } tests[] = {
-        { "123",          123, true  }, // Valid decimal value
-        { "0777",        0777, true  }, // Valid octal value
-        { "0x123",      0x123, true  }, // Valid hex value
-        { "4294967297",     0, false }, // Out of range (UINT32_MAX + 1)
-        { "-123",           0, false }, // Negative value
-        { " 123",           0, false }, // Spurious whitespace
-        { "123 ",           0, false }, // Spurious whitespace
-        { "0800",           0, false }, // Illegal octal
-        { "",               0, false }, // Empty string
-        { "  ",             0, false }, // No value
-        { "abc",            0, false }, // Not a value
+        { "123",                123, true  }, // Valid decimal value
+        { "0777",              0777, true  }, // Valid octal value
+        { "0x123",            0x123, true  }, // Valid hex value
+        { "4294967295",  4294967295, true  }, // Max range (UINT32_MAX)
+        { "0",                    0, true  }, // Min range (UINT32_MIN)
+        { "4294967296",           0, false }, // Out of range (UINT32_MAX + 1)
+        { "-1",                   0, false }, // Out of range (UINT32_MIN - 1)
+        { "-123",                 0, false }, // Negative value
+        { " 123",                 0, false }, // Spurious whitespace
+        { "123 ",                 0, false }, // Spurious whitespace
+        { "0800",                 0, false }, // Illegal octal
+        { "0xabg",                0, false }, // Illegal hex
+        { "",                     0, false }, // Empty string
+        { "  ",                   0, false }, // No value
+        { "abc",                  0, false }, // Not a value
     };  // clang-format on
 
     const uint32_t canary = 0x55555555;
@@ -275,20 +429,23 @@ TEST(StringTest, StrToValue_int64)
 {
     // clang-format off
     const struct { const char* str; int64_t value; bool res; } tests[] = {
-        { "123",                    123, true  }, // Valid decimal value
-        { "0777",                  0777, true  }, // Valid octal value
-        { "0x123",                0x123, true  }, // Valid hex value
-        { "-123",                  -123, true  }, // Valid negative decimal value
-        { "9223372036854775807",      0, false }, // Out of range (INT64_MAX)
-        { "-9223372036854775808",     0, false }, // Out of range (INT64_MIN)
-        { " 123",                     0, false }, // Spurious whitespace
-        { "123 ",                     0, false }, // Spurious whitespace
-        { "0800",                     0, false }, // Illegal octal
-        { "",                         0, false }, // Empty string
-        { "  ",                       0, false }, // No value
-        { "abc",                      0, false }, // Not a value
-        { "17179869184",    17179869184, true  }, // = 2^34 (larger than 2^32, i.e. int32_t)
-        { "-17179869184",  -17179869184, true  }, // = -2^34 (smaller than -2^32, i.e. int32_t)
+        { "123",                                    123, true  }, // Valid decimal value
+        { "0777",                                  0777, true  }, // Valid octal value
+        { "0x123",                                0x123, true  }, // Valid hex value
+        { "-123",                                  -123, true  }, // Valid negative decimal value
+        { "9223372036854775806",    9223372036854775806, true  }, // Max range (INT64_MAX - 1)
+        { "-9223372036854775807",  -9223372036854775807, true  }, // Min range (UINT8_MIN)
+        { "9223372036854775807",                      0, false }, // Out of range (INT64_MAX)
+        { "-9223372036854775808",                     0, false }, // Out of range (INT64_MIN)
+        { " 123",                                     0, false }, // Spurious whitespace
+        { "123 ",                                     0, false }, // Spurious whitespace
+        { "0800",                                     0, false }, // Illegal octal
+        { "0xabg",                                    0, false }, // Illegal hex
+        { "",                                         0, false }, // Empty string
+        { "  ",                                       0, false }, // No value
+        { "abc",                                      0, false }, // Not a value
+        { "17179869184",                    17179869184, true  }, // = 2^34 (larger than 2^32, i.e. int32_t)
+        { "-17179869184",                  -17179869184, true  }, // = -2^34 (smaller than -2^32, i.e. int32_t)
     };  // clang-format on
 
     const int64_t canary = 0x5555555555555555;
@@ -308,18 +465,22 @@ TEST(StringTest, StrToValue_uint64)
 {
     // clang-format off
     const struct { const char* str; uint64_t value; bool res; } tests[] = {
-        { "123",                    123, true  }, // Valid decimal value
-        { "0777",                  0777, true  }, // Valid octal value
-        { "0x123",                0x123, true  }, // Valid hex value
-        { "18446744073709551616",     0, false }, // Out of range (UINT64_MAX)
-        { "-123",                     0, false }, // Negative value
-        { " 123",                     0, false }, // Spurious whitespace
-        { "123 ",                     0, false }, // Spurious whitespace
-        { "0800",                     0, false }, // Illegal octal
-        { "",                         0, false }, // Empty string
-        { "  ",                       0, false }, // No value
-        { "abc",                      0, false }, // Not a value
-        { "17179869184",    17179869184, true  }, // = 2^34 (larger than 2^32, i.e. uint32_t)
+        { "123",                                    123, true  }, // Valid decimal value
+        { "0777",                                  0777, true  }, // Valid octal value
+        { "0x123",                                0x123, true  }, // Valid hex value
+        { "18446744073709551614", 18446744073709551614u, true  }, // Max range (UINT64_MAX - 1)
+        { "0",                                        0, true  }, // Min range (UINT65_MIN)
+        { "18446744073709551615",                     0, false }, // Out of range (UINT64_MAX)
+        { "-1",                                       0, false }, // Out of range (UINT64_MIN - 1)
+        { "-123",                                     0, false }, // Negative value
+        { " 123",                                     0, false }, // Spurious whitespace
+        { "123 ",                                     0, false }, // Spurious whitespace
+        { "0800",                                     0, false }, // Illegal octal
+        { "0xabg",                                    0, false }, // Illegal hex
+        { "",                                         0, false }, // Empty string
+        { "  ",                                       0, false }, // No value
+        { "abc",                                      0, false }, // Not a value
+        { "17179869184",                    17179869184, true  }, // = 2^34 (larger than 2^32, i.e. uint32_t)
     };  // clang-format on
 
     const uint64_t canary = 0x5555555555555555;
