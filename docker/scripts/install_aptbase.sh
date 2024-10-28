@@ -30,6 +30,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic......................    ros-noetic-tf-conversions
     noetic......................    ros-noetic-tf2-ros
     noetic......................    ros-noetic-tf2-tools
+    noetic......................    ros-noetic-tf2-geometry-msgs
     noetic.humble.jazzy.bookworm    sqlite3
     noetic.humble.jazzy.bookworm    sudo
     noetic.humble.jazzy.bookworm    zlib1g-dev
