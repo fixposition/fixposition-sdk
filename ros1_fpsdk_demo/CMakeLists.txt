@@ -29,7 +29,6 @@ endif()
 
 find_package(fpsdk_common REQUIRED)
 find_package(fpsdk_ros1 REQUIRED)
-find_package(CapnProto 1.0.2 REQUIRED) # TODO: why needed?
 find_package(catkin REQUIRED COMPONENTS
     roscpp
     rosbag

@@ -43,21 +43,6 @@ find_package(ZLIB REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package (Threads REQUIRED)
 
-# CapnProto is optional, unless explicitly requested with -DUSE_CAPNP=ON
-if (USE_CAPNP STREQUAL "ON")
-    find_package(CapnProto 1.0.2 REQUIRED)
-elseif(USE_CAPNP STREQUAL "OFF")
-else()
-    find_package(CapnProto 1.0.2 CONFIG QUIET)
-endif()
-if (${CapnProto_FOUND})
-    message(STATUS "fpsdk: Using CapnProto (${CapnProto_VERSION})")
-    set(FP_USE_CAPNP ON)
-else()
-    message(STATUS "fpsdk: No CapnProto found")
-    set(FP_USE_CAPNP OFF)
-endif()
-
 # PROJ is optional, unless explicitly requested with -DUSE_PROJ=ON
 if (USE_PROJ STREQUAL "ON")
     find_package(PROJ 9.4.1 REQUIRED CONFIG)
@@ -86,12 +71,6 @@ include_directories(include
 file(GLOB CPP_FILES src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${CPP_FILES})
 
-if (FP_USE_CAPNP)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC FP_USE_CAPNP=1)
-else()
-    target_compile_definitions(${PROJECT_NAME} PUBLIC FP_USE_CAPNP=0)
-endif()
-
 if (FP_USE_PROJ)
     target_compile_definitions(${PROJECT_NAME} PUBLIC FP_USE_PROJ=1)
 else()
@@ -108,7 +87,6 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         ${YAML_CPP_LIBRARIES}
         ${EIGEN3_LIBRARIES}
-        $<$<BOOL:${FP_USE_CAPNP}>:CapnProto::capnp>
     PRIVATE
         ${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
         ${ZLIB_LIBRARIES}
@@ -188,7 +166,6 @@ install(
 include(cmake/testing.cmake)
 
 add_gtest(TARGET app_test       SOURCES test/app_test.cpp       LINK_LIBS ${PROJECT_NAME})
-add_gtest(TARGET capnp_test     SOURCES test/capnp_test.cpp     LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET fpl_test       SOURCES test/fpl_test.cpp       LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET logging_test   SOURCES test/logging_test.cpp   LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET math_test      SOURCES test/math_test.cpp      LINK_LIBS ${PROJECT_NAME})
