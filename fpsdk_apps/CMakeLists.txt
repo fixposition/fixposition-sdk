@@ -33,9 +33,6 @@ if(NOT TARGET fpsdk_common)
     find_package(fpsdk_common REQUIRED)
 endif()
 
-# TODO: how to "inherit" this automatically from fpsdk_common
-find_package(CapnProto 1.0.2 CONFIG QUIET)
-
 if(FP_USE_ROS1)
     if(NOT TARGET fpsdk_ros1)
         find_package(fpsdk_ros1 REQUIRED)

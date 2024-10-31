@@ -24,7 +24,7 @@ RUN /tmp/install_clangformat.sh && rm -f /tmp/install_clangformat.sh
 COPY docker/scripts/install_gtest.sh /tmp
 RUN /tmp/install_gtest.sh && rm -f /tmp/install_gtest.sh
 
-# Download, build and install capnp
+# Download, build and install capnp (not currently used, though)
 COPY docker/scripts/install_capnp.sh /tmp
 RUN /tmp/install_capnp.sh && rm -f /tmp/install_capnp.sh
 

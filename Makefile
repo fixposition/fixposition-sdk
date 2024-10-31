@@ -9,6 +9,7 @@ default:
 BUILD_TYPE     = Debug
 INSTALL_PREFIX = fpsdk
 BUILD_TESTING  =
+VERBOSE        = 0
 
 # User vars
 -include config.mk
@@ -107,6 +108,7 @@ endif
 ########################################################################################################################
 
 CMAKE_ARGS_BUILD :=
+CTEST_ARGS := --output-on-failure
 CMAKE_ARGS := -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 ifneq ($(ROS_PACKAGE_PATH),)
@@ -120,6 +122,7 @@ MAKEFLAGS = --no-print-directory
 
 ifneq ($(VERBOSE),0)
   CMAKE_ARGS_BUILD += --verbose
+  CTEST_ARGS += --verbose
 endif
 
 ifeq ($(GITHUB_WORKSPACE),)
@@ -206,12 +209,12 @@ $(BUILD_DIR)/.make-install: $(BUILD_DIR)/.make-build
 .PHONY: test
 test: $(BUILD_DIR)/.make-build
 	@echo "$(HLW)***** Test ($(BUILD_TYPE)) *****$(HLO)"
-	$(V)(cd $(BUILD_DIR)/fpsdk_common && ctest)
+	$(V)(cd $(BUILD_DIR)/fpsdk_common && ctest $(CTEST_ARGS))
 ifneq ($(FP_USE_ROS1),)
-	$(V)(cd $(BUILD_DIR)/fpsdk_ros1 && ctest)
+	$(V)(cd $(BUILD_DIR)/fpsdk_ros1 && ctest $(CTEST_ARGS))
 endif
 ifneq ($(FP_USE_ROS2),)
-	$(V)(cd $(BUILD_DIR)/fpsdk_ros2 && ctest)
+	$(V)(cd $(BUILD_DIR)/fpsdk_ros2 && ctest $(CTEST_ARGS))
 endif
 
 # ----------------------------------------------------------------------------------------------------------------------

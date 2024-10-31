@@ -107,8 +107,6 @@ systems. Refer to the [Docker configration files and scripts](./docker) on insta
       enable testing if a suitable GTest library is found.
     - Explicitly enable or disable use of the PROJ library: `-DUSE_PROJ=ON` or `-DUSE_PROJ=OFF`. Default is to
       automatically use the PROJ library if a suitable version is found
-    - Explicitly enable or disable use of the CapnProto library: `-DUSE_CAPNP=ON` or `-DUSE_CAPNP=OFF`. Default is to
-      automatically use the CapnProto library if a suitable version is found
 
 4. Build
 

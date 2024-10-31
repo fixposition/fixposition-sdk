@@ -17,7 +17,7 @@ RUN /tmp/install_aptbase.sh && rm -f /tmp/install_aptbase.sh
 COPY docker/scripts/install_clangformat.sh /tmp
 RUN /tmp/install_clangformat.sh && rm -f /tmp/install_clangformat.sh
 
-# Download, build and install capnp
+# Download, build and install capnp (not currently used, though)
 COPY docker/scripts/install_capnp.sh /tmp
 RUN /tmp/install_capnp.sh && rm -f /tmp/install_capnp.sh
 

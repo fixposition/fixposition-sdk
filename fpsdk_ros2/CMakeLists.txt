@@ -34,8 +34,6 @@ if(NOT TARGET fpsdk_common)
     find_package(fpsdk_common REQUIRED)
 endif()
 
-find_package(CapnProto 1.0.2 REQUIRED) # TODO: why needed?
-
 set(FP_ROS2_INCLUDE_DIRS "")
 set(FP_ROS2_LIBRARIES "")
 
