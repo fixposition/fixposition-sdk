@@ -24,6 +24,7 @@
 /* EXTERNAL */
 
 /* PACKAGE */
+#include "logging.hpp"
 
 namespace fpsdk {
 namespace common {
@@ -106,6 +107,83 @@ class StacktraceHelper
  * @brief Prints a stacktrace to stderr
  */
 void PrintStacktrace();
+
+/**
+ * @brief Program options
+ */
+class ProgramOptions
+{
+   public:
+    /**
+     * @brief A program option
+     */
+    struct Option
+    {
+        char flag;          //!< The flag (reserved: 'h', 'V', 'v', 'q', '?', '*', ':')
+        bool has_argument;  //!< True if flag requires an an argument, false if not
+    };
+
+    /**
+     * @brief Constructor
+     */
+    ProgramOptions(const std::string& app_name, const std::vector<Option>& options);
+
+    /**
+     * @brief Destructor
+     */
+    virtual ~ProgramOptions();
+
+    /**
+     * @brief Load arguments from argv[]
+     *
+     * @param[in,out]  argc  Number of arguments
+     * @param[in,out]  argv  Command-line arguments
+     * @return
+     */
+    bool LoadFromArgv(int argc, char** argv);
+
+    /**
+     * @brief Print the help screen and exit(0)
+     */
+    virtual void PrintHelp() = 0;
+
+    /**
+     * @brief Handle a command-line flag argument
+     *
+     * @param[in]  option    The option
+     * @param[in]  argument  Optional argument
+     *
+     * @returns true if option was accepted, false otherwise
+     */
+    virtual bool HandleOption(const Option& option, const std::string& argument) = 0;
+
+    /**
+     * @brief Check options, and handle non-flag arguments
+     *
+     * @param[in]  args  The non-flag arguments
+     *
+     * @returns true if options are good, false otherwise
+     */
+    virtual bool CheckOptions(const std::vector<std::string>& args)
+    {
+        (void)args;
+        return true;
+    }
+
+    //! Help screen for common options  @hideinitializer
+    static constexpr const char* COMMON_FLAGS_HELP = /* clang-format off */
+        "    -h       -- Print program help screen, and exit\n"
+        "    -V       -- Print program, version and license information, and exit\n"
+        "    -v / -q  -- Increase / decrease logging verbosity, multiple flags accumulate\n";  // clang-format on
+
+    std::string app_name_;                                         //!< App name
+    logging::LoggingLevel logging_ = logging::LoggingLevel::INFO;  //!< Logging verbosity level
+    std::vector<std::string> argv_;                                //!< argv[] of program
+
+   private:
+    std::vector<Option> options_;  //!< Program options
+    void PrintVersion();
+};
 
 /* ****************************************************************************************************************** */
 }  // namespace app

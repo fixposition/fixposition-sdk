@@ -29,9 +29,9 @@ namespace fpltool {
 
 using namespace fpsdk::common::app;
 
-bool DoRecord(const FpltoolArgs& args)
+bool DoRecord(const FplToolOptions& opts)
 {
-    WARNING("Command %s is not implemented", args.command_str_.c_str());
+    WARNING("Command %s is not implemented", opts.command_str_.c_str());
     return false;
 }
 

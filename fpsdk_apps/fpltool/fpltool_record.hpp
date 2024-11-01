@@ -20,7 +20,7 @@
 /* Fixposition SDK */
 
 /* PACKAGE */
-#include "fpltool_args.hpp"
+#include "fpltool_opts.hpp"
 
 namespace fpsdk {
 namespace apps {
@@ -30,9 +30,9 @@ namespace fpltool {
 /**
  * @brief Run FpltoolArgs::Command::RECORD
  *
- * @param[in]  args  Arguments
+ * @param[in]  opts  Options
  */
-bool DoRecord(const FpltoolArgs& args);
+bool DoRecord(const FplToolOptions& opts);
 
 /* ****************************************************************************************************************** */
 }  // namespace fpltool

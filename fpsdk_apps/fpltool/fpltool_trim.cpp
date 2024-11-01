@@ -39,27 +39,27 @@ using namespace fpsdk::common::path;
 using namespace fpsdk::common::string;
 using namespace fpsdk::common::time;
 
-bool DoTrim(const FpltoolArgs& args)
+bool DoTrim(const FplToolOptions& opts)
 {
-    if (args.inputs_.size() != 1) {
+    if (opts.inputs_.size() != 1) {
         WARNING("Need exactly one input file");
         return false;
     }
-    const std::string input_fpl = args.inputs_[0];
+    const std::string input_fpl = opts.inputs_[0];
 
-    if ((args.skip_ < 60) || (args.duration_ < 60)) {
+    if ((opts.skip_ < 60) || (opts.duration_ < 60)) {
         WARNING("The -S as well as the -D arguments must be >= 60");
         return false;
     }
 
     // Determine output file name
     std::string output_fpl;
-    if (args.output_.empty()) {
+    if (opts.output_.empty()) {
         output_fpl = input_fpl;
         StrReplace(output_fpl, ".fpl", "");
-        output_fpl += "_S" + std::to_string(args.skip_) + "-D" + std::to_string(args.duration_) + ".fpl";
+        output_fpl += "_S" + std::to_string(opts.skip_) + "-D" + std::to_string(opts.duration_) + ".fpl";
     } else {
-        output_fpl = args.output_;
+        output_fpl = opts.output_;
     }
 
     // Open input log
@@ -69,7 +69,7 @@ bool DoTrim(const FpltoolArgs& args)
     }
 
     // Open output bag
-    if (!args.overwrite_ && PathExists(output_fpl)) {
+    if (!opts.overwrite_ && PathExists(output_fpl)) {
         WARNING("Output file %s already exists", output_fpl.c_str());
         return false;
     }
@@ -82,7 +82,7 @@ bool DoTrim(const FpltoolArgs& args)
     SigIntHelper sig_int;
 
     // Process log
-    NOTICE("Trimming %s (%" PRIu32 " + %" PRIu32 ") to %s", input_fpl.c_str(), args.skip_, args.duration_,
+    NOTICE("Trimming %s (%" PRIu32 " + %" PRIu32 ") to %s", input_fpl.c_str(), opts.skip_, opts.duration_,
         output_fpl.c_str());
     FplMessage log_msg;
     double progress = 0.0;
@@ -97,7 +97,7 @@ bool DoTrim(const FpltoolArgs& args)
     uint64_t n_used = 0;
     while (fpl_ok && !sig_int.ShouldAbort() && reader.Next(log_msg)) {
         // Report progress
-        if (args.progress_ > 0) {
+        if (opts.progress_ > 0) {
             if (reader.GetProgress(progress, rate)) {
                 INFO("Processing... %.1f%% (%.0f MiB/s) -- %" PRIu64 " msgs\r", progress, rate, n_used);
                 n_used = 0;
@@ -105,8 +105,8 @@ bool DoTrim(const FpltoolArgs& args)
         }
 
         // Decisions to use messages or not
-        const bool use0 = (time_into_log >= (args.skip_ - 60)) && (time_into_log < (args.skip_ + args.duration_));
-        const bool use1 = (time_into_log >= args.skip_) && (time_into_log < (args.skip_ + args.duration_));
+        const bool use0 = (time_into_log >= (opts.skip_ - 60)) && (time_into_log < (opts.skip_ + opts.duration_));
+        const bool use1 = (time_into_log >= opts.skip_) && (time_into_log < (opts.skip_ + opts.duration_));
 
         // Process message
         const auto log_type = log_msg.PayloadType();
@@ -222,9 +222,9 @@ bool DoTrim(const FpltoolArgs& args)
     if (!logstatus.valid_) {
         WARNING("Bad input log");
         ok = false;
-    } else if (logstatus.log_duration_ < (args.skip_ + args.duration_)) {
+    } else if (logstatus.log_duration_ < (opts.skip_ + opts.duration_)) {
         WARNING("Too short input log resp. too long skip + duration (%" PRIu32 " < %" PRIu32 " + %" PRIu32 ")",
-            logstatus.log_duration_, args.skip_, args.duration_);
+            logstatus.log_duration_, opts.skip_, opts.duration_);
         ok = false;
     } else {
         fpl.Write(last_status.Raw());
