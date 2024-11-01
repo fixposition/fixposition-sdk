@@ -33,13 +33,13 @@ namespace fpltool {
 using namespace fpsdk::common::app;
 using namespace fpsdk::common::fpl;
 
-bool DoMeta(const FpltoolArgs& args)
+bool DoMeta(const FplToolOptions& opts)
 {
-    if (args.inputs_.size() != 1) {
+    if (opts.inputs_.size() != 1) {
         WARNING("Need exactly one input file");
         return false;
     }
-    const std::string input_fpl = args.inputs_[0];
+    const std::string input_fpl = opts.inputs_[0];
 
     NOTICE("Getting metadata from %s", input_fpl.c_str());
 
@@ -60,7 +60,7 @@ bool DoMeta(const FpltoolArgs& args)
 
     while (!logmeta && !sig_int.ShouldAbort() && reader.Next(log_msg)) {
         // Report progress
-        if (args.progress_ > 0) {
+        if (opts.progress_ > 0) {
             if (reader.GetProgress(progress, rate)) {
                 INFO("Scanning... %.1f%% (%.0f MiB/s)\r", progress, rate);
             }

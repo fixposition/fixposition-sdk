@@ -64,13 +64,13 @@ static void PrintHexDump(const int level, const std::string& prefix, const uint8
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DoDump(const FpltoolArgs& args)
+bool DoDump(const FplToolOptions& opts)
 {
-    if (args.inputs_.size() != 1) {
+    if (opts.inputs_.size() != 1) {
         WARNING("Need exactly one input file");
         return false;
     }
-    const std::string input_fpl = args.inputs_[0];
+    const std::string input_fpl = opts.inputs_[0];
 
     NOTICE("Dumping %s", input_fpl.c_str());
 
@@ -99,7 +99,7 @@ bool DoDump(const FpltoolArgs& args)
         // - >= 2: add less or more hexdump
 
         // Report progress
-        if (args.progress_ > 0) {
+        if (opts.progress_ > 0) {
             if (reader.GetProgress(progress, rate)) {
                 INFO("Dumping... %.1f%% (%.0f MiB/s)\r", progress, rate);
             }
@@ -152,13 +152,13 @@ bool DoDump(const FpltoolArgs& args)
         }
 
         // Print summary of the message
-        if (args.extra_ > 0) {
+        if (opts.extra_ > 0) {
             std::printf("message %8" PRIu64 " 0x%08" PRIx64 " 0x%06" PRIx32 " %-15s %s\n", log_msg.file_seq_,
                 log_msg.file_pos_, log_msg.RawSize(), FplTypeStr(log_type), info.c_str());
         }
 
         // Print hexdump
-        PrintHexDump(args.extra_ - 1, "    ", log_msg.RawData(), log_msg.RawSize());
+        PrintHexDump(opts.extra_ - 1, "    ", log_msg.RawData(), log_msg.RawSize());
 
         // Update counts
         auto entry = counts.find(log_type);

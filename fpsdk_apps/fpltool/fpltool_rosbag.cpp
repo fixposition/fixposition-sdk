@@ -51,25 +51,25 @@ static std::string TopicName(const std::string& in_topic)
     }
 }
 
-bool DoRosbag(const FpltoolArgs& args)
+bool DoRosbag(const FplToolOptions& opts)
 {
-    if (args.inputs_.size() != 1) {
+    if (opts.inputs_.size() != 1) {
         WARNING("Need exactly one input file");
         return false;
     }
-    const std::string input_fpl = args.inputs_[0];
+    const std::string input_fpl = opts.inputs_[0];
 
     // Determine output file name
     std::string output_bag;
-    if (args.output_.empty()) {
+    if (opts.output_.empty()) {
         output_bag = input_fpl;
         StrReplace(output_bag, ".fpl", "");
-        if ((args.skip_ > 0) || (args.duration_ > 0)) {
-            output_bag += "_S" + std::to_string(args.skip_) + "-D" + std::to_string(args.duration_);
+        if ((opts.skip_ > 0) || (opts.duration_ > 0)) {
+            output_bag += "_S" + std::to_string(opts.skip_) + "-D" + std::to_string(opts.duration_);
         }
         output_bag += ".bag";
     } else {
-        output_bag = args.output_;
+        output_bag = opts.output_;
     }
 
     // Open input log
@@ -79,12 +79,12 @@ bool DoRosbag(const FpltoolArgs& args)
     }
 
     // Open output bag
-    if (!args.overwrite_ && PathExists(output_bag)) {
+    if (!opts.overwrite_ && PathExists(output_bag)) {
         WARNING("Output file %s already exists", output_bag.c_str());
         return false;
     }
     BagWriter bag;
-    if (!bag.Open(output_bag, args.compress_)) {
+    if (!bag.Open(output_bag, opts.compress_)) {
         return false;
     }
 
@@ -106,17 +106,17 @@ bool DoRosbag(const FpltoolArgs& args)
     uint32_t time_into_log = 0;
     while (!sig_int.ShouldAbort() && reader.Next(log_msg)) {
         // Report progress
-        if (args.progress_ > 0) {
+        if (opts.progress_ > 0) {
             if (reader.GetProgress(progress, rate)) {
                 INFO("Extracting... %.1f%% (%.0f MiB/s)\r", progress, rate);
             }
         }
 
         // Check if we want to skip this message
-        const bool skip = ((args.skip_ > 0) && (time_into_log < args.skip_));
+        const bool skip = ((opts.skip_ > 0) && (time_into_log < opts.skip_));
 
         // Maybe we can abort early
-        if ((args.duration_ > 0) && (time_into_log > (args.skip_ + args.duration_))) {
+        if ((opts.duration_ > 0) && (time_into_log > (opts.skip_ + opts.duration_))) {
             DEBUG("abort early");
             break;
         }
@@ -199,9 +199,9 @@ bool DoRosbag(const FpltoolArgs& args)
 /* ****************************************************************************************************************** */
 #else   // FP_USE_ROS1
 
-bool DoRosbag(const FpltoolArgs& args)
+bool DoRosbag(const FplToolOptions& opts)
 {
-    WARNING("Command %s unavailable, ROS functionality is not compiled in", args.command_str_.c_str());
+    WARNING("Command %s unavailable, ROS functionality is not compiled in", opts.command_str_.c_str());
     return false;
 }
 #endif  // FP_USE_ROS1

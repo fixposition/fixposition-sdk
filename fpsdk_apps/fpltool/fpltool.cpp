@@ -15,16 +15,15 @@
 #include <cstdio>
 
 /* EXTERNAL */
-#include <unistd.h>
 
 /* Fixposition SDK */
 #include <fpsdk_common/app.hpp>
 #include <fpsdk_common/logging.hpp>
 
 /* PACKAGE */
-#include "fpltool_args.hpp"
 #include "fpltool_dump.hpp"
 #include "fpltool_meta.hpp"
+#include "fpltool_opts.hpp"
 #include "fpltool_record.hpp"
 #include "fpltool_rosbag.hpp"
 #include "fpltool_trim.hpp"
@@ -41,29 +40,29 @@ int main(int argc, char** argv)
     bool ok = true;
 
     // Parse command line arguments
-    FpltoolArgs args;
-    if (!args.LoadFromArgv(argc, argv)) {
+    FplToolOptions opts;
+    if (!opts.LoadFromArgv(argc, argv)) {
         ok = false;
     }
 
     // Run command
     if (ok) {
-        switch (args.command_) { /* clang-format off */
-            case FpltoolArgs::Command::DUMP:        ok = DoDump(args);   break;
-            case FpltoolArgs::Command::META:        ok = DoMeta(args);   break;
-            case FpltoolArgs::Command::ROSBAG:      ok = DoRosbag(args); break;
-            case FpltoolArgs::Command::TRIM:        ok = DoTrim(args);   break;
-            case FpltoolArgs::Command::RECORD:      ok = DoRecord(args); break;
-            case FpltoolArgs::Command::UNSPECIFIED: ok = false;          break;
+        switch (opts.command_) { /* clang-format off */
+            case FplToolOptions::Command::DUMP:        ok = DoDump(opts);   break;
+            case FplToolOptions::Command::META:        ok = DoMeta(opts);   break;
+            case FplToolOptions::Command::ROSBAG:      ok = DoRosbag(opts); break;
+            case FplToolOptions::Command::TRIM:        ok = DoTrim(opts);   break;
+            case FplToolOptions::Command::RECORD:      ok = DoRecord(opts); break;
+            case FplToolOptions::Command::UNSPECIFIED: ok = false;          break;
         }  // clang-format on
     }
 
     // Are we happy?
     if (ok) {
-        INFO("Done: %s", args.command_str_.c_str());
+        INFO("Done: %s", opts.command_str_.c_str());
         return EXIT_SUCCESS;
     } else {
-        ERROR("Failed: %s", args.command_str_.c_str());
+        ERROR("Failed: %s", opts.command_str_.c_str());
         return EXIT_FAILURE;
     }
 }
