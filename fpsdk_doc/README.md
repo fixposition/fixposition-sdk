@@ -18,7 +18,7 @@
 
 For building the libraries and apps:
 
-- **Linux**, GCC, glibc, cmake, bash, etc. (tested with Ubuntu 22.04, Ubuntu 24.04 and Debian Bookworm)
+- **Linux**, GCC (C++-17), glibc, cmake, bash, etc. (tested with Ubuntu 22.04, Ubuntu 24.04 and Debian Bookworm)
 - yaml-cpp        (≥ ?,      tested with 0.6.2)
 - boost           (≥ ?,      tested with 0.71.0)
 - zlib1g          (≥ ?,      tested with 1.2.11)
