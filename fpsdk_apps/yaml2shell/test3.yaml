@@ -1,0 +1,36 @@
+foo:
+    - 1
+    - 2
+    - bar: 123
+      baz: 456
+    - - 4
+      - 5
+      - 6
+gugus:
+    meier: hello
+    bla: jööööö 🐱 :-)
+    utf1: 2H₂ + O₂ ⇌ 2H₂O, R = 4.7 kΩ, ⌀ 200 mm
+    utf2: χαῖρε, ὦ χαῖρε, ᾿Ελευθεριά!
+    utf3: ⠎⠊⠛⠝⠫ ⠃⠹ ⠹⠑ ⠊⠇⠻
+bar: gugus
+empty:
+nothing: ""
+a:
+    b:
+        c:
+            d:
+                # some comment
+                e:
+                    f:
+                        g:
+                            h:
+                                i: :-)
+x: [ [ [ [ [ [ [ [ [ 1 ], 2 ], 3 ], 4 ], 5 ], 6], 7 ], 8 ], 9 ]
+hmm: $password `rm -rf alles` bla'bla''bla'''bla\xyz
+key_coll: 123
+key_coll: 456
+key-coll: 789
+123nope: 123
+# a comment
+nope321: 321
+bü🐱si: 42

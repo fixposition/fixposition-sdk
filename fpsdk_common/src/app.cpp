@@ -215,7 +215,6 @@ bool ProgramOptions::LoadFromArgv(int argc, char** argv)
     // Non-flag arguments
     std::vector<std::string> args;
     while (optind < argc) {
-        DEBUG("arg[%s]", argv[optind]);
         args.push_back(argv[optind]);
         optind++;
     }

@@ -112,6 +112,52 @@ bool OutputFile::Write(const uint8_t* data, const std::size_t size)
     return ok;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool FileSlurp(const std::string& path, std::vector<uint8_t>& data)
+{
+    std::ifstream fh(path, std::ios::binary);
+    if (fh.fail()) {
+        WARNING("FileSlurp: fail open %s: %s", path.c_str(), std::strerror(errno));
+        return false;
+    }
+
+    while (!fh.eof() && !fh.fail()) {
+        uint8_t buf[100 * 1024];
+        fh.read((char*)buf, sizeof(buf));
+        data.insert(data.end(), buf, buf + fh.gcount());
+    }
+    bool ok = true;
+    if (!fh.eof() && fh.fail()) {
+        WARNING("FileSlurp: fail read %s: %s", path.c_str(), std::strerror(errno));
+        ok = false;
+    }
+
+    fh.close();
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool FileSpew(const std::string& path, const std::vector<uint8_t>& data)
+{
+    std::ofstream fh(path, std::ios::binary);
+    if (fh.fail()) {
+        WARNING("FileSpew: fail open %s: %s", path.c_str(), std::strerror(errno));
+        return false;
+    }
+
+    fh.write((const char*)data.data(), data.size());
+    bool ok = true;
+    if (fh.fail()) {
+        WARNING("FileSlurp: fail write %s: %s", path.c_str(), std::strerror(errno));
+        ok = false;
+    }
+
+    fh.close();
+    return ok;
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace path
 }  // namespace common

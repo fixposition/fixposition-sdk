@@ -19,6 +19,7 @@
 #define __FPSDK_COMMON_PATH_HPP__
 
 /* LIBC/STL */
+#include <cstdint>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -99,6 +100,26 @@ class OutputFile
     std::string path_;                  //!< File path
     std::unique_ptr<std::ostream> fh_;  //!< File handle
 };
+
+/**
+ * @brief Read entire file into a string
+ *
+ * @param[in]  path  File path
+ * @param[out] data  The data
+ *
+ * @returns true if data was successfully read from file, false otherwise
+ */
+bool FileSlurp(const std::string& path, std::vector<uint8_t>& data);
+
+/**
+ * @brief Write string to file
+ *
+ * @param[in]  path  File path
+ * @param[out] data  The data
+ *
+ * @returns true if data was successfully written to file, false otherwise
+ */
+bool FileSpew(const std::string& path, const std::vector<uint8_t>& data);
 
 /* ****************************************************************************************************************** */
 }  // namespace path
