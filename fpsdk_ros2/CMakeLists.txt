@@ -66,6 +66,11 @@ target_link_libraries(${PROJECT_NAME}
         ${FP_ROS2_LIBRARIES}
 )
 
+set_target_properties(${PROJECT_NAME}
+    PROPERTIES
+        VERSION ${PROJECT_VERSION}
+)
+
 
 # INSTALL ==============================================================================================================
 

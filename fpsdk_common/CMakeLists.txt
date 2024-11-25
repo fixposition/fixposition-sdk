@@ -93,6 +93,11 @@ target_link_libraries(${PROJECT_NAME}
         $<$<BOOL:${FP_USE_PROJ}>:PROJ::proj>
 )
 
+set_target_properties(${PROJECT_NAME}
+    PROPERTIES
+        VERSION ${PROJECT_VERSION}
+)
+
 
 # INSTALL ==============================================================================================================
 
