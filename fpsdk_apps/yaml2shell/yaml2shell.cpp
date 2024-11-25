@@ -305,9 +305,8 @@ class YamlToShell
 
         // A YAML only consisting of a single scalar won't have a variable name
         if (var.empty()) {
-            var = "value"; // like yq
+            var = "value";  // like yq
         }
-
 
         std::string str = Sprintf("%s='%s'\n", var.c_str(), val.c_str());
         size_ += str.size();
