@@ -1,6 +1,6 @@
 foo: 123
 bar:
-    a: gugus
+    a: foo
     b: false
 empty:
 xyz:
