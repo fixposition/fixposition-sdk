@@ -20,6 +20,7 @@
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <regex>
 #include <string>
 #include <vector>
 
@@ -51,7 +52,7 @@ class YamlToShellOptions : public ProgramOptions
    public:
     YamlToShellOptions()  // clang-format off
         : ProgramOptions("yaml2shell",
-            { { 'p', true }, { 'o', true }, { 'n', true }, { 's', true }, { 'u', false } })
+            { { 'p', true }, { 'o', true }, { 'n', true }, { 's', true }, { 'u', false }, { 'f', true } })
         {}  // clang-format on
 
     std::string input_;
@@ -60,6 +61,7 @@ class YamlToShellOptions : public ProgramOptions
     bool upper_ = false;
     uint32_t max_num_ = 0;
     uint32_t max_size_ = 1024 * 1024;
+    std::string filter_;
 
     void PrintHelp() final
     {
@@ -82,6 +84,8 @@ class YamlToShellOptions : public ProgramOptions
             "    -u        -- Uppercase variable names\n"
             "    -n <num>  -- Maximum number of variables to output (default: 0, i.e. unlimited)\n"
             "    -s <size> -- Maximum size of output [bytes], 0 = unlimited (default: 1 MiB)\n"
+            "    -f <re>   -- Filter output (on variable name) using a regex, case insensitive unless uppercase\n"
+            "                 chars are used in the <re> string\n"
             "\n"
             "If <some.yaml> is given the program reads the YAML from that file. Otherwise it processes YAML\n"
             "from stdin. For example:\n"
@@ -93,21 +97,21 @@ class YamlToShellOptions : public ProgramOptions
             "\n"
             "    foo: 123\n"
             "    bar:\n"
-            "        a: gugus\n"
+            "        a: foo\n"
             "        b: false\n"
             "    empty:\n"
             "    xyz:\n"
             "        - 2\n"
             "        - 3\n"
             "\n"
-            "    Output (default):    (with '-p cfg_')     (with '-p cfg -u')\n"
+            "    Output (default):    (with '-p cfg_')     (with '-p cfg -u')    (with '-f ^(foo|empty) -u')\n"
             "    \n"
-            "        foo='123'        cfg_foo='123'         CFG_FOO='123'\n"
-            "        bar_a='gugus'    cfg_bar_a='gugus'     CFG_BAR_A='gugus'\n"
-            "        bar_b='false'    cfg_bar_b='false'     CFG_BAR_B='false'\n"
-            "        empty=''         cfg_empty=''          CFG_EMPTY=''\n"
-            "        xyz_0='2'        cfg_xyz_0='2'         CFG_XYZ_0='2'\n"
-            "        xyz_1='3'        cfg_xyz_1='3'         CFG_XYZ_1='3'\n"
+            "        foo='123'        cfg_foo='123'        CFG_FOO='123'         FOO='123'\n"
+            "        bar_a='foo'      cfg_bar_a='foo'      CFG_BAR_A='foo'       EMPTY=''\n"
+            "        bar_b='false'    cfg_bar_b='false'    CFG_BAR_B='false'\n"
+            "        empty=''         cfg_empty=''         CFG_EMPTY=''\n"
+            "        xyz_0='2'        cfg_xyz_0='2'        CFG_XYZ_0='2'\n"
+            "        xyz_1='3'        cfg_xyz_1='3'        CFG_XYZ_1='3'\n"
             "\n", stdout);
         // clang-format on
     }
@@ -130,6 +134,9 @@ class YamlToShellOptions : public ProgramOptions
                 break;
             case 'u':
                 upper_ = true;
+                break;
+            case 'f':
+                filter_ = argument;
                 break;
             default:
                 ok = false;
@@ -154,6 +161,7 @@ class YamlToShellOptions : public ProgramOptions
         DEBUG("upper     = %s", upper_ ? "true" : "false");
         DEBUG("max_num_  = %" PRIu32, max_num_);
         DEBUG("max_size  = %" PRIu32, max_size_);
+        DEBUG("filter    = %s", filter_.c_str());
 
         return ok;
     }
@@ -170,6 +178,20 @@ class YamlToShell
 
     bool Run()
     {
+        // Have filter?
+        if (!opts_.filter_.empty()) {
+            try {
+                filter_ = std::make_unique<std::regex>(opts_.filter_,
+                    opts_.filter_ == StrToLower(opts_.filter_) ? std::regex_constants::icase
+                                                               : (std::regex_constants::syntax_option_type)0);
+            } catch (std::exception& ex) {
+                WARNING("Bad filter %s: %s", opts_.filter_.c_str(), ex.what());
+                return false;
+            }
+        }
+
+        // std::regex_constants::icase
+
         // Read data, input cannot be larger than max allowed output
         std::vector<uint8_t> data;
         // - from file
@@ -239,6 +261,7 @@ class YamlToShell
     std::size_t size_ = 0;
     std::unique_ptr<std::ofstream> out_;
     static constexpr int MAX_DEPTH = 10000;
+    std::unique_ptr<std::regex> filter_;
 
     bool Dump(const YAML::Node& node, const std::string& prefix, const int depth = 0)
     {
@@ -297,6 +320,13 @@ class YamlToShell
         }
         if ((var[0] >= '0') && (var[0] <= '9')) {
             var.insert(var.begin(), '_');
+        }
+
+        // Filter?
+        if (filter_) {
+            if (!std::regex_match(var, *filter_)) {
+                return ok;
+            }
         }
 
         // Sanitise variable value
