@@ -323,10 +323,8 @@ class YamlToShell
         }
 
         // Filter?
-        if (filter_) {
-            if (!std::regex_match(var, *filter_)) {
-                return ok;
-            }
+        if (filter_ && !std::regex_match(var, *filter_)) {
+            return ok;
         }
 
         // Sanitise variable value
