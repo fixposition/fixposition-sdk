@@ -20,7 +20,7 @@ For building the libraries and apps:
 
 - **Linux**, GCC (C++-17), glibc, cmake, bash, etc. (tested with Ubuntu 22.04, Ubuntu 24.04 and Debian Bookworm)
 - yaml-cpp        (≥ ?,      tested with 0.6.2)
-- boost           (≥ ?,      tested with 0.71.0)
+- boost           (≥ ?,      tested with 1.71.0)
 - zlib1g          (≥ ?,      tested with 1.2.11)
 - Eigen3          (≥ ?,      tested with 3.3.7)
 - Cap'n Proto (*) (≥ 1.0.2,  tested with 1.0.2)

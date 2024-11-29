@@ -15,6 +15,7 @@
 #include <cctype>
 #include <cstdio>
 #include <cstring>
+#include <ctime>
 #include <mutex>
 
 /* EXTERNAL */
@@ -31,35 +32,36 @@ namespace logging {
 static LoggingColour g_colour_init = LoggingColour::AUTO;
 static LoggingParams g_params;
 std::mutex g_mutex;
-char g_line[0xffff];
+static char g_line[0xffff];
+static struct timespec g_time0 = { 0, 0 };
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 const char* LoggingLevelStr(const LoggingLevel level)
 {
-    switch (level) {  // clang-format off
+    switch (level) { /* clang-format off */
         case LoggingLevel::TRACE:   return "TRACE";
         case LoggingLevel::DEBUG:   return "DEBUG";
         case LoggingLevel::INFO:    return "INFO";
         case LoggingLevel::NOTICE:  return "NOTICE";
         case LoggingLevel::WARNING: return "WARNING";
         case LoggingLevel::ERROR:   return "ERROR";
-        case LoggingLevel::FATAL:   return "FATAL";  // clang-format on
-    }
+        case LoggingLevel::FATAL:   return "FATAL";
+    }  // clang-format on
     return "?";
 }
 
 LoggingLevel& operator++(LoggingLevel& level)
 {
-    switch (level) {  // clang-format off
+    switch (level) { /* clang-format off */
         case LoggingLevel::TRACE:                                  break;
         case LoggingLevel::DEBUG:   level = LoggingLevel::TRACE;   break;
         case LoggingLevel::INFO:    level = LoggingLevel::DEBUG;   break;
         case LoggingLevel::NOTICE:  level = LoggingLevel::INFO;    break;
         case LoggingLevel::WARNING: level = LoggingLevel::NOTICE;  break;
         case LoggingLevel::ERROR:   level = LoggingLevel::WARNING; break;
-        case LoggingLevel::FATAL:   level = LoggingLevel::ERROR;   break;  // clang-format on
-    }
+        case LoggingLevel::FATAL:   level = LoggingLevel::ERROR;   break;
+    }  // clang-format on
     return level;
 }
 
@@ -72,8 +74,7 @@ LoggingLevel operator++(LoggingLevel& level, int)
 
 LoggingLevel& operator--(LoggingLevel& level)
 {
-    switch (level) {
-            // clang-format off
+    switch (level) { /* clang-format off */
         case LoggingLevel::TRACE:   level = LoggingLevel::DEBUG;   break;
         case LoggingLevel::DEBUG:   level = LoggingLevel::INFO;    break;
         case LoggingLevel::INFO:    level = LoggingLevel::NOTICE;  break;
@@ -81,8 +82,7 @@ LoggingLevel& operator--(LoggingLevel& level)
         case LoggingLevel::WARNING: level = LoggingLevel::ERROR;   break;
         case LoggingLevel::ERROR:   level = LoggingLevel::FATAL;   break;
         case LoggingLevel::FATAL:                                  break;
-            // clang-format on
-    }
+    }  // clang-format on
     return level;
 }
 
@@ -100,22 +100,47 @@ bool LoggingIsLevel(const LoggingLevel level)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const char* LoggingColourStr(const LoggingColour colour)
+{
+    switch (colour) { /* clang-format off */
+        case LoggingColour::AUTO:      return "AUTO";
+        case LoggingColour::YES:       return "YES";
+        case LoggingColour::NO:        return "NO";
+        case LoggingColour::JOURNAL:   return "JOURNAL";
+    }  // clang-format on
+    return "?";
+}
+
+const char* LoggingTimestampsStr(const LoggingTimestamps timestamps)
+{
+    switch (timestamps) { /* clang-format off */
+        case LoggingTimestamps::NONE:       return "NONE";
+        case LoggingTimestamps::RELATIVE:   return "RELATIVE";
+        case LoggingTimestamps::ABSOLUTE:   return "ABSOLUTE";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 static void LoggingDefaultFn(const LoggingParams& params, const LoggingLevel level, const char* str)
 {
     const char* prefix = NULL;
     const char* suffix = NULL;
+    const char* tscol = NULL;
 
     switch (params.colour_) {
         case LoggingColour::YES:
             switch (level) {  // clang-format off
                 case LoggingLevel::TRACE:   prefix = "\033[0;35m"; suffix = "\033[m\n"; break;
                 case LoggingLevel::DEBUG:   prefix = "\033[0;36m"; suffix = "\033[m\n"; break;
-                case LoggingLevel::INFO:    prefix = NULL;         suffix = "\n";       break;
-                case LoggingLevel::NOTICE:  prefix = "\033[1m";    suffix = "\033[m\n"; break;
+                case LoggingLevel::INFO:    prefix = "\033[m";     suffix = "\n";       break;
+                case LoggingLevel::NOTICE:  prefix = "\033[1;37m"; suffix = "\033[m\n"; break;
                 case LoggingLevel::WARNING: prefix = "\033[1;33m"; suffix = "\033[m\n"; break;
                 case LoggingLevel::ERROR:   prefix = "\033[1;31m"; suffix = "\033[m\n"; break;
                 case LoggingLevel::FATAL:   prefix = "\033[1;35m"; suffix = "\033[m\n"; break;
             }  // clang-format on
+            tscol = "\033[0;30m";
             break;
         case LoggingColour::JOURNAL:
             switch (params.level_) {  // clang-format off
@@ -130,14 +155,39 @@ static void LoggingDefaultFn(const LoggingParams& params, const LoggingLevel lev
             break;
         case LoggingColour::AUTO:
         case LoggingColour::NO:
-            prefix = NULL;
             suffix = "\n";
             break;
+    }
+
+    // Timestamps. Note: deliberately *not* using fpsdk::common::time
+    if (params.timestamps_ != LoggingTimestamps::NONE) {
+        if (g_time0.tv_sec == 0) {
+            clock_gettime(CLOCK_REALTIME, &g_time0);
+        }
+        struct timespec now;
+        clock_gettime(CLOCK_REALTIME, &now);
+
+        if (tscol != NULL) {
+            std::fputs(tscol, stderr);
+        }
+        if (params.timestamps_ == LoggingTimestamps::RELATIVE) {
+            now.tv_sec -= g_time0.tv_sec;
+            now.tv_nsec -= g_time0.tv_nsec;
+            std::fprintf(stderr, "%09.3f ", (double)now.tv_sec + ((double)now.tv_nsec * 1e-9));
+        } else {
+            struct tm tm;
+            localtime_r(&now.tv_sec, &tm);
+            char tstr[100];
+            strftime(tstr, sizeof(tstr), "%Y-%m-%d %H:%M:%S", &tm);
+            snprintf(&tstr[19], sizeof(tstr) - 19, ".%03d ", (int)(now.tv_nsec / 1000000));
+            std::fputs(tstr, stderr);
+        }
     }
 
     if (prefix != NULL) {
         std::fputs(prefix, stderr);
     }
+
     std::fputs(str, stderr);
     if (suffix != NULL) {
         std::fputs(suffix, stderr);
@@ -146,10 +196,12 @@ static void LoggingDefaultFn(const LoggingParams& params, const LoggingLevel lev
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-LoggingParams::LoggingParams(const LoggingLevel level, const LoggingColour colour) /* clang-format off */ :
-    level_    { level },
-    colour_   { colour },
-    fn_       { LoggingDefaultFn }  // clang-format on
+LoggingParams::LoggingParams(
+    const LoggingLevel level, const LoggingColour colour, const LoggingTimestamps timestamps) /* clang-format off */ :
+    level_        { level },
+    colour_       { colour },
+    timestamps_   { timestamps },
+    fn_           { LoggingDefaultFn }  // clang-format on
 {
     // User wants us to decide...
     if (colour_ == LoggingColour::AUTO) {

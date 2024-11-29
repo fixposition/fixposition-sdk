@@ -96,6 +96,19 @@ bool LoadRosParam(const std::string& name, double& value)
     return LoadRosParamEx(name, value);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+ros::Time ConvTime(const fpsdk::common::time::Time& time)
+{
+    const auto rt = time.GetRosTime();
+    return ros::Time(rt.sec_, rt.nsec_);
+}
+
+fpsdk::common::time::Time ConvTime(const ros::Time& time)
+{
+    return fpsdk::common::time::Time::FromRosTime({ time.sec, time.nsec });
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace utils
 }  // namespace ros1
