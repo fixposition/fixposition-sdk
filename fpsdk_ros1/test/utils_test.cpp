@@ -25,6 +25,26 @@ namespace {
 /* ****************************************************************************************************************** */
 using namespace fpsdk::ros1::utils;
 
+TEST(UtilsTest, ConvTime)
+{
+    const ros::Time ros_time(1723650283, 125000000);
+    DEBUG("ros::Time %" PRIu32 " %" PRIu32, ros_time.sec, ros_time.nsec);
+
+    const fpsdk::common::time::Time sdk_time = ConvTime(ros_time);
+    DEBUG("SDK Time  %" PRIu32 " %" PRIu32, sdk_time.sec_, sdk_time.nsec_);
+    EXPECT_EQ(sdk_time.sec_, ros_time.sec + 27);  // 1723650310
+    EXPECT_EQ(sdk_time.nsec_, ros_time.nsec);
+
+    const ros::Time ros_time_again = ConvTime(sdk_time);
+    DEBUG("ros::Time %" PRIu32 " %" PRIu32, ros_time_again.sec, ros_time_again.nsec);
+
+    EXPECT_EQ(ros_time_again.sec, ros_time.sec);
+    EXPECT_EQ(ros_time_again.nsec, ros_time.nsec);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// This should be the last test as it messes with the console and we may want to use DEBUG() etc. in the tests
 TEST(UtilsTest, RedirectLoggingToRosConsole)
 {
     // Silence the ROS console
@@ -53,6 +73,7 @@ TEST(UtilsTest, RedirectLoggingToRosConsole)
     INFO("This is fpsdk_common info after redirect...");
     // WARNING("This is fpsdk_common warning after redirect...");
 }
+// This should be the last test as it messes with the console and we may want to use DEBUG() etc. in the tests
 
 /* ****************************************************************************************************************** */
 }  // namespace

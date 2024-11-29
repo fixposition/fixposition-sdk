@@ -8,39 +8,37 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: apps documentation
+ * @brief Fixposition SDK: timeconv documentation
  */
 
-#ifndef __FPSDK_APPS_DOC_HPP__
-#define __FPSDK_APPS_DOC_HPP__
+#ifndef __FPSDK_APPS_TIMECONV_DOC_HPP__
+#define __FPSDK_APPS_TIMECONV_DOC_HPP__
 
 namespace fpsdk {
-/**
- * @brief Fixposition SDK: Apps
- */
 namespace apps {
+/**
+ * @brief timeconv
+ */
+namespace timeconv {
 // clang-format off
 /* ****************************************************************************************************************** */
 
 /*!
-    @page FPSDK_APPS_DOC Fixposition SDK: Apps
+    @page FPSDK_APPS_TIMECONV Time tool
 
-    @section FPSDK_APPS_OVERVIEW Overview
+    @section FPSDK_APPS_TIMECONV_OVERVIEW Overview
 
-    @todo add documentation
+    See the built-in help:
 
-    @section FPSDK_APPS_APPS Apps
+    @verbatim
+    $ timeconv -h
+    @endverbatim
 
-    - @subpage FPSDK_APPS_FPLTOOL
-    - @subpage FPSDK_APPS_TIMECONV
-
-    @section FPSDK_APPS_LICENSE License
-
-    @include fpsdk_apps/LICENSE
 */
 
 /* ****************************************************************************************************************** */
 // clang-format on
+}  // namespace timeconv
 }  // namespace apps
 }  // namespace fpsdk
-#endif  // __FPSDK_APPS_DOC_HPP__
+#endif  // __FPSDK_APPS_TIMECONV_DOC_HPP__

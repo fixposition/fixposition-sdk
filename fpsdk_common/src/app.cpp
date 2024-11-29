@@ -140,6 +140,8 @@ ProgramOptions::~ProgramOptions()
 
 bool ProgramOptions::LoadFromArgv(int argc, char** argv)
 {
+    using namespace fpsdk::common::logging;
+
     // Save original program options
     for (int ix = 0; ix < argc; ix++) {
         argv_.push_back(argv[ix]);
@@ -180,10 +182,10 @@ bool ProgramOptions::LoadFromArgv(int argc, char** argv)
                 exit(EXIT_SUCCESS);
                 break;
             case 'v':
-                logging_++;
+                logging_level_++;
                 break;
             case 'q':
-                logging_--;
+                logging_level_--;
                 break;
             // Special getopt_long() cases
             case '?':
@@ -209,8 +211,11 @@ bool ProgramOptions::LoadFromArgv(int argc, char** argv)
     }
 
     // Setup debugging
-    logging::LoggingSetParams({ logging_ });
-    DEBUG("logging = %s", logging::LoggingLevelStr(logging_));
+    if (logging_level_ >= LoggingLevel::DEBUG) {
+        logging_timestamps_ = LoggingTimestamps::RELATIVE;
+    }
+    LoggingSetParams({ logging_level_, LoggingColour::AUTO, logging_timestamps_ });
+    DEBUG("logging = %s %s", LoggingLevelStr(logging_level_), LoggingTimestampsStr(logging_timestamps_));
 
     // Non-flag arguments
     std::vector<std::string> args;
