@@ -1506,7 +1506,7 @@ bool Time::Diff(const Time& other, Duration& diff) const
 {
     const bool sign = (*this > other);
     const uint64_t value = (sign ? GetNSec() - other.GetNSec() : other.GetNSec() - GetNSec());
-    if (value < std::numeric_limits<int64_t>::max()) {
+    if (value < (uint64_t)std::numeric_limits<int64_t>::max()) {
         return diff.SetNSec(sign ? value : -value);
     } else {
         return false;
