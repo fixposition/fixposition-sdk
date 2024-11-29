@@ -83,6 +83,7 @@ target_include_directories(${PROJECT_NAME}
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../devel/include> # generate_message() puts them here
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../devel/include> # generate_message() puts them here
         ${FP_ROS1_INCLUDE_DIRS}
 )
 
