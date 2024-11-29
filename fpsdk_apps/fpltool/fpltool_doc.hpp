@@ -28,8 +28,11 @@ namespace fpltool {
 
     @section FPSDK_APPS_FPLTOOL_OVERVIEW Overview
 
-    See FpltoolArgs::USAGE_HELP
+    See the built-in help:
 
+    @verbatim
+    $ fpltool -h
+    @endverbatim
 */
 
 /* ****************************************************************************************************************** */

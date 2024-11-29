@@ -44,8 +44,8 @@ namespace fpsdk {
 
     @section FPSDK_LICENSE Licenses
 
-    See the LICENSE files of the individual packages, included in the documentation linked above.
-
+    See the LICENSE file included in the source of each package or the generated documentation (@ref
+    FPSDK_COMMON_LICENSE, @ref FPSDK_ROS1_LICENSE, @ref FPSDK_ROS2_LICENSE and @ref FPSDK_APPS_LICENSE).
 */
 
 // clang-format on

@@ -51,6 +51,11 @@ find_package(topic_tools REQUIRED)
 list(APPEND FP_ROS1_INCLUDE_DIRS ${topic_tools_INCLUDE_DIRS})
 list(APPEND FP_ROS1_LIBRARIES ${topic_tools_LIBRARIES})
 
+find_package(genmsg REQUIRED)
+list(APPEND FP_ROS1_INCLUDE_DIRS ${genmsg_INCLUDE_DIRS})
+list(APPEND FP_ROS1_LIBRARIES ${genmsg_LIBRARIES})
+
+
 list(REMOVE_DUPLICATES FP_ROS1_INCLUDE_DIRS)
 list(REMOVE_DUPLICATES FP_ROS1_LIBRARIES)
 
@@ -58,15 +63,26 @@ message(STATUS "fpsdk: FP_ROS1_INCLUDE_DIRS=${FP_ROS1_INCLUDE_DIRS}")
 message(STATUS "fpsdk: FP_ROS1_LIBRARIES=${FP_ROS1_LIBRARIES}")
 
 
+# MESSAGES =============================================================================================================
+
+file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} msg/*.msg)
+
+add_message_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} FILES ${MSG_FILES})
+generate_messages(LANGS gencpp DEPENDENCIES std_msgs)
+
+
 # SHARED LIBRARY =======================================================================================================
 
 file(GLOB CPP_FILES src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${CPP_FILES})
 
+#add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages)
+
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../devel/include> # generate_message() puts them here
         ${FP_ROS1_INCLUDE_DIRS}
 )
 

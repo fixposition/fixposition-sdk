@@ -92,6 +92,121 @@ constexpr inline T RadToDeg(T radians)
  */
 double RoundToFracDigits(const double value, const int digits);
 
+// ---------------------------------------------------------------------------------------------------------------------
+/**
+ * @name Bit manipulation functions
+ *
+ * Examples:
+ *
+ * @code{cpp}
+ * uint8_t mask = 0;
+ * SetBits(mask, Bit(0) | Bit(1) | Bit(7));  // mask is now 0x83
+ * const bool bit_7_is_set = CheckBits(mask, Bit(7));  // true
+ * @endcode
+ *
+ * @{
+ */
+/**
+ * @brief Return a number with the given bit set to 1 (i.e. 2^bit)
+ *
+ * @tparam     T    Numerical type
+ * @param[in]  bit  bit to be set to 1 (0-63, depending on T, 0 = LSB)
+ *
+ * @returns the mask (value) with the desired bit set
+ */
+template <typename T>
+constexpr T Bit(const size_t bit)
+{
+    return static_cast<T>(static_cast<uint64_t>(1) << bit);
+}
+
+/**
+ * @brief Checks if all bits are set
+ *
+ * @tparam      T     Numerical type
+ * @param[in]   mask  Mask (value) that should be checked
+ * @param[in]   bits  Bit(s) to be checked
+ *
+ * @returns true if all bit(s) is (are) set, false otherwise
+ */
+template <typename T>
+constexpr bool CheckBitsAll(const T mask, const T bits)
+{
+    return (mask & bits) == bits;
+}
+
+/**
+ * @brief Checks if any bits are set
+ *
+ * @tparam     T     Numerical type
+ * @param[in]  mask  Mask (value) to be checked
+ * @param[in]  bits  Bit(s) to be checked
+ *
+ * @returns true if any bit(s) is (are) set, false otherwise
+ */
+template <typename T>
+constexpr bool CheckBitsAny(const T mask, const T bits)
+{
+    return (mask & bits) != 0;
+}
+
+/**
+ * @brief Extracts bits
+ *
+ * @tparam     T      Numerical type
+ * @param[in]  value  The bitfield value
+ * @param[in]  mask   Mask of bits that should be extracted
+ *
+ * @returns the extracted bits
+ */
+template <typename T>
+constexpr T GetBits(const T value, const T mask)
+{
+    return (value & mask);
+}
+
+/**
+ * @brief Sets the bits
+ *
+ * @tparam         T     Numerical type
+ * @param[in,out]  mask  Mask (value) to be modified
+ * @param[in]      bits  Bit(s) to be set
+ */
+template <typename T>
+inline void SetBits(T& mask, const T bits)
+{
+    mask |= bits;
+}
+
+/**
+ * @brief Clears the bits
+ *
+ * @tparam         T     Numerical type
+ * @param[in,out]  mask  Mask (value) to be modified
+ * @param[in]      bits  Bit(s) to be cleared
+ */
+template <typename T>
+inline void ClearBits(T& mask, const T bits)
+{
+    mask &= ~bits;
+}
+
+/**
+ * @brief Toggles the bits
+ *
+ * @tparam         T     Numerical type
+ * @param[in,out]  mask  Mask (value) to be modified
+ * @param[in]      bits  Bit(s) to be toggled
+ */
+template <typename T>
+inline void ToggleBits(T& mask, const T bits)
+{
+    mask ^= bits;
+}
+
+///@}
+// ---------------------------------------------------------------------------------------------------------------------
+
 /* ****************************************************************************************************************** */
 }  // namespace math
 }  // namespace common

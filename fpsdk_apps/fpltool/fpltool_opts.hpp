@@ -39,7 +39,9 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
 {
    public:
     FplToolOptions()  // clang-format off
-        : ProgramOptions("fpltool", { { 'x', false }, { 's', false } }) {};  // clang-format on
+        : ProgramOptions("fpltool", {
+            { 'f', false }, { 'o', true }, { 'x', false }, { 'p', false },
+            { 'P', false }, { 'c', false }, { 'S', true }, { 'D', true } }) {};  // clang-format on
 
     /**
      * @brief Commands, modes of operation
@@ -197,7 +199,7 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
                 ok = false;
             }
         } else {
-            WARNING("Missing command or wrong arguments. Try 'fpltool -h'...");
+            WARNING("Missing command or wrong arguments");
             ok = false;
         }
 

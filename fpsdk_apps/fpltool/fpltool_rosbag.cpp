@@ -89,10 +89,9 @@ bool DoRosbag(const FplToolOptions& opts)
     }
 
     // Prepare message for stream messages
-    std_msgs::UInt8MultiArray stream_msg_ros;
-    stream_msg_ros.layout.dim.push_back(std_msgs::MultiArrayDimension());
-    stream_msg_ros.layout.dim[0].stride = 1;
-    stream_msg_ros.layout.dim[0].label = "bytes";
+    fpsdk_ros1::ParserMsg stream_msg_ros;
+    stream_msg_ros.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_UNSPECIFIED;
+    stream_msg_ros.seq = 0;
 
     // Handle SIGINT (C-c) to abort nicely
     SigIntHelper sig_int;
@@ -152,11 +151,14 @@ bool DoRosbag(const FplToolOptions& opts)
                 if (!skip) {
                     const StreamMsg streammsg(log_msg);
                     if (streammsg.valid_) {
-                        stream_msg_ros.layout.dim[0].size = streammsg.msg_data_.size();
+                        stream_msg_ros.stamp = { streammsg.rec_time_.sec_, streammsg.rec_time_.nsec_ };
                         stream_msg_ros.data = streammsg.msg_data_;
+                        // stream_msg_ros.name = ...; // @todo run data through parser
+                        // stream_msg_ros.protocol = ...; // @todo run data through parser
                         const std::string topic =
                             "/" + (streammsg.stream_name_ == "corr" ? "ntrip" : streammsg.stream_name_) + "/raw";
                         bag.WriteMessage(stream_msg_ros, topic, streammsg.rec_time_);
+                        // stream_msg_ros.seq++; // @todo per topic
                     } else {
                         WARNING("Invalid STREAMMSG");
                         ok = false;

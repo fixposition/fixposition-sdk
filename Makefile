@@ -173,7 +173,7 @@ $(BUILD_DIR)/.make-uid: | $(BUILD_DIR)
 .PHONY: cmake
 cmake: $(BUILD_DIR)/.make-cmake
 
-deps = $(sort $(wildcard Makefile fpsdk_doc/* Doxyfile \
+deps = $(sort $(wildcard CMakeList.txt Makefile fpsdk_doc/* Doxyfile \
     fpsdk_common/* fpsdk_common/*/* fpsdk_common/*/*/* fpsdk_common/*/*/*/* \
     fpsdk_ros1/* fpsdk_ros1/*/* fpsdk_ros1/*/*/* fpsdk_ros1/*/*/*/* \
     fpsdk_ros2/* fpsdk_ros2/*/* fpsdk_ros2/*/*/* fpsdk_ros2/*/*/*/* \

@@ -56,8 +56,18 @@ namespace app {
 class SigIntHelper
 {
    public:
-    SigIntHelper();
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  warn  Print a WARNING() (true, default) or a DEBUG() (false)
+     */
+    SigIntHelper(const bool warn = true);
+
+    /**
+     * @brief Destructor
+     */
     ~SigIntHelper();
+
     /**
      * @brief Check if signal was raised and we should abort
      *
@@ -73,6 +83,35 @@ class SigIntHelper
      * @returns true if the signal was raised, fals if timeout expired
      */
     bool WaitAbort(const uint32_t millis = 0);
+};
+
+/**
+ * @brief Helper to catch SIGPIPE
+ *
+ * On construction this installs a handler for SIGPIE. On destruction it sets the handler back to its previous state.
+ * Note that signal handlers are global and therefore you can only use one SigPipeHelper in a app.
+ */
+class SigPipeHelper
+{
+   public:
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  warn  Print a WARNING() (true) or a DEBUG() (false, default)
+     */
+    SigPipeHelper(const bool warn = false);
+
+    /**
+     * @brief Destructor
+     */
+    ~SigPipeHelper();
+
+    /**
+     * @brief Check if signal was raised
+     *
+     * @returns true if signal was raised, false otherwise
+     */
+    bool Raised();
 };
 
 /**

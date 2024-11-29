@@ -30,7 +30,7 @@
 #include <boost/iostreams/stream.hpp>
 
 /* PACKAGE */
-#include "fpsdk_common/time.hpp"
+#include "time.hpp"
 
 namespace fpsdk {
 namespace common {
