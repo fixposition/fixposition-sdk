@@ -451,11 +451,11 @@ TEST(TimeTest, Duration_Sleep)
 {
     const Duration dur = Duration::FromSec(0.1);
     const double s0 = GetSecs();
-    const uint64_t t0 = GetTicks();
+    const uint64_t t0 = GetMillis();
     const TicToc tt;
     dur.Sleep();
     const double s1 = GetSecs();
-    const uint64_t t1 = GetTicks();
+    const uint64_t t1 = GetMillis();
     const Duration dtt = tt.Toc();
     DEBUG("s0=%.3f t0=%" PRIu64, s0, t0);
     DEBUG("s1=%.3f t0=%" PRIu64 " %.3f %" PRIu64 " %.3f", s1, t1, s1 - s0, t1 - t0, dtt.GetSec());

@@ -5,6 +5,8 @@
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
  *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
+ *
+ * Partially based on work by flipflip (https://github.com/phkehl)
  * \endverbatim
  *
  * @file
@@ -19,6 +21,9 @@
 #define __FPSDK_COMMON_UTILS_HPP__
 
 /* LIBC/STL */
+#include <algorithm>
+#include <cstdint>
+#include <vector>
 
 /* EXTERNAL */
 
@@ -52,6 +57,96 @@ const char* GetCopyrightString();
  * @returns the license string
  */
 const char* GetLicenseString();
+
+/**
+ * Circular buffer for chunks of data (bytes, memory). For objects use use boost::circular_buffer or std::deque.
+ */
+class CircularBuffer
+{
+   public:
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  size  Size of buffer [bytes]
+     */
+    CircularBuffer(const std::size_t size);
+
+    /**
+     * @brief Reset buffer, discard all data
+     */
+    void Reset();
+
+    /**
+     * @brief Get size (capacity) of buffer
+     *
+     * @returns the size (capacity) of the buffer
+     */
+    std::size_t Size() const;
+
+    /**
+     * @brief Check if empty
+     *
+     * @returns true if the buffer is empty, false otherwise
+     */
+    bool Empty() const;
+
+    /**
+     * @brief Check if full
+     *
+     * @returns true if the buffer is completely full
+     */
+    bool Full() const;
+
+    /**
+     * @brief Get size used
+     *
+     * @returns the size of the used part of the buffer
+     */
+    std::size_t Used() const;
+
+    /**
+     * @brief Get size available
+     *
+     * @returns the size of the unused part of the buffer
+     */
+    std::size_t Avail() const;
+
+    /**
+     * @brief Write chunk of data to buffer
+     *
+     * @param[in]  data  Pointer to the data
+     * @param[in]  size  Size of the data (> 0)
+     *
+     * @returns true if data was copied to the buffer, false otherwise (not enough free space, bad params)
+     */
+    bool Write(const uint8_t* data, const std::size_t size);
+
+    /**
+     * @brief Read chunk of data from buffer
+     *
+     * @param[in]   data  Pointer to the data
+     * @param[out]  size  Size of the data (> 0)
+     *
+     * @returns true if data was copied from the buffer, false otherwise (not enough available data, bad params)
+     */
+    bool Read(uint8_t* data, const std::size_t size);
+
+    /**
+     * @brief Read chunk of data from buffer (but don't remove it from the buffer)
+     *
+     * @param[in]   data  Pointer to the data
+     * @param[out]  size  Size of the data (> 0)
+     *
+     * @returns true if data was copied from the buffer, false otherwise (not enough available data, bad params)
+     */
+    bool Peek(uint8_t* data, const std::size_t size);
+
+   private:
+    std::vector<uint8_t> buf_;  //!< Buffer/memory
+    std::size_t read_;          //!< Read pointer (index)
+    std::size_t write_;         //!< Write pointer (index)
+    bool full_;                 //!< Buffer full flag
+};
 
 /* ****************************************************************************************************************** */
 }  // namespace utils

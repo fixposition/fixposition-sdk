@@ -59,11 +59,11 @@ static constexpr double SEC_IN_WEEK_D  = static_cast<double>(SEC_IN_WEEK_I);  //
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- * @brief Get ticks [ms], monotonic time
+ * @brief Get milliseconds [ms], monotonic time
  *
- * @returns the number of ticks [ms]
+ * @returns the number of milliseconds
  */
-uint64_t GetTicks();
+uint64_t GetMillis();
 
 /**
  * @brief Get seconds [s], monotonic time

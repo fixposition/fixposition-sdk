@@ -28,6 +28,9 @@ TEST(LoggingTest, LoggingPrint)
     DEBUG("This is fpsdk_common debug...");
     INFO("This is fpsdk_common info...");
     // WARNING("This is fpsdk_common warning...");
+    DEBUG_THR(1234, "This is fpsdk_common debug...");
+    INFO_THR(1234, "This is fpsdk_common info...");
+    // WARNING_THR(1234, "This is fpsdk_common warning...");
 
     DEBUG_S("This"              // thank you, clang-format
             << " is"            // thank you, clang-format

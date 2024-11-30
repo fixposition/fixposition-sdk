@@ -21,12 +21,14 @@
 /* LIBC/STL */
 #include <cinttypes>  // PRI.. macros, often used with formats
 #include <cstdarg>
+#include <cstdint>
 #include <sstream>
 
 /* EXTERNAL */
 
 /* PACKAGE */
 #include "string.hpp"
+#include "time.hpp"
 
 namespace fpsdk {
 namespace common {
@@ -45,46 +47,68 @@ namespace logging {
  */
 // clang-format off
 /**
- * @brief Print a fatal message   @hideinitializer
+ * @brief Print a fatal message                                                                                         @hideinitializer
  */
-#define FATAL(fmt, ...)   fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::FATAL,   "Fatal: "   fmt, ## __VA_ARGS__)
+#define FATAL(fmt, ...)   _FPSDK_LOGGING_LOG(FATAL,   "Fatal: "   fmt, ## __VA_ARGS__)
 /**
- * @brief Print a error message   @hideinitializer
+ * @brief Print a error message                                                                                         @hideinitializer
  */
-#define ERROR(fmt, ...)   fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::ERROR,   "Error: "   fmt, ## __VA_ARGS__)
+#define ERROR(fmt, ...)   _FPSDK_LOGGING_LOG(ERROR,   "Error: "   fmt, ## __VA_ARGS__)
 /**
- * @brief Print a warning message   @hideinitializer
+ * @brief Print a warning message                                                                                       @hideinitializer
  */
-#define WARNING(fmt, ...) fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::WARNING, "Warning: " fmt, ## __VA_ARGS__)
+#define WARNING(fmt, ...) _FPSDK_LOGGING_LOG(WARNING, "Warning: " fmt, ## __VA_ARGS__)
 /**
- * @brief Print a notice message   @hideinitializer
+ * @brief Print a notice message                                                                                        @hideinitializer
  */
-#define NOTICE(fmt, ...)  fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::NOTICE,              fmt, ## __VA_ARGS__)
+#define NOTICE(fmt, ...)  _FPSDK_LOGGING_LOG(NOTICE,              fmt, ## __VA_ARGS__)
 /**
- * @brief Print a info message   @hideinitializer
+ * @brief Print a info message                                                                                          @hideinitializer
  */
-#define INFO(fmt, ...)    fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::INFO,                fmt, ## __VA_ARGS__)
+#define INFO(fmt, ...)    _FPSDK_LOGGING_LOG(INFO,                fmt, ## __VA_ARGS__)
 /**
- * @brief Print a debug message   @hideinitializer
+ * @brief Print a debug message                                                                                         @hideinitializer
  */
-#define DEBUG(fmt, ...)   fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::DEBUG,               fmt, ## __VA_ARGS__)
+#define DEBUG(fmt, ...)   _FPSDK_LOGGING_LOG(DEBUG,               fmt, ## __VA_ARGS__)
 /**
- * @brief Print a debug hexdump   @hideinitializer
+ * @brief Print a debug hexdump                                                                                         @hideinitializer
  */
-#define DEBUG_HEXDUMP(data, size, prefix, fmt, ...) fpsdk::common::logging::LoggingHexdump(fpsdk::common::logging::LoggingLevel::DEBUG, data, size, prefix, fmt, ## __VA_ARGS__)
+#define DEBUG_HEXDUMP(data, size, prefix, fmt, ...) _FPSDK_LOGGING_HEX(DEBUG, data, size, prefix, fmt, ## __VA_ARGS__)
 #if !defined(NDEBUG) || defined(_DOXYGEN_) // Only for non-Release builds
+
 /**
- * @brief Print a trace message (only debug builds, compiled out in release builds)  @hideinitializer
+ * @brief Print a trace message (only debug builds, compiled out in release builds)                                     @hideinitializer
  */
-#  define TRACE(fmt, ...)   fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::TRACE,               fmt, ## __VA_ARGS__)
+#  define TRACE(fmt, ...) _FPSDK_LOGGING_LOG(TRACE,               fmt, ## __VA_ARGS__)
 /**
- * @brief Print a trace hexdump (only debug builds, compiled out in release builds)   @hideinitializer
+ * @brief Print a trace hexdump (only debug builds, compiled out in release builds)                                     @hideinitializer
  */
-#  define TRACE_HEXDUMP(data, size, prefix, fmt, ...) fpsdk::common::logging::LoggingHexdump(fpsdk::common::logging::LoggingLevel::TRACE, data, size, prefix, fmt, ## __VA_ARGS__)
+#  define TRACE_HEXDUMP(data, size, prefix, fmt, ...) _FPSDK_LOGGING_HEX(TRACE, data, size, prefix, fmt, ## __VA_ARGS__)
 #else
 #  define TRACE(...)         /* nothing */
 #  define TRACE_HEXDUMP(...) /* nothing */
 #endif
+
+/**
+ * @brief Print a error message (throttled)                                                                             @hideinitializer
+ */
+#define ERROR_THR(millis, fmt, ...)   _FPSDK_LOGGING_THR(ERROR,   millis, fmt, ## __VA_ARGS__)
+/**
+ * @brief Print a warning message (throttled)                                                                           @hideinitializer
+ */
+#define WARNING_THR(millis, fmt, ...) _FPSDK_LOGGING_THR(WARNING, millis, fmt, ## __VA_ARGS__)
+/**
+ * @brief Print a notice message (throttled)                                                                            @hideinitializer
+ */
+#define NOTICE_THR(millis, fmt, ...)  _FPSDK_LOGGING_THR(NOTICE,  millis, fmt, ## __VA_ARGS__)
+/**
+ * @brief Print a info message (throttled)                                                                              @hideinitializer
+ */
+#define INFO_THR(millis, fmt, ...)    _FPSDK_LOGGING_THR(INFO,    millis, fmt, ## __VA_ARGS__)
+/**
+ * @brief Print a debug message (throttled)                                                                             @hideinitializer
+ */
+#define DEBUG_THR(millis, fmt, ...)   _FPSDK_LOGGING_THR(DEBUG,   millis, fmt, ## __VA_ARGS__)
 // clang-format on
 ///@}
 
@@ -97,41 +121,35 @@ namespace logging {
  */
 // clang-format off
 /**
- * @brief Print a fatal message   @hideinitializer
+ * @brief Print a fatal message                                                                                         @hideinitializer
  */
-#define FATAL_S(expr)   if (fpsdk::common::logging::LoggingIsLevel(fpsdk::common::logging::LoggingLevel::FATAL)) { \
-    std::stringstream ss; ss << expr; FATAL("%s", ss.str().c_str()); }
+#define FATAL_S(expr)   _FPSDK_LOGGING_IF(FATAL,   std::stringstream ss; ss << expr; FATAL("%s", ss.str().c_str()))
 /**
- * @brief Print a error message   @hideinitializer
+ * @brief Print a error message                                                                                         @hideinitializer
  */
-#define ERROR_S(expr)   if (fpsdk::common::logging::LoggingIsLevel(fpsdk::common::logging::LoggingLevel::ERROR)) { \
-    std::stringstream ss; ss << expr; ERROR("%s", ss.str().c_str()); }
+#define ERROR_S(expr)   _FPSDK_LOGGING_IF(ERROR,   std::stringstream ss; ss << expr; ERROR("%s", ss.str().c_str()))
 /**
- * @brief Print a warning message   @hideinitializer
+ * @brief Print a warning message                                                                                       @hideinitializer
  */
-#define WARNING_S(expr) if (fpsdk::common::logging::LoggingIsLevel(fpsdk::common::logging::LoggingLevel::WARNING)) { \
-    std::stringstream ss; ss << expr; WARNING("%s", ss.str().c_str()); }
+#define WARNING_S(expr) _FPSDK_LOGGING_IF(WARNING, std::stringstream ss; ss << expr; WARNING("%s", ss.str().c_str()))
 /**
- * @brief Print a debug message   @hideinitializer
+ * @brief Print a debug message                                                                                         @hideinitializer
  */
-#define DEBUG_S(expr)   if (fpsdk::common::logging::LoggingIsLevel(fpsdk::common::logging::LoggingLevel::DEBUG)) { \
-    std::stringstream ss; ss << expr; DEBUG("%s", ss.str().c_str()); }
+#define DEBUG_S(expr)   _FPSDK_LOGGING_IF(DEBUG,   std::stringstream ss; ss << expr; DEBUG("%s", ss.str().c_str()))
 /**
- * @brief Print a notice message   @hideinitializer
+ * @brief Print a notice message                                                                                        @hideinitializer
  */
-#define NOTICE_S(expr)  if (fpsdk::common::logging::LoggingIsLevel(fpsdk::common::logging::LoggingLevel::NOTICE)) { \
-    std::stringstream ss; ss << expr; NOTICE("%s", ss.str().c_str()); }
+#define NOTICE_S(expr)  _FPSDK_LOGGING_IF(NOTIC,   std::stringstream ss; ss << expr; NOTICE("%s", ss.str().c_str()))
 /**
- * @brief Print a info message   @hideinitializer
+ * @brief Print a info message                                                                                          @hideinitializer
  */
-#define INFO_S(expr)    if (fpsdk::common::logging::LoggingIsLevel(fpsdk::common::logging::LoggingLevel::INFO)) { \
-    std::stringstream ss; ss << expr; INFO("%s", ss.str().c_str()); }
+#define INFO_S(expr)    _FPSDK_LOGGING_IF(INFO,    std::stringstream ss; ss << expr; INFO("%s", ss.str().c_str()))
+
 #if !defined(NDEBUG) || defined(_DOXYGEN_) // Only for non-Release builds
 /**
- * @brief Print a trace message (only debug builds, compiled out in release builds)   @hideinitializer
+ * @brief Print a trace message (only debug builds, compiled out in release builds)                                     @hideinitializer
  */
-#  define TRACE_S(expr)   if (fpsdk::common::logging::LoggingIsLevel(fpsdk::common::logging::LoggingLevel::TRACE)) { \
-    std::stringstream ss; ss << expr; TRACE("%s", ss.str().c_str()); }
+#  define TRACE_S(expr) _FPSDK_LOGGING_IF(TRACE,   std::stringstream ss; ss << expr; TRACE("%s", ss.str().c_str()))
 #else
 #  define TRACE_S(...) /* nothing */
 #endif
@@ -148,16 +166,16 @@ namespace logging {
  *
  * Libraries (fpsdk_common, fpsdk_ros1, ...) code shall only use WARNING and DEBUG.
  */
-enum class LoggingLevel
-{
-    FATAL,    //!< [2/crit]    Hard errors, critical conditions (for apps). Cannot be silenced.
-    ERROR,    //!< [3/err]     Errors (for apps)
-    WARNING,  //!< [4/warning] Warnings (for libs and apps)
-    NOTICE,   //!< [5/notice]  Significant stuff, for example headings (for apps)
-    INFO,     //!< [6/info]    Interesting stuff, the default level (for apps)
-    DEBUG,    //!< [7/debug]   Debugging (for libs and apps)
-    TRACE     //!< [7/debug]   Extra debugging, only compiled-in in non-Release builds
-};
+enum class LoggingLevel : int
+{  // clang-format off
+    FATAL    = 2,  //!< [2/crit]    Hard errors, critical conditions (for apps). Cannot be silenced.
+    ERROR    = 3,  //!< [3/err]     Errors (for apps)
+    WARNING  = 4,  //!< [4/warning] Warnings (for libs and apps)
+    NOTICE   = 5,  //!< [5/notice]  Significant stuff, for example headings (for apps)
+    INFO     = 6,  //!< [6/info]    Interesting stuff, the default level (for apps)
+    DEBUG    = 7,  //!< [7/debug]   Debugging (for libs and apps)
+    TRACE    = 8,  //!< [7/debug]   Extra debugging, only compiled-in in non-Release builds
+};  // clang-format on
 
 LoggingLevel& operator++(LoggingLevel& level);      //!< Increase verbosity (pre-increment)
 LoggingLevel& operator--(LoggingLevel& level);      //!< Decrease verbosity (pre-decrement)
@@ -297,6 +315,28 @@ void LoggingPrint(const LoggingLevel level, const char* fmt, ...) PRINTF_ATTR(2)
  */
 void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const uint64_t size, const char* prefix,
     const char* fmt, ...) PRINTF_ATTR(5);
+
+// Helper macros
+#ifndef _DOXYGEN_
+#  define _FPSDK_LOGGING_LOG(_level_, _fmt_, ...) \
+      ::fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::_level_, _fmt_, ##__VA_ARGS__)
+#  define _FPSDK_LOGGING_HEX(_level_, _data_, _size_, _prefix_, _fmt_, ...) \
+      ::fpsdk::common::logging::LoggingHexdump(                             \
+          fpsdk::common::logging::LoggingLevel::_level_, _data_, _size_, _prefix_, _fmt_, ##__VA_ARGS__)
+#  define _FPSDK_LOGGING_IF(_level_, _code_)                                                         \
+      if (::fpsdk::common::logging::LoggingIsLevel(fpsdk::common::logging::LoggingLevel::_level_)) { \
+          _code_;                                                                                    \
+      }
+#  define _FPSDK_LOGGING_THR(_level_, _millis_, _fmt_, ...)          \
+      do {                                                           \
+          static uint32_t __last = 0;                                \
+          const uint32_t __now = ::fpsdk::common::time::GetMillis(); \
+          if ((__now - __last) >= (_millis_)) {                      \
+              __last = __now;                                        \
+              _level_(_fmt_, ##__VA_ARGS__);                         \
+          }                                                          \
+      } while (0)
+#endif  // _DOXYGEN_
 
 /* ****************************************************************************************************************** */
 }  // namespace logging

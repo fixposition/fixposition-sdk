@@ -28,3 +28,7 @@ COLCON_IGNORE
 .catkin_tools
 /log
 /src
+meier*
+foo*
+bar*
+baz*

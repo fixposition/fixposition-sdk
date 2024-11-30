@@ -70,17 +70,18 @@ target_link_libraries(fpltool
     $<$<BOOL:${FP_USE_ROS1}>:fpsdk_ros1>
 )
 
+file(GLOB TIMECONV_CPP_FILES timeconv/*.cpp)
+add_executable(timeconv ${TIMECONV_CPP_FILES} ${COMMON_CPP_FILES})
+target_link_libraries(timeconv
+    fpsdk_common
+)
+
 file(GLOB YAML2SHELL_CPP_FILES yaml2shell/*.cpp)
 add_executable(yaml2shell ${YAML2SHELL_CPP_FILES} ${COMMON_CPP_FILES})
 target_link_libraries(yaml2shell
     fpsdk_common
 )
 
-file(GLOB TIMECONV_CPP_FILES timeconv/*.cpp)
-add_executable(timeconv ${TIMECONV_CPP_FILES} ${COMMON_CPP_FILES})
-target_link_libraries(timeconv
-    fpsdk_common
-)
 
 # INSTALL ==============================================================================================================
 
@@ -90,7 +91,7 @@ set(PROJECT_LIBRARY_DIR ${CMAKE_INSTALL_FULL_LIBDIR})
 set(PROJECT_INCLUDE_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME})
 set(PROJECT_DATA_DIR    ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME})
 
-install(TARGETS fpltool yaml2shell timeconv
+install(TARGETS fpltool timeconv yaml2shell
     EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION ${PROJECT_LIBRARY_DIR}
     RUNTIME DESTINATION ${PROJECT_RUNTIME_DIR}

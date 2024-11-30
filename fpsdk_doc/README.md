@@ -23,7 +23,6 @@ For building the libraries and apps:
 - boost           (≥ ?,      tested with 1.71.0)
 - zlib1g          (≥ ?,      tested with 1.2.11)
 - Eigen3          (≥ ?,      tested with 3.3.7)
-- Cap'n Proto (*) (≥ 1.0.2,  tested with 1.0.2)
 - PROJ        (*) (≥ 9.?.?,  tested with 9.4.1)
 - ROS1        (*) (Noetic,   tested with Noetic), or
 - ROS2        (*) (Humble,   tested with Humble and Jazzy)
@@ -88,9 +87,9 @@ systems. Refer to the [Docker configration files and scripts](./docker) on insta
     or otherwise tell CMake where to find them.
 
     ```sh
-    sudo apt install  libyaml-cpp-dev libboost-all-dev zlib1g-dev libeigen3-dev                     # For building...
-    sudo apt install libgtest-dev clang-format doxygen pre-commit                                   # For development...
-    source /opt/ros/noetic/setup.bash                                                               # If you have ROS1...
+    sudo apt install libyaml-cpp-dev libboost-all-dev zlib1g-dev libeigen3-dev linux-libc-dev       # For building
+    sudo apt install libgtest-dev clang-format doxygen pre-commit                                   # For development
+    source /opt/ros/noetic/setup.bash                                                               # If you have ROS1
     ```
 
 3. Configure

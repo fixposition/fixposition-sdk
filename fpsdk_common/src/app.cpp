@@ -31,15 +31,20 @@ namespace common {
 namespace app {
 /* ****************************************************************************************************************** */
 
-static bool g_siginit_abort = false;
+static bool g_sigint_abort = false;
+static bool g_sigint_warn = false;
 static sighandler_t g_sigint_old_handler = SIG_IGN;
 static fpsdk::common::thread::BinarySemaphore g_sigint_sem;
 
 static void SigIntHandler(int signum)
 {
-    if ((signum == SIGINT) && !g_siginit_abort) {
-        WARNING("Caught SIGINT, aborting...");
-        g_siginit_abort = true;
+    if ((signum == SIGINT) && !g_sigint_abort) {
+        if (g_sigint_warn) {
+            WARNING("Caught SIGINT, aborting...");
+        } else {
+            DEBUG("Caught SIGINT, aborting...");
+        }
+        g_sigint_abort = true;
 
         // Handle signal only once, next time let the original handler deal with it
         std::signal(SIGINT, g_sigint_old_handler == SIG_IGN ? SIG_DFL : g_sigint_old_handler);
@@ -49,10 +54,11 @@ static void SigIntHandler(int signum)
     }
 }
 
-SigIntHelper::SigIntHelper()
+SigIntHelper::SigIntHelper(const bool warn)
 {
     if (g_sigint_old_handler == SIG_IGN) {
         g_sigint_old_handler = std::signal(SIGINT, SigIntHandler);
+        g_sigint_warn = warn;
     }
 }
 
@@ -64,7 +70,7 @@ SigIntHelper::~SigIntHelper()
 
 bool SigIntHelper::ShouldAbort()
 {
-    return g_siginit_abort;
+    return g_sigint_abort;
 }
 
 bool SigIntHelper::WaitAbort(const uint32_t millis)
@@ -82,6 +88,46 @@ bool SigIntHelper::WaitAbort(const uint32_t millis)
         }
     }
     return false;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+static bool g_sigpipe_raised = false;
+static bool g_sigpipe_warn = false;
+static sighandler_t g_sigpipe_old_handler = SIG_IGN;
+
+static void SigPipeHandler(int signum)
+{
+    if ((signum == SIGPIPE) && !g_sigpipe_raised) {
+        if (g_sigpipe_warn) {
+            WARNING("Caught SIGPIPE");
+        } else {
+            DEBUG("Caught SIGPIPE");
+        }
+        g_sigpipe_raised = true;
+
+        // Handle signal only once, next time let the original handler deal with it
+        std::signal(SIGPIPE, g_sigpipe_old_handler == SIG_IGN ? SIG_DFL : g_sigpipe_old_handler);
+        g_sigpipe_old_handler = SIG_IGN;
+    }
+}
+
+SigPipeHelper::SigPipeHelper(const bool warn)
+{
+    if (g_sigpipe_old_handler == SIG_IGN) {
+        g_sigpipe_old_handler = std::signal(SIGPIPE, SigPipeHandler);
+        g_sigpipe_warn = warn;
+    }
+}
+
+SigPipeHelper::~SigPipeHelper()
+{
+    std::signal(SIGPIPE, g_sigpipe_old_handler == SIG_IGN ? SIG_DFL : g_sigpipe_old_handler);
+}
+
+bool SigPipeHelper::Raised()
+{
+    return g_sigpipe_raised;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

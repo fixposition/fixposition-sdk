@@ -27,12 +27,16 @@ endif()
 # - ROS1 package path explicitly given on cmake command line. Not recommended. Enough to build, but not enough to run.
 if(NOT "${ROS_PACKAGE_PATH}" STREQUAL "")
     message(STATUS "fpsdk: Using ROS1 (cmake arg ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH})")
-    list(APPEND CMAKE_PREFIX_PATH ${ROS_PACKAGE_PATH})
+    string(REPLACE ":" ";" ROS_PACKAGE_PATH_LIST ${ROS_PACKAGE_PATH})
+    list(APPEND CMAKE_PREFIX_PATH ${ROS_PACKAGE_PATH_LIST})
+    list(APPEND CMAKE_PREFIX_PATH /opt/ros/noetic)
     set(FP_USE_ROS1 ON)
 # - ROS1 environment loaded. Recommended.
 elseif(NOT "$ENV{ROS_PACKAGE_PATH}" STREQUAL "")
     message(STATUS "fpsdk: Using ROS1 (environment ROS_PACKAGE_PATH=$ENV{ROS_PACKAGE_PATH})")
-    list(APPEND CMAKE_PREFIX_PATH $ENV{ROS_PACKAGE_PATH})
+    string(REPLACE ":" ";" ROS_PACKAGE_PATH_LIST $ENV{ROS_PACKAGE_PATH})
+    list(APPEND CMAKE_PREFIX_PATH ${ROS_PACKAGE_PATH_LIST})
+    list(APPEND CMAKE_PREFIX_PATH /opt/ros/noetic)
     set(FP_USE_ROS1 ON)
 # - ROS2 environment loaded
 elseif("$ENV{ROS_VERSION}" STREQUAL "2")

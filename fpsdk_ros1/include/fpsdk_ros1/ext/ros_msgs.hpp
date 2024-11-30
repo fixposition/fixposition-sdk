@@ -5,6 +5,7 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wshadow"
+#include <fpsdk_ros1/ParserMsg.h>
 #include <std_msgs/String.h>
 #include <std_msgs/UInt8MultiArray.h>
 #pragma GCC diagnostic pop

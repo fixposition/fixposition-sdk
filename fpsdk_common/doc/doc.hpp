@@ -33,6 +33,7 @@ namespace common {
 
     - @subpage FPSDK_COMMON_APPS
     - @subpage FPSDK_COMMON_FPL
+    - @subpage FPSDK_COMMON_GNSS
     - @subpage FPSDK_COMMON_LOGGING
     - @subpage FPSDK_COMMON_MATH
     - @subpage FPSDK_COMMON_PARSER
