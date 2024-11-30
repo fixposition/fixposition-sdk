@@ -22,8 +22,10 @@
 #include <cstring>
 
 /* EXTERNAL */
+#include <fpsdk_ros1/ext/ros_time.hpp>
 
 /* Fixposition SDK */
+#include <fpsdk_common/time.hpp>
 
 /* PACKAGE */
 
@@ -100,6 +102,24 @@ bool LoadRosParam(const std::string& name, float& value);
  * @returns true if parameter found and loaded, false otherwise
  */
 bool LoadRosParam(const std::string& name, double& value);
+
+/**
+ * @brief Convert to ROS time (atomic -> POSIX)
+ *
+ * @param[in]  time  The Time object (atomic)
+ *
+ * @returns the ROS time object (POSIX)
+ */
+ros::Time ConvTime(const fpsdk::common::time::Time& time);
+
+/**
+ * @brief Convert from ROS time (POSIX -> atomic)
+ *
+ * @param[in]  time  The ROS time object (POSIX)
+ *
+ * @returns the Time object (atomic)
+ */
+fpsdk::common::time::Time ConvTime(const ros::Time& time);
 
 /* ****************************************************************************************************************** */
 }  // namespace utils

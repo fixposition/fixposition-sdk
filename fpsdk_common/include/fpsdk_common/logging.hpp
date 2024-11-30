@@ -193,6 +193,34 @@ enum class LoggingColour
     JOURNAL,   //!< Use systemd journal level indicators (instead of terminal colours), useful for systemd services
 };
 
+/**
+ * @brief Stringify log level
+ *
+ * @param[in]  colour  The logging colour
+ *
+ * @returns a unique string identifying the level
+ */
+const char* LoggingColourStr(const LoggingColour colour);
+
+/**
+ * @brief Logging timestamps
+ */
+enum class LoggingTimestamps
+{
+    NONE = 0,  //!< No timestamps
+    RELATIVE,  //!< Relative timestamps (since first logging message, sssss.sss format)
+    ABSOLUTE,  //!< Absolute timestamps (local time, yyyy-mm-dd hh::mm:ss.sss format)
+};
+
+/**
+ * @brief Stringify log level
+ *
+ * @param[in]  timestamps  The logging timestamps
+ *
+ * @returns a unique string identifying the level
+ */
+const char* LoggingTimestampsStr(const LoggingTimestamps timestamps);
+
 struct LoggingParams;  // forward declaration
 
 /**
@@ -208,13 +236,16 @@ struct LoggingParams
     /**
      * @brief Constructor
      *
-     * @param[in]  level   Logging level
-     * @param[in]  colour  Logging colours
+     * @param[in]  level       Logging level
+     * @param[in]  colour      Logging colours
+     * @param[in]  timestamps  Logging timestamps
      */
-    LoggingParams(const LoggingLevel level = LoggingLevel::INFO, const LoggingColour colour = LoggingColour::AUTO);
-    LoggingLevel level_;    //!< Logging level
-    LoggingColour colour_;  //!< Level colours
-    LoggingPrintFunc fn_;   //!< Custom logging print function
+    LoggingParams(const LoggingLevel level = LoggingLevel::INFO, const LoggingColour colour = LoggingColour::AUTO,
+        const LoggingTimestamps timestamps = LoggingTimestamps::NONE);
+    LoggingLevel level_;            //!< Logging level
+    LoggingColour colour_;          //!< Level colours
+    LoggingTimestamps timestamps_;  //!< Timestamps
+    LoggingPrintFunc fn_;           //!< Custom logging print function
 };
 
 /**
@@ -225,8 +256,9 @@ struct LoggingParams
  * Examples:
  *
  * @code{.cpp}
- * LoggingSetParams({LoggingLevel::DEBUG});
- * LoggingSetParams({LoggingLevel::DEBUG, LoggingColour::YES});
+ * LoggingSetParams({ LoggingLevel::DEBUG });
+ * LoggingSetParams({ LoggingLevel::DEBUG, LoggingColour::YES });
+ * LoggingSetParams({ LoggingLevel::DEBUG, LoggingColour::AUTO, LoggingTimestamps::RELATIVE });
  * @endcode
  *
  * @returns a copy of the applied logging parameters

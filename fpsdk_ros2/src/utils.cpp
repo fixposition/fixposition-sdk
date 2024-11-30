@@ -15,7 +15,6 @@
 #include <memory>
 
 /* EXTERNAL */
-#include "fpsdk_ros2/ext/rclcpp.hpp"
 
 /* Fixposition SDK */
 #include <fpsdk_common/logging.hpp>
@@ -55,6 +54,21 @@ void RedirectLoggingToRosConsole()
     params.fn_ = sLoggingFn;
     params.level_ = LoggingLevel::TRACE;  // We leave it up to ROS to decide what to print
     LoggingSetParams(params);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+rclcpp::Time ConvTime(const fpsdk::common::time::Time& time)
+{
+    const auto rt = time.GetRosTime();
+    return rclcpp::Time(rt.sec_, rt.nsec_);
+}
+
+fpsdk::common::time::Time ConvTime(const rclcpp::Time& time)
+{
+    const uint64_t nsec = time.nanoseconds();
+    return fpsdk::common::time::Time::FromRosTime(
+        { static_cast<uint32_t>(nsec / 1000000000), static_cast<uint32_t>(nsec % 1000000000) });
 }
 
 /* ****************************************************************************************************************** */

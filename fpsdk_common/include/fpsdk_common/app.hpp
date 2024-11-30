@@ -176,9 +176,10 @@ class ProgramOptions
         "    -V       -- Print program, version and license information, and exit\n"
         "    -v / -q  -- Increase / decrease logging verbosity, multiple flags accumulate\n";  // clang-format on
 
-    std::string app_name_;                                         //!< App name
-    logging::LoggingLevel logging_ = logging::LoggingLevel::INFO;  //!< Logging verbosity level
-    std::vector<std::string> argv_;                                //!< argv[] of program
+    std::string app_name_;                                                              //!< App name
+    logging::LoggingLevel logging_level_ = logging::LoggingLevel::INFO;                 //!< Logging verbosity level
+    logging::LoggingTimestamps logging_timestamps_ = logging::LoggingTimestamps::NONE;  //!< Logging timestamps
+    std::vector<std::string> argv_;                                                     //!< argv[] of program
 
    private:
     std::vector<Option> options_;  //!< Program options

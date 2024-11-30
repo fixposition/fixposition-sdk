@@ -24,9 +24,19 @@ namespace {
 /* ****************************************************************************************************************** */
 using namespace fpsdk::ros2::utils;
 
-TEST(UtilsTest, Dummy)
+TEST(UtilsTest, ConvTime)
 {
-    EXPECT_TRUE(true);
+    const rclcpp::Time ros_time(1723650283, 125000000);
+    DEBUG("rclcpp::Time %" PRIu64, ros_time.nanoseconds());
+
+    const fpsdk::common::time::Time sdk_time = ConvTime(ros_time);
+    DEBUG("SDK Time     %" PRIu64, sdk_time.GetNSec());
+    EXPECT_EQ(sdk_time.GetNSec(), ros_time.nanoseconds() + 27000000000);  // 1723650310e9
+
+    const rclcpp::Time ros_time_again = ConvTime(sdk_time);
+    DEBUG("rclcpp::Time %" PRIu64, ros_time_again.nanoseconds());
+
+    EXPECT_EQ(ros_time.nanoseconds(), ros_time_again.nanoseconds());
 }
 
 /* ****************************************************************************************************************** */
