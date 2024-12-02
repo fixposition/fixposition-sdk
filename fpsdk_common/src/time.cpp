@@ -721,6 +721,8 @@ struct LeapSecInfo
     bool at_leapsec_;
 };
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 // "Our" internal atomic timescale starts at the same time as POSIX. So at 1970-01-01 both are value 0. At this point
 // TAI (CLOCK_TAI) has TAI_OFFS leap seconds.
 static constexpr uint32_t MAX_LEAPS = 27;
@@ -732,18 +734,17 @@ LeapSecInfo getLeapSecInfo(const uint32_t ts, const bool posix)
     // See also /usr/share/zoneinfo/{leapseconds,leap-seconds.list}
     // 2025-06-30 12:00:00 (The earliest time there can be a change is at midnight this day)
     // TZ=UTC date --date "2025-06-30 12:00:00" +%s
-    if (ts > 1751284837) {
+    static constexpr uint32_t max_ts = 1751284837;
+    if (ts > max_ts) {
         static bool you_have_been_warned = false;
-        const int leapsec = 37;
         if (!you_have_been_warned) {
-            WARNING(
-                "time::Time() Leapsecond knowledge outdated (at %" PRIu32 "), assuming it is still %d", ts, leapsec);
+            WARNING("time::Time() Leapsecond knowledge outdated (at %" PRIu32 "), assuming unchanged since  %" PRIu32,
+                ts, max_ts);
             you_have_been_warned = true;
         }
-        return { leapsec, false };
+        return getLeapSecInfo(max_ts, true);
     }
 
-    // TAI - UTC
     static const std::array<std::array<uint32_t, 2>, MAX_LEAPS> leapseconds = { {
         // clang-format off
         // POSIX      Atomic
@@ -789,6 +790,8 @@ LeapSecInfo getLeapSecInfo(const uint32_t ts, const bool posix)
     }
     return { 0, false };
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 // GPS 0:0 in atomic sec, 1980-01-06 00:00:00.0 UTC
 static constexpr uint32_t GPS_OFFS = 315532800 + (5 * SEC_IN_DAY_I) + 9;  // 315964809

@@ -696,6 +696,19 @@ TEST(TimeTest, Time_LaterLeapsecEvent)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+TEST(TimeTest, Time_LatestLeapsec)
+{
+    const Time t0 = Time::FromUtcTime({ 2100, 1, 1, 0, 0, 0.0 });
+    const time_t asec = std::floor(t0.GetSec());
+    const time_t psec = t0.GetPosix();
+    const time_t tsec = t0.GetTai();
+    DEBUG("%s asec=%" PRIiMAX " psec=%" PRIiMAX " tsec=%" PRIuMAX " asec-psec=%" PRIiMAX " tsec-psec=%" PRIiMAX,
+        t0.StrUtcTime().c_str(), asec, psec, tsec, asec - psec, tsec - psec);
+    ASSERT_EQ(asec - psec, 27);  // This fails when the leapseconds table is updated
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(TimeTest, Time_GloTime)
 {
     // @todo Is this all correct?
