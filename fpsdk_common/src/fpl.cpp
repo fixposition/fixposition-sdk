@@ -21,6 +21,7 @@
 
 /* PACKAGE */
 #include "fpsdk_common/fpl.hpp"
+#include "fpsdk_common/gnss.hpp"
 #include "fpsdk_common/logging.hpp"
 #include "fpsdk_common/path.hpp"
 #include "fpsdk_common/string.hpp"
@@ -308,7 +309,7 @@ bool FplFileReader::Open(const std::string& path)
         fh_ = std::make_unique<std::ifstream>(path, std::ios::binary);
     }
     if (fh_->fail()) {
-        WARNING("FplFileReader: fail open %s: %s", path.c_str(), std::strerror(errno));
+        WARNING("FplFileReader: fail open %s: %s", path.c_str(), fpsdk::common::string::StrError(errno).c_str());
         fh_.reset();
         return false;
     }
@@ -469,15 +470,14 @@ LogStatus::LogStatus(const FplMessage& log_msg)
                     pos_lat_ = status["pos_lat"].as<double>();
                     pos_lon_ = status["pos_lon"].as<double>();
                     pos_height_ = status["pos_height"].as<double>();
-                    using GnssFixType = fpsdk::common::types::GnssFixType;
+                    using GnssFixType = fpsdk::common::gnss::GnssFixType;
                     const bool pos_avail =
-                        ((pos_source_ > POS_SOURCE_UNKNOWN) &&
-                            ((GnssFixType)pos_fix_type_ > fpsdk::common::types::GnssFixType::FIX_NOFIX));
+                        ((pos_source_ > POS_SOURCE_UNKNOWN) && ((GnssFixType)pos_fix_type_ > GnssFixType::NOFIX));
                     const char* pos_source_str =
                         (pos_source_ == POS_SOURCE_GNSS ? "GNSS" : (pos_source_ == POS_SOURCE_FUSION ? "FUSION" : "?"));
                     info_ += " log_time=" + log_time_iso_ +
                              fpsdk::common::string::Sprintf(" pos=%s/%s/%.6f/%.6f/%.0f", pos_source_str,
-                                 fpsdk::common::types::GnssFixTypeStr((GnssFixType)pos_fix_type_),
+                                 fpsdk::common::gnss::GnssFixTypeStr((GnssFixType)pos_fix_type_),
                                  pos_avail ? pos_lat_ : NAN, pos_avail ? pos_lon_ : NAN, pos_avail ? pos_height_ : NAN);
                 }
 

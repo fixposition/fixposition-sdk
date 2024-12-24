@@ -20,6 +20,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    libcurl4-openssl-dev
     noetic.humble.jazzy.bookworm    libeigen3-dev
     ..............jazzy.bookworm    libgtest-dev
+    noetic.humble.jazzy.bookworm    libpath-tiny-perl
     noetic.humble.jazzy.bookworm    libsqlite3-dev
     noetic.humble.jazzy.bookworm    libtiff-dev
     noetic.humble.jazzy.bookworm    libyaml-cpp-dev
@@ -29,6 +30,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    python-is-python3
     noetic.humble.jazzy.bookworm    python3-osrf-pycommon
     noetic.humble.jazzy.bookworm    python3-pip
+    noetic.humble.jazzy.bookworm    python3-venv
     noetic......................    ros-noetic-eigen-conversions
     noetic......................    ros-noetic-tf
     noetic......................    ros-noetic-tf-conversions
@@ -38,7 +40,9 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    sqlite3
     noetic.humble.jazzy.bookworm    sudo
     ..............jazzy.........    unminimize
+    noetic.humble.jazzy.bookworm    unzip
     noetic.humble.jazzy.bookworm    zlib1g-dev
+    noetic.humble.jazzy.bookworm    zip
 EOF
 )
 

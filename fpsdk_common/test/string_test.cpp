@@ -12,6 +12,7 @@
  */
 
 /* LIBC/STL */
+#include <cerrno>
 
 /* EXTERNAL */
 #include <gtest/gtest.h>
@@ -255,6 +256,8 @@ TEST(StringTest, StrToValue_int8)
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(StringTest, StrToValue_uint8)
 {
     // clang-format off
@@ -288,6 +291,8 @@ TEST(StringTest, StrToValue_uint8)
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 TEST(StringTest, StrToValue_int16)
 {
@@ -323,6 +328,8 @@ TEST(StringTest, StrToValue_int16)
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(StringTest, StrToValue_uint16)
 {
     // clang-format off
@@ -356,6 +363,8 @@ TEST(StringTest, StrToValue_uint16)
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 TEST(StringTest, StrToValue_int32)
 {
@@ -391,6 +400,8 @@ TEST(StringTest, StrToValue_int32)
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(StringTest, StrToValue_uint32)
 {
     // clang-format off
@@ -424,6 +435,8 @@ TEST(StringTest, StrToValue_uint32)
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 TEST(StringTest, StrToValue_int64)
 {
@@ -461,6 +474,8 @@ TEST(StringTest, StrToValue_int64)
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(StringTest, StrToValue_uint64)
 {
     // clang-format off
@@ -496,6 +511,8 @@ TEST(StringTest, StrToValue_uint64)
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(StringTest, StrToValue_float)
 {
     // clang-format off
@@ -526,6 +543,8 @@ TEST(StringTest, StrToValue_float)
         }
     }
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 TEST(StringTest, StrToValue_double)
 {
@@ -558,6 +577,8 @@ TEST(StringTest, StrToValue_double)
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(StringTest, StrToUpper)
 {
     EXPECT_EQ(StrToUpper("foobar 123#%^"), std::string("FOOBAR 123#%^"));
@@ -565,11 +586,34 @@ TEST(StringTest, StrToUpper)
     EXPECT_EQ(StrToUpper("FooBar 123#%^"), std::string("FOOBAR 123#%^"));
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(StringTest, StrToLower)
 {
     EXPECT_EQ(StrToLower("foobar 123#%^"), std::string("foobar 123#%^"));
     EXPECT_EQ(StrToLower("FOOBAR 123#%^"), std::string("foobar 123#%^"));
     EXPECT_EQ(StrToLower("FooBar 123#%^"), std::string("foobar 123#%^"));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(StringTest, StrError)
+{
+    {
+        const auto str = StrError(EAGAIN);  // "Resource temporarily unavailable (11, EAGAIN)"
+        DEBUG("str: %s", str.c_str());
+        EXPECT_FALSE(str.empty());
+    }
+    {
+        const auto str = StrError(0);  // "Success (0, 0)"
+        DEBUG("str: %s", str.c_str());
+        EXPECT_FALSE(str.empty());
+    }
+    {
+        const auto str = StrError(-2);  // "Unknown error (-2, ?)"
+        DEBUG("str: %s", str.c_str());
+        EXPECT_FALSE(str.empty());
+    }
 }
 
 /* ****************************************************************************************************************** */

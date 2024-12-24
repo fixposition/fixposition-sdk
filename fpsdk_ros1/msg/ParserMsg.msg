@@ -1,3 +1,9 @@
+# ___    ___
+# \  \  /  /
+#  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+#  /  /\  \   License: see the LICENSE file
+# /__/  \__\
+#
 # Similar to a fpsdk::common::parser::ParserMsg
 
 time    stamp                     # Timestamp of message reception time

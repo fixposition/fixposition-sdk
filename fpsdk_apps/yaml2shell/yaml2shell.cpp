@@ -231,7 +231,7 @@ class YamlToShell
             try {
                 out_ = std::make_unique<std::ofstream>(opts_.output_, std::ios::binary);
                 if (!out_ || out_->fail()) {
-                    throw std::runtime_error(std::strerror(errno));
+                    throw std::runtime_error(StrError(errno).c_str());
                 }
             } catch (std::exception& ex) {
                 WARNING("Open %s fail: %s", opts_.output_.c_str(), ex.what());

@@ -67,6 +67,7 @@ message(STATUS "fpsdk: FP_ROS1_LIBRARIES=${FP_ROS1_LIBRARIES}")
 
 file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} msg/*.msg)
 
+# /opt/ros/noetic/share/genmsg/cmake/genmsg-extras.cmake
 add_message_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} FILES ${MSG_FILES})
 generate_messages(LANGS gencpp DEPENDENCIES std_msgs)
 
@@ -76,7 +77,7 @@ generate_messages(LANGS gencpp DEPENDENCIES std_msgs)
 file(GLOB CPP_FILES src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${CPP_FILES})
 
-#add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages)
 
 target_include_directories(${PROJECT_NAME}
     PUBLIC
@@ -170,6 +171,7 @@ install(
 include(../fpsdk_common/cmake/testing.cmake)
 
 add_gtest(TARGET bagwriter_test SOURCES test/bagwriter_test.cpp LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET msgs_test      SOURCES test/msgs_test.cpp      LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET utils_test     SOURCES test/utils_test.cpp     LINK_LIBS ${PROJECT_NAME})
 
 

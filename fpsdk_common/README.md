@@ -5,7 +5,7 @@ This library contains various common functionality. This is used for example by 
 ---
 ## Dependencies
 
-- [Fixposition SDK dependencies](../fpsdk_doc/README.md#dependencies)
+- [Fixposition SDK dependencies](../fpsdk_docs/README.md#dependencies)
 - This does *not* need any ROS
 
 

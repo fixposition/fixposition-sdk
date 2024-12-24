@@ -445,6 +445,20 @@ std::string StrToLower(const std::string& str)
     return res;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string StrError(const int errnum)
+{
+#if __GLIBC_PREREQ(2, 32)
+    const char* desc = strerrordesc_np(errnum);
+    const char* name = strerrorname_np(errnum);
+    return Sprintf("%s (%d, %s)", desc == NULL ? "Unknown error" : desc, errnum, name == NULL ? "?" : name);
+#else
+    char buf[1000];
+    return Sprintf("%s (%d)", strerror_r(errnum, buf, sizeof(buf)), errnum);
+#endif
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace string
 }  // namespace common

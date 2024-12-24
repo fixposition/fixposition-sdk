@@ -1,0 +1,695 @@
+/**
+ * \verbatim
+ * ___    ___
+ * \  \  /  /
+ *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+ *  /  /\  \   License: see the LICENSE file
+ * /__/  \__\
+ *
+ * Based on work by flipflip (https://github.com/phkehl)
+ * The information on message structures, IDs, descriptions etc. in this file are from publicly available data, such as:
+ * - NMEA 0183 (https://www.nmea.org/)
+ * - https://en.wikipedia.org/wiki/NMEA_0183
+ * - u-blox ZED-F9P Interface Description (HPG 1.50) (https://www.u-blox.com/en/docs/UBXDOC-963802114-12815),
+ *   copyright (c) 2024 u-blox AG
+ * \endverbatim
+ *
+ * @file
+ * @brief Fixposition SDK: Parser NMEA routines and types
+ */
+// clang-format off
+/**
+ * @page FPSDK_COMMON_PARSER_NMEA Parser NMEA routines and types
+ *
+ * **API**: fpsdk_common/parser/nmea.hpp and fpsdk::common::parser::nmea
+ *
+ * @fp_msgspec_begin{NMEA-Protocol}
+ *
+ * The NMEA framing and behaviour is defined by the NMEA 0183 standard (v4.11 and erratas).
+ *
+ * In NMEA speak messages are called *Sentences*. Frames (messages) are in this form:
+ *
+ * <code><b style="color: red;">$</b><b style="color: green;">Talker</b><b style="color: blue;">Formatter</b>,<em>field<sub>1</sub></em>,<em>field<sub>2</sub></em>,…,<em>field<sub>N</sub></em><b style="color: red;">\*CC</b><b style="color: red;">\\r\\n</b></code>
+ *
+ * Where:
+ *
+ * - The NMEA style framing:
+ *     - <code><b style="color: red;">\$</b></code>
+ *       -- Start character ("$", ASCII 36)
+ *     - <code><b style="color: red;">\*CC</b></code>
+ *       -- Checksum: "\*" (ASCII 42) and two digit XOR value of all payload
+ *       characters in captial hexadecimal notation, for example:
+ *       "FPX" = <code>'F' ^ 'P' ^ 'X' = 70 ^ 80 ^ 88 = 78 = 0x4e</code> = checksum <code>4E</code>
+ *     -  <code><b style="color: red;">\\r\\n</b></code>
+ *       -- Sentence termination characters (CR + LF, ASCII 13 + 10)
+ * - A <code><b style="color: green;">Talker</b></code> ID -- Two capital characters:
+ *     - `GP` -- Talker ID for GPS, also legacy resp. "compatibility"
+ *     - `GL` -- Talker ID for GLONASS
+ *     - `GA` -- Talker ID for Galileo
+ *     - `GB` -- Talker ID for BeiDou
+ *     - `GQ` -- Talker ID for QZSS
+ *     - `GI` -- Talker ID for NavIC (IRNSS)
+ *     - `GN` -- Talker ID for any combination of GNSS
+ * - A <code><b style="color: blue;">Formatter</b></code> ID -- Three capital characters, for example:
+ *     - `RMC` for the message containing recommended minimum specific GNSS data
+ *     - See the NMEA 0183 standard document for an extensive list
+ * - Data fields (payload)
+ *     - <code><em>field<sub>1</sub></em>,<em>field<sub>2</sub></em>,…,<em>field<sub>N</sub></em></code>
+ *       -- The structure of the message data is defined by the <code><b style="color: blue;">Formatter</b></code>.
+ *       Each field can contain all printable 7-bit ASCII characters (ASCII 32–126), excluding the
+ *       reserved characters `!` (ASCII 33), `$` (ASCII 36), `*` (ASCII 42), `,` (ASCII 44),
+ *       `\` (ASCII 92), `~` (ASCII 126).
+ * - Field separators
+ *     - All fields (identifier, message type, message version, data fields) are separated by a `,` (comma, ASCII 44)
+ * - Null fields
+ *     - Data fields can be _null_, meaning their value is absent to indicate that no data is
+ *         available. The data for null fields is the empty string. For example:
+ *         - Definition: <code>…,<em>field<sub>i</sub></em>,<em>field<sub>i+1</sub></em>,<em>field<sub>i+2</sub></em>,…</code>
+ *         - Values: <code><em>field<sub>i</sub></em></code> = 123, <code><em>field<sub>i+1</sub></em></code> = _null_,
+ *           <code><em>field<sub>i+2</sub></em></code> = 456
+ *         - Payload string: <code>…,123,,456,…</code>
+ * - Data field types:
+ *     - See the NMEA 0183 standard document for specifications
+ *
+ * @fp_msgspec_end
+ *
+ */
+// clang-format on
+#ifndef __FPSDK_COMMON_PARSER_NMEA_HPP__
+#define __FPSDK_COMMON_PARSER_NMEA_HPP__
+
+/* LIBC/STL */
+#include <array>
+#include <cstdint>
+#include <string>
+#include <vector>
+
+/* EXTERNAL */
+
+/* PACKAGE */
+
+namespace fpsdk {
+namespace common {
+namespace parser {
+/**
+ * @brief Parser NMEA routines and types
+ */
+namespace nmea {
+/* ****************************************************************************************************************** */
+
+static constexpr uint8_t NMEA_PREAMBLE = '$';      //!< NMEA framing preamble
+static constexpr std::size_t NMEA_FRAME_SIZE = 6;  //!< NMEA frame size ("$*cc\r\n")
+
+//! NMEA message meta data
+struct NmeaMessageMeta
+{
+    char talker_[3] = { 0 };      //!< Talker ID (for example, "GP", "GN" or "P"), nul-terminated string
+    char formatter_[20] = { 0 };  //!< Formatter (for example, "GGA", "RMC", or "UBX"), nul-terminated string
+    int payload_ix0_ = 0;         //!< Index (offset) for start of payload, 0 if no payload available
+    int payload_ix1_ = 0;         //!< Index (offset) for end of payload, 0 if no payload available
+};
+
+/**
+ * @brief Get NMEA message meta data
+ *
+ * @param[out]  meta      The meta data
+ * @param[in]   msg       Pointer to the NMEA message
+ * @param[in]   msg_size  Size of the NMEA message (>= 11)
+ *
+ * @note No check on the data provided is done. The caller must ensure that the data is a correct NMEA message.
+ *
+ * @returns true if the meta data was successfully extracted, false otherwise
+ */
+bool NmeaGetMessageMeta(NmeaMessageMeta& meta, const uint8_t* msg, const std::size_t msg_size);
+
+/**
+ * @brief Get NMEA message name
+ *
+ * Generates a name (string) in the form "NMEA-TALKER-FORMATTER" (for example, "NMEA-GP-GGA"). Some proprietary messages
+ * are recognised, for example, "NMEA-PUBX-POSITION".
+ *
+ * @param[out] name      String to write the name to
+ * @param[in]  size      Size of \c name (incl. nul termination)
+ * @param[in]  msg       Pointer to the NMEA message
+ * @param[in]  msg_size  Size of the \c msg
+ *
+ * @note No check on the data provided is done. The caller must ensure that the data is a valid NMEA message.
+ *
+ * @returns true if message name was generated, false if \c name buffer was too small
+ */
+bool NmeaGetMessageName(char* name, const std::size_t size, const uint8_t* msg, const std::size_t msg_size);
+
+/**
+ * @brief Get NMEA message info
+ *
+ * This stringifies the content of some NMEA messages, for debugging.
+ *
+ * @param[out] info      String to write the info to
+ * @param[in]  size      Size of \c name (incl. nul termination)
+ * @param[in]  msg       Pointer to the NMEA message
+ * @param[in]  msg_size  Size of the \c msg
+ *
+ * @note No check on the data provided is done. The caller must ensure that the data is a valid NMEA message.
+ *
+ * @returns true if message info was generated (even if info is empty), false if \c name buffer was too small
+ */
+bool NmeaGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size);
+
+/**
+ * @brief NMEA coordinates (integer degrees, float minutes and a sign for N/S resp. E/W)
+ */
+struct NmeaCoordinates
+{
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  degs    Decimal degrees
+     * @param[in]  digits  Number of digits (0-12), param clamped to range
+     */
+    NmeaCoordinates(const double degs, const int digits = 5);
+
+    int deg_;     //!< Integer degrees value, >= 0
+    double min_;  //!< Fractional minutes value, >= 0.0
+    bool sign_;   //!< false for negative (S or W), true for positive (N or E)
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief NMEA talker IDs
+ *
+ * @note Do not use <, >, >=, <= operators on this!
+ */
+enum class NmeaTalkerId : int
+{  // clang-format off
+    UNSPECIFIED = '?',  //!< Unspecified
+    PROPRIETARY = 'x',  //!< Proprietary
+    GPS_SBAS    = 'P',  //!< GPS and/or SBAS
+    GLO         = 'L',  //!< GLONASS
+    GAL         = 'A',  //!< GALILEO
+    BDS         = 'B',  //!< BeiDou
+    NAVIC       = 'I',  //!< NavIC
+    QZSS        = 'Q',  //!< QZSS
+    GNSS        = 'N',  //!< GNSS (multi-constellation)
+};  // clang-format on
+
+/**
+ * @brief NMEA-Gx-GGA quality indicator
+ *
+ * @note Do not use <, >, >=, <= operators on this!
+ */
+enum class NmeaQualityGga : int
+{  // clang-format off
+    UNSPECIFIED = '?',  //!< Unspecified
+    NOFIX       = '0',  //!< No fix
+    SPP         = '1',  //!< Autonomous GNSS fix
+    DGNSS       = '2',  //!< Differential GPS fix (e.g. with SBAS)
+    PPS         = '3',  //!< PPS mode
+    RTK_FIXED   = '4',  //!< RTK fixed
+    RTK_FLOAT   = '5',  //!< RTK float
+    ESTIMATED   = '6',  //!< Estimated (dead reckoning only)
+    MANUAL      = '7',  //!< Manual input mode
+    SIM         = '8',  //!< Simulator
+};  // clang-format on
+
+/**
+ * @brief  NMEA-Gx-GLL and NMEA-Gx-RMC status
+ *
+ * @note Do not use <, >, >=, <= operators on this!
+ */
+enum class NmeaStatusGllRmc : int
+{  // clang-format off
+    UNSPECIFIED  = '?',  //!< Unspecified
+    INVALID      = 'V',  //!< Data invalid
+    VALID        = 'A',  //!< Data valid
+ // DIFFERENTIAL = 'D',  // @todo another possible value?
+};  // clang-format on
+
+/**
+ * @brief NMEA-Gx-GLL and NMEA-Gx-VTG pos mode
+ *
+ * @note Do not use <, >, >=, <= operators on this!
+ */
+enum class NmeaModeGllVtg : int
+{  // clang-format off
+    UNSPECIFIED = '?',  //!< Unspecified
+    INVALID     = 'N',  //!< Invalid (no fix)
+    AUTONOMOUS  = 'A',  //!< Autonomous mode (SPP)
+    DGNSS       = 'D',  //!< Differential GNSS fix
+    ESTIMATED   = 'E',  //!< Estimated (dead reckoning only)
+    MANUAL      = 'M',  //!< Manual input mode
+    SIM         = 'S',  //!< Simulator mode
+};  // clang-format on
+
+/**
+ * @brief  NMEA-Gx-RMC and NMEA-Gx-GNS pos mode
+ *
+ * @note Do not use <, >, >=, <= operators on this!
+ */
+enum class NmeaModeRmcGns : int
+{  // clang-format off
+    UNSPECIFIED = '?',  //!< Unspecified
+    INVALID     = 'N',  //!< Invalid (no fix)
+    AUTONOMOUS  = 'A',  //!< Autonomous mode (SPP)
+    DGNSS       = 'D',  //!< Differential GNSS fix
+    ESTIMATED   = 'E',  //!< Estimated (dead reckoning only)
+    RTK_FIXED   = 'R',  //!< RTK fixed
+    RTK_FLOAT   = 'F',  //!< RTK float
+    PRECISE     = 'P',  //!< Precise
+    MANUAL      = 'M',  //!< Manual input mode
+    SIM         = 'S',  //!< Simulator mode
+};  // clang-format on
+
+/**
+ * @brief NMEA-Gx-RMC navigational status
+ *
+ * @note Do not use <, >, >=, <= operators on this!
+ */
+enum class NmeaNavStatusRmc : int
+{  // clang-format off
+    UNSPECIFIED = '?',  //!< Unspecified
+    SAFE        = 'S',  //!< Safe
+    CAUTION     = 'C',  //!< Caution
+    UNSAFE      = 'U',  //!< Unsafe
+    NA          = 'V',  //!< Equipment does not provide navigational status
+};  // clang-format on
+
+/**
+ * @brief NMEA-Gx-GNS operation mode
+ *
+ * @note Do not use <, >, >=, <= operators on this!
+ */
+enum class NmeaOpModeGsa : int
+{  // clang-format off
+    UNSPECIFIED = '?',  //!< Unspecified
+    MANUAL      = 'M',  //!< Manual
+    AUTO        = 'A',  //!< Automatic
+};  // clang-format on
+
+/**
+ * @brief NMEA-Gx-GNS nav mode
+ *
+ * @note Do not use <, >, >=, <= operators on this!
+ */
+enum class NmeaNavModeGsa : int
+{  // clang-format off
+    UNSPECIFIED = '?',  //!< Unspecified
+    NOFIX       = '1',  //!< No fix
+    FIX2D       = '2',  //!< 2D fix
+    FIX3D       = '3',  //!< 3D fix
+};  // clang-format on
+
+/**
+ * @brief NMEA system IDs
+ */
+enum class NmeaSystemId : int
+{  // clang-format off
+    UNSPECIFIED = '?',  //!< Unspecified
+    GPS_SBAS    = '1',  //!< GPS and/or SBAS
+    GLO         = '2',  //!< GLONASS
+    GAL         = '3',  //!< Galileo
+    BDS         = '4',  //!< BeiDou
+    QZSS        = '5',  //!< QZSS
+    NAVIC       = '6',  //!< NavIC
+};  // clang-format on
+
+/**
+ * @brief NMEA signal IDs
+ */
+enum class NmeaSignalId : int
+{  // clang-format off
+    UNSPECIFIED = '?',  //!< Unspecified
+    GPS_L1CA    = '1',  //!< GPS L1 C/A
+    GPS_L2CL    = '6',  //!< GPS L2 CL
+    GPS_L2CM    = '5',  //!< GPS L2 CM
+    GPS_L5I     = '7',  //!< GPS L5 I
+    GPS_L5Q     = '8',  //!< GPS L5 Q
+    SBAS_L1CA   = '1',  //!< SBAS L1 C/A
+    GAL_E1      = '7',  //!< Galileo E1
+    GAL_E5A     = '1',  //!< Galileo E5 A
+    GAL_E5B     = '2',  //!< Galileo E5 B
+    BDS_B1ID    = '1',  //!< BeiDou B1I D
+    BDS_B2ID    = 'B',  //!< BeiDou B2I D
+    BDS_B1C     = '3',  //!< BeiDou B1 C
+    BDS_B2A     = '5',  //!< BeiDou B2 a
+    QZSS_L1CA   = '1',  //!< QZSS L1 C/A
+    QZSS_L1S    = '4',  //!< QZSS L1S
+    QZSS_L2CM   = '5',  //!< QZSS L2 CM
+    QZSS_L2CL   = '6',  //!< QZSS L2 CL
+    QZSS_L5I    = '7',  //!< QZSS L5 I
+    QZSS_L5Q    = '8',  //!< QZSS L5 Q
+    GLO_L1OF    = '1',  //!< GLONASS L1 OF
+    GLO_L2OF    = '3',  //!< GLONASS L2 OF
+    NAVIC_L5A   = '5',  //!< NavIC L5 A
+};  // clang-format on
+
+/**
+ * @brief NMEA time (hour, minutes, seconds)
+ */
+struct NmeaTime
+{
+    bool valid = false;  //!< Data is valid
+    int hours = 0;       //!< Hours
+    int mins = 0;        //!< Minutes
+    double secs = 0.0;   //!< Seconds
+
+    bool operator==(const NmeaTime& rhs) const;  //!< Equal
+    bool operator!=(const NmeaTime& rhs) const;  //!< Not equal
+};
+
+/**
+ * @brief NMEA date (year, month, day)
+ */
+struct NmeaDate
+{
+    bool valid = false;  //!< Data is valid
+    int years = 0;       //!< Year
+    int months = 0;      //!< Month
+    int days = 0.0;      //!< Day
+
+    bool operator==(const NmeaDate& rhs) const;  //!< Equal
+    bool operator!=(const NmeaDate& rhs) const;  //!< Not equal
+};
+
+/**
+ * @brief NMEA geodetic position
+ */
+struct NmeaLlh
+{
+    bool latlon_valid = false;  //!< Latitude/longitude is valid
+    double lat = 0.0;           //!< Latitude [deg], >= 0.0 East, < 0.0 West
+    double lon = 0.0;           //!< Longitude [deg], >= 0.0 North, < 0.0 South
+    bool height_valid = false;  //!< Height is valid
+    double height = 0.0;        //!< Ellipsoidal (!) height [m]
+};
+
+/**
+ * @brief NMEA satellite (used, e.g. in GSA)
+ */
+struct NmeaSat
+{
+    bool valid = false;                               //!< Data is valid
+    NmeaSystemId system = NmeaSystemId::UNSPECIFIED;  //!< System ID
+    int svid = 0;                                     //!< Satellite ID (numbering cf. NMEA 0183)
+};
+
+/**
+ * @brief Constants for different versions of NMEA
+ */
+struct NmeaVersion
+{
+    const int svid_min_gps;  //!< Min GPS satellite ID
+    const int svid_max_gps;  //!< Max GPS satellite ID
+    const int svid_min_sbs;  //!< Min SBAS satellite ID
+    const int svid_max_sbs;  //!< Max SBAS satellite ID
+    const int svid_min_glo;  //!< Min GLONASS satellite ID
+    const int svid_max_glo;  //!< Max GLONASS satellite ID
+    const int svid_min_gal;  //!< Min Galileo satellite ID
+    const int svid_max_gal;  //!< Max Galileo satellite ID
+    const int svid_min_bds;  //!< Min BeiDou satellite ID
+    const int svid_max_bds;  //!< Max BeiDou satellite ID
+    const int svid_min_qzs;  //!< Min QZSS satellite ID
+    const int svid_max_qzs;  //!< Max QZSS satellite ID
+
+    static const NmeaVersion V410;          //!< Values for NMEA v4.10
+    static const NmeaVersion V410_UBX_EXT;  //!< Values for NMEA v4.10 extended (u-blox flavour)
+    static const NmeaVersion V411;          //!< Values for NMEA v4.11
+};
+
+/**
+ * NMEA satellite position (GSA)
+ */
+struct NmeaAzEl
+{
+    bool valid = false;                               //!< Data is valid
+    NmeaSystemId system = NmeaSystemId::UNSPECIFIED;  //!< System ID
+    int svid = 0;                                     //!< Satellite ID (numbering cf. NMEA 0183)
+    int el = 0;                                       //!< Elevation [deg] (-90..90)
+    int az = 0;                                       //!< Azimuth [deg] (0..360)
+};
+
+/**
+ * NMEA signal levels (GSA)
+ */
+struct NmeaCno
+{
+    bool valid = false;                               //!< Data valid
+    NmeaSystemId system = NmeaSystemId::UNSPECIFIED;  //!< System ID
+    int svid = 0;                                     //!< Satellite ID (numbering cf. NMEA 0183)
+    NmeaSignalId signal = NmeaSignalId::UNSPECIFIED;  //!< Signal ID
+    int cno = 0;                                      //!< Signal level [dBHz]
+};
+
+/**
+ * @brief NMEA integer value
+ */
+struct NmeaInt
+{
+    bool valid = false;  //!< Data is valid
+    int value = 0;       //!< Value
+};
+
+/**
+ * @brief NMEA float value
+ */
+struct NmeaFloat
+{
+    bool valid = false;  //!< Data is valid
+    double value = 0;    //!< Value
+};
+
+/**
+ * @brief NMEA-Gx-GGA message payload
+ */
+struct NmeaGgaPayload
+{
+    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;       //!< Talker
+    NmeaTime time;                                         //!< Time
+    NmeaLlh llh;                                           //!< Position
+    NmeaQualityGga quality = NmeaQualityGga::UNSPECIFIED;  //!< Fix quality
+    NmeaInt num_sv;                                        //!< Number of satellites used (may be limited to 12)
+    NmeaFloat hdop;                                        //!< Horizontal dilution of precision (only with valid fix)
+    NmeaFloat diff_age;                                    //!< Differential data age (optional, NMEA 4.11 only)
+    NmeaInt diff_sta;                                      //!< Differential station ID (optional, NMEA 4.11 only)
+
+    /**
+     * @brief Set data from sentence
+     *
+     * @param[in]   msg       Pointer to the NMEA message
+     * @param[in]   msg_size  Size of the NMEA message (>= 11)
+     *
+     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+};
+
+/**
+ * @brief NMEA-Gx-GLL message payload
+ */
+struct NmeaGllPayload
+{
+    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;          //!< Talker
+    NmeaLlh llh;                                              //!< Position
+    NmeaTime time;                                            //!< Time
+    NmeaStatusGllRmc status = NmeaStatusGllRmc::UNSPECIFIED;  //!< Positioning system status
+    NmeaModeGllVtg mode = NmeaModeGllVtg::UNSPECIFIED;        //!< Positioning system mode
+
+    /**
+     * @brief Set data from sentence
+     *
+     * @param[in]   msg       Pointer to the NMEA message
+     * @param[in]   msg_size  Size of the NMEA message (>= 11)
+     *
+     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+};
+
+/**
+ * @brief NMEA-Gx-RMC message payload
+ */
+struct NmeaRmcPayload
+{
+    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;             //!< Talker
+    NmeaTime time;                                               //!< Time
+    NmeaStatusGllRmc status = NmeaStatusGllRmc::UNSPECIFIED;     //!< Positioning system status
+    NmeaLlh llh;                                                 //!< Position
+    NmeaFloat speed;                                             //!< Speed over ground [knots]
+    NmeaFloat course;                                            //!< Course over ground w.r.t. True North [deg]
+    NmeaDate date;                                               //!< Date
+    NmeaModeRmcGns mode = NmeaModeRmcGns::UNSPECIFIED;           //!< positioning system mode indicator
+    NmeaNavStatusRmc navstatus = NmeaNavStatusRmc::UNSPECIFIED;  //!< Navigational status
+    /**
+     * @brief Set data from sentence
+     *
+     * @param[in]   msg       Pointer to the NMEA message
+     * @param[in]   msg_size  Size of the NMEA message (>= 11)
+     *
+     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+};
+
+/**
+ * @brief NMEA-Gx-VTG message payload
+ */
+struct NmeaVtgPayload
+{
+    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;  //!< Talker
+    NmeaFloat cogt;                                   //!< Course over ground (true) [deg]
+    NmeaFloat sogn;                                   //!< Speed over ground [knots]
+    NmeaFloat sogk;                                   //!< Speed over ground [km/h]
+    NmeaModeGllVtg mode;                              //!< Positioning system mode
+
+    /**
+     * @brief Set data from sentence
+     *
+     * @param[in]   msg       Pointer to the NMEA message
+     * @param[in]   msg_size  Size of the NMEA message (>= 11)
+     *
+     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+};
+
+/**
+ * @brief NMEA-Gx-GSA message payload (NMEA 4.11 only!)
+ */
+struct NmeaGsaPayload
+{
+    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;       //!< Talker
+    NmeaOpModeGsa opmode = NmeaOpModeGsa::UNSPECIFIED;     //!< Operation mode
+    NmeaNavModeGsa navmode = NmeaNavModeGsa::UNSPECIFIED;  //!< Nav mode
+    std::array<NmeaSat, 12> sats;                          //!< Satellites, valid ones are 0..(num_sats-1)
+    int num_sats = 0;                                      //!< Number of valid sats (the first n of sats[])
+    NmeaFloat pdop;                                        //!< PDOP
+    NmeaFloat hdop;                                        //!< HDOP
+    NmeaFloat vdop;                                        //!< VDOP
+    NmeaSystemId system = NmeaSystemId::UNSPECIFIED;       //!< System ID
+
+    /**
+     * @brief Set data from sentence
+     *
+     * @param[in]   msg       Pointer to the NMEA message
+     * @param[in]   msg_size  Size of the NMEA message (>= 11)
+     *
+     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+};
+
+/**
+ * @brief NMEA-Gx-GSV message payload (NMEA 4.11 only!)
+ */
+struct NmeaGsvPayload
+{
+    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;  //!< Talker
+    NmeaInt num_msgs;                                 //!< Number of messages in this GSV sequence (for this signal ID)
+    NmeaInt msg_num;                                  //!< Message number in sequence (1...num_msgs)
+    NmeaInt tot_num_sat;                              //!< Number of sat/sig info in the whole sequence of GSV messages
+    std::array<NmeaAzEl, 4> azels;                    //!< Satellite positions, valid ones are 0..(num_sats-1)
+    int num_azels = 0;                                //!< Number of valid satellite positions (the first n of azels[])
+    std::array<NmeaCno, 4> cnos;                      //!< Signal levels, valid ones are 0..(num_sats-1)
+    int num_cnos = 0;                                 //!< Number of valid signal levels (the first n of azels[])
+    NmeaSystemId system;                              //!< System ID
+    NmeaSignalId signal;                              //!< Signal ID
+
+    /**
+     * @brief Set data from sentence
+     *
+     * @param[in]   msg       Pointer to the NMEA message
+     * @param[in]   msg_size  Size of the NMEA message (>= 11)
+     *
+     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Collector for NMEA-Gx-GSA and NMEA-Gx-GPA
+ */
+struct NmeaCollectGsaGsv
+{
+    /**
+     * @brief Satellite info
+     */
+    struct Sat
+    {
+        NmeaSystemId system_ = NmeaSystemId::UNSPECIFIED;  //!< System ID
+        int svid_ = 0;                                     //!< Satellite ID (numbering cf. NMEA 0183)
+        int az_ = 0;                                       //!< Azimuth [deg] (0..360)
+        int el_ = 0;                                       //!< Elevation [deg] (-90..90)
+    };
+
+    /**
+     * Signal info
+     */
+    struct Sig
+    {
+        NmeaSystemId system_ = NmeaSystemId::UNSPECIFIED;  //!< System ID
+        int svid_ = 0;                                     //!< Satellite ID (numbering cf. NMEA 0183)
+        NmeaSignalId signal_ = NmeaSignalId::UNSPECIFIED;  //!< Signal ID
+        double cno_ = 0.0;                                 //!< Signal level [dBHz]
+        bool used_ = false;                                //!< Signal is used in navigation
+    };
+
+    std::vector<Sat> sats_;  //!< Collected satellite info
+    std::vector<Sig> sigs_;  //!< Collected signal info
+
+    /**
+     * @brief Add NMEA-GN-GSA message to collection
+     *
+     * These must be provided in order and completely, and before the GSV messages.
+     *
+     * @param[in]  gsa  Decoded message payload
+     *
+     * @returns true if the message was accepted, false otherwise
+     */
+    bool AddGsa(const NmeaGsaPayload& gsa);
+
+    /**
+     * @brief Add NMEA-Gx-GSV message to collection
+     *
+     * These must be provided in order and completely, and after the GSA messages.
+     *
+     * @param[in]  gsv  Decoded message payload
+     *
+     * @returns true if the message was accepted, false otherwise
+     */
+    bool AddGsv(const NmeaGsvPayload& gsv);
+
+    /**
+     * @brief Complete collection after feeding all GSA and GSV messages
+     */
+    void Complete();
+
+    /**
+     * @brief Add NMEA-GN-GSA and NMEA-Gx-GSV messages to collection
+     *
+     * Does all of AddGsa(), AddGsv() and Complete() in one call.
+     *
+     * @param[in]  gsas  All decoded message payloads, complete and in order
+     * @param[in]  gsvs  All decoded message payloads, complete and in order
+     *
+     * @returns true if all messages were collected successfully
+     */
+    bool AddGsaAndGsv(const std::vector<NmeaGsaPayload>& gsas, const std::vector<NmeaGsvPayload>& gsvs);
+
+   private:
+    std::vector<NmeaSat> gsa_sats_;  //!< Satellites used
+};
+
+/* ****************************************************************************************************************** */
+}  // namespace nmea
+}  // namespace parser
+}  // namespace common
+}  // namespace fpsdk
+#endif  // __FPSDK_COMMON_PARSER_NMEA_HPP__

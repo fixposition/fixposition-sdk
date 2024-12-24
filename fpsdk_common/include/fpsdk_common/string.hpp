@@ -354,6 +354,18 @@ std::string StrToUpper(const std::string& str);
  */
 std::string StrToLower(const std::string& str);
 
+/**
+ * @brief Stringify glibc error
+ *
+ * This works much like strerror(3), but is a bit more detailed adding the errnum value and name to the description. For
+ * example: StrError(EAGAIN) returns "Resource temporarily unavailable (11, EAGAIN)".
+ *
+ * @param[in]  errnum  The error number, see errno(3)
+ *
+ * @returns a string describing the error
+ */
+std::string StrError(const int errnum);
+
 /* ****************************************************************************************************************** */
 }  // namespace string
 }  // namespace common

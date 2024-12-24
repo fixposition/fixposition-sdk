@@ -63,11 +63,19 @@ endif()
 
 # EXECUTABLES ==========================================================================================================
 
+file(GLOB COMMON_CPP_FILES common/*.cpp)
+
 file(GLOB FPLTOOL_CPP_FILES fpltool/*.cpp)
 add_executable(fpltool ${FPLTOOL_CPP_FILES})
 target_link_libraries(fpltool
     fpsdk_common
     $<$<BOOL:${FP_USE_ROS1}>:fpsdk_ros1>
+)
+
+file(GLOB PARSERTOOL_CPP_FILES parsertool/*.cpp)
+add_executable(parsertool ${PARSERTOOL_CPP_FILES} ${COMMON_CPP_FILES})
+target_link_libraries(parsertool
+    fpsdk_common
 )
 
 file(GLOB TIMECONV_CPP_FILES timeconv/*.cpp)
@@ -91,7 +99,7 @@ set(PROJECT_LIBRARY_DIR ${CMAKE_INSTALL_FULL_LIBDIR})
 set(PROJECT_INCLUDE_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME})
 set(PROJECT_DATA_DIR    ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME})
 
-install(TARGETS fpltool timeconv yaml2shell
+install(TARGETS fpltool parsertool timeconv yaml2shell
     EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION ${PROJECT_LIBRARY_DIR}
     RUNTIME DESTINATION ${PROJECT_RUNTIME_DIR}

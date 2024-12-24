@@ -173,7 +173,7 @@ $(BUILD_DIR)/.make-uid: | $(BUILD_DIR)
 .PHONY: cmake
 cmake: $(BUILD_DIR)/.make-cmake
 
-deps = $(sort $(wildcard CMakeList.txt Makefile fpsdk_doc/* Doxyfile \
+deps = $(sort $(wildcard CMakeList.txt Makefile fpsdk_doc/* \
     fpsdk_common/* fpsdk_common/*/* fpsdk_common/*/*/* fpsdk_common/*/*/*/* \
     fpsdk_ros1/* fpsdk_ros1/*/* fpsdk_ros1/*/*/* fpsdk_ros1/*/*/*/* \
     fpsdk_ros2/* fpsdk_ros2/*/* fpsdk_ros2/*/*/* fpsdk_ros2/*/*/*/* \
@@ -222,14 +222,15 @@ endif
 .PHONY: doc
 doc: $(BUILD_DIR)/.make-doc
 
-$(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-cmake
+$(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-cmake fpsdk_doc/Doxyfile
 	@echo "$(HLW)***** Doc ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)( \
-            cat Doxyfile; \
+            cat fpsdk_doc/Doxyfile; \
             echo "PROJECT_NUMBER = $$(cat $(BUILD_DIR)/FP_VERSION_STRING || echo 'unknown revision')"; \
             echo "OUTPUT_DIRECTORY = $(BUILD_DIR)"; \
         ) | $(DOXYGEN) -
 	$(V)$(TOUCH) $@
+	@echo "now run: xdg-open $(BUILD_DIR)/doc/index.html"
 
 # ----------------------------------------------------------------------------------------------------------------------
 

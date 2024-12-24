@@ -48,33 +48,6 @@ constexpr typename std::underlying_type<T>::type EnumToVal(T enum_val)
     return static_cast<typename std::underlying_type<T>::type>(enum_val);
 }
 
-/**
- * @brief GNSS fix types
- */
-enum class GnssFixType : int8_t  // clang-format off
-{
-    FIX_UNKNOWN        =  0,  //!< Unknown fix
-    FIX_NOFIX          =  1,  //!< No fix
-    FIX_DRONLY         =  2,  //!< Dead-reckoning only fix
-    FIX_TIME           =  3,  //!< Time only fix
-    FIX_2D             =  4,  //!< 2D fix
-    FIX_3D             =  5,  //!< 3D fix
-    FIX_3D_DR          =  6,  //!< 3D + dead-reckoning fix
-    FIX_RTK_FLOAT      =  7,  //!< RTK float fix (implies 3D fix)
-    FIX_RTK_FIXED      =  8,  //!< RTK fixed fix (implies 3D fix)
-    FIX_RTK_FLOAT_DR   =  9,  //!< RTK float fix + dead-reckoning (implies 3D_DR fix)
-    FIX_RTK_FIXED_DR   = 10,  //!< RTK fixed fix + dead-reckoning (implies 3D_DR fix)
-};  // clang-format on
-
-/**
- * @brief Stringify GNSS fix type
- *
- * @param[in]  fix_type  The fix type
- *
- * @returns a concise and unique string for the fix types, "?" for bad values
- */
-const char* GnssFixTypeStr(const GnssFixType fix_type);
-
 /* ****************************************************************************************************************** */
 }  // namespace types
 }  // namespace common
