@@ -24,7 +24,7 @@ namespace timeconv {
 /* ****************************************************************************************************************** */
 
 /*!
-    @page FPSDK_APPS_TIMECONV Time tool
+    @page FPSDK_APPS_TIMECONV Time conversion tool
 
     @section FPSDK_APPS_TIMECONV_OVERVIEW Overview
 

@@ -33,7 +33,7 @@ services:
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
             # Workspace
-            - ../.:/home/fpsdk/fixposition_utility
+            - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
           - SYS_PTRACE # Set kernel.yama.ptrace_scope = 0 in /etc/sysctl.d/10-ptrace.conf
         hostname: fpsdk-bookworm-dev-${USER}
@@ -68,7 +68,7 @@ services:
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
-            - ../.:/home/fpsdk/fixposition_utility
+            - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
           - SYS_PTRACE
         hostname: fpsdk-noetic-dev-${USER}
@@ -102,7 +102,7 @@ services:
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
-            - ../.:/home/fpsdk/fixposition_utility
+            - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
           - SYS_PTRACE
         hostname: fpsdk-humble-dev-${USER}
@@ -134,7 +134,7 @@ services:
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
-            - ../.:/home/fpsdk/fixposition_utility
+            - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
           - SYS_PTRACE
         hostname: fpsdk-jazzy-dev-${USER}

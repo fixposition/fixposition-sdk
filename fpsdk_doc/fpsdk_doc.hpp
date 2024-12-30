@@ -40,7 +40,7 @@ namespace fpsdk {
 
     @section FP_REFS References
 
-    - Fixposition SDK source code repository: https://github.com/fixposition/fixposition_utility
+    - Fixposition SDK source code repository: https://github.com/fixposition/fixposition-sdk
 
     @section FPSDK_LICENSE Licenses
 

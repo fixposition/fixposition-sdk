@@ -1,23 +1,13 @@
-# Fixposition Utilities and SDK
+# Fixposition SDK for Linux
 
-This is a collection of utilities that may be useful to use with Fixposition products.
-The SDK part of this repo refers to C++ libraries and apps.
+[![CI](https://github.com/fixposition/fixposition-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/fixposition/fixposition-sdk/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/Documentation-781808)](https://fixposition.github.io/fixposition-sdk/fixposition-sdk-docs)
 
----
-## Utilities
+The Fixposition SDK consists of C++ libraries and apps for using Fixposition products with Linux.
 
-- [Software Update](software_update/README.md)
-- [Recording utilities](record/README.md)
-
-
----
-## SDK
-
-- [Fixposition SDK](fpsdk_doc/README.md)
-
+See the [fpsdk_doc/README.md](fpsdk_doc/README.md) for details.
 
 ---
 ## License
 
-Unless otherwise noted, the content of this project is licensed under the MIT License.
-See the [LICENSE](LICENSE) file for details.
+See [fpsdk_doc/README.md#license](fpsdk_doc/README.md#license) for details.

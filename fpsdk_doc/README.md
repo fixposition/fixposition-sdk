@@ -1,7 +1,7 @@
-# Fixposition SDK
+# Fixposition SDK for Linux
 
-[![CI](https://github.com/fixposition/fixposition_utility/actions/workflows/ci.yml/badge.svg)](https://github.com/fixposition/fixposition_utility/actions/workflows/ci.yml)
-[![Docs](https://img.shields.io/badge/Documentation-781808)](https://fixposition.github.io/fixposition_utility/fixposition-sdk-docs)
+[![CI](https://github.com/fixposition/fixposition-sdk/actions/workflows/ci.yml/badge.svg)](https://github.com/fixposition/fixposition-sdk/actions/workflows/ci.yml)
+[![Docs](https://img.shields.io/badge/Documentation-781808)](https://fixposition.github.io/fixposition-sdk/fixposition-sdk-docs)
 
 ---
 ## Overview
@@ -36,7 +36,7 @@ For development additionally:
 - Doxygen      (≥ 1.11.0, tested with 1.11.0)
 - GTest        (≥ 1.12.0, tested with 1.12.1 and 1.13.0)
 
-<img src="fpsdk-overview.drawio.svg" width="400">
+<img src="fpsdk-overview.drawio.svg" width="600">
 
 ---
 ## Building
@@ -130,11 +130,11 @@ systems. Refer to the [Docker configration files and scripts](./docker) on insta
 
 Alternatively, you can do `catkin build fpsdk_apps` in your ROS workspace.
 
-The packages can be built individually. See the instructions in the [fpsdk_common](fpsdk_common/README.md),
-[fpsdk_ros1](fpsdk_ros1/README.md) and [fpsdk_apps](fpsdk_apps/README.md) packages.
+The packages can be built individually. See the instructions in the [fpsdk_common](../fpsdk_common/README.md),
+[fpsdk_ros1](../fpsdk_ros1/README.md) and [fpsdk_apps](../fpsdk_apps/README.md) packages.
 
-Refer to the CI workflow configuration ([ci.yaml](./.github/workflows/ci.yml)) and the CI script
-([ci.sh](./docker/ci.sh)) for more options, such as different build configurations or running tests.
+Refer to the CI workflow configuration ([ci.yaml](../.github/workflows/ci.yml)) and the CI script
+([ci.sh](../docker/ci.sh)) for more options, such as different build configurations or running tests.
 
 
 ## Documentation
@@ -147,5 +147,6 @@ make doc INSTALL_PREFIX=dummy BUILD_TYPE=Release
 ---
 ## License
 
-Unless otherwise noted, the content of this project is licensed under the MIT License.
-See the [LICENSE](LICENSE) file for details.
+See the LICENSE files: [LICENSE](LICENSE), [fpsdk_common/LICENSE](../fpsdk_common/LICENSE),
+[fpsdk_ros1/LICENSE](../fpsdk_ros1/LICENSE), [fpsdk_ros2/LICENSE](../fpsdk_ros2/LICENSE),
+[fpsdk_apps/LICENSE](../fpsdk_apps/LICENSE).

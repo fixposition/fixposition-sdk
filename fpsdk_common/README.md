@@ -1,11 +1,11 @@
 # Fixposition SDK: Common Library
 
-This library contains various common functionality. This is used for example by the [fpsdk_apps](../fpsdk_apps/README).
+This library contains various common functionality. This is used for example by the [fpsdk_apps](../fpsdk_apps/README.md).
 
 ---
 ## Dependencies
 
-- [Fixposition SDK dependencies](../fpsdk_docs/README.md#dependencies)
+- [Fixposition SDK dependencies](../fpsdk_doc/README.md#dependencies)
 - This does *not* need any ROS
 
 
@@ -33,4 +33,4 @@ catkin build fpsdk_common
 ---
 ## License
 
-MIT, see [LICENSE](LICENSE)
+See the [LICENSE](LICENSE) file and [../fpsdk_doc/README.md#license](../fpsdk_doc/README.md#license).

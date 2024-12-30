@@ -6,7 +6,7 @@ import os, sys, glob, time
 print("\n\n----------- gdbinit ---------")
 print('Using Python ' + ' '.join([sys.executable] + sys.version.split('\n')))
 sys.path.insert(0, '/usr/share/gcc/python')
-sys.path.insert(0, '/home/fpsdk/fixposition_utility/.devcontainer/.gdb')
+sys.path.insert(0, '/home/fpsdk/fixposition-sdk/.devcontainer/.gdb')
 sys.path.insert(0, os.getcwd() + '/.devcontainer/.gdb')
 #/usr/share/gcc/python/libstdcxx
 
