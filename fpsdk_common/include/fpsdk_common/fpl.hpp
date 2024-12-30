@@ -309,7 +309,7 @@ struct LogStatus
     uint32_t log_time_posix_;   //!< Approximate time
     std::string log_time_iso_;  //!< Approximate time
     int8_t pos_source_;         //!< Approximate sensor position source (see POS_SOURCE_... below)
-    int8_t pos_fix_type_;       //!< Approximate sensor position fix type (see fpsdk::common::types::GnssFixType)
+    int8_t pos_fix_type_;       //!< Approximate sensor position fix type (see fpsdk::common::gnss::GnssFixType)
     double pos_lat_;            //!< Approximate sensor position latitude [deg]
     double pos_lon_;            //!< Approximate sensor position longitude [deg]
     double pos_height_;         //!< Approximate sensor position height [m]

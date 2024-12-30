@@ -1068,7 +1068,7 @@ TEST(TimeTest, Time_Clock)
     if (adjtimex(&tx) == TIME_OK) {
         tx_tai = tx.tai;
     } else {
-        WARNING("adjtimex() fail: %s", strerror(errno));
+        WARNING("adjtimex() fail: %s", fpsdk::common::string::StrError(errno).c_str());
     }
     DEBUG("tx_tai=%d", tx_tai);
 

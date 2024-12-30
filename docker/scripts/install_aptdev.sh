@@ -14,6 +14,7 @@ fi
 # List of packages, with filter for the different images we make
 packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    ack
+    noetic.humble.jazzy.bookworm    aptitude
     noetic.humble.jazzy.bookworm    bash-completion
     noetic.humble.jazzy.bookworm    bind9-dnsutils
     noetic.humble.jazzy.bookworm    bsdmainutils
@@ -48,6 +49,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    manpages-posix-dev
     noetic.humble.jazzy.bookworm    moreutils
     noetic.humble.jazzy.bookworm    ncdu
+    noetic.humble.jazzy.bookwork    net-tools
     noetic.humble...............    netcat
     ..............jazzy.bookworm    netcat-openbsd
     noetic.humble.jazzy.bookworm    openssh-client

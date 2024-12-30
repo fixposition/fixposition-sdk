@@ -156,6 +156,14 @@ namespace logging {
 // clang-format on
 ///@}
 
+#if !defined(NDEBUG) || defined(_DOXYGEN_)  // Only for non-Release builds
+//! Conditional compilation for non-Release builds
+#  define IF_TRACE(...) __VA_ARGS__
+#else
+#  define IF_TRACE(...) /* nothing */
+#endif
+// Note: for other levels use LoggingIsLevel()
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
@@ -313,7 +321,7 @@ void LoggingPrint(const LoggingLevel level, const char* fmt, ...) PRINTF_ATTR(2)
  * @param[in]  fmt     printf() style format string (for a first line to print), can be NULL to omit
  * @param[in]  ...     Arguments to the format string
  */
-void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const uint64_t size, const char* prefix,
+void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const std::size_t size, const char* prefix,
     const char* fmt, ...) PRINTF_ATTR(5);
 
 // Helper macros

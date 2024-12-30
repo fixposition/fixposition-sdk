@@ -5,7 +5,7 @@ This contains various apps (tools, utilities). See below for details.
 ---
 ## Dependencies
 
-- [Fixposition SDK dependencies](../README.md#dependencies)
+- [Fixposition SDK dependencies](../fpsdk_docs/README.md#dependencies)
 - [fpsdk_common](../fpsdk_common/README.md)
 - [fpsdk_ros1](../fpsdk_common/README.md) -- optional, but recommended, and required for some functionality
 

@@ -67,7 +67,7 @@ include_directories(include
 
 # SHARED LIBRARY =======================================================================================================
 
-file(GLOB CPP_FILES src/*.cpp)
+file(GLOB CPP_FILES src/*.cpp src/parser/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${CPP_FILES})
 
 if (FP_USE_PROJ)
@@ -172,8 +172,19 @@ include(cmake/testing.cmake)
 add_gtest(TARGET app_test             SOURCES test/app_test.cpp             LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET fpl_test             SOURCES test/fpl_test.cpp             LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET logging_test         SOURCES test/logging_test.cpp         LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET gnss_test            SOURCES test/gnss_test.cpp            LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET math_test            SOURCES test/math_test.cpp            LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET parser_test          SOURCES test/parser_test.cpp          LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET parser_crc_test      SOURCES test/parser_crc_test.cpp      LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET parser_fpa_test      SOURCES test/parser_fpa_test.cpp      LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET parser_fpb_test      SOURCES test/parser_fpb_test.cpp      LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET parser_nmea_test     SOURCES test/parser_nmea_test.cpp     LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET parser_novb_test     SOURCES test/parser_novb_test.cpp     LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET parser_rtcm3_test    SOURCES test/parser_rtcm3_test.cpp    LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET parser_spartn_test   SOURCES test/parser_spartn_test.cpp   LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET parser_types_test    SOURCES test/parser_types_test.cpp    LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET parser_ubx_test      SOURCES test/parser_ubx_test.cpp      LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET parser_unib_test     SOURCES test/parser_unib_test.cpp     LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET path_test            SOURCES test/path_test.cpp            LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET stream_test          SOURCES test/stream_test.cpp          LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET string_test          SOURCES test/string_test.cpp          LINK_LIBS ${PROJECT_NAME})

@@ -72,7 +72,7 @@ bool OutputFile::Open(const std::string& path)
         fh_ = std::make_unique<std::ofstream>(path, std::ios::binary);
     }
     if (fh_->fail()) {
-        WARNING("OutputFile: open fail %s: %s", path.c_str(), std::strerror(errno));
+        WARNING("OutputFile: open fail %s: %s", path.c_str(), string::StrError(errno).c_str());
         fh_.reset();
         return false;
     }
@@ -106,7 +106,7 @@ bool OutputFile::Write(const uint8_t* data, const std::size_t size)
     bool ok = true;
     fh_->write((const char*)data, size);
     if (fh_->fail()) {
-        WARNING("OutputFile: write fail %s: %s", path_.c_str(), std::strerror(errno));
+        WARNING("OutputFile: write fail %s: %s", path_.c_str(), string::StrError(errno).c_str());
         ok = false;
     }
     return ok;
@@ -118,7 +118,7 @@ bool FileSlurp(const std::string& path, std::vector<uint8_t>& data)
 {
     std::ifstream fh(path, std::ios::binary);
     if (fh.fail()) {
-        WARNING("FileSlurp: fail open %s: %s", path.c_str(), std::strerror(errno));
+        WARNING("FileSlurp: fail open %s: %s", path.c_str(), string::StrError(errno).c_str());
         return false;
     }
 
@@ -129,7 +129,7 @@ bool FileSlurp(const std::string& path, std::vector<uint8_t>& data)
     }
     bool ok = true;
     if (!fh.eof() && fh.fail()) {
-        WARNING("FileSlurp: fail read %s: %s", path.c_str(), std::strerror(errno));
+        WARNING("FileSlurp: fail read %s: %s", path.c_str(), string::StrError(errno).c_str());
         ok = false;
     }
 
@@ -143,14 +143,14 @@ bool FileSpew(const std::string& path, const std::vector<uint8_t>& data)
 {
     std::ofstream fh(path, std::ios::binary);
     if (fh.fail()) {
-        WARNING("FileSpew: fail open %s: %s", path.c_str(), std::strerror(errno));
+        WARNING("FileSpew: fail open %s: %s", path.c_str(), string::StrError(errno).c_str());
         return false;
     }
 
     fh.write((const char*)data.data(), data.size());
     bool ok = true;
     if (fh.fail()) {
-        WARNING("FileSlurp: fail write %s: %s", path.c_str(), std::strerror(errno));
+        WARNING("FileSlurp: fail write %s: %s", path.c_str(), string::StrError(errno).c_str());
         ok = false;
     }
 

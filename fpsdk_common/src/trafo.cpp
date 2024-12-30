@@ -33,20 +33,6 @@ namespace trafo {
 using namespace fpsdk::common::math;
 using namespace fpsdk::common::string;
 
-/**
- * @details
- *
- * \f[
- *
- * \text{Rotate a vector from ECEF to ENU:} \\
- * V_{ENU} = M \cdot V_{ECEF} \\
- * \text{Rotate a covariance matrix from ECEF to ENU:} \\
- * Cov_{ENU} = M \cdot Cov_{ECEF} \cdot M^{T} \\
- *
- * \f]
- *
- * Reference https://gssc.esa.int/navipedia/index.php/Transformations_between_ECEF_and_ENU_coordinates
- */
 Eigen::Matrix3d RotEnuEcef(const double lat, const double lon)
 {
     const double s_lon = sin(lon);
@@ -72,18 +58,6 @@ Eigen::Matrix3d RotEnuEcef(const double lat, const double lon)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-/**
- * @details
- *
- * \f[
- *
- * \text{Rotate a vector from ECEF to ENU:} \\
- * V_{ENU} = M \cdot V_{ECEF} \\
- * \text{Rotate a covariance matrix from ECEF to ENU:} \\
- * Cov_{ENU} = M \cdot Cov_{ECEF} \cdot M^{T} \\
- *
- * \f]
- */
 Eigen::Matrix3d RotEnuEcef(const Eigen::Vector3d& ecef)
 {
     const Eigen::Vector3d wgs84llh = TfWgs84LlhEcef(ecef);

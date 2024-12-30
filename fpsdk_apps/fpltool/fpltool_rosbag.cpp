@@ -24,7 +24,7 @@
 #include <fpsdk_common/string.hpp>
 #ifdef FP_USE_ROS1
 #  include <fpsdk_ros1/bagwriter.hpp>
-#  include <fpsdk_ros1/ext/ros_msgs.hpp>
+#  include <fpsdk_ros1/msgs.hpp>
 #endif
 
 /* PACKAGE */
@@ -90,7 +90,7 @@ bool DoRosbag(const FplToolOptions& opts)
 
     // Prepare message for stream messages
     fpsdk_ros1::ParserMsg stream_msg_ros;
-    stream_msg_ros.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_UNSPECIFIED;
+    stream_msg_ros.protocol = fpsdk::ros1::msgs::ParserMsg::PROTOCOL_UNSPECIFIED;
     stream_msg_ros.seq = 0;
 
     // Handle SIGINT (C-c) to abort nicely

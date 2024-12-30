@@ -127,7 +127,7 @@ void Thread::_Thread()
     try {
         func_(this, arg_);
     } catch (const std::exception& e) {
-        WARNING("%s thread crash: %s", name_.c_str(), e.what());
+        WARNING("%s thread unhandled exception: %s", name_.c_str(), e.what());
     }
 
     // Run optional user cleanup function

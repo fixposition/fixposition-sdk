@@ -196,7 +196,8 @@
             "expected": "cpp",
             "format": "cpp",
             "stdfloat": "cpp",
-            "*.ipp": "cpp"
+            "*.ipp": "cpp",
+            "forward_list": "cpp"
         },
         "workbench.remoteIndicator.showExtensionRecommendations": true,
         "yaml.extension.recommendations": false

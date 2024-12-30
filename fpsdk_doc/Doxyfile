@@ -1033,7 +1033,8 @@ EXCLUDE_SYMBOLS        =
 
 EXAMPLE_PATH           = fpsdk_doc \
                          fpsdk_common  fpsdk_common/doc \
-                         fpsdk_ros1    fpsdk_ros1/doc \
+                         fpsdk_ros1    fpsdk_ros1/doc      fpsdk_ros1/msg \
+                         fpsdk_ros2    fpsdk_ros2/doc \
                          fpsdk_apps    fpsdk_apps/doc
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
@@ -2346,7 +2347,7 @@ MACRO_EXPANSION        = NO
 # The default value is: NO.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-EXPAND_ONLY_PREDEF     = NO
+EXPAND_ONLY_PREDEF     = YES
 
 # If the SEARCH_INCLUDES tag is set to YES, the include files in the
 # INCLUDE_PATH will be searched if a #include is found.

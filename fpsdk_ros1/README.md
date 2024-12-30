@@ -6,7 +6,7 @@ This library contains various ROS1 functionality. This is used for example by th
 ---
 ## Dependencies
 
-- [Fixposition SDK dependencies](../README.md#dependencies)
+- [Fixposition SDK dependencies](../fpsdk_docs/README.md#dependencies)
 - [fpsdk_common](../fpsdk_common/README.md)
 - This *does* need ROS (Noetic)
 

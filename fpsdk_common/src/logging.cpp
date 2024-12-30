@@ -249,7 +249,7 @@ void LoggingPrint(const LoggingLevel level, const char* fmt, ...)
 // ---------------------------------------------------------------------------------------------------------------------
 
 void LoggingHexdump(
-    const LoggingLevel level, const uint8_t* data, const uint64_t size, const char* prefix, const char* fmt, ...)
+    const LoggingLevel level, const uint8_t* data, const std::size_t size, const char* prefix, const char* fmt, ...)
 {
     if (!LoggingIsLevel(level)) {
         return;
@@ -266,7 +266,7 @@ void LoggingHexdump(
 
     const char i2hex[] = "0123456789abcdef";
     const uint8_t* pData = data;
-    for (uint64_t ix = 0; ix < size;) {
+    for (std::size_t ix = 0; ix < size;) {
         char str[70];
         std::memset(str, ' ', sizeof(str));
         str[50] = '|';

@@ -1,0 +1,1094 @@
+/**
+ * \verbatim
+ * ___    ___
+ * \  \  /  /
+ *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+ *  /  /\  \   License: see the LICENSE file
+ * /__/  \__\
+ *
+ * Based on work by flipflip (https://github.com/phkehl)
+ * \endverbatim
+ *
+ * @file
+ * @brief Fixposition SDK: Parser NMEA routines and types
+ */
+
+/* LIBC/STL */
+#include <algorithm>
+#include <cinttypes>
+#include <cmath>
+#include <cstddef>
+#include <cstdio>
+#include <cstring>
+#include <limits>
+
+/* EXTERNAL */
+
+/* PACKAGE */
+#include "fpsdk_common/math.hpp"
+#include "fpsdk_common/parser/nmea.hpp"
+#include "fpsdk_common/types.hpp"
+
+namespace fpsdk {
+namespace common {
+namespace parser {
+namespace nmea {
+/* ****************************************************************************************************************** */
+
+bool NmeaGetMessageMeta(NmeaMessageMeta& meta, const uint8_t* msg, const std::size_t msg_size)
+{
+    if ((msg == NULL) || (msg_size < 10)) {
+        return false;
+    }
+    meta.payload_ix0_ = 0;
+    meta.payload_ix1_ = 0;
+
+    // 012345678901234567890123456789
+    // $TTF*xx\r\n"
+    // $GNGGA,...,...,...*xx\r\n
+    // $PUBX,nn,...,...,...*xx\r\n
+    // $FP,ODOMETRY,n,...,...,...*xx\r\n
+
+    // Talker ID
+    std::size_t offs = 0;
+    if (msg[1] == 'P')  // Proprietary
+    {
+        meta.talker_[0] = 'P';
+        meta.talker_[1] = '\0';
+        offs = 2;
+    } else {
+        meta.talker_[0] = msg[1];
+        meta.talker_[1] = msg[2];
+        meta.talker_[2] = '\0';
+        offs = 3;
+    }
+
+    // Sentence formatter
+    std::size_t comma_ix = 0;
+    for (std::size_t ix = offs; (ix < (msg_size - 4)) && (ix < (sizeof(meta.formatter_) - 1 + offs)); ix++) {
+        if ((msg[ix] == ',') || (msg[ix] == '*')) {
+            comma_ix = ix;
+            break;
+        }
+    }
+    if (comma_ix <= 0) {
+        meta.formatter_[0] = '\0';
+        return false;
+    }
+
+    std::size_t i_ix;
+    std::size_t o_ix;
+    const std::size_t max_o = sizeof(meta.formatter_) - 1;
+    for (i_ix = offs, o_ix = 0; (i_ix < comma_ix) && (o_ix < max_o); i_ix++, o_ix++) {
+        meta.formatter_[o_ix] = msg[i_ix];
+    }
+    meta.formatter_[o_ix] = '\0';
+
+    // No payload
+    if (msg[comma_ix] == '*') {
+        meta.payload_ix0_ = 0;
+        meta.payload_ix1_ = 0;
+        return true;
+    }
+
+    meta.payload_ix0_ = comma_ix + 1;
+    meta.payload_ix1_ = msg_size - 5 - 1;  // "*XX\r\n"
+
+    return true;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaGetMessageName(char* name, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
+{
+    if ((name == NULL) || (size < 1)) {
+        return false;
+    }
+    name[0] = '\0';
+
+    NmeaMessageMeta meta;
+    if (!NmeaGetMessageMeta(meta, msg, msg_size)) {
+        return false;
+    }
+
+    // u-blox proprietary
+    if ((meta.talker_[0] == 'P') && (meta.formatter_[0] == 'U') && (meta.formatter_[1] == 'B') &&
+        (meta.formatter_[2] == 'X') && (meta.formatter_[3] == '\0')) {
+        const char* pubx = NULL;
+        const char c1 = msg[meta.payload_ix0_];
+        const char c2 = msg[meta.payload_ix0_ + 1];
+        // clang-format off
+        if      ( (c1 == '4') && (c2 == '1') ) { pubx = "CONFIG"; }
+        else if ( (c1 == '0') && (c2 == '0') ) { pubx = "POSITION"; }
+        else if ( (c1 == '4') && (c2 == '0') ) { pubx = "RATE"; }
+        else if ( (c1 == '0') && (c2 == '3') ) { pubx = "SVSTATUS"; }
+        else if ( (c1 == '0') && (c2 == '4') ) { pubx = "TIME"; }  // clang-format on
+        else {
+            return std::snprintf(name, size, "NMEA-PUBX-%c%c", c1, c2) < (int)size;
+        }
+        return std::snprintf(name, size, "NMEA-PUBX-%s", pubx) < (int)size;
+    }
+    // Standard NMEA, incl. other proprietary ("P" talker ID)
+    else {
+        return std::snprintf(name, size, "NMEA-%s-%s", meta.talker_[0] != '\0' ? meta.talker_ : "?",
+                   meta.formatter_[0] != '\0' ? meta.formatter_ : "?") < (int)size;
+    }
+
+    return false;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
+{
+    if ((info == NULL) || (size < 1)) {
+        return false;
+    }
+    std::size_t len = 0;
+    NmeaMessageMeta meta;
+    if (NmeaGetMessageMeta(meta, msg, msg_size)) {
+        char fmt[20];
+        snprintf(fmt, sizeof(fmt), "%%.%ds", meta.payload_ix1_ - meta.payload_ix0_ + 1);
+        len += snprintf(info, size, fmt, (const char*)&msg[meta.payload_ix0_]);
+    }
+    return (len > 0) && (len < size);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+NmeaCoordinates::NmeaCoordinates(const double degs, const int digits)
+{
+    sign_ = (degs >= 0.0);
+    const double degs_abs = std::abs(degs);
+    deg_ = (int)degs_abs;
+    const double frac_deg = degs_abs - (double)deg_;
+    min_ = math::RoundToFracDigits(frac_deg * 60.0, digits);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/*static*/ const NmeaVersion NmeaVersion::V410 = { 1, 32, 33, 64, 65, 96, 1, 36, 1, 63, -1, -1 };
+/*static*/ const NmeaVersion NmeaVersion::V410_UBX_EXT = { 1, 32, 33, 64, 65, 96, 1, 36, 1, 63, 193, 202 };
+/*static*/ const NmeaVersion NmeaVersion::V411 = { 1, 32, 33, 64, 65, 96, 1, 36, 1, 63, 1, 10 };
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaTime::operator==(const NmeaTime& rhs) const
+{
+    return (valid == rhs.valid) && (hours == rhs.hours) && (mins == rhs.mins) && (std::abs(secs - rhs.secs) < 1e-9);
+}
+
+bool NmeaTime::operator!=(const NmeaTime& rhs) const
+{
+    return !(*this == rhs);
+}
+
+bool NmeaDate::operator==(const NmeaDate& rhs) const
+{
+    return (valid == rhs.valid) && (years == rhs.years) && (months == rhs.months) && (days == rhs.days);
+}
+
+bool NmeaDate::operator!=(const NmeaDate& rhs) const
+{
+    return !(*this == rhs);
+}
+
+// Parse float
+static bool StrToFloat(const std::string& str, double& value)
+{
+    if (str.empty() || (std::isspace(str[0]) != 0)) {
+        return false;
+    }
+
+    double value_tmp = 0.0f;
+    int num = 0;
+    int count = std::sscanf(str.data(), "%lf%n", &value_tmp, &num);
+
+    if ((count == 1) && ((std::size_t)num == str.size()) && std::isfinite(value_tmp)) {
+        value = value_tmp;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// Parse decimal (!) integer
+static bool StrToInt(const std::string& str, int32_t& value)
+{
+    // No empty string, no leading whitespace
+    if (str.empty() || (std::isspace(str[0]) != 0)) {
+        return false;
+    }
+
+    // Parse
+    int64_t value_tmp = 0;
+    int num = 0;
+    int count = std::sscanf(str.data(), "%" SCNd64 "%n", &value_tmp, &num);  // *decimal* integer, so SCNd, not SCNi
+    // Number of values found must be 1 and the entire string must have been used (no trailing stuff)
+    if ((count == 1) && ((std::size_t)num == str.size()) && (value_tmp >= INT32_MIN) && (value_tmp <= INT32_MAX)) {
+        value = value_tmp;
+        return true;
+    } else {
+        return false;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// Various helpers for the SetFromMsg() NMEA decoding functions
+
+// Debug prints, for development
+#if 0
+#  define NMEA_TRACE(fmt, ...) fprintf(stderr, fmt "\n", ##__VA_ARGS__)
+#else
+#  define NMEA_TRACE(fmt, ...) /* nothing */
+#endif
+
+// Split NMEA sentence (message) into its meta data and the payload fields
+struct NmeaParts
+{
+    NmeaMessageMeta meta_;
+    std::vector<std::string> fields_;
+};
+
+static bool GetParts(NmeaParts& parts, const char* formatter, const uint8_t* msg, const std::size_t msg_size)
+{
+    bool ok = true;
+
+    if (!NmeaGetMessageMeta(parts.meta_, msg, msg_size) || (parts.meta_.payload_ix0_ <= 0) ||
+        (parts.meta_.payload_ix1_ <= 0)) {
+        ok = false;
+    } else {
+        if (std::strcmp(parts.meta_.formatter_, formatter) != 0) {
+            ok = false;
+        }
+
+        std::string payload((const char*)&msg[parts.meta_.payload_ix0_],
+            (const char*)&msg[parts.meta_.payload_ix0_] + (parts.meta_.payload_ix1_ - parts.meta_.payload_ix0_ + 1));
+
+        NMEA_TRACE("GetParts(...) talker=%s formatter=%s payload=%s ix0=%d ix1=%d size=%d", parts.meta_.talker_,
+            parts.meta_.formatter_, payload.c_str(), parts.meta_.payload_ix0_, parts.meta_.payload_ix1_, msg_size);
+
+        std::size_t pos = 0;
+        while ((pos = payload.find(",")) != std::string::npos) {
+            std::string part = payload.substr(0, pos);
+            payload.erase(0, pos + 1);
+            parts.fields_.push_back(part);
+        }
+        parts.fields_.push_back(payload);
+    }
+
+    NMEA_TRACE(
+        "GetParts(..., \"%s\", ..., ...)=%s #fields=%d", formatter, ok ? "true" : "false", (int)parts.fields_.size());
+    return ok;
+}
+
+// Get talker ID
+bool GetTalker(NmeaTalkerId& talker, const char* talkerstr)
+{
+    bool ok = true;
+    if (talkerstr[0] == 'P') {
+        talker = NmeaTalkerId::PROPRIETARY;
+    } else if (talkerstr[0] == 'G') {
+        switch ((NmeaTalkerId)talkerstr[1]) {  // clang-format off
+            case NmeaTalkerId::GPS_SBAS:     talker = NmeaTalkerId::GPS_SBAS; break;
+            case NmeaTalkerId::GLO:          talker = NmeaTalkerId::GLO;      break;
+            case NmeaTalkerId::GAL:          talker = NmeaTalkerId::GAL;      break;
+            case NmeaTalkerId::BDS:          talker = NmeaTalkerId::BDS;      break;
+            case NmeaTalkerId::NAVIC:        talker = NmeaTalkerId::NAVIC;    break;
+            case NmeaTalkerId::QZSS:         talker = NmeaTalkerId::QZSS;     break;
+            case NmeaTalkerId::GNSS:         talker = NmeaTalkerId::GNSS;     break;
+            case NmeaTalkerId::UNSPECIFIED:
+            case NmeaTalkerId::PROPRIETARY:  ok = false; break;
+        }  // clang-format on
+    } else {
+        ok = false;
+    }
+    NMEA_TRACE("GetTalker(\"%s\")=%s talker=%c", talkerstr, ok ? "true" : "false", types::EnumToVal(talker));
+    return ok;
+}
+
+// Get position, and optionally height
+static bool GetLlh(NmeaLlh& llh, const std::vector<std::string>& fields, const int lat_ix, const int lon_ix,
+    const int alt_ix, const int sep_ix, const bool required)
+{
+    bool ok = true;
+
+    // Lat/lon
+    if (fields[lat_ix].empty() || fields[lon_ix].empty()) {
+        if (required) {
+            ok = false;
+        }
+    } else {
+        double latval = 0.0;
+        double lonval = 0.0;
+        if (StrToFloat(fields[lat_ix], latval) && !fields[lat_ix + 1].empty() && (latval >= 0.0) &&
+            (latval <= 9000.0) && StrToFloat(fields[lon_ix], lonval) && !fields[lon_ix + 1].empty() &&
+            (lonval >= 0.0) && (lonval <= 18000.0)) {
+            const double ilat = std::floor(latval / 100.0);
+            latval -= ilat * 100.0;
+            llh.lat = ilat + (latval / 60.0);
+            if (fields[lat_ix + 1] == "S") {
+                llh.lat = -llh.lat;
+            }
+            const double ilon = std::floor(lonval / 100.0);
+            lonval -= ilon * 100.0;
+            llh.lon = ilon + (lonval / 60.0);
+            if (fields[lon_ix + 1] == "W") {
+                llh.lon = -llh.lon;
+            }
+            llh.latlon_valid = true;
+        } else {
+            ok = false;
+        }
+    }
+
+    // Optional height
+    if ((alt_ix >= 0) && (sep_ix >= 0)) {
+        if (fields[alt_ix].empty()) {
+            if (required) {
+                ok = false;
+            }
+        } else {
+            double heightval = 0.0;
+            double sepval = 0.0;
+            if (StrToFloat(fields[alt_ix], heightval) && (fields[alt_ix + 1] == "M") &&
+                (fields[sep_ix].empty() || (StrToFloat(fields[sep_ix], sepval) && (fields[sep_ix + 1] == "M")))) {
+                // Contrary to the NMEA standard we'll allow sep (fields[10]) to be empty and assume that height
+                // (fields[9]) is ellipsoidal instead of mean sea level
+                llh.height = heightval + sepval;
+                llh.height_valid = true;
+            } else {
+                ok = false;
+            }
+        }
+    }
+
+    NMEA_TRACE("GetLlh(%d=\"%s\", %d=\"%s\", %d=\"%s\", %d=\"%s\", %s)=%s ll=%g/%g/%s h=%g/%s", lat_ix,
+        lat_ix >= 0 ? fields[lat_ix].c_str() : "", lon_ix, lon_ix >= 0 ? fields[lon_ix].c_str() : "", alt_ix,
+        alt_ix >= 0 ? fields[alt_ix].c_str() : "", sep_ix, sep_ix >= 0 ? fields[sep_ix].c_str() : "",
+        required ? "true" : "false", ok ? "true" : "false", llh.lat, llh.lon, llh.latlon_valid ? "true" : "false",
+        llh.height, llh.height_valid ? "true" : "false");
+    return ok;
+}
+
+// Get time, with basic range checks, may be null
+static bool GetTime(NmeaTime& time, const std::string& field)
+{
+    bool ok = true;
+    if (!field.empty()) {
+        double timeval = 0.0;
+        if (StrToFloat(field, timeval)) {
+            time.valid = !((timeval < 0.0) || (timeval > 235962.0));  // 00:00:00 .. 23:59:61.9999
+            time.hours = std::floor(timeval / 10000.0);
+            timeval -= time.hours * 10000;
+            time.mins = std::floor(timeval / 100.0);
+            timeval -= time.mins * 100.0;
+            time.secs = timeval;
+            return true;
+        } else {
+            ok = false;
+        }
+    }
+    NMEA_TRACE("GetTime(\"%s\")=%s time=%d/%d/%g/%s", field.c_str(), ok ? "true" : "false", time.hours, time.mins,
+        time.secs, time.valid ? "true" : "false");
+    return ok;
+}
+
+// Get date (DDMMYY format), with basic range checks, may be null
+static bool GetDateDdMmYy(NmeaDate& date, const std::string& field)
+{
+    bool ok = true;
+    if (!field.empty()) {
+        int dateval = 0;
+        if (StrToInt(field, dateval)) {
+            date.years = dateval % 100;
+            date.years += (date.years >= 80 ? 1900 : 2000);
+            date.months = (dateval / 100) % 100;
+            date.days = (dateval / 10000) % 100;
+            date.valid = ((date.years >= 2001) && (date.years <= 2099));  // 2001-01-01 ... 2099-12-31
+        } else {
+            ok = false;
+        }
+    }
+    NMEA_TRACE("GetDateDdMmYy(\"%s\")=%s date=%d/%d/%d/%s", field.c_str(), ok ? "true" : "false", date.years,
+        date.months, date.days, date.valid ? "true" : "false");
+    return ok;
+}
+
+#if 0
+// Get date (YYYYMMDD format), with basic range checks, may be null
+static bool GetDateYyyyMmDd(NmeaDate& date, const std::string& field) {
+    bool ok = true;
+    if (!field.empty()) {
+        int dateval = 0;
+        if (StrToInt(field, dateval)) {
+            // During coldstart the receiver reports 19800105...
+            date.days = dateval % 100;
+            date.months = (dateval / 100) % 100;
+            date.years = (dateval / 10000) % 10000;
+            date.valid = ((date.years >= 2001) && (date.years <= 2099));  // 2001-01-01 ... 2099-12-31
+        } else {
+            ok = false;
+        }
+    }
+    NMEA_TRACE("GetDateYyyyMmDd(\"%s\")=%s date=%d/%d/%d/%s", field.c_str(), ok ? "true" : "false", date.years,
+               date.months, date.days, date.valid ? "true" : "false");
+    return ok;
+}
+#endif
+
+// Get satellite
+static bool GetSat(NmeaSat& sat, const std::string& field, const NmeaSystemId system, const bool required)
+{
+    bool ok = true;
+
+    if (field.empty()) {
+        if (required) {
+            ok = false;
+        }
+    } else {
+        sat.system = system;
+        if (StrToInt(field, sat.svid) && sat.svid >= 0) {  // @todo more validity checks per system?
+            sat.valid = true;
+        } else {
+            ok = false;
+        }
+    }
+    NMEA_TRACE("GetSat(\"%s\")=%s svid=%d/%c/%s", field.c_str(), ok ? "true" : "false", sat.svid,
+        types::EnumToVal(sat.system), sat.valid ? "true" : "false");
+    return ok;
+}
+
+// Get GGA quality flag
+static bool GetQualityGga(NmeaQualityGga& quality, const std::string& field)
+{
+    bool ok = true;
+    if (!field.empty()) {
+        switch ((NmeaQualityGga)field[0]) {  // clang-format off
+            case NmeaQualityGga::NOFIX:        quality = NmeaQualityGga::NOFIX;      break;
+            case NmeaQualityGga::SPP:          quality = NmeaQualityGga::SPP;        break;
+            case NmeaQualityGga::DGNSS:        quality = NmeaQualityGga::DGNSS;      break;
+            case NmeaQualityGga::PPS:          quality = NmeaQualityGga::PPS;        break;
+            case NmeaQualityGga::RTK_FIXED:    quality = NmeaQualityGga::RTK_FIXED;  break;
+            case NmeaQualityGga::RTK_FLOAT:    quality = NmeaQualityGga::RTK_FLOAT;  break;
+            case NmeaQualityGga::ESTIMATED:    quality = NmeaQualityGga::ESTIMATED;  break;
+            case NmeaQualityGga::MANUAL:       quality = NmeaQualityGga::MANUAL;     break;
+            case NmeaQualityGga::SIM:          quality = NmeaQualityGga::SIM;        break;
+            case NmeaQualityGga::UNSPECIFIED:  ok = false; break;
+        }  // clang-format on
+    } else {
+        ok = false;
+    }
+    NMEA_TRACE("GetQualityGga(\"%s\")=%s quality=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(quality));
+    return ok;
+}
+
+// Get GLL/RMC status flag
+static bool GetStatusGllRmc(NmeaStatusGllRmc& status, const std::string& field)
+{
+    bool ok = true;
+    if (!field.empty()) {
+        switch ((NmeaStatusGllRmc)field[0]) {  // clang-format off
+            case NmeaStatusGllRmc::INVALID:      status = NmeaStatusGllRmc::INVALID;  break;
+            case NmeaStatusGllRmc::VALID:        status = NmeaStatusGllRmc::VALID;    break;
+            case NmeaStatusGllRmc::UNSPECIFIED:  ok = false; break;
+        }  // clang-format on
+    } else {
+        ok = false;
+    }
+    NMEA_TRACE("GetStatusGllRmc(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    return ok;
+}
+
+// Get GLL/VTG mode flag
+static bool GetModeGllVtg(NmeaModeGllVtg& mode, const std::string& field)
+{
+    bool ok = true;
+    if (!field.empty()) {
+        switch ((NmeaModeGllVtg)field[0]) {  // clang-format off
+            case NmeaModeGllVtg::INVALID:      mode = NmeaModeGllVtg::INVALID;     break;
+            case NmeaModeGllVtg::AUTONOMOUS:   mode = NmeaModeGllVtg::AUTONOMOUS;  break;
+            case NmeaModeGllVtg::DGNSS:        mode = NmeaModeGllVtg::DGNSS;       break;
+            case NmeaModeGllVtg::ESTIMATED:    mode = NmeaModeGllVtg::ESTIMATED;   break;
+            case NmeaModeGllVtg::MANUAL:       mode = NmeaModeGllVtg::MANUAL;      break;
+            case NmeaModeGllVtg::SIM:          mode = NmeaModeGllVtg::SIM;         break;
+            case NmeaModeGllVtg::UNSPECIFIED:  ok = false; break;
+        }  // clang-format on
+    } else {
+        ok = false;
+    }
+    NMEA_TRACE("GetModeGllVtg(\"%s\")=%s mode=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(mode));
+    return ok;
+}
+
+// Get RMC/GNS mode flag
+static bool GetModeRmcGns(NmeaModeRmcGns& mode, const std::string& field)
+{
+    bool ok = true;
+    if (!field.empty()) {
+        switch ((NmeaModeRmcGns)field[0]) {  // clang-format off
+            case NmeaModeRmcGns::INVALID:      mode = NmeaModeRmcGns::INVALID;     break;
+            case NmeaModeRmcGns::AUTONOMOUS:   mode = NmeaModeRmcGns::AUTONOMOUS;  break;
+            case NmeaModeRmcGns::DGNSS:        mode = NmeaModeRmcGns::DGNSS;       break;
+            case NmeaModeRmcGns::ESTIMATED:    mode = NmeaModeRmcGns::ESTIMATED;   break;
+            case NmeaModeRmcGns::RTK_FIXED:    mode = NmeaModeRmcGns::RTK_FIXED;   break;
+            case NmeaModeRmcGns::RTK_FLOAT:    mode = NmeaModeRmcGns::RTK_FLOAT;   break;
+            case NmeaModeRmcGns::PRECISE:      mode = NmeaModeRmcGns::PRECISE;     break;
+            case NmeaModeRmcGns::MANUAL:       mode = NmeaModeRmcGns::MANUAL;      break;
+            case NmeaModeRmcGns::SIM:          mode = NmeaModeRmcGns::SIM;         break;
+            case NmeaModeRmcGns::UNSPECIFIED:  ok = false; break;
+        }  // clang-format on
+    } else {
+        ok = false;
+    }
+    NMEA_TRACE("GetModeRmcGns(\"%s\")=%s mode=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(mode));
+    return ok;
+}
+
+// Get RMC status flag
+static bool GetNavStatusRmc(NmeaNavStatusRmc& navstatus, const std::string& field)
+{
+    bool ok = true;
+    if (!field.empty()) {
+        switch ((NmeaNavStatusRmc)field[0]) {  // clang-format off
+            case NmeaNavStatusRmc::SAFE:         navstatus = NmeaNavStatusRmc::SAFE;     break;
+            case NmeaNavStatusRmc::CAUTION:      navstatus = NmeaNavStatusRmc::CAUTION;  break;
+            case NmeaNavStatusRmc::UNSAFE:       navstatus = NmeaNavStatusRmc::UNSAFE;   break;
+            case NmeaNavStatusRmc::NA:           navstatus = NmeaNavStatusRmc::NA;       break;
+            case NmeaNavStatusRmc::UNSPECIFIED:  ok = false; break;
+        }  // clang-format on
+    } else {
+        ok = false;
+    }
+    NMEA_TRACE(
+        "GetNavStatusRmc(\"%s\")=%s navstatus=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(navstatus));
+    return ok;
+}
+
+// Get GNS operation mode
+static bool GetOpModeGsa(NmeaOpModeGsa& opmode, const std::string& field)
+{
+    bool ok = true;
+    if (!field.empty()) {
+        switch ((NmeaOpModeGsa)field[0]) {  // clang-format off
+            case NmeaOpModeGsa::MANUAL:       opmode = NmeaOpModeGsa::MANUAL;  break;
+            case NmeaOpModeGsa::AUTO:         opmode = NmeaOpModeGsa::AUTO;    break;
+            case NmeaOpModeGsa::UNSPECIFIED:  ok = false; break;
+        }  // clang-format on
+    } else {
+        ok = false;
+    }
+    NMEA_TRACE("GetOpModeGsa(\"%s\")=%s opmode=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(opmode));
+    return ok;
+}
+
+// Get GNS operation mode
+static bool GetNavModeGsa(NmeaNavModeGsa& navmode, const std::string& field)
+{
+    bool ok = true;
+    if (!field.empty()) {
+        switch ((NmeaNavModeGsa)field[0]) {  // clang-format off
+            case NmeaNavModeGsa::NOFIX:        navmode = NmeaNavModeGsa::NOFIX;  break;
+            case NmeaNavModeGsa::FIX2D:        navmode = NmeaNavModeGsa::FIX2D;  break;
+            case NmeaNavModeGsa::FIX3D:        navmode = NmeaNavModeGsa::FIX3D;  break;
+            case NmeaNavModeGsa::UNSPECIFIED:  ok = false; break;
+        }  // clang-format on
+    } else {
+        ok = false;
+    }
+    NMEA_TRACE("GetNavModeGsa(\"%s\")=%s navmode=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(navmode));
+    return ok;
+}
+
+// Get (GSA) system ID
+static bool GetSystemId(NmeaSystemId& system, const std::string& field)
+{
+    bool ok = true;
+    if (!field.empty()) {
+        switch ((NmeaSystemId)field[0]) {  // clang-format off
+            case NmeaSystemId::GPS_SBAS:     system = NmeaSystemId::GPS_SBAS;  break;
+            case NmeaSystemId::GLO:          system = NmeaSystemId::GLO;       break;
+            case NmeaSystemId::GAL:          system = NmeaSystemId::GAL;       break;
+            case NmeaSystemId::BDS:          system = NmeaSystemId::BDS;       break;
+            case NmeaSystemId::QZSS:         system = NmeaSystemId::QZSS;      break;
+            case NmeaSystemId::NAVIC:        system = NmeaSystemId::NAVIC;     break;
+            case NmeaSystemId::UNSPECIFIED:  ok = false; break;
+        }  // clang-format on
+    } else {
+        ok = false;
+    }
+    NMEA_TRACE("GetSystemId(\"%s\")=%s system=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(system));
+    return ok;
+}
+
+// Get system Id
+bool GetSignalId(NmeaSignalId& signalid, const std::string& field, const NmeaSystemId system)
+{
+    bool ok = true;
+    if (!field.empty()) {
+        switch (system) {  // clang-format off
+            case NmeaSystemId::GPS_SBAS: switch ((NmeaSignalId)field[0]) {
+                case NmeaSignalId::GPS_L1CA:   signalid = NmeaSignalId::GPS_L1CA;   break; // = NmeaSignalId::SBAS_L1CA
+                case NmeaSignalId::GPS_L2CL:   signalid = NmeaSignalId::GPS_L2CL;   break;
+                case NmeaSignalId::GPS_L2CM:   signalid = NmeaSignalId::GPS_L2CM;   break;
+                case NmeaSignalId::GPS_L5I:    signalid = NmeaSignalId::GPS_L5I;    break;
+                case NmeaSignalId::GPS_L5Q:    signalid = NmeaSignalId::GPS_L5Q;    break;
+                default: ok = false; break;
+            } break;
+            case NmeaSystemId::GLO: switch ((NmeaSignalId)field[0]) {
+                case NmeaSignalId::GLO_L1OF:   signalid = NmeaSignalId::GLO_L1OF;   break;
+                case NmeaSignalId::GLO_L2OF:   signalid = NmeaSignalId::GLO_L2OF;   break;
+                default: ok = false; break;
+            } break;
+            case NmeaSystemId::GAL: switch ((NmeaSignalId)field[0]) {
+                case NmeaSignalId::GAL_E1:     signalid = NmeaSignalId::GAL_E1;     break;
+                case NmeaSignalId::GAL_E5A:    signalid = NmeaSignalId::GAL_E5A;    break;
+                case NmeaSignalId::GAL_E5B:    signalid = NmeaSignalId::GAL_E5B;    break;
+                default: ok = false; break;
+            } break;
+            case NmeaSystemId::BDS: switch ((NmeaSignalId)field[0]) {
+                case NmeaSignalId::BDS_B1ID:   signalid = NmeaSignalId::BDS_B1ID;   break;
+                case NmeaSignalId::BDS_B2ID:   signalid = NmeaSignalId::BDS_B2ID;   break;
+                case NmeaSignalId::BDS_B1C:    signalid = NmeaSignalId::BDS_B1C;    break;
+                case NmeaSignalId::BDS_B2A:    signalid = NmeaSignalId::BDS_B2A;    break;
+                default: ok = false; break;
+            } break;
+            case NmeaSystemId::QZSS: switch ((NmeaSignalId)field[0]) {
+                case NmeaSignalId::QZSS_L1CA:  signalid = NmeaSignalId::QZSS_L1CA;  break;
+                case NmeaSignalId::QZSS_L1S:   signalid = NmeaSignalId::QZSS_L1S;   break;
+                case NmeaSignalId::QZSS_L2CM:  signalid = NmeaSignalId::QZSS_L2CM;  break;
+                case NmeaSignalId::QZSS_L2CL:  signalid = NmeaSignalId::QZSS_L2CL;  break;
+                case NmeaSignalId::QZSS_L5I:   signalid = NmeaSignalId::QZSS_L5I;   break;
+                case NmeaSignalId::QZSS_L5Q:   signalid = NmeaSignalId::QZSS_L5Q;   break;
+                default: ok = false; break;
+            } break;
+            case NmeaSystemId::NAVIC: switch ((NmeaSignalId)field[0]) {
+                case NmeaSignalId::NAVIC_L5A:  signalid = NmeaSignalId::NAVIC_L5A;  break;
+                default: ok = false; break;
+            } break;
+            case NmeaSystemId::UNSPECIFIED:
+                ok = false;
+                break;
+
+        }  // clang-format on
+    } else {
+        ok = false;
+    }
+    NMEA_TRACE("GetSignalId(\"%s\")=%s signalid=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(signalid));
+    return ok;
+}
+
+// Convert talker ID to system ID
+static NmeaSystemId TalkerIdToSystemId(const NmeaTalkerId talkerid)
+{
+    NmeaSystemId systemid = NmeaSystemId::UNSPECIFIED;
+    switch (talkerid) {  // clang-format off
+        case NmeaTalkerId::GPS_SBAS:     systemid = NmeaSystemId::GPS_SBAS;  break;
+        case NmeaTalkerId::GLO:          systemid = NmeaSystemId::GLO;       break;
+        case NmeaTalkerId::GAL:          systemid = NmeaSystemId::GAL;       break;
+        case NmeaTalkerId::BDS:          systemid = NmeaSystemId::BDS;       break;
+        case NmeaTalkerId::NAVIC:        systemid = NmeaSystemId::NAVIC;     break;
+        case NmeaTalkerId::QZSS:         systemid = NmeaSystemId::QZSS;      break;
+        case NmeaTalkerId::GNSS:
+        case NmeaTalkerId::UNSPECIFIED:
+        case NmeaTalkerId::PROPRIETARY:  break;
+    }  // clang-format on
+    NMEA_TRACE("TalkerIdToSystemId(%c)=%c", types::EnumToVal(talkerid), types::EnumToVal(systemid));
+    return systemid;
+}
+
+static constexpr int INAN = std::numeric_limits<int>::max();
+
+// Get integer value
+static bool GetInt(
+    NmeaInt& nmeaint, const std::string& field, const bool required, const int min = INAN, const int max = INAN)
+{
+    bool ok = true;
+    // Null field may be okay
+    if (field.empty()) {
+        if (required) {
+            ok = false;
+        }
+    }
+    // Otherwise we require a value
+    else {
+        int value = 0;
+        if (StrToInt(field, value)) {
+            // Range limits?
+            if ((min != INAN) && (value < min)) {
+                ok = false;
+            }
+            if ((max != INAN) && (value > max)) {
+                ok = false;
+            }
+            if (ok) {
+                nmeaint.value = value;
+                nmeaint.valid = true;
+            }
+        } else {
+            ok = false;
+        }
+    }
+
+    NMEA_TRACE("GetInt(\"%s\", %s, %d, %d)=%s value=%d/%s", field.c_str(), required ? "true" : "false", min, max,
+        ok ? "true" : "false", nmeaint.value, nmeaint.valid ? "true" : "false");
+    return ok;
+}
+
+// Get float value
+static bool GetFloat(
+    NmeaFloat& nmeafloat, const std::string& field, const bool required, const double min = NAN, const double max = NAN)
+{
+    bool ok = true;
+    // Null field may be okay
+    if (field.empty()) {
+        if (required) {
+            ok = false;
+        }
+    }
+    // Otherwise we require a value
+    else {
+        double value = 0.0;
+        if (StrToFloat(field, value)) {
+            // Range limits?
+            if (std::isfinite(min) && (value < min)) {
+                ok = false;
+            }
+            if (std::isfinite(max) && (value > max)) {
+                ok = false;
+            }
+            if (ok) {
+                nmeafloat.value = value;
+                nmeafloat.valid = true;
+            }
+        } else {
+            ok = false;
+        }
+    }
+
+    NMEA_TRACE("GetFloat(\"%s\", %s, %g, %g)=%s value=%g/%s", field.c_str(), required ? "true" : "false", min, max,
+        ok ? "true" : "false", nmeafloat.value, nmeafloat.valid ? "true" : "false");
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaGgaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
+{
+    // $GNGGA,092207.400,4724.017956,N,00827.022383,E,2,41,0.43,411.542,M,47.989,M,,*79\r\n
+    //             0        1        2     3        4 5 6  7    8       9 10    11 12 13
+    // $GNGGA,235943.812,,,,,0,00,99.99,,M,,M,,*49
+    // 14 or 12 fields as diff station info is optional
+    bool ok = false;
+    NmeaParts m;
+    if (GetParts(m, "GGA", msg, msg_size) && GetTalker(talker, m.meta_.talker_) &&
+        ((m.fields_.size() == 14) || (m.fields_.size() == 12))) {
+        ok = (GetTime(time, m.fields_[0]) && GetQualityGga(quality, m.fields_[5]) &&
+              GetLlh(llh, m.fields_, 1, 3, 8, 10, quality != NmeaQualityGga::NOFIX) &&
+              GetInt(num_sv, m.fields_[6], false, 0, 200) &&
+              ((quality == NmeaQualityGga::NOFIX) || GetFloat(hdop, m.fields_[7], true, 0.0)) &&
+              ((m.fields_.size() == 12) ||
+                  (GetFloat(diff_age, m.fields_[12], false, 0, 1023) && GetInt(diff_sta, m.fields_[13], false, 0.0))));
+    }
+    NMEA_TRACE("NmeaGgaPayload %s", ok ? "true" : "false");
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaGllPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
+{
+    // $GNGLL,4724.018931,N,00827.023090,E,110546.800,A,D*4F    $GNGLL,,,,,235943.612,V,N*6B
+    //           0        1     2        3      4     5 6
+    bool ok = false;
+    NmeaParts m;
+    if (GetParts(m, "GLL", msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 7)) {
+        ok = (GetTime(time, m.fields_[4]) && GetStatusGllRmc(status, m.fields_[5]) &&
+              GetModeGllVtg(mode, m.fields_[6]) &&
+              GetLlh(llh, m.fields_, 0, 2, -1, -1, mode != NmeaModeGllVtg::INVALID));
+    }
+    NMEA_TRACE("NmeaGllPayload %s", ok ? "true" : "false");
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaRmcPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
+{
+    // $GNRMC,110546.800,A,4724.018931,N,00827.023090,E,0.015,139.17,231024,,,D,V*3D
+    //             0     1    2        3     4        5 6     7      8    9 10 11 12
+    // $GNRMC,235943.412,V,,,,,,,050180,,,N,V*28
+    bool ok = false;
+    NmeaParts m;
+    if (GetParts(m, "RMC", msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 13)) {
+        // Ignore magnetic variation fields_[9] and fields_[10]
+        ok = (GetTime(time, m.fields_[0]) && GetStatusGllRmc(status, m.fields_[1]) &&
+              GetFloat(speed, m.fields_[6], false) && GetFloat(course, m.fields_[7], false, 0.0, 360.0) &&
+              GetDateDdMmYy(date, m.fields_[8]) && GetModeRmcGns(mode, m.fields_[11]) &&
+              GetNavStatusRmc(navstatus, m.fields_[12]) &&
+              GetLlh(llh, m.fields_, 2, 4, -1, -1, mode != NmeaModeRmcGns::INVALID));
+    }
+    NMEA_TRACE("NmeaRmcPayload %s", ok ? "true" : "false");
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaVtgPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
+{
+    // $GNVTG,139.17,T,,M,0.015,N,0.027,K,D*2A*4F       $GNVTG,,T,,M,,N,,K,N*32
+    //        0      1 23 4     5 6     7 8
+    bool ok = false;
+    NmeaParts m;
+    if (GetParts(m, "VTG", msg, msg_size) && (m.fields_.size() == 9)) {
+        // Ignore magnetic course fields_[2] and fields_[3]
+        ok = (GetTalker(talker, m.meta_.talker_) && (m.fields_[1] == "T") && GetFloat(cogt, m.fields_[0], false) &&
+              (m.fields_[5] == "N") && GetFloat(sogn, m.fields_[4], false) && (m.fields_[7] == "K") &&
+              GetFloat(sogk, m.fields_[6], false) && GetModeGllVtg(mode, m.fields_[8]));
+    }
+    NMEA_TRACE("NmeaVtgPayload %s", ok ? "true" : "false");
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaGsaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
+{
+    // $GNGSA,A,3,03,04,06,07,09,11,19,20,26,30,31,,0.79,0.46,0.64,1*0F
+    //        0 1 2  3  4  5  6  7  8  9  10 11 12 13 14 15   16   17
+    // $GNGSA,A,1,,,,,,,,,,,,,99.99,99.99,99.99,5*37
+    bool ok = false;
+    NmeaParts m;
+    if (GetParts(m, "GSA", msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 18)) {
+        ok = GetSystemId(system, m.fields_[17]);
+
+        // Satellites
+        for (std::size_t field_ix = 2; ok && (field_ix <= 13) && (field_ix < m.fields_.size()); field_ix++) {
+            if (!m.fields_[field_ix].empty()) {
+                NmeaSat cand;
+                if (GetSat(cand, m.fields_[field_ix], system, false) && cand.valid) {
+                    sats[num_sats] = cand;
+                    num_sats++;
+                } else {
+                    ok = false;
+                }
+            }
+        }
+
+        // Remaining fields
+        if (ok) {
+            ok = (GetOpModeGsa(opmode, m.fields_[0]) && GetNavModeGsa(navmode, m.fields_[1]) &&
+                  ((navmode == NmeaNavModeGsa::NOFIX) || GetFloat(pdop, m.fields_[14], true, 0.0)) &&
+                  ((navmode == NmeaNavModeGsa::NOFIX) || GetFloat(hdop, m.fields_[15], true, 0.0)) &&
+                  ((navmode == NmeaNavModeGsa::NOFIX) || GetFloat(vdop, m.fields_[16], true, 0.0)));
+        }
+    }
+    NMEA_TRACE("NmeaGsaPayload %s", ok ? "true" : "false");
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaGsvPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
+{
+    // Sequence of 4 messages, total 14 sats/sigs = 4 + 4 + 4 + 2
+    // $GPGSV,4,2,14,09,84,270,52,11,28,311,46,16,03,080,42,17,03,218,35,1*69
+    //        0 1  2  3  4  5   6  7  8  9  10 11 12 13  14 15 16 17  18 19
+    //               ^^^^^^^^^^^^ ^^^^^^^^^^^^ ^^^^^^^^^^^^ ^^^^^^^^^^^^  <-- 2nd message: 4 sigs/sats
+    // $GPGSV,4,4,14,31,08,034,46,36,31,149,43,1*62
+    //        0 1  2 3  4  5   6  7  8  9   10 11
+    //               ^^^^^^^^^^^^ ^^^^^^^^^^^^ <-- 4th (last) message: 2 sigs/sats
+    //
+    // $GAGSV,1,1,00,1*75
+    //        0 1  2 3
+    bool ok = false;
+    NmeaParts m;
+    if (GetParts(m, "GSV", msg, msg_size) && GetTalker(talker, m.meta_.talker_)) {
+        // The number of fields depends on the number of satellites and the sequence of the message
+        static constexpr int MAX_MSGS = 9;
+        static constexpr int SV_PER_MSG = 4;
+        ok = (
+            // - At least 4 fields are required
+            ((int)m.fields_.size() >= 4) &&
+            // - The number of messages in the sequence
+            GetInt(num_msgs, m.fields_[0], true, 1, MAX_MSGS) && num_msgs.valid &&
+            // - The message number in the sequence
+            GetInt(msg_num, m.fields_[1], true, 1, num_msgs.value) && msg_num.valid &&
+            // - The total number of satellits in the sequence
+            GetInt(tot_num_sat, m.fields_[2], true, 0, MAX_MSGS * SV_PER_MSG) && tot_num_sat.valid);
+        // Determine the number of sat/sig in this message. The last message has the remainder, other messages have 4.
+        int num_sv = 0;
+        if (ok) {
+            const bool last_message = (msg_num.value == num_msgs.value);
+            num_sv = (last_message ? (tot_num_sat.value - ((msg_num.value - 1) * SV_PER_MSG)) : SV_PER_MSG);
+            ok = ((int)m.fields_.size() == (4 + (4 * num_sv)));
+        }
+
+        // Now we know the field ix for the signal field. Note that GetSignalId() is only valid for certain talkers. So
+        // the checks below should give us an ok for valid talker/system and signal, and false otherwise.
+        system = TalkerIdToSystemId(talker);
+        signal = NmeaSignalId::UNSPECIFIED;
+        if (ok) {
+            ok = (GetSignalId(signal, m.fields_[3 + (num_sv * 4)], system) && (system != NmeaSystemId::UNSPECIFIED) &&
+                  (signal != NmeaSignalId::UNSPECIFIED));
+        }
+
+        // Read the sat/sig and populate the AzEl and Cno arrays
+        for (std::size_t field_offs = 3;
+             ok && ((int)field_offs < (3 + (num_sv * 4))) && ((field_offs + 3) < m.fields_.size()); field_offs += 4) {
+            NmeaSat sat;
+            NmeaInt el;
+            NmeaInt az;
+            NmeaInt cno;
+            if (GetSat(sat, m.fields_[field_offs], system, true) && sat.valid &&
+                GetInt(el, m.fields_[field_offs + 1], false, -90, 90) &&
+                GetInt(az, m.fields_[field_offs + 2], false, 0, 360) &&
+                GetInt(cno, m.fields_[field_offs + 3], false, 0, 100)) {
+                // Have az/el
+                if (el.valid && az.valid) {
+                    azels[num_azels].valid = true;
+                    azels[num_azels].system = system;
+                    azels[num_azels].svid = sat.svid;
+                    azels[num_azels].az = az.value;
+                    azels[num_azels].el = el.value;
+                    num_azels++;
+                }
+                // Have cno
+                if (cno.valid) {
+                    cnos[num_cnos].valid = true;
+                    cnos[num_cnos].system = system;
+                    cnos[num_cnos].svid = sat.svid;
+                    cnos[num_cnos].signal = signal;
+                    cnos[num_cnos].cno = cno.value;
+                    num_cnos++;
+                }
+            } else {
+                ok = false;
+            }
+        }
+    }
+    NMEA_TRACE("NmeaGsvPayload %s", ok ? "true" : "false");
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaCollectGsaGsv::AddGsaAndGsv(const std::vector<NmeaGsaPayload>& gsas, const std::vector<NmeaGsvPayload>& gsvs)
+{
+    bool ok = true;
+    for (auto& gsa : gsas) {
+        if (!AddGsa(gsa)) {
+            ok = false;
+        }
+    }
+    for (auto& gsv : gsvs) {
+        if (!AddGsv(gsv)) {
+            ok = false;
+        }
+    }
+    NMEA_TRACE("AddGsaAndGsv(%d, %d)=%s", (int)gsas.size(), (int)gsvs.size(), ok ? "true" : "false");
+    if (ok) {
+        Complete();
+    }
+    return ok;
+}
+
+bool NmeaCollectGsaGsv::AddGsa(const NmeaGsaPayload& gsa)
+{
+    // Collect all "satellites used" from GSA message. They have no numbering, so we have to rely on the user giving us
+    // all messages.
+    for (auto& gsa_sat : gsa.sats) {
+        if (gsa_sat.valid) {
+            NMEA_TRACE("AddGsa() sat %c %d", types::EnumToVal(gsa_sat.system), gsa_sat.svid);
+            gsa_sats_.push_back(gsa_sat);
+        }
+    }
+
+    NMEA_TRACE("AddGsa(%d, %c) gsa_sats_=%d", gsa.num_sats, types::EnumToVal(gsa.system), (int)gsa_sats_.size());
+
+    // @todo: Add checks on expected sequence of messages maybe? How? Maybe check that a message for each GNSS was seen?
+    //        Check for duplicate SVs, ...
+
+    return true;
+}
+
+bool NmeaCollectGsaGsv::AddGsv(const NmeaGsvPayload& gsv)
+{
+    // @todo: Add checks on expected sequence of messages maybe? We could use the msg_num and num_msgs fields and check
+    //        that a set of messages for each GNSS was seen. Check for duplicate SVs, ...
+
+    // Satellite info.
+    for (auto& gsv_azel : gsv.azels) {
+        // Also check that we don't have this SV already *sat* info is reported repeatedly in the GSV message*s* if
+        // there are multiple signals tracked for the satellite.
+        auto entry = std::find_if(sats_.cbegin(), sats_.cend(), [&gsv_azel](const auto& cand) {
+            return (cand.system_ == gsv_azel.system) && (cand.svid_ == gsv_azel.svid);
+        });
+        if (gsv_azel.valid && (entry == sats_.cend())) {
+            Sat sat;
+            sat.system_ = gsv_azel.system;
+            sat.svid_ = gsv_azel.svid;
+            sat.az_ = gsv_azel.az;
+            sat.el_ = gsv_azel.el;
+            NMEA_TRACE("AddGsv() sat %c %d %d %d", types::EnumToVal(sat.system_), sat.svid_, sat.az_, sat.el_);
+            sats_.push_back(sat);
+        }
+    }
+
+    // Signal info
+    for (auto& gsv_cno : gsv.cnos) {
+        if (gsv_cno.valid) {
+            Sig sig;
+            sig.system_ = gsv_cno.system;
+            sig.svid_ = gsv_cno.svid;
+            sig.signal_ = gsv_cno.signal;
+            sig.cno_ = gsv_cno.cno;
+            // If satellite is listed as used in GSA, assume the signal is used. Even though it may be wrong (e.g. for a
+            // sat only L1 is used and L2 is only tracked) this is the best we can do with the NMEA data.
+            const auto entry = std::find_if(gsa_sats_.cbegin(), gsa_sats_.cend(),
+                [&sig](const auto& cand) { return (cand.system == sig.system_) && (cand.svid == sig.svid_); });
+            sig.used_ = (entry != gsa_sats_.cend());
+            NMEA_TRACE("AddGsv() sig %c %c %d %.1f %s", types::EnumToVal(sig.system_), types::EnumToVal(sig.signal_),
+                sig.svid_, sig.cno_, sig.used_ ? "used" : "-");
+            sigs_.push_back(sig);
+        }
+    }
+
+    NMEA_TRACE("AddGsv(%d/%s, %d/%s, %c, %c, %d, %d) sats_=%d sigs_=%d", gsv.msg_num.value,
+        gsv.msg_num.valid ? "true" : "false", gsv.num_msgs.value, gsv.num_msgs.valid ? "true" : "false",
+        types::EnumToVal(gsv.system), types::EnumToVal(gsv.signal), gsv.num_azels, gsv.num_cnos, (int)sats_.size(),
+        (int)sigs_.size());
+
+    return true;
+}
+
+void NmeaCollectGsaGsv::Complete()
+{
+    // No longer needed
+    gsa_sats_.clear();
+
+    // Order by system and svid
+    std::sort(sats_.begin(), sats_.end(), [](const auto& a, const auto& b) {
+        return (a.system_ == b.system_) ? (a.svid_ < b.svid_) : (a.system_ < b.system_);
+    });
+    // Order by system, signal and svid
+    std::sort(sigs_.begin(), sigs_.end(), [](const auto& a, const auto& b) {
+        return (a.system_ == b.system_) ? ((a.signal_ == b.signal_) ? (a.svid_ < b.svid_) : (a.signal_ < b.signal_))
+                                        : (a.system_ < b.system_);
+    });
+
+    for (std::size_t ix = 0; ix < sats_.size(); ix++) {
+        NMEA_TRACE("NmeaCollectGsaGsv() sats_[%d] %c %d %d %d", (int)ix, types::EnumToVal(sats_[ix].system_),
+            sats_[ix].svid_, sats_[ix].az_, sats_[ix].el_);
+    }
+    for (std::size_t ix = 0; ix < sigs_.size(); ix++) {
+        NMEA_TRACE("NmeaCollectGsaGsv() sigs_[%d] %c %c %d %.1f %s", (int)ix, types::EnumToVal(sigs_[ix].system_),
+            types::EnumToVal(sigs_[ix].signal_), sigs_[ix].svid_, sigs_[ix].cno_, sigs_[ix].used_ ? "used" : "-");
+    }
+}
+
+/* ****************************************************************************************************************** */
+}  // namespace nmea
+}  // namespace parser
+}  // namespace common
+}  // namespace fpsdk
