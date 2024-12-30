@@ -10,7 +10,7 @@
     "updateRemoteUserUID": true,
 
     // compare .services.noetic-dev.volumes in ../../docker/docker-compose.yaml
-    "workspaceFolder": "/home/fpsdk/fixposition_utility",
+    "workspaceFolder": "/home/fpsdk/fixposition-sdk",
 
     // Deliberately empty, see fpsdk.code-workspace instead
     "customizations": {}

@@ -5,7 +5,7 @@ An example ROS2 package with a node demonstrating the use of the Fixpositon SDK.
 ---
 ## Dependencies
 
-- [Fixposition SDK dependencies](../README.md#dependencies)
+- [Fixposition SDK dependencies](../fpsdk_doc/README.md#dependencies)
 - [fpsdk_common](../fpsdk_common/README.md)
 - [fpsdk_ros2](../fpsdk_ros2/README.md)
 
@@ -35,4 +35,4 @@ ros2 launch ros2_fpsdk_demo node.launch
 ---
 ## License
 
-MIT, see [LICENSE](LICENSE)
+See the [LICENSE](LICENSE) file and [../fpsdk_doc/README.md#license](../fpsdk_doc/README.md#license).
