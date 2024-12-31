@@ -521,6 +521,124 @@ TEST(NmeaTest, NmeaVtgPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+TEST(NmeaTest, NmeaGstPayload)
+{
+    {
+        NmeaGstPayload gst;
+        const char* good_gst = "$GPGST,132419.0000,,0.0515,0.0188,162.6609,0.0495,0.0236,0.0182*7D\r\n";
+        EXPECT_TRUE(gst.SetFromMsg((const uint8_t*)good_gst, strlen(good_gst)));
+        EXPECT_EQ(gst.talker, NmeaTalkerId::GPS_SBAS);
+        EXPECT_TRUE(gst.time.valid);
+        EXPECT_EQ(gst.time.hours, 13);
+        EXPECT_EQ(gst.time.mins, 24);
+        EXPECT_NEAR(gst.time.secs, 19.0, 1e-9);
+        EXPECT_FALSE(gst.rms_range.valid);
+        EXPECT_EQ(gst.rms_range.value, 0.0);
+        EXPECT_TRUE(gst.std_major.valid);
+        EXPECT_NEAR(gst.std_major.value, 0.0515, 1e-9);
+        EXPECT_TRUE(gst.std_minor.valid);
+        EXPECT_NEAR(gst.std_minor.value, 0.0188, 1e-9);
+        EXPECT_TRUE(gst.angle_major.valid);
+        EXPECT_NEAR(gst.angle_major.value, 162.6609, 1e-9);
+        EXPECT_TRUE(gst.std_lat.valid);
+        EXPECT_NEAR(gst.std_lat.value, 0.0495, 1e-9);
+        EXPECT_TRUE(gst.std_lon.valid);
+        EXPECT_NEAR(gst.std_lon.value, 0.0236, 1e-9);
+        EXPECT_TRUE(gst.std_alt.valid);
+        EXPECT_NEAR(gst.std_alt.value, 0.0182, 1e-9);
+    }
+    {
+        NmeaGstPayload gst;
+        const char* empty_gst = "$GPGST,,,,,,,,*XX\r\n";
+        EXPECT_TRUE(gst.SetFromMsg((const uint8_t*)empty_gst, strlen(empty_gst)));
+        EXPECT_EQ(gst.talker, NmeaTalkerId::GPS_SBAS);
+        EXPECT_FALSE(gst.time.valid);
+        EXPECT_EQ(gst.time.hours, 0);
+        EXPECT_EQ(gst.time.mins, 0);
+        EXPECT_EQ(gst.time.secs, 0.0);
+        EXPECT_FALSE(gst.rms_range.valid);
+        EXPECT_EQ(gst.rms_range.value, 0.0);
+        EXPECT_FALSE(gst.std_major.valid);
+        EXPECT_EQ(gst.std_major.value, 0.0);
+        EXPECT_FALSE(gst.std_minor.valid);
+        EXPECT_EQ(gst.std_minor.value, 0.0);
+        EXPECT_FALSE(gst.angle_major.valid);
+        EXPECT_EQ(gst.angle_major.value, 0.0);
+        EXPECT_FALSE(gst.std_lat.valid);
+        EXPECT_EQ(gst.std_lat.value, 0.0);
+        EXPECT_FALSE(gst.std_lon.valid);
+        EXPECT_EQ(gst.std_lon.value, 0.0);
+        EXPECT_FALSE(gst.std_alt.valid);
+        EXPECT_EQ(gst.std_alt.value, 0.0);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(NmeaTest, NmeaHdtPayload)
+{
+    {
+        NmeaHdtPayload hdt;
+        const char* good_hdt = "$GPHDT,61.7183,T*3F\r\n";
+        EXPECT_TRUE(hdt.SetFromMsg((const uint8_t*)good_hdt, strlen(good_hdt)));
+        EXPECT_EQ(hdt.talker, NmeaTalkerId::GPS_SBAS);
+        EXPECT_TRUE(hdt.heading.valid);
+        EXPECT_NEAR(hdt.heading.value, 61.7183, 1e-9);
+    }
+    {
+        NmeaHdtPayload hdt;
+        const char* empty_hdt = "$GPHDT,,*3F\r\n";
+        EXPECT_TRUE(hdt.SetFromMsg((const uint8_t*)empty_hdt, strlen(empty_hdt)));
+        EXPECT_EQ(hdt.talker, NmeaTalkerId::GPS_SBAS);
+        EXPECT_FALSE(hdt.heading.valid);
+        EXPECT_EQ(hdt.heading.value, 0.0);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(NmeaTest, NmeaZdaPayload)
+{
+    {
+        NmeaZdaPayload zda;
+        const char* good_zda = "$GPZDA,090411.0001,10,10,2023,00,00*69\r\n";
+        EXPECT_TRUE(zda.SetFromMsg((const uint8_t*)good_zda, strlen(good_zda)));
+        EXPECT_EQ(zda.talker, NmeaTalkerId::GPS_SBAS);
+        EXPECT_TRUE(zda.time.valid);
+        EXPECT_EQ(zda.time.hours, 9);
+        EXPECT_EQ(zda.time.mins, 4);
+        EXPECT_NEAR(zda.time.secs, 11.0001, 1e-9);
+        EXPECT_TRUE(zda.date.valid);
+        EXPECT_EQ(zda.date.years, 2023);
+        EXPECT_EQ(zda.date.months, 10);
+        EXPECT_EQ(zda.date.days, 10);
+        EXPECT_TRUE(zda.local_hr.valid);
+        EXPECT_EQ(zda.local_hr.value, 0);
+        EXPECT_TRUE(zda.local_min.valid);
+        EXPECT_EQ(zda.local_min.value, 0);
+    }
+    {
+        NmeaZdaPayload zda;
+        const char* empty_zda = "$GPZDA,,,,,,*XX\r\n";
+        EXPECT_TRUE(zda.SetFromMsg((const uint8_t*)empty_zda, strlen(empty_zda)));
+        EXPECT_EQ(zda.talker, NmeaTalkerId::GPS_SBAS);
+        EXPECT_FALSE(zda.time.valid);
+        EXPECT_EQ(zda.time.hours, 0);
+        EXPECT_EQ(zda.time.mins, 0);
+        EXPECT_EQ(zda.time.secs, 0.0);
+        EXPECT_FALSE(zda.date.valid);
+        EXPECT_EQ(zda.date.years, 0);
+        EXPECT_EQ(zda.date.months, 0);
+        EXPECT_EQ(zda.date.days, 0);
+        EXPECT_FALSE(zda.local_hr.valid);
+        EXPECT_EQ(zda.local_hr.value, 0);
+        EXPECT_FALSE(zda.local_min.valid);
+        EXPECT_EQ(zda.local_min.value, 0);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(NmeaTest, NmeaGsaPayload)
 {
     {

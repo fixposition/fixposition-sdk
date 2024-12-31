@@ -20,6 +20,8 @@
 
 /* LIBC/STL */
 #include <cstring>
+#include <string>
+#include <vector>
 
 /* EXTERNAL */
 #include <fpsdk_ros1/ext/ros_time.hpp>
@@ -102,6 +104,16 @@ bool LoadRosParam(const std::string& name, float& value);
  * @returns true if parameter found and loaded, false otherwise
  */
 bool LoadRosParam(const std::string& name, double& value);
+
+/**
+ * @brief Loads a parameter from the ROS parameter server (list of strings)
+ *
+ * @param[in]  name   The parameter name
+ * @param[out] value  The value
+ *
+ * @returns true if parameter found and loaded, false otherwise
+ */
+bool LoadRosParam(const std::string& name, std::vector<std::string>& value);
 
 /**
  * @brief Convert to ROS time (atomic -> POSIX)

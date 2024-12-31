@@ -144,7 +144,7 @@ struct ParserStats {
 // clang-format off
 static constexpr std::size_t MAX_ADD_SIZE  = 32 * 1024;  //!< Max size for Parser::Add() that is guaranteed to work
 static constexpr std::size_t MAX_NAME_SIZE     =   100;  //!< Maximum size of message name string (incl. nul termination)
-static constexpr std::size_t MAX_INFO_SIZE     =   200;  //!< Maximum size of message info string (incl. nul termination)
+static constexpr std::size_t MAX_INFO_SIZE     =   400;  //!< Maximum size of message info string (incl. nul termination)
 static constexpr std::size_t MAX_FP_A_SIZE     =   400;  //!< Maximum FP_A message size (must be the same as MAX_NMEA_SIZE)
 static constexpr std::size_t MAX_FP_B_SIZE     =  4096;  //!< Maximum FP_B message size
 static constexpr std::size_t MAX_NMEA_SIZE     =   400;  //!< Maximum NMEA message size (standard NMEA would be 82!)
