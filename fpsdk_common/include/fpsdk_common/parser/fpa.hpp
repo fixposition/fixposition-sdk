@@ -523,9 +523,17 @@ struct FpaGpsTime
 };
 
 /**
+ * @brief FP_A payload base class
+ */
+struct FpaPayload
+{
+    virtual ~FpaPayload() = default;  //!< Virtual dtor for polymorphism
+};
+
+/**
  * @brief FP_A-EOE (version 1) message payload
  */
-struct FpaEoePayload
+struct FpaEoePayload : public FpaPayload
 {
     FpaGpsTime gps_time;                     //!< Time
     FpaEpoch epoch = FpaEpoch::UNSPECIFIED;  //!< Indicates which epoch ended ("FUSION", "GNSS", "GNSS1", "GNSS2")
@@ -540,12 +548,14 @@ struct FpaEoePayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* MSG_NAME = "FP_A-EOE";  //!< Message name
 };
 
 /**
  * @brief FP_A-GNSSANT (version 1) message payload
  */
-struct FpaGnssantPayload
+struct FpaGnssantPayload : public FpaPayload
 {  // clang-format off
     FpaGpsTime   gps_time;    //!< Time
     FpaAntState  gnss1_state = FpaAntState::UNSPECIFIED;  //!< GNSS1 antenna state
@@ -566,12 +576,14 @@ struct FpaGnssantPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* MSG_NAME = "FP_A-GNSSANT";  //!< Message name
 };
 
 /**
  * @brief FP_A-GNSSCORR (version 1) message payload
  */
-struct FpaGnsscorrPayload
+struct FpaGnsscorrPayload : public FpaPayload
 {  // clang-format off
     FpaGpsTime  gps_time;          //!< Time
     FpaGnssFix  gnss1_fix = FpaGnssFix::UNSPECIFIED;  //!< Fix status of GNSS1
@@ -599,12 +611,14 @@ struct FpaGnsscorrPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* MSG_NAME = "FP_A-GNSSCORR";  //!< Message name
 };
 
 /**
  * @brief FP_A-...IMU (version 1) messages payload
  */
-struct FpaImuPayload
+struct FpaImuPayload : public FpaPayload
 {
     //! Data from which FP_A-...IMU is stored
     enum class Which
@@ -638,6 +652,8 @@ struct FpaImuPayload
 struct FpaRawimuPayload : public FpaImuPayload
 {
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
+
+    static constexpr const char* MSG_NAME = "FP_A-RAWIMU";  //!< Message name
 };
 
 /**
@@ -646,12 +662,14 @@ struct FpaRawimuPayload : public FpaImuPayload
 struct FpaCorrimuPayload : public FpaImuPayload
 {
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
+
+    static constexpr const char* MSG_NAME = "FP_A-CORRIMU";  //!< Message name
 };
 
 /**
  * @brief FP_A-IMUBIAS (version 1) message payload
  */
-struct FpaImubiasPayload
+struct FpaImubiasPayload : public FpaPayload
 {  // clang-format off
     FpaGpsTime     gps_time;      //!< Time
     FpaMeasStatus  fusion_imu;    //!< Fusion measurement status: IMU
@@ -674,12 +692,14 @@ struct FpaImubiasPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* MSG_NAME = "FP_A-IMUBIAS";  //!< Message name
 };
 
 /**
  * @brief FP_A-LLH (version 1) message payload
  */
-struct FpaLlhPayload
+struct FpaLlhPayload : public FpaPayload
 {  // clang-format off
     FpaGpsTime gps_time;  //!< Time
     FpaFloat3 llh;        //!< Latitude/longitude/height [deg, deg, m]
@@ -696,12 +716,14 @@ struct FpaLlhPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* MSG_NAME = "FP_A-LLH";  //!< Message name
 };
 
 /**
  * @brief FP_A-ODOM... (version 1) messages payload
  */
-struct FpaOdomPayload
+struct FpaOdomPayload : public FpaPayload
 {
     //! Data from which FP_A-...IMU is stored
     enum class Which
@@ -747,6 +769,8 @@ struct FpaOdomPayload
 struct FpaOdometryPayload : public FpaOdomPayload
 {
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
+
+    static constexpr const char* MSG_NAME = "FP_A-ODOMETRY";  //!< Message name
 };
 
 /**
@@ -755,6 +779,8 @@ struct FpaOdometryPayload : public FpaOdomPayload
 struct FpaOdomenuPayload : public FpaOdomPayload
 {
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
+
+    static constexpr const char* MSG_NAME = "FP_A-ODOMENU";  //!< Message name
 };
 
 /**
@@ -763,12 +789,14 @@ struct FpaOdomenuPayload : public FpaOdomPayload
 struct FpaOdomshPayload : public FpaOdomPayload
 {
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
+
+    static constexpr const char* MSG_NAME = "FP_A-ODOMSH";  //!< Message name
 };
 
 /**
  * @brief FP_A-ODOMSTATUS (version 1) messages payload
  */
-struct FpaOdomstatusPayload
+struct FpaOdomstatusPayload : public FpaPayload
 {  // clang-format off
     FpaGpsTime         gps_time;         //!< Time
     FpaInitStatus      init_status;      //!< Fusion init status
@@ -803,12 +831,14 @@ struct FpaOdomstatusPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* MSG_NAME = "FP_A-ODOMSTATUS";  //!< Message name
 };
 
 /**
  * @brief FP_A-TEXT (version 1) message payload
  */
-struct FpaTextPayload
+struct FpaTextPayload : public FpaPayload
 {  // clang-format off
     FpaTextLevel  level;                        //!< Level
     char          text[MAX_FP_A_SIZE] = { 0 };  //!< Text (nul-terminated string)
@@ -824,12 +854,14 @@ struct FpaTextPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* MSG_NAME = "FP_A-TEXT";  //!< Message name
 };
 
 /**
  * @brief FP_A-TF (version 2) message payload
  */
-struct FpaTfPayload
+struct FpaTfPayload : public FpaPayload
 {  // clang-format off
     FpaGpsTime gps_time;             //!< Time
     char       frame_a[10] = { 0 };  //!< Target frame (nul-terminated string)
@@ -848,12 +880,14 @@ struct FpaTfPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* MSG_NAME = "FP_A-TF";  //!< Message name
 };
 
 /**
  * @brief FP_A-TP (version 1) message payload
  */
-struct FpaTpPayload
+struct FpaTpPayload : public FpaPayload
 {  // clang-format off
     FpaGpsTime  gps_time;                             //!< Time
     char        tp_name[10] = { 0 };                  //!< Timebulse name (nul-terminated string)
@@ -874,6 +908,8 @@ struct FpaTpPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* MSG_NAME = "FP_A-TP";  //!< Message name
 };
 
 /* ****************************************************************************************************************** */

@@ -459,11 +459,19 @@ struct NmeaFloat
 };
 
 /**
+ * @brief NMEA payload base class
+ */
+struct NmeaPayload
+{
+    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;  //!< Talker
+    virtual ~NmeaPayload() = default;                 //!< Virtual dtor for polymorphism
+};
+
+/**
  * @brief NMEA-Gx-GGA message payload
  */
-struct NmeaGgaPayload
+struct NmeaGgaPayload : public NmeaPayload
 {
-    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;       //!< Talker
     NmeaTime time;                                         //!< Time
     NmeaLlh llh;                                           //!< Position
     NmeaQualityGga quality = NmeaQualityGga::UNSPECIFIED;  //!< Fix quality
@@ -482,14 +490,15 @@ struct NmeaGgaPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* FORMATTER = "GGA";  //!< Formatter
 };
 
 /**
  * @brief NMEA-Gx-GLL message payload
  */
-struct NmeaGllPayload
+struct NmeaGllPayload : public NmeaPayload
 {
-    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;          //!< Talker
     NmeaLlh llh;                                              //!< Position
     NmeaTime time;                                            //!< Time
     NmeaStatusGllRmc status = NmeaStatusGllRmc::UNSPECIFIED;  //!< Positioning system status
@@ -505,14 +514,15 @@ struct NmeaGllPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* FORMATTER = "GLL";  //!< Formatter
 };
 
 /**
  * @brief NMEA-Gx-RMC message payload
  */
-struct NmeaRmcPayload
+struct NmeaRmcPayload : public NmeaPayload
 {
-    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;             //!< Talker
     NmeaTime time;                                               //!< Time
     NmeaStatusGllRmc status = NmeaStatusGllRmc::UNSPECIFIED;     //!< Positioning system status
     NmeaLlh llh;                                                 //!< Position
@@ -531,18 +541,19 @@ struct NmeaRmcPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* FORMATTER = "RMC";  //!< Formatter
 };
 
 /**
  * @brief NMEA-Gx-VTG message payload
  */
-struct NmeaVtgPayload
+struct NmeaVtgPayload : public NmeaPayload
 {
-    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;  //!< Talker
-    NmeaFloat cogt;                                   //!< Course over ground (true) [deg]
-    NmeaFloat sogn;                                   //!< Speed over ground [knots]
-    NmeaFloat sogk;                                   //!< Speed over ground [km/h]
-    NmeaModeGllVtg mode;                              //!< Positioning system mode
+    NmeaFloat cogt;       //!< Course over ground (true) [deg]
+    NmeaFloat sogn;       //!< Speed over ground [knots]
+    NmeaFloat sogk;       //!< Speed over ground [km/h]
+    NmeaModeGllVtg mode;  //!< Positioning system mode
 
     /**
      * @brief Set data from sentence
@@ -554,14 +565,88 @@ struct NmeaVtgPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* FORMATTER = "VTG";  //!< Talker
+};
+
+/**
+ * @brief NMEA-Gx-GST message payload
+ */
+struct NmeaGstPayload : public NmeaPayload
+{
+    NmeaTime time;          //!< Time
+    NmeaFloat rms_range;    //!< RMS value of the standard deviation of the range inputs to the navigation process
+    NmeaFloat std_major;    //!< Standard deviation of semi-major axis of error ellipse
+    NmeaFloat std_minor;    //!< Standard deviation of semi-minor axis of error ellipse
+    NmeaFloat angle_major;  //!< Angle of semi-major axis of error ellipse from true North
+    NmeaFloat std_lat;      //!< Standard deviation of latitude error
+    NmeaFloat std_lon;      //!< Standard deviation of longitude error
+    NmeaFloat std_alt;      //!< Standard deviation of altitude error
+
+    /**
+     * @brief Set data from sentence
+     *
+     * @param[in]   msg       Pointer to the NMEA message
+     * @param[in]   msg_size  Size of the NMEA message (>= 11)
+     *
+     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* FORMATTER = "GST";  //!< Formatter
+};
+
+/**
+ * @brief NMEA-Gx-HDT message payload
+ */
+struct NmeaHdtPayload : public NmeaPayload
+{
+    NmeaFloat heading;  //!< True heading
+
+    /**
+     * @brief Set data from sentence
+     *
+     * @param[in]   msg       Pointer to the NMEA message
+     * @param[in]   msg_size  Size of the NMEA message (>= 11)
+     *
+     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* FORMATTER = "HDT";  //!< Formatter
+};
+
+/**
+ * @brief NMEA-Gx-ZDA message payload
+ */
+struct NmeaZdaPayload : public NmeaPayload
+{
+    NmeaTime time;      //!< Time
+    NmeaDate date;      //!< Date
+    NmeaInt local_hr;   //!< Local zone hours, always 00 (= UTC)
+    NmeaInt local_min;  //!< Local zone minutes, always 00 (= UTC)
+
+    /**
+     * @brief Set data from sentence
+     *
+     * @param[in]   msg       Pointer to the NMEA message
+     * @param[in]   msg_size  Size of the NMEA message (>= 11)
+     *
+     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* FORMATTER = "ZDA";  //!< Formatter
 };
 
 /**
  * @brief NMEA-Gx-GSA message payload (NMEA 4.11 only!)
  */
-struct NmeaGsaPayload
+struct NmeaGsaPayload : public NmeaPayload
 {
-    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;       //!< Talker
     NmeaOpModeGsa opmode = NmeaOpModeGsa::UNSPECIFIED;     //!< Operation mode
     NmeaNavModeGsa navmode = NmeaNavModeGsa::UNSPECIFIED;  //!< Nav mode
     std::array<NmeaSat, 12> sats;                          //!< Satellites, valid ones are 0..(num_sats-1)
@@ -581,23 +666,24 @@ struct NmeaGsaPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* FORMATTER = "GSA";  //!< Formatter
 };
 
 /**
  * @brief NMEA-Gx-GSV message payload (NMEA 4.11 only!)
  */
-struct NmeaGsvPayload
+struct NmeaGsvPayload : public NmeaPayload
 {
-    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;  //!< Talker
-    NmeaInt num_msgs;                                 //!< Number of messages in this GSV sequence (for this signal ID)
-    NmeaInt msg_num;                                  //!< Message number in sequence (1...num_msgs)
-    NmeaInt tot_num_sat;                              //!< Number of sat/sig info in the whole sequence of GSV messages
-    std::array<NmeaAzEl, 4> azels;                    //!< Satellite positions, valid ones are 0..(num_sats-1)
-    int num_azels = 0;                                //!< Number of valid satellite positions (the first n of azels[])
-    std::array<NmeaCno, 4> cnos;                      //!< Signal levels, valid ones are 0..(num_sats-1)
-    int num_cnos = 0;                                 //!< Number of valid signal levels (the first n of azels[])
-    NmeaSystemId system;                              //!< System ID
-    NmeaSignalId signal;                              //!< Signal ID
+    NmeaInt num_msgs;               //!< Number of messages in this GSV sequence (for this signal ID)
+    NmeaInt msg_num;                //!< Message number in sequence (1...num_msgs)
+    NmeaInt tot_num_sat;            //!< Number of sat/sig info in the whole sequence of GSV messages
+    std::array<NmeaAzEl, 4> azels;  //!< Satellite positions, valid ones are 0..(num_sats-1)
+    int num_azels = 0;              //!< Number of valid satellite positions (the first n of azels[])
+    std::array<NmeaCno, 4> cnos;    //!< Signal levels, valid ones are 0..(num_sats-1)
+    int num_cnos = 0;               //!< Number of valid signal levels (the first n of azels[])
+    NmeaSystemId system;            //!< System ID
+    NmeaSignalId signal;            //!< Signal ID
 
     /**
      * @brief Set data from sentence
@@ -609,6 +695,8 @@ struct NmeaGsvPayload
      *          otherwise (fields are now invalid)
      */
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* FORMATTER = "GSV";  //!< Formatter
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

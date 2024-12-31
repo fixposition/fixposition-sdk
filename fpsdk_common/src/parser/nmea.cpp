@@ -266,7 +266,7 @@ static bool GetParts(NmeaParts& parts, const char* formatter, const uint8_t* msg
             (const char*)&msg[parts.meta_.payload_ix0_] + (parts.meta_.payload_ix1_ - parts.meta_.payload_ix0_ + 1));
 
         NMEA_TRACE("GetParts(...) talker=%s formatter=%s payload=%s ix0=%d ix1=%d size=%d", parts.meta_.talker_,
-            parts.meta_.formatter_, payload.c_str(), parts.meta_.payload_ix0_, parts.meta_.payload_ix1_, msg_size);
+            parts.meta_.formatter_, payload.c_str(), parts.meta_.payload_ix0_, parts.meta_.payload_ix1_, (int)msg_size);
 
         std::size_t pos = 0;
         while ((pos = payload.find(",")) != std::string::npos) {
@@ -781,7 +781,7 @@ bool NmeaGgaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     // 14 or 12 fields as diff station info is optional
     bool ok = false;
     NmeaParts m;
-    if (GetParts(m, "GGA", msg, msg_size) && GetTalker(talker, m.meta_.talker_) &&
+    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_) &&
         ((m.fields_.size() == 14) || (m.fields_.size() == 12))) {
         ok = (GetTime(time, m.fields_[0]) && GetQualityGga(quality, m.fields_[5]) &&
               GetLlh(llh, m.fields_, 1, 3, 8, 10, quality != NmeaQualityGga::NOFIX) &&
@@ -802,7 +802,7 @@ bool NmeaGllPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     //           0        1     2        3      4     5 6
     bool ok = false;
     NmeaParts m;
-    if (GetParts(m, "GLL", msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 7)) {
+    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 7)) {
         ok = (GetTime(time, m.fields_[4]) && GetStatusGllRmc(status, m.fields_[5]) &&
               GetModeGllVtg(mode, m.fields_[6]) &&
               GetLlh(llh, m.fields_, 0, 2, -1, -1, mode != NmeaModeGllVtg::INVALID));
@@ -820,7 +820,7 @@ bool NmeaRmcPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     // $GNRMC,235943.412,V,,,,,,,050180,,,N,V*28
     bool ok = false;
     NmeaParts m;
-    if (GetParts(m, "RMC", msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 13)) {
+    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 13)) {
         // Ignore magnetic variation fields_[9] and fields_[10]
         ok = (GetTime(time, m.fields_[0]) && GetStatusGllRmc(status, m.fields_[1]) &&
               GetFloat(speed, m.fields_[6], false) && GetFloat(course, m.fields_[7], false, 0.0, 360.0) &&
@@ -840,13 +840,73 @@ bool NmeaVtgPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     //        0      1 23 4     5 6     7 8
     bool ok = false;
     NmeaParts m;
-    if (GetParts(m, "VTG", msg, msg_size) && (m.fields_.size() == 9)) {
+    if (GetParts(m, FORMATTER, msg, msg_size) && (m.fields_.size() == 9)) {
         // Ignore magnetic course fields_[2] and fields_[3]
         ok = (GetTalker(talker, m.meta_.talker_) && (m.fields_[1] == "T") && GetFloat(cogt, m.fields_[0], false) &&
               (m.fields_[5] == "N") && GetFloat(sogn, m.fields_[4], false) && (m.fields_[7] == "K") &&
               GetFloat(sogk, m.fields_[6], false) && GetModeGllVtg(mode, m.fields_[8]));
     }
     NMEA_TRACE("NmeaVtgPayload %s", ok ? "true" : "false");
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaGstPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
+{
+    // $GPGST,132419.0000,,0.0515,0.0188,162.6609,0.0495,0.0236,0.0182*7D
+    //        0          1 2      3        4      5      6      7
+    bool ok = false;
+    NmeaParts m;
+    if (GetParts(m, FORMATTER, msg, msg_size) && (m.fields_.size() == 8)) {
+        ok = (GetTalker(talker, m.meta_.talker_) && GetTime(time, m.fields_[0]) &&
+              GetFloat(rms_range, m.fields_[1], false) && GetFloat(std_major, m.fields_[2], false) &&
+              GetFloat(std_minor, m.fields_[3], false) && GetFloat(angle_major, m.fields_[4], false) &&
+              GetFloat(std_lat, m.fields_[5], false) && GetFloat(std_lon, m.fields_[6], false) &&
+              GetFloat(std_alt, m.fields_[7], false));
+    }
+    NMEA_TRACE("NmeaGstPayload %s", ok ? "true" : "false");
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaHdtPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
+{
+    // $GPHDT,61.7,T*05
+    //        0    1
+    bool ok = false;
+    NmeaParts m;
+    if (GetParts(m, FORMATTER, msg, msg_size) && (m.fields_.size() == 2)) {
+        // Ignore true_ind fields_[1]
+        ok = (GetTalker(talker, m.meta_.talker_) && GetFloat(heading, m.fields_[0], false, 0.0, 360.0));
+    }
+    NMEA_TRACE("NmeaHdtPayload %s", ok ? "true" : "false");
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaZdaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
+{
+    // $GPZDA,090924.00,10,10,2023,00,00*63
+    //        0         1  2  3    4  5
+    bool ok = false;
+    NmeaParts m;
+    NmeaInt day;
+    NmeaInt month;
+    NmeaInt year;
+    if (GetParts(m, FORMATTER, msg, msg_size) && (m.fields_.size() == 6)) {
+        ok = (GetTalker(talker, m.meta_.talker_) && GetTime(time, m.fields_[0]) &&
+              GetInt(day, m.fields_[1], false, 1, 31) && GetInt(month, m.fields_[2], false, 1, 12) &&
+              GetInt(year, m.fields_[3], false, 2001, 2099) && GetInt(local_hr, m.fields_[4], false, -13, 13) &&
+              GetInt(local_min, m.fields_[5], false, 0, 59));
+        date.valid = day.valid && month.valid && year.valid;
+        date.years = year.value;
+        date.months = month.value;
+        date.days = day.value;
+    }
+    NMEA_TRACE("NmeaZdaPayload %s", ok ? "true" : "false");
     return ok;
 }
 
@@ -859,7 +919,7 @@ bool NmeaGsaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     // $GNGSA,A,1,,,,,,,,,,,,,99.99,99.99,99.99,5*37
     bool ok = false;
     NmeaParts m;
-    if (GetParts(m, "GSA", msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 18)) {
+    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 18)) {
         ok = GetSystemId(system, m.fields_[17]);
 
         // Satellites
@@ -903,7 +963,7 @@ bool NmeaGsvPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     //        0 1  2 3
     bool ok = false;
     NmeaParts m;
-    if (GetParts(m, "GSV", msg, msg_size) && GetTalker(talker, m.meta_.talker_)) {
+    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_)) {
         // The number of fields depends on the number of satellites and the sequence of the message
         static constexpr int MAX_MSGS = 9;
         static constexpr int SV_PER_MSG = 4;

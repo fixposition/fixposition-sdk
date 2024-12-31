@@ -96,6 +96,11 @@ bool LoadRosParam(const std::string& name, double& value)
     return LoadRosParamEx(name, value);
 }
 
+bool LoadRosParam(const std::string& name, std::vector<std::string>& value)
+{
+    return LoadRosParamEx(name, value);
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 ros::Time ConvTime(const fpsdk::common::time::Time& time)
