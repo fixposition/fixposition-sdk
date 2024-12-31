@@ -147,7 +147,7 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
             "            parsertool some_userio.raw\n"
             "\n"
             "\n", stdout);
-        // clang-format on$
+        // clang-format on
     }
 
     bool HandleOption(const Option& option, const std::string& argument) final
