@@ -114,6 +114,13 @@ bool OutputFile::Write(const uint8_t* data, const std::size_t size)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const std::string& OutputFile::GetPath() const
+{
+    return path_;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool FileSlurp(const std::string& path, std::vector<uint8_t>& data)
 {
     std::ifstream fh(path, std::ios::binary);

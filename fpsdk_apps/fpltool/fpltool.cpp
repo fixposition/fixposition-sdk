@@ -22,6 +22,7 @@
 
 /* PACKAGE */
 #include "fpltool_dump.hpp"
+#include "fpltool_extract.hpp"
 #include "fpltool_meta.hpp"
 #include "fpltool_opts.hpp"
 #include "fpltool_record.hpp"
@@ -48,12 +49,13 @@ int main(int argc, char** argv)
     // Run command
     if (ok) {
         switch (opts.command_) { /* clang-format off */
-            case FplToolOptions::Command::DUMP:        ok = DoDump(opts);   break;
-            case FplToolOptions::Command::META:        ok = DoMeta(opts);   break;
-            case FplToolOptions::Command::ROSBAG:      ok = DoRosbag(opts); break;
-            case FplToolOptions::Command::TRIM:        ok = DoTrim(opts);   break;
-            case FplToolOptions::Command::RECORD:      ok = DoRecord(opts); break;
-            case FplToolOptions::Command::UNSPECIFIED: ok = false;          break;
+            case FplToolOptions::Command::DUMP:        ok = DoDump(opts);    break;
+            case FplToolOptions::Command::META:        ok = DoMeta(opts);    break;
+            case FplToolOptions::Command::ROSBAG:      ok = DoRosbag(opts);  break;
+            case FplToolOptions::Command::TRIM:        ok = DoTrim(opts);    break;
+            case FplToolOptions::Command::RECORD:      ok = DoRecord(opts);  break;
+            case FplToolOptions::Command::EXTRACT:     ok = DoExtract(opts); break;
+            case FplToolOptions::Command::UNSPECIFIED: ok = false;           break;
         }  // clang-format on
     }
 

@@ -96,6 +96,13 @@ class OutputFile
      */
     bool Write(const uint8_t* data, const std::size_t size);
 
+    /**
+     * @brief Get file path
+     *
+     * @returns the file path if the file has been opened before, the empty string otherwise
+     */
+    const std::string& GetPath() const;
+
    private:
     std::string path_;                  //!< File path
     std::unique_ptr<std::ostream> fh_;  //!< File handle

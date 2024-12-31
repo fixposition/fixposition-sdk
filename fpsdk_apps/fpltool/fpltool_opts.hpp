@@ -54,6 +54,7 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
         ROSBAG,       //!< Create ROS bag from log
         TRIM,         //!< Trim .fpl file
         RECORD,       //!< Record a log
+        EXTRACT,      //!< Extract .fpl file to various (non-ROS) files
     };
 
     // clang-format off
@@ -135,8 +136,18 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
             "    Trim a verylong.fpl into a shorter one:\n"
             "\n"
             "        fpltool trim some.fpl -S 3600 -D 1800\n"
+            "\n"
+            "    Extract data from some.fpl:\n"
+            "\n"
+            "        fpltool output some.fpl\n"
+            "\n"
+            "        This results in various data files suitable for further processing. For example, the input/output\n"
+            "        messages received/sent by the sensor can be processed by the parsertool:\n"
+            "\n"
+            "            parsertool some_userio.raw\n"
+            "\n"
             "\n", stdout);
-        // clang-format on
+        // clang-format on$
     }
 
     bool HandleOption(const Option& option, const std::string& argument) final
@@ -188,11 +199,12 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
         if (args.size() > 0) {
             command_str_ = args[0];
             // clang-format off
-            if      (command_str_ == "meta")    { command_ = Command::META; }
-            else if (command_str_ == "dump")    { command_ = Command::DUMP; }
-            else if (command_str_ == "rosbag")  { command_ = Command::ROSBAG; }
-            else if (command_str_ == "trim")    { command_ = Command::TRIM; }
-            else if (command_str_ == "record")  { command_ = Command::RECORD; }
+            if      (command_str_ == "meta")     { command_ = Command::META;     }
+            else if (command_str_ == "dump")     { command_ = Command::DUMP;     }
+            else if (command_str_ == "rosbag")   { command_ = Command::ROSBAG;   }
+            else if (command_str_ == "trim")     { command_ = Command::TRIM;     }
+            else if (command_str_ == "record")   { command_ = Command::RECORD;   }
+            else if (command_str_ == "extract")  { command_ = Command::EXTRACT;  }
             // clang-format on
             else {
                 WARNING("Unknown command '%s'", command_str_.c_str());
