@@ -12,6 +12,7 @@
  */
 
 /* LIBC/STL */
+#include <cstring>
 
 /* EXTERNAL */
 #include "fpsdk_ros1/ext/ros.hpp"
@@ -31,26 +32,31 @@ using namespace fpsdk::common::logging;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+static char g_logger_name[100];
+
 static void sLoggingFn(const LoggingParams& /*params*/, const LoggingLevel level, const char* str)
 {
-    // These will appear under the "ros.fpsdk_ros1" logger.
-    // @todo Can we make this log to "ros1.fpsdk_common"?
     switch (level) {  // clang-format off
-        case LoggingLevel::TRACE:   ROS_DEBUG("%s", str); break;
-        case LoggingLevel::DEBUG:   ROS_DEBUG("%s", str); break;
-        case LoggingLevel::INFO:    ROS_INFO( "%s", str); break;
-        case LoggingLevel::NOTICE:  ROS_INFO( "%s", str); break;
-        case LoggingLevel::WARNING: ROS_WARN( "%s", str); break;
-        case LoggingLevel::ERROR:   ROS_ERROR("%s", str); break;
-        case LoggingLevel::FATAL:   ROS_FATAL("%s", str); break;
+        case LoggingLevel::TRACE:   ROS_LOG(ros::console::levels::Debug, g_logger_name, "%s", str); break;
+        case LoggingLevel::DEBUG:   ROS_LOG(ros::console::levels::Debug, g_logger_name, "%s", str); break;
+        case LoggingLevel::INFO:    ROS_LOG(ros::console::levels::Info,  g_logger_name, "%s", str); break;
+        case LoggingLevel::NOTICE:  ROS_LOG(ros::console::levels::Info,  g_logger_name, "%s", str); break;
+        case LoggingLevel::WARNING: ROS_LOG(ros::console::levels::Warn,  g_logger_name, "%s", str); break;
+        case LoggingLevel::ERROR:   ROS_LOG(ros::console::levels::Error, g_logger_name, "%s", str); break;
+        case LoggingLevel::FATAL:   ROS_LOG(ros::console::levels::Fatal, g_logger_name, "%s", str); break;
     }  // clang-format on
 }
 
-void RedirectLoggingToRosConsole()
+void RedirectLoggingToRosConsole(const char* logger_name)
 {
     LoggingParams params = LoggingGetParams();
     params.fn_ = sLoggingFn;
     params.level_ = LoggingLevel::TRACE;  // We leave it up to ROS to decide what to print
+    // Set logger name. Note that ROSCONSOLE_DEFAULT_NAME here is the "ros.fpsdk_ros1" package name. However, when
+    // called from the app (node) then the default argument to logger_name is that package's ROSCONSOLE_DEFAULT_NAME,
+    // e.g. "ros.ros1_fpsdk_demo"
+    std::snprintf(
+        g_logger_name, sizeof(g_logger_name), "%s", logger_name != NULL ? logger_name : ROSCONSOLE_DEFAULT_NAME);
     LoggingSetParams(params);
 }
 

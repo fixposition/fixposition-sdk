@@ -35,6 +35,7 @@ int main(int argc, char** argv)
 {
 #ifndef NDEBUG
     fpsdk::common::app::StacktraceHelper stacktrace;
+    WARNING("***** Running debug build *****");
 #endif
     ROS_INFO("main() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
 
@@ -44,10 +45,10 @@ int main(int argc, char** argv)
     ros::init(argc, argv, "ros1_fpsdk_demo_node");
     ros::NodeHandle nh("~");
 
-    // Redirect Fixposition SDK logging to ROS console
+    // Redirect Fixposition SDK logging to ROS console, all should use the "ros.ros1_fpsdk_demo" logger
     fpsdk::ros1::utils::RedirectLoggingToRosConsole();
-    DEBUG("This is a message from fpsdk_common's logging, redirected to the ROS console");  // logger: "ros1.fpsdk_ros1"
-    ROS_DEBUG("This is a proper ROS console message");  // logger: "ros.ros1_fpsdk_demo"
+    DEBUG("This is a message from fpsdk_common's logging, redirected to the ROS console");
+    ROS_DEBUG("This is a proper ROS console message");
 
     // Handle CTRL-C / SIGINT ourselves
     fpsdk::common::app::SigIntHelper sigint;

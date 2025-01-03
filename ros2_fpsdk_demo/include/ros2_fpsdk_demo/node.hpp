@@ -14,9 +14,10 @@
 #define __ROS2_FPSDK_DEMO_NODE_HPP__
 
 /* LIBC/STL */
+#include <memory>
 
 /* EXTERNAL */
-#include <rclcpp/rclcpp.hpp>
+#include <fpsdk_ros2/ext/rclcpp.hpp>
 #include <std_msgs/msg/string.hpp>
 
 /* Fixposition SDK */
@@ -31,7 +32,7 @@ class DemoParams
 {
    public:
     DemoParams();
-    bool LoadFromRos(std::shared_ptr<rclcpp::Node> node);
+    bool LoadFromRos(std::shared_ptr<rclcpp::Node> nh, const std::string& ns = "");
 
     double worker1_interval_;
     double worker2_interval_;
@@ -42,17 +43,18 @@ class DemoParams
     static constexpr double INTERVAL_MAX = 10.0;
 };
 
-class DemoNode : public rclcpp::Node
+class DemoNode
 {
    public:
-    DemoNode();
+    DemoNode(std::shared_ptr<rclcpp::Node> nh, const DemoParams& params);
     ~DemoNode();
-    bool LoadParams();
     bool Start();
     void Stop();
 
    private:
+    std::shared_ptr<rclcpp::Node> nh_;
     DemoParams params_;
+    rclcpp::Logger logger_;
     fpsdk::common::thread::Thread worker1_;
     fpsdk::common::thread::Thread worker2_;
     rclcpp::TimerBase::SharedPtr timer1_;

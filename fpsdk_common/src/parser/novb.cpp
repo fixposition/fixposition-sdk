@@ -26,6 +26,7 @@
 
 /* PACKAGE */
 #include "fpsdk_common/parser/novb.hpp"
+#include "fpsdk_common/types.hpp"
 
 namespace fpsdk {
 namespace common {
@@ -90,6 +91,24 @@ bool NovbGetMessageName(char* name, const std::size_t size, const uint8_t* msg, 
 
     // If that failed, too, stringify the message ID
     return std::snprintf(name, size, "NOV_B-MSG%05" PRIu16, msg_id) < (int)size;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NovbHeader::IsLongHeader() const
+{
+    return long_header.sync3 == NOV_B_SYNC_3_LONG;
+}
+
+NovbMsgTypeSource NovbHeader::Source() const
+{
+    if (long_header.sync3 == NOV_B_SYNC_3_LONG) {
+        return static_cast<NovbMsgTypeSource>(
+            long_header.message_type & fpsdk::common::types::EnumToVal(NovbMsgTypeSource::_MASK));
+
+    } else {
+        return NovbMsgTypeSource::_MASK;
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -42,15 +42,17 @@ namespace utils {
  * This configures the fpsdk::common::logging facility to output via the ROS console. This does *not* configure the ROS
  * console (logger level, logger name, etc.).
  *
- * The mapping of fpsdk::common::logging::LoggingLevel to ros::console::levels is as follows:
+ * The mapping of fpsdk::common::logging::LoggingLevel to rclcpp levels is as follows:
  *
  * - TRACE and DEBUG --> DEBUG
  * - INFO and NOTICE --> INFO
  * - WARNING         --> WARN
  * - ERROR           --> ERROR
  * - FATAL           --> FATAL
+ *
+ * @param[in]  logger_name  The name of the logger. The recommended value is node->get_logger().get_name()
  */
-void RedirectLoggingToRosConsole();
+void RedirectLoggingToRosConsole(const char* logger_name = "fpsdk_ros2");
 
 /**
  * @brief Convert to ROS time (atomic -> POSIX)

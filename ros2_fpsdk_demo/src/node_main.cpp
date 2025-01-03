@@ -30,47 +30,66 @@
 
 /* ****************************************************************************************************************** */
 
+using namespace Ros2FpsdkDemo;
+
 int main(int argc, char* argv[])
 {
 #ifndef NDEBUG
     fpsdk::common::app::StacktraceHelper stacktrace;
+    WARNING("***** Running debug build *****");
 #endif
-    auto logger = rclcpp::get_logger("node_main");
-    RCLCPP_INFO(logger, "main() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
+    INFO("main() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
 
     bool ok = true;
 
-    // Initialise
+    // Initialise ROS, create node handle
     rclcpp::init(argc, argv);
+    auto nh = std::make_shared<rclcpp::Node>("ros2_fpsdk_demo");
+    auto logger = nh->get_logger();
 
-    // Redirect Fixposition SDK logging to ROS console
-    fpsdk::ros2::utils::RedirectLoggingToRosConsole();
-    DEBUG("This is a message from fpsdk_common's logging, redirected to the ROS console");  // logger: "fpsdk_ros2"
-    RCLCPP_DEBUG(logger, "This is a proper ROS console message");                           // logger: "node_main"
+    // Redirect Fixposition SDK logging to ROS console, all should use the "ros2_fpsdk_demo" logger
+    fpsdk::ros2::utils::RedirectLoggingToRosConsole(logger.get_name());
+    DEBUG("This is a message from fpsdk_common's logging, redirected to the ROS console");
+    RCLCPP_DEBUG(logger, "This is a proper ROS console message");
+
+    // Load parameters
+    RCLCPP_INFO(logger, "Loading parameters...");
+    DemoParams params;
+    if (!params.LoadFromRos(nh)) {
+        RCLCPP_ERROR(logger, "Failed loading parameters");
+        ok = false;
+    }
 
     // Handle CTRL-C / SIGINT ourselves
     fpsdk::common::app::SigIntHelper sigint;
 
-    // Create node. This doesn't do much yet.
-    auto node = std::make_shared<Ros2FpsdkDemo::DemoNode>();
-
-    // Load params
-    if (node->LoadParams()) {
-        // Start node
+    // Start node
+    std::unique_ptr<DemoNode> node;
+    if (ok) {
+        try {
+            node = std::make_unique<DemoNode>(nh, params);
+        } catch (const std::exception& ex) {
+            RCLCPP_ERROR(logger, "Failed creating node: %s", ex.what());
+            ok = false;
+        }
+    }
+    if (ok) {
+        RCLCPP_INFO(logger, "Starting node...");
         if (node->Start()) {
             RCLCPP_INFO(logger, "main() spinning...");
 #if 1
-            // Do the same as rclpp::spin(), but also handle CTRL-C / SIGINT nicely
+            // Do the same as rclpp::spin(nh), but also handle CTRL-C / SIGINT nicely
             // Callbacks execute in main thread
             while (rclcpp::ok() && !sigint.ShouldAbort()) {
                 rclcpp::spin_until_future_complete(
-                    node, std::promise<bool>().get_future(), std::chrono::milliseconds(345));
+                    nh, std::promise<bool>().get_future(), std::chrono::milliseconds(345));
             }
 #else
+
             // Use multiple spinner threads. Callback execute in one of them.
-            // TODO: this doesn't seem to work
+            // TODO: this (executing in those threads) doesn't seem to work
             rclcpp::executors::MultiThreadedExecutor executor{ rclcpp::ExecutorOptions(), 4 };
-            executor.add_node(node);
+            executor.add_node(nh);
             while (rclcpp::ok() && !sigint.ShouldAbort()) {
                 executor.spin_once(std::chrono::milliseconds(345));
             }
@@ -80,12 +99,10 @@ int main(int argc, char* argv[])
             RCLCPP_ERROR(logger, "Failed starting node");
             ok = false;
         }
-    } else {
-        RCLCPP_ERROR(logger, "Failed loading parameters");
-        ok = false;
+        node->Stop();
+        node.reset();
+        nh.reset();
     }
-
-    node->Stop();
 
     // Are we happy?
     if (ok) {

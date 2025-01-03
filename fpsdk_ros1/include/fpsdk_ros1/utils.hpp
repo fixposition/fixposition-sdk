@@ -24,6 +24,7 @@
 #include <vector>
 
 /* EXTERNAL */
+#include <fpsdk_ros1/ext/ros_console.hpp>
 #include <fpsdk_ros1/ext/ros_time.hpp>
 
 /* Fixposition SDK */
@@ -52,8 +53,12 @@ namespace utils {
  * - WARNING         --> WARN
  * - ERROR           --> ERROR
  * - FATAL           --> FATAL
+ *
+ * @param[in]  logger_name  The name of the logger. The default value should give the caller package's
+ *                          ROSCONSOLE_DEFAULT_NAME, for example, "ros1_fpsdk_demo". That is, typically this argument
+ *                          should be left empty (the default value).
  */
-void RedirectLoggingToRosConsole();
+void RedirectLoggingToRosConsole(const char* logger_name = ROSCONSOLE_DEFAULT_NAME /* = caller's package name */);
 
 /**
  * @brief Loads a parameter from the ROS parameter server (int)

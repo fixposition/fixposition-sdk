@@ -25,6 +25,7 @@
 #include <chrono>
 #include <cstdint>
 #include <ctime>
+#include <string>
 
 /* EXTERNAL */
 

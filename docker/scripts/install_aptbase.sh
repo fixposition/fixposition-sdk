@@ -21,11 +21,15 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    libeigen3-dev
     ..............jazzy.bookworm    libgtest-dev
     noetic.humble.jazzy.bookworm    libpath-tiny-perl
+    ..............jazzy.........    libproj25
+    ..............jazzy.........    libproj-dev
     noetic.humble.jazzy.bookworm    libsqlite3-dev
     noetic.humble.jazzy.bookworm    libtiff-dev
     noetic.humble.jazzy.bookworm    libyaml-cpp-dev
     noetic.humble.jazzy.bookworm    netbase
     .......humble.jazzy.bookworm    pre-commit
+    ..............jazzy.........    proj-data
+    ..............jazzy.........    proj-bin
     noetic......................    python3-catkin-tools
     noetic.humble.jazzy.bookworm    python-is-python3
     noetic.humble.jazzy.bookworm    python3-osrf-pycommon

@@ -24,7 +24,7 @@ For building the libraries and apps:
 - Eigen3          (≥ 3.3.7,  tested with 3.3.7, 3.4.0)
 - yaml-cpp        (≥ 0.6.2,  tested with 0.6.2, 0.7.0, 0.8.0)
 - zlib1g          (≥ 1.2.11, tested with 1.2.11, 1.2.13, 1.3)
-- PROJ        (*) (≥ 9.?.?,  tested with 9.4.1)
+- PROJ        (*) (≥ 9.4.x,  tested with 9.4.0, 9.4.1)
 - ROS1        (*) (Noetic), or
 - ROS2        (*) (Humble or Jazzy)
 

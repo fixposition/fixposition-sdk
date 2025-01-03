@@ -158,7 +158,7 @@ bool FpaGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
  */
 enum class FpaInitStatus : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     NOT_INIT                 = '0',  //!< Not initialised
     LOCAL_INIT               = '1',  //!< Locally initialised
     GLOBAL_INIT              = '2',  //!< Globally initialised
@@ -169,7 +169,7 @@ enum class FpaInitStatus : int
  */
 enum class FpaFusionStatusLegacy : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     NONE                     = '0',  //!< Not started
     VISION                   = '1',  //!< Vision only
     VIO                      = '2',  //!< Visual-inertial fusion
@@ -182,7 +182,7 @@ enum class FpaFusionStatusLegacy : int
  */
 enum class FpaMeasStatus : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     NOT_USED                 = '0',  //!< Not used
     USED                     = '1',  //!< Used
     DEGRADED                 = '2',  //!< Degraded
@@ -193,7 +193,7 @@ enum class FpaMeasStatus : int
  */
 enum class FpaImuStatus : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     NOT_CONVERGED            = '0',  //!< Not converged
     WARMSTARTED              = '1',  //!< Warmstarted
     ROUGH_CONVERGED          = '2',  //!< Rough convergence
@@ -205,7 +205,7 @@ enum class FpaImuStatus : int
  */
 enum class FpaImuStatusLegacy : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     NOT_CONVERGED            = '0',  //!< Not converged
     CONVERGED                = '1',  //!< Converged
 };  // clang-format on
@@ -215,7 +215,7 @@ enum class FpaImuStatusLegacy : int
  */
 enum class FpaImuNoise : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     LOW_NOISE                = '1',  //!< Low noise
     MEDIUM_NOISE             = '2',  //!< Medium noise
     HIGH_NOISE               = '3',  //!< High noise
@@ -230,7 +230,7 @@ enum class FpaImuNoise : int
  */
 enum class FpaImuConv : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     RESERVED0                = '0',  //!< Reserved
     WAIT_IMU_MEAS            = '1',  //!< Awaiting IMU measurements
     WAIT_GLOBAL_MEAS         = '2',  //!< Insufficient global measurements
@@ -246,7 +246,7 @@ enum class FpaImuConv : int
  */
 enum class FpaGnssStatus : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     NO_FIX                   = '0',  //!< No fix
     SPP                      = '1',  //!< Single-point positioning (SPP)
     RTK_MB                   = '2',  //!< RTK moving baseline
@@ -264,7 +264,7 @@ enum class FpaGnssStatus : int
  */
 enum class FpaCorrStatus : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     WAITING_FUSION           = '0',  //!< Waiting fusion
     NO_GNSS                  = '1',  //!< No GNSS available
     NO_CORR                  = '2',  //!< No corrections used
@@ -282,7 +282,7 @@ enum class FpaCorrStatus : int
  */
 enum class FpaBaselineStatus : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     WAITING_FUSION           = '0',  //!< Waiting fusion
     NO_FIX                   = '1',  //!< Not available or no fix
     FAILING                  = '2',  //!< Failing
@@ -294,7 +294,7 @@ enum class FpaBaselineStatus : int
  */
 enum class FpaCamStatus : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     CAM_UNAVL                = '0',  //!< Camera not available
     BAD_FEAT                 = '1',  //!< Camera available, but not usable  (e.g. too dark)
     RESERVED2                = '2',  //!< Reserved
@@ -308,7 +308,7 @@ enum class FpaCamStatus : int
  */
 enum class FpaWsStatus : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     NOT_ENABLED              = '0',  //!< No wheelspeed enabled
     MISS_MEAS                = '1',  //!< Missing wheelspeed measurements
     NONE_CONVERGED           = '2',  //!< At least one wheelspeed enabled, no wheelspeed converged
@@ -321,7 +321,7 @@ enum class FpaWsStatus : int
  */
 enum class FpaWsStatusLegacy : int
 {  // clang-format off
-    UNSPECIFIED              = '?', //!< Unspecified
+    UNSPECIFIED              = '!', //!< Unspecified
     NOT_ENABLED              = '-', //!< No wheelspeed enabled
     NONE_CONVERGED           = '0', //!< None converged
     ONE_OR_MORE_CONVERGED    = '1', //!< At least one converged
@@ -332,7 +332,7 @@ enum class FpaWsStatusLegacy : int
  */
 enum class FpaWsConv : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     WAIT_FUSION              = '0',  //!< Awaiting Fusion
     WAIT_WS_MEAS             = '1',  //!< Missing wheelspeed measurements
     WAIT_GLOBAL_MEAS         = '2',  //!< Insufficient global measurements
@@ -347,7 +347,7 @@ enum class FpaWsConv : int
  */
 enum class FpaMarkersStatus : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     NOT_ENABLED              = '0',  //!< No markers available
     NONE_CONVERGED           = '1',  //!< Markers available
     ONE_CONVERGED            = '2',  //!< Markers available and used
@@ -359,7 +359,7 @@ enum class FpaMarkersStatus : int
  */
 enum class FpaMarkersConv : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     WAIT_FUSION              = '0',  //!< Awaiting Fusion
     WAIT_MARKER_MEAS         = '1',  //!< Waiting marker measurements
     WAIT_GLOBAL_MEAS         = '2',  //!< Insufficient global measurements
@@ -372,7 +372,7 @@ enum class FpaMarkersConv : int
  */
 enum class FpaGnssFix : int
 {  // clang-format off
-    UNSPECIFIED              = '?',  //!< Unspecified
+    UNSPECIFIED              = '!',  //!< Unspecified
     UNKNOWN                  = '0',  //!< Unknown
     NOFIX                    = '1',  //!< No fix
     DRONLY                   = '2',  //!< Dead-reckoning only
@@ -402,8 +402,8 @@ enum class FpaEpoch : int
 enum class FpaAntState : int
 {
     UNSPECIFIED = 0,  //!< Unspecified
-    OK,               //!< Antenna detected and good
     OPEN,             //!< No antenna detected (or connected via DC block)
+    OK,               //!< Antenna detected and good
     SHORT,            //!< Antenna short circuit detected
 };
 
@@ -623,9 +623,9 @@ struct FpaImuPayload : public FpaPayload
     //! Data from which FP_A-...IMU is stored
     enum class Which
     {
-        UNSPECIFIED,   //!< Unspecified
-        FP_A_RAWIMU,   //!< Data is from FP_A-RAWIMU
-        FP_A_CORRIMU,  //!< Data is from FP_A-CORRIMU
+        UNSPECIFIED,  //!< Unspecified
+        RAWIMU,       //!< Data is from FP_A-RAWIMU
+        CORRIMU,      //!< Data is from FP_A-CORRIMU
     };
     Which which = Which::UNSPECIFIED;  //!< Indicates from which message the data is
     // clang-format off
@@ -728,27 +728,28 @@ struct FpaOdomPayload : public FpaPayload
     //! Data from which FP_A-...IMU is stored
     enum class Which
     {
-        UNSPECIFIED,    //!< Unspecified
-        FP_A_ODOMETRY,  //!< Data is from FP_A-ODOMETRY
-        FP_A_ODOMENU,   //!< Data is from FP_A-ODOMENU
-        FP_A_ODOMSH,    //!< Data is from FP_A-ODOMSH
+        UNSPECIFIED,  //!< Unspecified
+        ODOMETRY,     //!< Data is from FP_A-ODOMETRY
+        ODOMENU,      //!< Data is from FP_A-ODOMENU
+        ODOMSH,       //!< Data is from FP_A-ODOMSH
     };
     // clang-format off
-    Which which = Which::UNSPECIFIED;  //!< Indicates from which message the data is
-    FpaGpsTime             gps_time;           //!< Time
-    FpaFloat3              pos;                //!< Position, X/Y/Z components
-    FpaFloat4              orientation;        //!< Quaternion, W/X/Y/Z components
-    FpaFloat3              vel;                //!< Velocity, X/Y/Z components
-    FpaFloat3              rot;                //!< Bias corrected angular velocity, X/Y/Z components
-    FpaFloat3              acc;                //!< Bias corrected acceleration, X/Y/Z components
-    FpaFusionStatusLegacy  fusion_status;      //!< Fustion status
-    FpaImuStatusLegacy     imu_bias_status;    //!< IMU bias status
-    FpaGnssFix             gnss1_fix;          //!< Fix status of GNSS1 receiver
-    FpaGnssFix             gnss2_fix;          //!< Fix status of GNSS2 receiver
-    FpaWsStatusLegacy      wheelspeed_status;  //!< Wheelspeed status
-    FpaFloat6              pos_cov;            //!< Position covariance, XX/YY/ZZ/XY/YZ/XZ components
-    FpaFloat6              orientation_cov;    //!< Orientation covariance, XX/YY/ZZ/XY/YZ/XZ components
-    FpaFloat6              vel_cov;            //!< Velocity covariance, XX/YY/ZZ/XY/YZ/XZ components
+    Which which = Which::UNSPECIFIED;            //!< Indicates from which message the data is
+    FpaGpsTime             gps_time;             //!< Time
+    FpaFloat3              pos;                  //!< Position, X/Y/Z components
+    FpaFloat4              orientation;          //!< Quaternion, W/X/Y/Z components
+    FpaFloat3              vel;                  //!< Velocity, X/Y/Z components
+    FpaFloat3              rot;                  //!< Bias corrected angular velocity, X/Y/Z components
+    FpaFloat3              acc;                  //!< Bias corrected acceleration, X/Y/Z components
+    FpaFusionStatusLegacy  fusion_status;        //!< Fustion status
+    FpaImuStatusLegacy     imu_bias_status;      //!< IMU bias status
+    FpaGnssFix             gnss1_fix;            //!< Fix status of GNSS1 receiver
+    FpaGnssFix             gnss2_fix;            //!< Fix status of GNSS2 receiver
+    FpaWsStatusLegacy      wheelspeed_status;    //!< Wheelspeed status
+    FpaFloat6              pos_cov;              //!< Position covariance, XX/YY/ZZ/XY/YZ/XZ components
+    FpaFloat6              orientation_cov;      //!< Orientation covariance, XX/YY/ZZ/XY/YZ/XZ components
+    FpaFloat6              vel_cov;              //!< Velocity covariance, XX/YY/ZZ/XY/YZ/XZ components
+    char                   version[100] = { 0 };  //!< Version
     // clang-format on
 
     /**

@@ -47,9 +47,9 @@ static void sLoggingFn(const LoggingParams& /*params*/, const LoggingLevel level
     }  // clang-format on
 }
 
-void RedirectLoggingToRosConsole()
+void RedirectLoggingToRosConsole(const char* logger_name)
 {
-    g_logger = std::make_unique<rclcpp::Logger>(rclcpp::get_logger("fpsdk_ros2"));
+    g_logger = std::make_unique<rclcpp::Logger>(rclcpp::get_logger(logger_name));
     LoggingParams params = LoggingGetParams();
     params.fn_ = sLoggingFn;
     params.level_ = LoggingLevel::TRACE;  // We leave it up to ROS to decide what to print

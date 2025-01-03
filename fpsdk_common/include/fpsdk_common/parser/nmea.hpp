@@ -177,12 +177,10 @@ struct NmeaCoordinates
 
 /**
  * @brief NMEA talker IDs
- *
- * @note Do not use <, >, >=, <= operators on this!
  */
 enum class NmeaTalkerId : int
 {  // clang-format off
-    UNSPECIFIED = '?',  //!< Unspecified
+    UNSPECIFIED = '!',  //!< Unspecified
     PROPRIETARY = 'x',  //!< Proprietary
     GPS_SBAS    = 'P',  //!< GPS and/or SBAS
     GLO         = 'L',  //!< GLONASS
@@ -195,12 +193,10 @@ enum class NmeaTalkerId : int
 
 /**
  * @brief NMEA-Gx-GGA quality indicator
- *
- * @note Do not use <, >, >=, <= operators on this!
  */
 enum class NmeaQualityGga : int
 {  // clang-format off
-    UNSPECIFIED = '?',  //!< Unspecified
+    UNSPECIFIED = '!',  //!< Unspecified
     NOFIX       = '0',  //!< No fix
     SPP         = '1',  //!< Autonomous GNSS fix
     DGNSS       = '2',  //!< Differential GPS fix (e.g. with SBAS)
@@ -219,7 +215,7 @@ enum class NmeaQualityGga : int
  */
 enum class NmeaStatusGllRmc : int
 {  // clang-format off
-    UNSPECIFIED  = '?',  //!< Unspecified
+    UNSPECIFIED  = '!',  //!< Unspecified
     INVALID      = 'V',  //!< Data invalid
     VALID        = 'A',  //!< Data valid
  // DIFFERENTIAL = 'D',  // @todo another possible value?
@@ -232,7 +228,7 @@ enum class NmeaStatusGllRmc : int
  */
 enum class NmeaModeGllVtg : int
 {  // clang-format off
-    UNSPECIFIED = '?',  //!< Unspecified
+    UNSPECIFIED = '!',  //!< Unspecified
     INVALID     = 'N',  //!< Invalid (no fix)
     AUTONOMOUS  = 'A',  //!< Autonomous mode (SPP)
     DGNSS       = 'D',  //!< Differential GNSS fix
@@ -248,7 +244,7 @@ enum class NmeaModeGllVtg : int
  */
 enum class NmeaModeRmcGns : int
 {  // clang-format off
-    UNSPECIFIED = '?',  //!< Unspecified
+    UNSPECIFIED = '!',  //!< Unspecified
     INVALID     = 'N',  //!< Invalid (no fix)
     AUTONOMOUS  = 'A',  //!< Autonomous mode (SPP)
     DGNSS       = 'D',  //!< Differential GNSS fix
@@ -267,7 +263,7 @@ enum class NmeaModeRmcGns : int
  */
 enum class NmeaNavStatusRmc : int
 {  // clang-format off
-    UNSPECIFIED = '?',  //!< Unspecified
+    UNSPECIFIED = '!',  //!< Unspecified
     SAFE        = 'S',  //!< Safe
     CAUTION     = 'C',  //!< Caution
     UNSAFE      = 'U',  //!< Unsafe
@@ -281,19 +277,17 @@ enum class NmeaNavStatusRmc : int
  */
 enum class NmeaOpModeGsa : int
 {  // clang-format off
-    UNSPECIFIED = '?',  //!< Unspecified
+    UNSPECIFIED = '!',  //!< Unspecified
     MANUAL      = 'M',  //!< Manual
     AUTO        = 'A',  //!< Automatic
 };  // clang-format on
 
 /**
  * @brief NMEA-Gx-GNS nav mode
- *
- * @note Do not use <, >, >=, <= operators on this!
  */
 enum class NmeaNavModeGsa : int
 {  // clang-format off
-    UNSPECIFIED = '?',  //!< Unspecified
+    UNSPECIFIED = '!',  //!< Unspecified
     NOFIX       = '1',  //!< No fix
     FIX2D       = '2',  //!< 2D fix
     FIX3D       = '3',  //!< 3D fix
@@ -301,10 +295,12 @@ enum class NmeaNavModeGsa : int
 
 /**
  * @brief NMEA system IDs
+ *
+ * @note Do not use <, >, >=, <= operators on this!
  */
 enum class NmeaSystemId : int
 {  // clang-format off
-    UNSPECIFIED = '?',  //!< Unspecified
+    UNSPECIFIED = '!',  //!< Unspecified
     GPS_SBAS    = '1',  //!< GPS and/or SBAS
     GLO         = '2',  //!< GLONASS
     GAL         = '3',  //!< Galileo
@@ -315,10 +311,12 @@ enum class NmeaSystemId : int
 
 /**
  * @brief NMEA signal IDs
+ *
+ * @note Do not use <, >, >=, <= operators on this!
  */
 enum class NmeaSignalId : int
 {  // clang-format off
-    UNSPECIFIED = '?',  //!< Unspecified
+    UNSPECIFIED = '!',  //!< Unspecified
     GPS_L1CA    = '1',  //!< GPS L1 C/A
     GPS_L2CL    = '6',  //!< GPS L2 CL
     GPS_L2CM    = '5',  //!< GPS L2 CM
