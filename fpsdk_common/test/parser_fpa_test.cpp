@@ -344,7 +344,7 @@ TEST(FpaTest, FpaRawimuPayload)
         const char* msg =  // clang-format off
             "$FP,RAWIMU,1,2197,126191.777855,-0.199914,0.472851,9.917973,0.023436,0.007723,0.002131*34\r\n";  // clang-format on
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
-        EXPECT_EQ(payload.which, FpaImuPayload::Which::FP_A_RAWIMU);
+        EXPECT_EQ(payload.which, FpaImuPayload::Which::RAWIMU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2197);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -363,7 +363,7 @@ TEST(FpaTest, FpaRawimuPayload)
         const char* msg =  // clang-format off
             "$FP,RAWIMU,1,,,,,,,,*XX\r\n";  // clang-format on
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
-        EXPECT_EQ(payload.which, FpaImuPayload::Which::FP_A_RAWIMU);
+        EXPECT_EQ(payload.which, FpaImuPayload::Which::RAWIMU);
         EXPECT_FALSE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 0);
         EXPECT_FALSE(payload.gps_time.tow.valid);
@@ -388,7 +388,7 @@ TEST(FpaTest, FpaCorrimuPayload)
         const char* msg =  // clang-format off
             "$FP,CORRIMU,1,2197,126191.777855,-0.195224,0.393969,9.869998,0.013342,-0.004620,-0.000728*7D\r\n";  // clang-format on
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
-        EXPECT_EQ(payload.which, FpaImuPayload::Which::FP_A_CORRIMU);
+        EXPECT_EQ(payload.which, FpaImuPayload::Which::CORRIMU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2197);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -407,7 +407,7 @@ TEST(FpaTest, FpaCorrimuPayload)
         const char* msg =  // clang-format off
             "$FP,CORRIMU,1,,,,,,,,*XX\r\n";  // clang-format on
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
-        EXPECT_EQ(payload.which, FpaImuPayload::Which::FP_A_CORRIMU);
+        EXPECT_EQ(payload.which, FpaImuPayload::Which::CORRIMU);
         EXPECT_FALSE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 0);
         EXPECT_FALSE(payload.gps_time.tow.valid);
@@ -547,7 +547,7 @@ TEST(FpaTest, FpaOdometryPayload)
             "0.01761,0.02274,0.01713,-0.00818,0.00235,0.00129,0.00013,0.00015,0.00014,-0.00001,0.00001,0.00002,"
             "0.03482,0.06244,0.05480,0.00096,0.00509,0.00054,fp_release_vr2_2.54.0_160*4F\r\n";  // clang-format on
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
-        EXPECT_EQ(payload.which, FpaOdomPayload::Which::FP_A_ODOMETRY);
+        EXPECT_EQ(payload.which, FpaOdomPayload::Which::ODOMETRY);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2231);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -599,6 +599,7 @@ TEST(FpaTest, FpaOdometryPayload)
         EXPECT_NEAR(payload.vel_cov.values[3], 0.00096, 1e-9);
         EXPECT_NEAR(payload.vel_cov.values[4], 0.00509, 1e-9);
         EXPECT_NEAR(payload.vel_cov.values[5], 0.00054, 1e-9);
+        EXPECT_EQ(std::string(payload.version), "fp_release_vr2_2.54.0_160");
     }
 }
 
@@ -614,11 +615,12 @@ TEST(FpaTest, FpaOdomenuPayload)
             "-0.00149,-0.00084,0.00025,0.00003,0.00003,0.00012,0.00000,0.00000,0.00000,0.01742,0.01146,0.01612,"
             "-0.00550,-0.00007,-0.00050*74\r\n";  // clang-format on
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
-        EXPECT_EQ(payload.which, FpaOdomPayload::Which::FP_A_ODOMENU);
+        EXPECT_EQ(payload.which, FpaOdomPayload::Which::ODOMENU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2180);
         EXPECT_TRUE(payload.gps_time.tow.valid);
         EXPECT_NEAR(payload.gps_time.tow.value, 298591.500000, 1e-9);
+        EXPECT_TRUE(std::string(payload.version).empty());
     }
 }
 
@@ -634,11 +636,12 @@ TEST(FpaTest, FpaOdomshPayload)
             "-0.00149,-0.00084,0.00025,0.00003,0.00003,0.00012,0.00000,0.00000,0.00000,0.01742,0.01146,0.01612,"
             "-0.00550,-0.00007,-0.00050*74\r\n";  // clang-format on
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
-        EXPECT_EQ(payload.which, FpaOdomPayload::Which::FP_A_ODOMSH);
+        EXPECT_EQ(payload.which, FpaOdomPayload::Which::ODOMSH);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2180);
         EXPECT_TRUE(payload.gps_time.tow.valid);
         EXPECT_NEAR(payload.gps_time.tow.value, 298591.500000, 1e-9);
+        EXPECT_TRUE(std::string(payload.version).empty());
     }
 }
 

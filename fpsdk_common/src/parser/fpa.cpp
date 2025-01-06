@@ -899,7 +899,7 @@ bool FpaRawimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size
               GetFloatArr(rot, m.fields_, 5, false));
     }
     if (ok) {
-        which = Which::FP_A_RAWIMU;
+        which = Which::RAWIMU;
     }
     FPA_TRACE("FpaRawimuPayload %s", ok ? "true" : "false");
     return ok;
@@ -918,7 +918,7 @@ bool FpaCorrimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
               GetFloatArr(rot, m.fields_, 5, false));
     }
     if (ok) {
-        which = Which::FP_A_CORRIMU;
+        which = Which::CORRIMU;
     }
     FPA_TRACE("FpaCorrimuPayload %s", ok ? "true" : "false");
     return ok;
@@ -977,10 +977,10 @@ bool FpaOdometryPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_si
               GetImuStatusLegacy(imu_bias_status, m.fields_[19]) && GetGnssFix(gnss1_fix, m.fields_[20]) &&
               GetGnssFix(gnss2_fix, m.fields_[21]) && GetWsStatusLegacy(wheelspeed_status, m.fields_[22]) &&
               GetFloatArr(pos_cov, m.fields_, 23, false) && GetFloatArr(orientation_cov, m.fields_, 29, false) &&
-              GetFloatArr(vel_cov, m.fields_, 35, false));
+              GetFloatArr(vel_cov, m.fields_, 35, false) && GetText(version, sizeof(version), m.fields_[41]));
     }
     if (ok) {
-        which = Which::FP_A_ODOMETRY;
+        which = Which::ODOMETRY;
     }
     FPA_TRACE("FpaOdometryPayload %s", ok ? "true" : "false");
     return ok;
@@ -1003,7 +1003,7 @@ bool FpaOdomenuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
               GetFloatArr(vel_cov, m.fields_, 35, false));
     }
     if (ok) {
-        which = Which::FP_A_ODOMENU;
+        which = Which::ODOMENU;
     }
     FPA_TRACE("FpaOdomenuPayload %s", ok ? "true" : "false");
     return ok;
@@ -1026,7 +1026,7 @@ bool FpaOdomshPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size
               GetFloatArr(vel_cov, m.fields_, 35, false));
     }
     if (ok) {
-        which = Which::FP_A_ODOMSH;
+        which = Which::ODOMSH;
     }
     FPA_TRACE("FpaOdomshPayload %s", ok ? "true" : "false");
     return ok;

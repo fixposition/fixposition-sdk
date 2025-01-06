@@ -44,10 +44,10 @@ find_package (Threads REQUIRED)
 
 # PROJ is optional, unless explicitly requested with -DUSE_PROJ=ON
 if (USE_PROJ STREQUAL "ON")
-    find_package(PROJ 9.4.1 REQUIRED CONFIG)
+    find_package(PROJ 9.4 REQUIRED CONFIG)
 elseif(USE_PROJ STREQUAL "OFF")
 else()
-    find_package(PROJ 9.4.1 CONFIG QUIET)
+    find_package(PROJ 9.4 CONFIG QUIET)
 endif()
 if (${PROJ_FOUND})
     message(STATUS "fpsdk: Using PROJ (${PROJ_VERSION})")
@@ -193,6 +193,5 @@ add_gtest(TARGET thread_test          SOURCES test/thread_test.cpp          LINK
 add_gtest(TARGET trafo_test           SOURCES test/trafo_test.cpp           LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET utils_test           SOURCES test/utils_test.cpp           LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET yaml_test            SOURCES test/yaml_test.cpp            LINK_LIBS ${PROJECT_NAME})
-
 
 # ======================================================================================================================

@@ -24,10 +24,6 @@ RUN /tmp/install_clangformat.sh && rm -f /tmp/install_clangformat.sh
 COPY docker/scripts/install_capnp.sh /tmp
 RUN /tmp/install_capnp.sh && rm -f /tmp/install_capnp.sh
 
-# Download, build and install PROJ
-COPY docker/scripts/install_proj.sh /tmp
-RUN /tmp/install_proj.sh && rm -f /tmp/install_proj.sh
-
 # Download, build and install Doxygen
 COPY docker/scripts/install_doxygen.sh /tmp
 RUN /tmp/install_doxygen.sh && rm -f /tmp/install_doxygen.sh
@@ -44,10 +40,6 @@ Pin: origin *
 Pin-Priority: -1
 
 Package: capnproto libcapnp-* libcapnp-dev
-Pin: origin *
-Pin-Priority: -1
-
-Package: proj proj-ps-doc proj-data proj-rdnap proj-bin libproj15 libproj-dev
 Pin: origin *
 Pin-Priority: -1
 EOF

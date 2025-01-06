@@ -37,15 +37,15 @@ DemoParams::DemoParams() /* clang-format off */ :
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DemoParams::LoadFromRos(std::shared_ptr<rclcpp::Node> node)
+bool DemoParams::LoadFromRos(std::shared_ptr<rclcpp::Node> node, const std::string& ns)
 {
     bool ok = true;
 
     // Declare used params, use as default whatever we the object has currently
-    const std::string WORKER1_INTERVAL_NAME = "worker1_interval";
-    const std::string WORKER2_INTERVAL_NAME = "worker2_interval";
-    const std::string TIMER1_INTERVAL_NAME = "timer1_interval";
-    const std::string TIMER2_INTERVAL_NAME = "timer2_interval";
+    const std::string WORKER1_INTERVAL_NAME = ns + ".worker1_interval";
+    const std::string WORKER2_INTERVAL_NAME = ns + ".worker2_interval";
+    const std::string TIMER1_INTERVAL_NAME = ns + ".timer1_interval";
+    const std::string TIMER2_INTERVAL_NAME = ns + ".timer2_interval";
     node->declare_parameter(WORKER1_INTERVAL_NAME, worker1_interval_);
     node->declare_parameter(WORKER2_INTERVAL_NAME, worker2_interval_);
     node->declare_parameter(TIMER1_INTERVAL_NAME, timer1_interval_);
@@ -96,16 +96,18 @@ bool DemoParams::LoadFromRos(std::shared_ptr<rclcpp::Node> node)
 
 /* ****************************************************************************************************************** */
 
-DemoNode::DemoNode() /* clang-format off */ :
-    Node("demo_node"),
+DemoNode::DemoNode(std::shared_ptr<rclcpp::Node> nh, const DemoParams& params) /* clang-format off */ :
+    nh_       { nh },
+    params_   { params },
+    logger_   { nh_->get_logger() },
     worker1_  { "worker1", std::bind(&DemoNode::Worker1, this, std::placeholders::_1) },
     worker2_  { "worker2", std::bind(&DemoNode::Worker2, this, std::placeholders::_1) }  // clang-format on
 {
-    RCLCPP_DEBUG(this->get_logger(), "i am debug");
-    RCLCPP_INFO(this->get_logger(), "i am info");
-    RCLCPP_WARN(this->get_logger(), "i am warn");
-    RCLCPP_ERROR(this->get_logger(), "i am error");
-    RCLCPP_FATAL(this->get_logger(), "i am fatal");
+    RCLCPP_DEBUG(logger_, "i am debug");
+    RCLCPP_INFO(logger_, "i am info");
+    RCLCPP_WARN(logger_, "i am warn");
+    RCLCPP_ERROR(logger_, "i am error");
+    RCLCPP_FATAL(logger_, "i am fatal");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -117,25 +119,19 @@ DemoNode::~DemoNode()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool DemoNode::LoadParams()
-{
-    return params_.LoadFromRos(shared_from_this());
-}
-
-// ---------------------------------------------------------------------------------------------------------------------
-
 bool DemoNode::Start()
 {
-    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Start() %s %s", get_name(), get_namespace());
-    timer1_ = this->create_wall_timer(
+    RCLCPP_DEBUG(logger_, "DemoNode::Start() namespace=%s name=%s", nh_->get_namespace(), nh_->get_name());
+    timer1_ = nh_->create_wall_timer(
         rclcpp::Duration::from_seconds(params_.timer1_interval_).to_chrono<std::chrono::milliseconds>(),
         std::bind(&DemoNode::Timer1, this));
-    timer2_ = this->create_wall_timer(
+    timer2_ = nh_->create_wall_timer(
         rclcpp::Duration::from_seconds(params_.timer2_interval_).to_chrono<std::chrono::milliseconds>(),
         std::bind(&DemoNode::Timer2, this));
 
-    const std::string topic_name = std::string(get_namespace()) + std::string(get_name()) + "/string";
-    publisher_ = this->create_publisher<std_msgs::msg::String>(topic_name, 5);
+    const std::string topic_name = std::string(nh_->get_namespace()) + std::string(nh_->get_name()) + "/string";
+    RCLCPP_DEBUG(logger_, "topic_name: %s", topic_name.c_str());
+    publisher_ = nh_->create_publisher<std_msgs::msg::String>(topic_name, 5);
 
     return worker1_.Start() && worker2_.Start();
 }
@@ -144,7 +140,7 @@ bool DemoNode::Start()
 
 void DemoNode::Stop()
 {
-    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Stop()");
+    RCLCPP_DEBUG(logger_, "DemoNode::Stop()");
     // timer1_.stop();
     // timer2_.stop();
     worker1_.Stop();
@@ -156,39 +152,39 @@ void DemoNode::Stop()
 
 void DemoNode::Worker1(void* /*arg*/)
 {
-    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Worker1() start 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
+    RCLCPP_DEBUG(logger_, "DemoNode::Worker1() start 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     while (!worker1_.ShouldAbort()) {
-        RCLCPP_DEBUG(this->get_logger(), "DemoNode::Worker1() ...");
+        RCLCPP_DEBUG(logger_, "DemoNode::Worker1() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
         auto msg = std_msgs::msg::String();
         msg.data = "worker1...";
         publisher_->publish(msg);
         rclcpp::sleep_for(
             rclcpp::Duration::from_seconds(params_.worker1_interval_).to_chrono<std::chrono::milliseconds>());
     }
-    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Worker1() done");
+    RCLCPP_DEBUG(logger_, "DemoNode::Worker1() done");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DemoNode::Worker2(void* /*arg*/)
 {
-    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Worker2() start 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
+    RCLCPP_DEBUG(logger_, "DemoNode::Worker2() start 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     while (!worker2_.ShouldAbort()) {
-        RCLCPP_DEBUG(this->get_logger(), "DemoNode::Worker2() ...");
+        RCLCPP_DEBUG(logger_, "DemoNode::Worker2() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
         auto msg = std_msgs::msg::String();
         msg.data = "worker2...";
         publisher_->publish(msg);
         rclcpp::sleep_for(
             rclcpp::Duration::from_seconds(params_.worker2_interval_).to_chrono<std::chrono::milliseconds>());
     }
-    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Worker() done");
+    RCLCPP_DEBUG(logger_, "DemoNode::Worker() done");
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 void DemoNode::Timer1()
 {
-    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Timer1() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
+    RCLCPP_DEBUG(logger_, "DemoNode::Timer1() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     auto msg = std_msgs::msg::String();
     msg.data = "timer1...";
     publisher_->publish(msg);
@@ -198,7 +194,7 @@ void DemoNode::Timer1()
 
 void DemoNode::Timer2()
 {
-    RCLCPP_DEBUG(this->get_logger(), "DemoNode::Timer2() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
+    RCLCPP_DEBUG(logger_, "DemoNode::Timer2() 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     auto msg = std_msgs::msg::String();
     msg.data = "timer2...";
     publisher_->publish(msg);

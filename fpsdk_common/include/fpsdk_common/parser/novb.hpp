@@ -26,6 +26,7 @@
 #define __FPSDK_COMMON_PARSER_NOVB_HPP__
 
 /* LIBC/STL */
+#include <cstddef>
 #include <cstdint>
 
 /* EXTERNAL */
@@ -227,6 +228,34 @@ struct NovbShortHeader
 };  // clang-format on
 
 static_assert(sizeof(NovbShortHeader) == NOV_B_HEAD_SIZE_SHORT, "");
+
+enum class NovbMsgTypeSource : uint8_t;  // forward declaration
+
+/**
+ * @brief Union of NOV_B long and short header
+ */
+struct NovbHeader
+{
+    union
+    {
+        NovbLongHeader long_header;    //!< Long header
+        NovbShortHeader short_header;  //!< Short header
+    };
+    /**
+     * @brief Check for long vs short header
+     *
+     * @returns true if long_header is valid, false if short_header is valid
+     */
+    bool IsLongHeader() const;
+    /**
+     * @brief Get message type source
+     *
+     * @returns the message type source (NovbMsgTypeSource::_MASK if unknown)
+     */
+    NovbMsgTypeSource Source() const;
+};
+
+static_assert(sizeof(NovbHeader) == sizeof(NovbLongHeader), "");
 
 /**
  * @brief Message type measurement source (bits 4..0 of NovbLongHeader.message_type)
