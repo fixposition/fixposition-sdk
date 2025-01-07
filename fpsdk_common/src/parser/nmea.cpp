@@ -805,7 +805,7 @@ bool NmeaGllPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 7)) {
         ok = (GetTime(time, m.fields_[4]) && GetStatusGllRmc(status, m.fields_[5]) &&
               GetModeGllVtg(mode, m.fields_[6]) &&
-              GetLlh(llh, m.fields_, 0, 2, -1, -1, mode != NmeaModeGllVtg::INVALID));
+              GetLlh(ll, m.fields_, 0, 2, -1, -1, mode != NmeaModeGllVtg::INVALID));
     }
     NMEA_TRACE("NmeaGllPayload %s", ok ? "true" : "false");
     return ok;

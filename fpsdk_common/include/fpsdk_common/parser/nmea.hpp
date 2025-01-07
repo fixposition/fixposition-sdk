@@ -471,7 +471,7 @@ struct NmeaPayload
 struct NmeaGgaPayload : public NmeaPayload
 {
     NmeaTime time;                                         //!< Time
-    NmeaLlh llh;                                           //!< Position
+    NmeaLlh llh;                                           //!< Position (with height)
     NmeaQualityGga quality = NmeaQualityGga::UNSPECIFIED;  //!< Fix quality
     NmeaInt num_sv;                                        //!< Number of satellites used (may be limited to 12)
     NmeaFloat hdop;                                        //!< Horizontal dilution of precision (only with valid fix)
@@ -497,7 +497,7 @@ struct NmeaGgaPayload : public NmeaPayload
  */
 struct NmeaGllPayload : public NmeaPayload
 {
-    NmeaLlh llh;                                              //!< Position
+    NmeaLlh ll;                                               //!< Position (no height)
     NmeaTime time;                                            //!< Time
     NmeaStatusGllRmc status = NmeaStatusGllRmc::UNSPECIFIED;  //!< Positioning system status
     NmeaModeGllVtg mode = NmeaModeGllVtg::UNSPECIFIED;        //!< Positioning system mode
@@ -527,7 +527,7 @@ struct NmeaRmcPayload : public NmeaPayload
     NmeaFloat speed;                                             //!< Speed over ground [knots]
     NmeaFloat course;                                            //!< Course over ground w.r.t. True North [deg]
     NmeaDate date;                                               //!< Date
-    NmeaModeRmcGns mode = NmeaModeRmcGns::UNSPECIFIED;           //!< positioning system mode indicator
+    NmeaModeRmcGns mode = NmeaModeRmcGns::UNSPECIFIED;           //!< Positioning system mode indicator
     NmeaNavStatusRmc navstatus = NmeaNavStatusRmc::UNSPECIFIED;  //!< Navigational status
     /**
      * @brief Set data from sentence
@@ -549,6 +549,7 @@ struct NmeaRmcPayload : public NmeaPayload
 struct NmeaVtgPayload : public NmeaPayload
 {
     NmeaFloat cogt;       //!< Course over ground (true) [deg]
+    NmeaFloat cogm;       //!< Course over ground (magnetic) [deg], not typically available
     NmeaFloat sogn;       //!< Speed over ground [knots]
     NmeaFloat sogk;       //!< Speed over ground [km/h]
     NmeaModeGllVtg mode;  //!< Positioning system mode

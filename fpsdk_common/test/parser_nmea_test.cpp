@@ -404,11 +404,11 @@ TEST(NmeaTest, NmeaGllPayload)
         EXPECT_EQ(gll.time.hours, 11);
         EXPECT_EQ(gll.time.mins, 5);
         EXPECT_NEAR(gll.time.secs, 46.8, 1e-9);
-        EXPECT_TRUE(gll.llh.latlon_valid);
-        EXPECT_NEAR(gll.llh.lat, 47.0 + (24.018931 / 60.0), 1e-12);
-        EXPECT_NEAR(gll.llh.lon, 8.0 + (27.023090 / 60.0), 1e-12);
-        EXPECT_FALSE(gll.llh.height_valid);
-        EXPECT_NEAR(gll.llh.height, 0.0, 1e-9);
+        EXPECT_TRUE(gll.ll.latlon_valid);
+        EXPECT_NEAR(gll.ll.lat, 47.0 + (24.018931 / 60.0), 1e-12);
+        EXPECT_NEAR(gll.ll.lon, 8.0 + (27.023090 / 60.0), 1e-12);
+        EXPECT_FALSE(gll.ll.height_valid);
+        EXPECT_NEAR(gll.ll.height, 0.0, 1e-9);
         EXPECT_EQ(gll.status, NmeaStatusGllRmc::VALID);
         EXPECT_EQ(gll.mode, NmeaModeGllVtg::DGNSS);
     }
@@ -421,11 +421,11 @@ TEST(NmeaTest, NmeaGllPayload)
         EXPECT_EQ(gll.time.hours, 23);
         EXPECT_EQ(gll.time.mins, 59);
         EXPECT_NEAR(gll.time.secs, 43.612, 1e-9);
-        EXPECT_FALSE(gll.llh.latlon_valid);
-        EXPECT_EQ(gll.llh.lat, 0.0);
-        EXPECT_EQ(gll.llh.lon, 0.0);
-        EXPECT_FALSE(gll.llh.height_valid);
-        EXPECT_EQ(gll.llh.height, 0.0);
+        EXPECT_FALSE(gll.ll.latlon_valid);
+        EXPECT_EQ(gll.ll.lat, 0.0);
+        EXPECT_EQ(gll.ll.lon, 0.0);
+        EXPECT_FALSE(gll.ll.height_valid);
+        EXPECT_EQ(gll.ll.height, 0.0);
         EXPECT_EQ(gll.status, NmeaStatusGllRmc::INVALID);
         EXPECT_EQ(gll.mode, NmeaModeGllVtg::INVALID);
     }
@@ -500,6 +500,8 @@ TEST(NmeaTest, NmeaVtgPayload)
         EXPECT_EQ(vtg.talker, NmeaTalkerId::GNSS);
         EXPECT_TRUE(vtg.cogt.valid);
         EXPECT_NEAR(vtg.cogt.value, 139.17, 1e-4);
+        EXPECT_FALSE(vtg.cogm.valid);
+        EXPECT_EQ(vtg.cogm.value, 0.0);
         EXPECT_TRUE(vtg.sogn.valid);
         EXPECT_NEAR(vtg.sogn.value, 0.015, 1e-6);
         EXPECT_TRUE(vtg.sogk.valid);
@@ -512,6 +514,8 @@ TEST(NmeaTest, NmeaVtgPayload)
         EXPECT_EQ(vtg.talker, NmeaTalkerId::GNSS);
         EXPECT_FALSE(vtg.cogt.valid);
         EXPECT_EQ(vtg.cogt.value, 0.0);
+        EXPECT_FALSE(vtg.cogm.valid);
+        EXPECT_EQ(vtg.cogm.value, 0.0);
         EXPECT_FALSE(vtg.sogn.valid);
         EXPECT_EQ(vtg.sogn.value, 0.0);
         EXPECT_FALSE(vtg.sogk.valid);
