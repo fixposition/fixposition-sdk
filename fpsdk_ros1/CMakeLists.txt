@@ -69,7 +69,7 @@ file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} msg/*.msg)
 
 # /opt/ros/noetic/share/genmsg/cmake/genmsg-extras.cmake
 add_message_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} FILES ${MSG_FILES})
-generate_messages(LANGS gencpp DEPENDENCIES std_msgs)
+generate_messages(LANGS gencpp genpy DEPENDENCIES std_msgs)
 
 
 # SHARED LIBRARY =======================================================================================================

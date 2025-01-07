@@ -1,10 +1,9 @@
-# ___    ___
-# \  \  /  /
-#  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
-#  /  /\  \   License: see the LICENSE file
-# /__/  \__\
+# Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+# License: see the LICENSE file
 #
 # Similar to a fpsdk::common::parser::ParserMsg
+#
+# !!! fpsdk_{ros1,ros2}/msg/ParserMsg.msg should be kept in sync !!!
 
 time    stamp                     # Timestamp of message reception time
 int8    protocol                  # Protocol
