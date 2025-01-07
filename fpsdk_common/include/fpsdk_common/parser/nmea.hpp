@@ -316,29 +316,29 @@ enum class NmeaSystemId : int
  */
 enum class NmeaSignalId : int
 {  // clang-format off
-    UNSPECIFIED = '!',  //!< Unspecified
-    GPS_L1CA    = '1',  //!< GPS L1 C/A
-    GPS_L2CL    = '6',  //!< GPS L2 CL
-    GPS_L2CM    = '5',  //!< GPS L2 CM
-    GPS_L5I     = '7',  //!< GPS L5 I
-    GPS_L5Q     = '8',  //!< GPS L5 Q
-    SBAS_L1CA   = '1',  //!< SBAS L1 C/A
-    GAL_E1      = '7',  //!< Galileo E1
-    GAL_E5A     = '1',  //!< Galileo E5 A
-    GAL_E5B     = '2',  //!< Galileo E5 B
-    BDS_B1ID    = '1',  //!< BeiDou B1I D
-    BDS_B2ID    = 'B',  //!< BeiDou B2I D
-    BDS_B1C     = '3',  //!< BeiDou B1 C
-    BDS_B2A     = '5',  //!< BeiDou B2 a
-    QZSS_L1CA   = '1',  //!< QZSS L1 C/A
-    QZSS_L1S    = '4',  //!< QZSS L1S
-    QZSS_L2CM   = '5',  //!< QZSS L2 CM
-    QZSS_L2CL   = '6',  //!< QZSS L2 CL
-    QZSS_L5I    = '7',  //!< QZSS L5 I
-    QZSS_L5Q    = '8',  //!< QZSS L5 Q
-    GLO_L1OF    = '1',  //!< GLONASS L1 OF
-    GLO_L2OF    = '3',  //!< GLONASS L2 OF
-    NAVIC_L5A   = '5',  //!< NavIC L5 A
+    UNSPECIFIED = 0x000 + '!',  //!< Unspecified
+    GPS_L1CA    = 0x100 + '1',  //!< GPS L1 C/A
+    GPS_L2CL    = 0x100 + '6',  //!< GPS L2 CL
+    GPS_L2CM    = 0x100 + '5',  //!< GPS L2 CM
+    GPS_L5I     = 0x100 + '7',  //!< GPS L5 I
+    GPS_L5Q     = 0x100 + '8',  //!< GPS L5 Q
+    SBAS_L1CA   = 0xa00 + '1',  //!< SBAS L1 C/A
+    GLO_L1OF    = 0x200 + '1',  //!< GLONASS L1 OF
+    GLO_L2OF    = 0x200 + '3',  //!< GLONASS L2 OF
+    GAL_E1      = 0x300 + '7',  //!< Galileo E1
+    GAL_E5A     = 0x300 + '1',  //!< Galileo E5 A
+    GAL_E5B     = 0x300 + '2',  //!< Galileo E5 B
+    BDS_B1ID    = 0x400 + '1',  //!< BeiDou B1I D
+    BDS_B2ID    = 0x400 + 'B',  //!< BeiDou B2I D
+    BDS_B1C     = 0x400 + '3',  //!< BeiDou B1 C
+    BDS_B2A     = 0x400 + '5',  //!< BeiDou B2 a
+    QZSS_L1CA   = 0x500 + '1',  //!< QZSS L1 C/A
+    QZSS_L1S    = 0x500 + '4',  //!< QZSS L1S
+    QZSS_L2CM   = 0x500 + '5',  //!< QZSS L2 CM
+    QZSS_L2CL   = 0x500 + '6',  //!< QZSS L2 CL
+    QZSS_L5I    = 0x500 + '7',  //!< QZSS L5 I
+    QZSS_L5Q    = 0x500 + '8',  //!< QZSS L5 Q
+    NAVIC_L5A   = 0x600 + '5',  //!< NavIC L5 A
 };  // clang-format on
 
 /**
