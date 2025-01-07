@@ -14,7 +14,6 @@
 /* LIBC/STL */
 
 /* EXTERNAL */
-#include <fpsdk_ros1/ext/ros_console.hpp>
 #include <gtest/gtest.h>
 
 /* PACKAGE */
