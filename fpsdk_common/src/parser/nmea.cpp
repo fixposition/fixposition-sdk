@@ -627,43 +627,43 @@ bool GetSignalId(NmeaSignalId& signalid, const std::string& field, const NmeaSys
     bool ok = true;
     if (!field.empty()) {
         switch (system) {  // clang-format off
-            case NmeaSystemId::GPS_SBAS: switch ((NmeaSignalId)field[0]) {
-                case NmeaSignalId::GPS_L1CA:   signalid = NmeaSignalId::GPS_L1CA;   break; // = NmeaSignalId::SBAS_L1CA
-                case NmeaSignalId::GPS_L2CL:   signalid = NmeaSignalId::GPS_L2CL;   break;
-                case NmeaSignalId::GPS_L2CM:   signalid = NmeaSignalId::GPS_L2CM;   break;
-                case NmeaSignalId::GPS_L5I:    signalid = NmeaSignalId::GPS_L5I;    break;
-                case NmeaSignalId::GPS_L5Q:    signalid = NmeaSignalId::GPS_L5Q;    break;
+            case NmeaSystemId::GPS_SBAS: switch ((int)field[0]) {
+                case 0xff & types::EnumToVal(NmeaSignalId::GPS_L1CA):   signalid = NmeaSignalId::GPS_L1CA;   break; // = NmeaSignalId::SBAS_L1CA
+                case 0xff & types::EnumToVal(NmeaSignalId::GPS_L2CL):   signalid = NmeaSignalId::GPS_L2CL;   break;
+                case 0xff & types::EnumToVal(NmeaSignalId::GPS_L2CM):   signalid = NmeaSignalId::GPS_L2CM;   break;
+                case 0xff & types::EnumToVal(NmeaSignalId::GPS_L5I):    signalid = NmeaSignalId::GPS_L5I;    break;
+                case 0xff & types::EnumToVal(NmeaSignalId::GPS_L5Q):    signalid = NmeaSignalId::GPS_L5Q;    break;
                 default: ok = false; break;
             } break;
-            case NmeaSystemId::GLO: switch ((NmeaSignalId)field[0]) {
-                case NmeaSignalId::GLO_L1OF:   signalid = NmeaSignalId::GLO_L1OF;   break;
-                case NmeaSignalId::GLO_L2OF:   signalid = NmeaSignalId::GLO_L2OF;   break;
+            case NmeaSystemId::GLO: switch ((int)field[0]) {
+                case 0xff & types::EnumToVal(NmeaSignalId::GLO_L1OF):   signalid = NmeaSignalId::GLO_L1OF;   break;
+                case 0xff & types::EnumToVal(NmeaSignalId::GLO_L2OF):   signalid = NmeaSignalId::GLO_L2OF;   break;
                 default: ok = false; break;
             } break;
-            case NmeaSystemId::GAL: switch ((NmeaSignalId)field[0]) {
-                case NmeaSignalId::GAL_E1:     signalid = NmeaSignalId::GAL_E1;     break;
-                case NmeaSignalId::GAL_E5A:    signalid = NmeaSignalId::GAL_E5A;    break;
-                case NmeaSignalId::GAL_E5B:    signalid = NmeaSignalId::GAL_E5B;    break;
+            case NmeaSystemId::GAL: switch ((int_fast16_t)field[0]) {
+                case 0xff & types::EnumToVal(NmeaSignalId::GAL_E1):     signalid = NmeaSignalId::GAL_E1;     break;
+                case 0xff & types::EnumToVal(NmeaSignalId::GAL_E5A):    signalid = NmeaSignalId::GAL_E5A;    break;
+                case 0xff & types::EnumToVal(NmeaSignalId::GAL_E5B):    signalid = NmeaSignalId::GAL_E5B;    break;
                 default: ok = false; break;
             } break;
-            case NmeaSystemId::BDS: switch ((NmeaSignalId)field[0]) {
-                case NmeaSignalId::BDS_B1ID:   signalid = NmeaSignalId::BDS_B1ID;   break;
-                case NmeaSignalId::BDS_B2ID:   signalid = NmeaSignalId::BDS_B2ID;   break;
-                case NmeaSignalId::BDS_B1C:    signalid = NmeaSignalId::BDS_B1C;    break;
-                case NmeaSignalId::BDS_B2A:    signalid = NmeaSignalId::BDS_B2A;    break;
+            case NmeaSystemId::BDS: switch ((int)field[0]) {
+                case 0xff & types::EnumToVal(NmeaSignalId::BDS_B1ID):   signalid = NmeaSignalId::BDS_B1ID;   break;
+                case 0xff & types::EnumToVal(NmeaSignalId::BDS_B2ID):   signalid = NmeaSignalId::BDS_B2ID;   break;
+                case 0xff & types::EnumToVal(NmeaSignalId::BDS_B1C):    signalid = NmeaSignalId::BDS_B1C;    break;
+                case 0xff & types::EnumToVal(NmeaSignalId::BDS_B2A):    signalid = NmeaSignalId::BDS_B2A;    break;
                 default: ok = false; break;
             } break;
-            case NmeaSystemId::QZSS: switch ((NmeaSignalId)field[0]) {
-                case NmeaSignalId::QZSS_L1CA:  signalid = NmeaSignalId::QZSS_L1CA;  break;
-                case NmeaSignalId::QZSS_L1S:   signalid = NmeaSignalId::QZSS_L1S;   break;
-                case NmeaSignalId::QZSS_L2CM:  signalid = NmeaSignalId::QZSS_L2CM;  break;
-                case NmeaSignalId::QZSS_L2CL:  signalid = NmeaSignalId::QZSS_L2CL;  break;
-                case NmeaSignalId::QZSS_L5I:   signalid = NmeaSignalId::QZSS_L5I;   break;
-                case NmeaSignalId::QZSS_L5Q:   signalid = NmeaSignalId::QZSS_L5Q;   break;
+            case NmeaSystemId::QZSS: switch ((int)field[0]) {
+                case 0xff & types::EnumToVal(NmeaSignalId::QZSS_L1CA):  signalid = NmeaSignalId::QZSS_L1CA;  break;
+                case 0xff & types::EnumToVal(NmeaSignalId::QZSS_L1S):   signalid = NmeaSignalId::QZSS_L1S;   break;
+                case 0xff & types::EnumToVal(NmeaSignalId::QZSS_L2CM):  signalid = NmeaSignalId::QZSS_L2CM;  break;
+                case 0xff & types::EnumToVal(NmeaSignalId::QZSS_L2CL):  signalid = NmeaSignalId::QZSS_L2CL;  break;
+                case 0xff & types::EnumToVal(NmeaSignalId::QZSS_L5I):   signalid = NmeaSignalId::QZSS_L5I;   break;
+                case 0xff & types::EnumToVal(NmeaSignalId::QZSS_L5Q):   signalid = NmeaSignalId::QZSS_L5Q;   break;
                 default: ok = false; break;
             } break;
-            case NmeaSystemId::NAVIC: switch ((NmeaSignalId)field[0]) {
-                case NmeaSignalId::NAVIC_L5A:  signalid = NmeaSignalId::NAVIC_L5A;  break;
+            case NmeaSystemId::NAVIC: switch ((int)field[0]) {
+                case 0xff & types::EnumToVal(NmeaSignalId::NAVIC_L5A):  signalid = NmeaSignalId::NAVIC_L5A;  break;
                 default: ok = false; break;
             } break;
             case NmeaSystemId::UNSPECIFIED:
