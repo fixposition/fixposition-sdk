@@ -547,11 +547,11 @@ struct NmeaRmcPayload : public NmeaPayload
  */
 struct NmeaVtgPayload : public NmeaPayload
 {
-    NmeaFloat cogt;       //!< Course over ground (true) [deg]
-    NmeaFloat cogm;       //!< Course over ground (magnetic) [deg], not typically available
-    NmeaFloat sogn;       //!< Speed over ground [knots]
-    NmeaFloat sogk;       //!< Speed over ground [km/h]
-    NmeaModeGllVtg mode;  //!< Positioning system mode
+    NmeaFloat cogt;  //!< Course over ground (true) [deg]
+    NmeaFloat cogm;  //!< Course over ground (magnetic) [deg], not typically available
+    NmeaFloat sogn;  //!< Speed over ground [knots]
+    NmeaFloat sogk;  //!< Speed over ground [km/h]
+    NmeaModeGllVtg mode = NmeaModeGllVtg::UNSPECIFIED;  //!< Positioning system mode
 
     /**
      * @brief Set data from sentence
