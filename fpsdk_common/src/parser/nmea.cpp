@@ -314,29 +314,30 @@ static bool GetLlh(NmeaLlh& llh, const std::vector<std::string>& fields, const i
     bool ok = true;
 
     // Lat/lon
-    if (fields[lat_ix].empty() || fields[lon_ix].empty()) {
+    auto& slat = fields[lat_ix];
+    auto& slon = fields[lon_ix];
+    if (slat.empty() || slon.empty() || (slat.size() < 7) || (slon.size() < 8) || (slat[4] != '.') ||
+        (slon[5] != '.')) {
         if (required) {
             ok = false;
         }
     } else {
-        double latval = 0.0;
-        double lonval = 0.0;
-        if (StrToFloat(fields[lat_ix], latval) && !fields[lat_ix + 1].empty() && (latval >= 0.0) &&
-            (latval <= 9000.0) && StrToFloat(fields[lon_ix], lonval) && !fields[lon_ix + 1].empty() &&
-            (lonval >= 0.0) && (lonval <= 18000.0)) {
-            const double ilat = std::floor(latval / 100.0);
-            latval -= ilat * 100.0;
-            llh.lat = ilat + (latval / 60.0);
+        double ilat = 0.0;
+        double flat = 0.0;
+        double ilon = 0.0;
+        double flon = 0.0;
+        if (StrToFloat(slat.substr(0, 2), ilat) && StrToFloat(slat.substr(2), flat) &&
+            StrToFloat(slon.substr(0, 3), ilon) && StrToFloat(slon.substr(3), flon) && (ilat <= 90.0) &&
+            (ilat >= -90.0) && (ilon <= 180.0) && (ilon >= -180.0) && (flat < 60.0) && (flon < 60.0)) {
+            llh.latlon_valid = true;
+            llh.lat = ilat + (flat / 60.0);
             if (fields[lat_ix + 1] == "S") {
                 llh.lat = -llh.lat;
             }
-            const double ilon = std::floor(lonval / 100.0);
-            lonval -= ilon * 100.0;
-            llh.lon = ilon + (lonval / 60.0);
+            llh.lon = ilon + (flon / 60.0);
             if (fields[lon_ix + 1] == "W") {
                 llh.lon = -llh.lon;
             }
-            llh.latlon_valid = true;
         } else {
             ok = false;
         }
@@ -363,7 +364,7 @@ static bool GetLlh(NmeaLlh& llh, const std::vector<std::string>& fields, const i
         }
     }
 
-    NMEA_TRACE("GetLlh(%d=\"%s\", %d=\"%s\", %d=\"%s\", %d=\"%s\", %s)=%s ll=%g/%g/%s h=%g/%s", lat_ix,
+    NMEA_TRACE("GetLlh(%d=\"%s\", %d=\"%s\", %d=\"%s\", %d=\"%s\", %s)=%s ll=%.12g/%.12g/%s h=%g/%s", lat_ix,
         lat_ix >= 0 ? fields[lat_ix].c_str() : "", lon_ix, lon_ix >= 0 ? fields[lon_ix].c_str() : "", alt_ix,
         alt_ix >= 0 ? fields[alt_ix].c_str() : "", sep_ix, sep_ix >= 0 ? fields[sep_ix].c_str() : "",
         required ? "true" : "false", ok ? "true" : "false", llh.lat, llh.lon, llh.latlon_valid ? "true" : "false",
@@ -815,18 +816,20 @@ bool NmeaGllPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
 
 bool NmeaRmcPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
 {
-    // $GNRMC,110546.800,A,4724.018931,N,00827.023090,E,0.015,139.17,231024,,,D,V*3D
+    // $GPRMC,094821.199,A,4724.017904,N,00827.021943,E,0.001,250.72,080125,,,R*73       < NMEA 4.10
+    // $GNRMC,110546.800,A,4724.018931,N,00827.023090,E,0.015,139.17,231024,,,D,V*3D    >= NMEA 4.10
     //             0     1    2        3     4        5 6     7      8    9 10 11 12
     // $GNRMC,235943.412,V,,,,,,,050180,,,N,V*28
     bool ok = false;
     NmeaParts m;
-    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 13)) {
-        // Ignore magnetic variation fields_[9] and fields_[10]
+    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_) &&
+        ((m.fields_.size() == 12) || (m.fields_.size() == 13))) {
+        // Ignore magnetic variation fields_[9] and fields_[10], and fields_[12] is optional
         ok = (GetTime(time, m.fields_[0]) && GetStatusGllRmc(status, m.fields_[1]) &&
               GetFloat(speed, m.fields_[6], false) && GetFloat(course, m.fields_[7], false, 0.0, 360.0) &&
               GetDateDdMmYy(date, m.fields_[8]) && GetModeRmcGns(mode, m.fields_[11]) &&
-              GetNavStatusRmc(navstatus, m.fields_[12]) &&
-              GetLlh(llh, m.fields_, 2, 4, -1, -1, mode != NmeaModeRmcGns::INVALID));
+              GetLlh(llh, m.fields_, 2, 4, -1, -1, mode != NmeaModeRmcGns::INVALID) &&
+              ((m.fields_.size() == 12) || GetNavStatusRmc(navstatus, m.fields_[12])));
     }
     NMEA_TRACE("NmeaRmcPayload %s", ok ? "true" : "false");
     return ok;
