@@ -528,7 +528,7 @@ struct NmeaRmcPayload : public NmeaPayload
     NmeaFloat course;                                            //!< Course over ground w.r.t. True North [deg]
     NmeaDate date;                                               //!< Date
     NmeaModeRmcGns mode = NmeaModeRmcGns::UNSPECIFIED;           //!< Positioning system mode indicator
-    NmeaNavStatusRmc navstatus = NmeaNavStatusRmc::UNSPECIFIED;  //!< Navigational status
+    NmeaNavStatusRmc navstatus = NmeaNavStatusRmc::UNSPECIFIED;  //!< Navigational status (optional)
     /**
      * @brief Set data from sentence
      *

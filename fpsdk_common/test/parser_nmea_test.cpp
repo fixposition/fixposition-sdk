@@ -487,6 +487,59 @@ TEST(NmeaTest, NmeaRmcPayload)
         EXPECT_EQ(rmc.mode, NmeaModeRmcGns::INVALID);
         EXPECT_EQ(rmc.navstatus, NmeaNavStatusRmc::NA);
     }
+    {
+        NmeaRmcPayload rmc;
+        const char* old_rmc = "$GPRMC,094821.1999,A,4724.0179049,N,00827.0219431,E,0.00151,250.7782,080125,,,R*73\r\n";
+        EXPECT_TRUE(rmc.SetFromMsg((const uint8_t*)old_rmc, strlen(old_rmc)));
+        EXPECT_EQ(rmc.talker, NmeaTalkerId::GPS_SBAS);
+        EXPECT_TRUE(rmc.time.valid);
+        EXPECT_EQ(rmc.time.hours, 9);
+        EXPECT_EQ(rmc.time.mins, 48);
+        EXPECT_NEAR(rmc.time.secs, 21.1999, 1e-9);
+        EXPECT_EQ(rmc.status, NmeaStatusGllRmc::VALID);
+        EXPECT_TRUE(rmc.llh.latlon_valid);
+        EXPECT_NEAR(rmc.llh.lat, 47.0 + (24.017904 / 60.0), 1e-7);
+        EXPECT_NEAR(rmc.llh.lon, 8.0 + (27.021943 / 60.0), 1e-7);
+        EXPECT_FALSE(rmc.llh.height_valid);  // no height in RMC
+        EXPECT_NEAR(rmc.llh.height, 0.0, 1e-9);
+        EXPECT_TRUE(rmc.speed.valid);
+        EXPECT_NEAR(rmc.speed.value, 0.00151, 1e-6);
+        EXPECT_TRUE(rmc.course.valid);
+        EXPECT_NEAR(rmc.course.value, 250.7782, 1e-6);
+        EXPECT_TRUE(rmc.date.valid);
+        EXPECT_EQ(rmc.date.years, 2025);
+        EXPECT_EQ(rmc.date.months, 1);
+        EXPECT_EQ(rmc.date.days, 8);
+        EXPECT_EQ(rmc.mode, NmeaModeRmcGns::RTK_FIXED);
+        EXPECT_EQ(rmc.navstatus, NmeaNavStatusRmc::UNSPECIFIED);  // n/a
+    }
+    {
+        NmeaRmcPayload rmc;
+        const char* south_west_rmc =
+            "$GNRMC,110546.800,A,4724.018931,S,00827.023090,W,0.015,139.17,231024,,,D,V*3D\r\n";
+        EXPECT_TRUE(rmc.SetFromMsg((const uint8_t*)south_west_rmc, strlen(south_west_rmc)));
+        EXPECT_EQ(rmc.talker, NmeaTalkerId::GNSS);
+        EXPECT_TRUE(rmc.time.valid);
+        EXPECT_EQ(rmc.time.hours, 11);
+        EXPECT_EQ(rmc.time.mins, 5);
+        EXPECT_NEAR(rmc.time.secs, 46.8, 1e-9);
+        EXPECT_EQ(rmc.status, NmeaStatusGllRmc::VALID);
+        EXPECT_TRUE(rmc.llh.latlon_valid);
+        EXPECT_NEAR(rmc.llh.lat, -(47.0 + (24.018931 / 60.0)), 1e-9);
+        EXPECT_NEAR(rmc.llh.lon, -(8.0 + (27.023090 / 60.0)), 1e-9);
+        EXPECT_FALSE(rmc.llh.height_valid);  // no height in RMC
+        EXPECT_NEAR(rmc.llh.height, 0.0, 1e-9);
+        EXPECT_TRUE(rmc.speed.valid);
+        EXPECT_NEAR(rmc.speed.value, 0.015, 1e-6);
+        EXPECT_TRUE(rmc.course.valid);
+        EXPECT_NEAR(rmc.course.value, 139.17, 1e-3);
+        EXPECT_TRUE(rmc.date.valid);
+        EXPECT_EQ(rmc.date.years, 2024);
+        EXPECT_EQ(rmc.date.months, 10);
+        EXPECT_EQ(rmc.date.days, 23);
+        EXPECT_EQ(rmc.mode, NmeaModeRmcGns::DGNSS);
+        EXPECT_EQ(rmc.navstatus, NmeaNavStatusRmc::NA);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
