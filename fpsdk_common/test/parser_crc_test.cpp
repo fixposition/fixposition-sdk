@@ -60,7 +60,7 @@ static const uint8_t RANDOM_64_BYTES[] = { 0xfc, 0xf3, 0xbb, 0x2b, 0x6f, 0xf0, 0
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(CrcTest, Data)
+TEST(ParserCrcTest, Data)
 {
     EXPECT_EQ(sizeof(RANDOM_1_BYTE), (size_t)1);
     EXPECT_EQ(sizeof(RANDOM_2_BYTES), (size_t)2);
@@ -87,7 +87,7 @@ TEST(CrcTest, Data)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(CrcTest, Crc32fpb)
+TEST(ParserCrcTest, Crc32fpb)
 {
     // Bad input should lead to 0 CRC
     EXPECT_EQ(Crc32fpb(NULL, 0), (uint32_t)0x00000000);
@@ -119,7 +119,7 @@ TEST(CrcTest, Crc32fpb)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(CrcTest, Crc24rtcm3)
+TEST(ParserCrcTest, Crc24rtcm3)
 {
     // Bad input should lead to 0 CRC
     EXPECT_EQ(Crc24rtcm3(NULL, 0), (uint32_t)0x000000);
@@ -151,7 +151,7 @@ TEST(CrcTest, Crc24rtcm3)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(CrcTest, Crc32novb)
+TEST(ParserCrcTest, Crc32novb)
 {
     // Bad input should lead to 0 CRC
     EXPECT_EQ(Crc32novb(NULL, 0), (uint32_t)0x00000000);
@@ -183,7 +183,7 @@ TEST(CrcTest, Crc32novb)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(CrcTest, Crc4spartn)
+TEST(ParserCrcTest, Crc4spartn)
 {
     // Bad input should lead to 0 CRC
     EXPECT_EQ(Crc4spartn(NULL, 0), (uint8_t)0x0);
@@ -215,7 +215,7 @@ TEST(CrcTest, Crc4spartn)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(CrcTest, Crc8spartn)
+TEST(ParserCrcTest, Crc8spartn)
 {
     // Bad input should lead to 0 CRC
     EXPECT_EQ(Crc8spartn(NULL, 0), (uint8_t)0x00);
@@ -247,7 +247,7 @@ TEST(CrcTest, Crc8spartn)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(CrcTest, Crc16spartn)
+TEST(ParserCrcTest, Crc16spartn)
 {
     // Bad input should lead to 0 CRC
     EXPECT_EQ(Crc16spartn(NULL, 0), (uint16_t)0x0000);
@@ -279,7 +279,7 @@ TEST(CrcTest, Crc16spartn)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(CrcTest, Crc32spartn)
+TEST(ParserCrcTest, Crc32spartn)
 {
     // Bad input should lead to 0 CRC
     EXPECT_EQ(Crc32spartn(NULL, 0), (uint32_t)0x00000000);
@@ -311,7 +311,7 @@ TEST(CrcTest, Crc32spartn)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(CrcTest, ChecksumUbx)
+TEST(ParserCrcTest, ChecksumUbx)
 {
     // Bad input should lead to 0 CRC
     EXPECT_EQ(ChecksumUbx(NULL, 0), (uint16_t)0x0000);

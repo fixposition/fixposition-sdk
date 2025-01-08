@@ -148,7 +148,7 @@ TEST(ParserFpaTest, FpaGetMessageName)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaGpsTime)
+TEST(ParserFpaTest, FpaGpsTime)
 {
     const FpaGpsTime t1;
     const FpaGpsTime t2 = { { true, 1234 }, { true, 456789.123456 } };
@@ -183,7 +183,7 @@ TEST(FpaTest, FpaGpsTime)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaEoePayload)
+TEST(ParserFpaTest, FpaEoePayload)
 {
     {
         FpaEoePayload payload;
@@ -219,7 +219,7 @@ TEST(FpaTest, FpaEoePayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaGnssantPayload)
+TEST(ParserFpaTest, FpaGnssantPayload)
 {
     {
         FpaGnssantPayload payload;
@@ -259,7 +259,7 @@ TEST(FpaTest, FpaGnssantPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaGnsscorrPayload)
+TEST(ParserFpaTest, FpaGnsscorrPayload)
 {
     {
         FpaGnsscorrPayload payload;
@@ -337,7 +337,7 @@ TEST(FpaTest, FpaGnsscorrPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaRawimuPayload)
+TEST(ParserFpaTest, FpaRawimuPayload)
 {
     {
         FpaRawimuPayload payload;
@@ -381,7 +381,7 @@ TEST(FpaTest, FpaRawimuPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaCorrimuPayload)
+TEST(ParserFpaTest, FpaCorrimuPayload)
 {
     {
         FpaCorrimuPayload payload;
@@ -425,7 +425,7 @@ TEST(FpaTest, FpaCorrimuPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaImubiasPayload)
+TEST(ParserFpaTest, FpaImubiasPayload)
 {
     {
         FpaImubiasPayload payload;
@@ -490,7 +490,7 @@ TEST(FpaTest, FpaImubiasPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaLlhPayload)
+TEST(ParserFpaTest, FpaLlhPayload)
 {
     {
         FpaLlhPayload payload;
@@ -537,7 +537,7 @@ TEST(FpaTest, FpaLlhPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaOdometryPayload)
+TEST(ParserFpaTest, FpaOdometryPayload)
 {
     {
         FpaOdometryPayload payload;
@@ -605,7 +605,7 @@ TEST(FpaTest, FpaOdometryPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaOdomenuPayload)
+TEST(ParserFpaTest, FpaOdomenuPayload)
 {
     {
         FpaOdomenuPayload payload;
@@ -626,7 +626,7 @@ TEST(FpaTest, FpaOdomenuPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaOdomshPayload)
+TEST(ParserFpaTest, FpaOdomshPayload)
 {
     {
         FpaOdomshPayload payload;
@@ -647,7 +647,7 @@ TEST(FpaTest, FpaOdomshPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaOdomstatusPayload)
+TEST(ParserFpaTest, FpaOdomstatusPayload)
 {
     {
         FpaOdomstatusPayload payload;
@@ -712,7 +712,7 @@ TEST(FpaTest, FpaOdomstatusPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaTextPayload)
+TEST(ParserFpaTest, FpaTextPayload)
 {
     {
         FpaTextPayload payload;
@@ -732,7 +732,7 @@ TEST(FpaTest, FpaTextPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaTfPayload)
+TEST(ParserFpaTest, FpaTfPayload)
 {
     {
         FpaTfPayload payload;
@@ -758,7 +758,7 @@ TEST(FpaTest, FpaTfPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(FpaTest, FpaTpPayload)
+TEST(ParserFpaTest, FpaTpPayload)
 {
     {
         FpaTpPayload payload;

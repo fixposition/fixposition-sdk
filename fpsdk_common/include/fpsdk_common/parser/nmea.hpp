@@ -317,12 +317,12 @@ enum class NmeaSystemId : int
 enum class NmeaSignalId : int
 {  // clang-format off
     UNSPECIFIED = 0x000 + '!',  //!< Unspecified
-    GPS_L1CA    = 0x100 + '1',  //!< GPS L1 C/A
+    NONE        = 0x000 + '0',  //!< None
+    GPS_L1CA    = 0x100 + '1',  //!< GPS L1 C/A or SBAS L1 C/A
     GPS_L2CL    = 0x100 + '6',  //!< GPS L2 CL
     GPS_L2CM    = 0x100 + '5',  //!< GPS L2 CM
     GPS_L5I     = 0x100 + '7',  //!< GPS L5 I
     GPS_L5Q     = 0x100 + '8',  //!< GPS L5 Q
-    SBAS_L1CA   = 0xa00 + '1',  //!< SBAS L1 C/A
     GLO_L1OF    = 0x200 + '1',  //!< GLONASS L1 OF
     GLO_L2OF    = 0x200 + '3',  //!< GLONASS L2 OF
     GAL_E1      = 0x300 + '7',  //!< Galileo E1
@@ -396,22 +396,21 @@ struct NmeaSat
  */
 struct NmeaVersion
 {
-    const int svid_min_gps;  //!< Min GPS satellite ID
-    const int svid_max_gps;  //!< Max GPS satellite ID
-    const int svid_min_sbs;  //!< Min SBAS satellite ID
-    const int svid_max_sbs;  //!< Max SBAS satellite ID
-    const int svid_min_glo;  //!< Min GLONASS satellite ID
-    const int svid_max_glo;  //!< Max GLONASS satellite ID
-    const int svid_min_gal;  //!< Min Galileo satellite ID
-    const int svid_max_gal;  //!< Max Galileo satellite ID
-    const int svid_min_bds;  //!< Min BeiDou satellite ID
-    const int svid_max_bds;  //!< Max BeiDou satellite ID
-    const int svid_min_qzs;  //!< Min QZSS satellite ID
-    const int svid_max_qzs;  //!< Max QZSS satellite ID
-
-    static const NmeaVersion V410;          //!< Values for NMEA v4.10
-    static const NmeaVersion V410_UBX_EXT;  //!< Values for NMEA v4.10 extended (u-blox flavour)
-    static const NmeaVersion V411;          //!< Values for NMEA v4.11
+    const int svid_min_gps = -1;            //!< Min GPS satellite ID
+    const int svid_max_gps = -1;            //!< Max GPS satellite ID
+    const int svid_min_sbas = -1;           //!< Min SBAS satellite ID
+    const int svid_max_sbas = -1;           //!< Max SBAS satellite ID
+    const int svid_min_gal = -1;            //!< Min Galileo satellite ID
+    const int svid_max_gal = -1;            //!< Max Galileo satellite ID
+    const int svid_min_bds = -1;            //!< Min BeiDou satellite ID
+    const int svid_max_bds = -1;            //!< Max BeiDou satellite ID
+    const int svid_min_glo = -1;            //!< Min GLONASS satellite ID
+    const int svid_max_glo = -1;            //!< Max GLONASS satellite ID
+    const int svid_min_qzss = -1;           //!< Min QZSS satellite ID, -1 if not available
+    const int svid_max_qzss = -1;           //!< Max QZSS satellite ID, -1 if not available
+    static const NmeaVersion V410;          //!< Value for NMEA v4.10
+    static const NmeaVersion V410_UBX_EXT;  //!< Value for NMEA v4.10 extended (u-blox flavour)
+    static const NmeaVersion V411;          //!< Value for NMEA v4.11
 };
 
 /**

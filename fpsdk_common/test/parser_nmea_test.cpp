@@ -262,7 +262,7 @@ TEST(ParserNmeaTest, NmeaGetMessageName)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(NmeaTest, NmeaTime)
+TEST(ParserNmeaTest, NmeaTime)
 {
     const NmeaTime t1 = { true, 11, 44, 1.0 };
     EXPECT_TRUE(t1.valid);
@@ -284,7 +284,7 @@ TEST(NmeaTest, NmeaTime)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(NmeaTest, NmeaDate)
+TEST(ParserNmeaTest, NmeaDate)
 {
     const NmeaDate d1 = { true, 2024, 10, 31 };
     EXPECT_TRUE(d1.valid);
@@ -302,7 +302,7 @@ TEST(NmeaTest, NmeaDate)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(NmeaTest, NmeaGgaPayload)
+TEST(ParserNmeaTest, NmeaGgaPayload)
 {
     {
         NmeaGgaPayload gga;
@@ -393,7 +393,7 @@ TEST(NmeaTest, NmeaGgaPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(NmeaTest, NmeaGllPayload)
+TEST(ParserNmeaTest, NmeaGllPayload)
 {
     {
         NmeaGllPayload gll;
@@ -433,7 +433,7 @@ TEST(NmeaTest, NmeaGllPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(NmeaTest, NmeaRmcPayload)
+TEST(ParserNmeaTest, NmeaRmcPayload)
 {
     {
         NmeaRmcPayload rmc;
@@ -544,7 +544,7 @@ TEST(NmeaTest, NmeaRmcPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(NmeaTest, NmeaVtgPayload)
+TEST(ParserNmeaTest, NmeaVtgPayload)
 {
     {
         NmeaVtgPayload vtg;
@@ -578,7 +578,7 @@ TEST(NmeaTest, NmeaVtgPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(NmeaTest, NmeaGstPayload)
+TEST(ParserNmeaTest, NmeaGstPayload)
 {
     {
         NmeaGstPayload gst;
@@ -632,7 +632,7 @@ TEST(NmeaTest, NmeaGstPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(NmeaTest, NmeaHdtPayload)
+TEST(ParserNmeaTest, NmeaHdtPayload)
 {
     {
         NmeaHdtPayload hdt;
@@ -654,7 +654,7 @@ TEST(NmeaTest, NmeaHdtPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(NmeaTest, NmeaZdaPayload)
+TEST(ParserNmeaTest, NmeaZdaPayload)
 {
     {
         NmeaZdaPayload zda;
@@ -696,7 +696,7 @@ TEST(NmeaTest, NmeaZdaPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(NmeaTest, NmeaGsaPayload)
+TEST(ParserNmeaTest, NmeaGsaPayload)
 {
     {
         NmeaGsaPayload gsa;
@@ -806,7 +806,7 @@ TEST(NmeaTest, NmeaGsaPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(NmeaTest, NmeaGsvPayload)
+TEST(ParserNmeaTest, NmeaGsvPayload)
 {
     {
         NmeaGsvPayload gsv;
@@ -969,11 +969,70 @@ TEST(NmeaTest, NmeaGsvPayload)
             EXPECT_EQ(gsv.cnos[ix].cno, 0);
         }
     }
+    {
+        NmeaGsvPayload gsv;
+        const char* no_cno =
+            "$GPGSV,1,1,03,"
+            "11,02,124,,"
+            "23,01,241,,"
+            "41,02,101,,"
+            "0*53..";  // no cnos -> no signal
+        EXPECT_TRUE(gsv.SetFromMsg((const uint8_t*)no_cno, strlen(no_cno)));
+        EXPECT_EQ(gsv.talker, NmeaTalkerId::GPS_SBAS);
+        EXPECT_TRUE(gsv.num_msgs.valid);
+        EXPECT_EQ(gsv.num_msgs.value, 1);
+        EXPECT_TRUE(gsv.msg_num.valid);
+        EXPECT_EQ(gsv.msg_num.value, 1);
+        EXPECT_TRUE(gsv.tot_num_sat.valid);
+        EXPECT_EQ(gsv.tot_num_sat.value, 3);
+        EXPECT_EQ(gsv.num_azels, 3);
+        EXPECT_TRUE(gsv.azels[0].valid);
+        EXPECT_EQ(gsv.azels[0].system, NmeaSystemId::GPS_SBAS);
+        EXPECT_EQ(gsv.azels[0].svid, 11);
+        EXPECT_EQ(gsv.azels[0].el, 2);
+        EXPECT_EQ(gsv.azels[0].az, 124);
+        EXPECT_TRUE(gsv.azels[1].valid);
+        EXPECT_EQ(gsv.azels[1].system, NmeaSystemId::GPS_SBAS);
+        EXPECT_EQ(gsv.azels[1].svid, 23);
+        EXPECT_EQ(gsv.azels[1].el, 1);
+        EXPECT_EQ(gsv.azels[1].az, 241);
+        EXPECT_TRUE(gsv.azels[2].valid);
+        EXPECT_EQ(gsv.azels[2].system, NmeaSystemId::GPS_SBAS);
+        EXPECT_EQ(gsv.azels[2].svid, 41);
+        EXPECT_EQ(gsv.azels[2].el, 2);
+        EXPECT_EQ(gsv.azels[2].az, 101);
+        EXPECT_FALSE(gsv.azels[3].valid);
+        EXPECT_EQ(gsv.azels[3].system, NmeaSystemId::UNSPECIFIED);
+        EXPECT_EQ(gsv.azels[3].svid, 0);
+        EXPECT_EQ(gsv.azels[3].el, 0);
+        EXPECT_EQ(gsv.azels[3].az, 0);
+        EXPECT_EQ(gsv.num_cnos, 0);
+        EXPECT_FALSE(gsv.cnos[0].valid);
+        EXPECT_EQ(gsv.cnos[0].system, NmeaSystemId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[0].svid, 0);
+        EXPECT_EQ(gsv.cnos[0].signal, NmeaSignalId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[0].cno, 0);
+        EXPECT_FALSE(gsv.cnos[1].valid);
+        EXPECT_EQ(gsv.cnos[1].system, NmeaSystemId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[1].svid, 0);
+        EXPECT_EQ(gsv.cnos[1].signal, NmeaSignalId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[1].cno, 0);
+        EXPECT_FALSE(gsv.cnos[2].valid);
+        EXPECT_EQ(gsv.cnos[2].system, NmeaSystemId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[2].svid, 0);
+        EXPECT_EQ(gsv.cnos[2].signal, NmeaSignalId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[2].cno, 0);
+        EXPECT_FALSE(gsv.cnos[3].valid);
+        EXPECT_EQ(gsv.cnos[3].system, NmeaSystemId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[3].svid, 0);
+        EXPECT_EQ(gsv.cnos[3].signal, NmeaSignalId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[3].cno, 0);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(NmeaTest, NmeaCollectGsaGsv)
+TEST(ParserNmeaTest, NmeaCollectGsaGsv)
 {
     const char* gsa_msgs[] = {
         // clang-format off

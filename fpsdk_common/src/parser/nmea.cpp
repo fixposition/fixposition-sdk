@@ -167,9 +167,12 @@ NmeaCoordinates::NmeaCoordinates(const double degs, const int digits)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-/*static*/ const NmeaVersion NmeaVersion::V410 = { 1, 32, 33, 64, 65, 96, 1, 36, 1, 63, -1, -1 };
-/*static*/ const NmeaVersion NmeaVersion::V410_UBX_EXT = { 1, 32, 33, 64, 65, 96, 1, 36, 1, 63, 193, 202 };
-/*static*/ const NmeaVersion NmeaVersion::V411 = { 1, 32, 33, 64, 65, 96, 1, 36, 1, 63, 1, 10 };
+// clang-format off
+//                                                         GPS      SBAS      GAL      BDS      GLO       QZSS
+/*static*/ const NmeaVersion NmeaVersion::V410         = { 1, 32,   33, 64,   1, 36,   1, 63,   65, 96,    -1,  -1 };
+/*static*/ const NmeaVersion NmeaVersion::V410_UBX_EXT = { 1, 32,   33, 64,   1, 36,   1, 63,   65, 96,   193, 202 };
+/*static*/ const NmeaVersion NmeaVersion::V411         = { 1, 32,   33, 64,   1, 36,   1, 63,   65, 96,     1,  10 };
+// clang-format on
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -623,12 +626,13 @@ static bool GetSystemId(NmeaSystemId& system, const std::string& field)
 }
 
 // Get system Id
-bool GetSignalId(NmeaSignalId& signalid, const std::string& field, const NmeaSystemId system)
+static bool GetSignalId(NmeaSignalId& signalid, const std::string& field, const NmeaSystemId system)
 {
     bool ok = true;
     if (!field.empty()) {
         switch (system) {  // clang-format off
             case NmeaSystemId::GPS_SBAS: switch ((int)field[0]) {
+                case 0xff & types::EnumToVal(NmeaSignalId::NONE):       signalid = NmeaSignalId::NONE;       break;
                 case 0xff & types::EnumToVal(NmeaSignalId::GPS_L1CA):   signalid = NmeaSignalId::GPS_L1CA;   break; // = NmeaSignalId::SBAS_L1CA
                 case 0xff & types::EnumToVal(NmeaSignalId::GPS_L2CL):   signalid = NmeaSignalId::GPS_L2CL;   break;
                 case 0xff & types::EnumToVal(NmeaSignalId::GPS_L2CM):   signalid = NmeaSignalId::GPS_L2CM;   break;
@@ -637,17 +641,20 @@ bool GetSignalId(NmeaSignalId& signalid, const std::string& field, const NmeaSys
                 default: ok = false; break;
             } break;
             case NmeaSystemId::GLO: switch ((int)field[0]) {
+                case 0xff & types::EnumToVal(NmeaSignalId::NONE):       signalid = NmeaSignalId::NONE;       break;
                 case 0xff & types::EnumToVal(NmeaSignalId::GLO_L1OF):   signalid = NmeaSignalId::GLO_L1OF;   break;
                 case 0xff & types::EnumToVal(NmeaSignalId::GLO_L2OF):   signalid = NmeaSignalId::GLO_L2OF;   break;
                 default: ok = false; break;
             } break;
             case NmeaSystemId::GAL: switch ((int_fast16_t)field[0]) {
+                case 0xff & types::EnumToVal(NmeaSignalId::NONE):       signalid = NmeaSignalId::NONE;       break;
                 case 0xff & types::EnumToVal(NmeaSignalId::GAL_E1):     signalid = NmeaSignalId::GAL_E1;     break;
                 case 0xff & types::EnumToVal(NmeaSignalId::GAL_E5A):    signalid = NmeaSignalId::GAL_E5A;    break;
                 case 0xff & types::EnumToVal(NmeaSignalId::GAL_E5B):    signalid = NmeaSignalId::GAL_E5B;    break;
                 default: ok = false; break;
             } break;
             case NmeaSystemId::BDS: switch ((int)field[0]) {
+                case 0xff & types::EnumToVal(NmeaSignalId::NONE):       signalid = NmeaSignalId::NONE;       break;
                 case 0xff & types::EnumToVal(NmeaSignalId::BDS_B1ID):   signalid = NmeaSignalId::BDS_B1ID;   break;
                 case 0xff & types::EnumToVal(NmeaSignalId::BDS_B2ID):   signalid = NmeaSignalId::BDS_B2ID;   break;
                 case 0xff & types::EnumToVal(NmeaSignalId::BDS_B1C):    signalid = NmeaSignalId::BDS_B1C;    break;
@@ -655,6 +662,7 @@ bool GetSignalId(NmeaSignalId& signalid, const std::string& field, const NmeaSys
                 default: ok = false; break;
             } break;
             case NmeaSystemId::QZSS: switch ((int)field[0]) {
+                case 0xff & types::EnumToVal(NmeaSignalId::NONE):       signalid = NmeaSignalId::NONE;       break;
                 case 0xff & types::EnumToVal(NmeaSignalId::QZSS_L1CA):  signalid = NmeaSignalId::QZSS_L1CA;  break;
                 case 0xff & types::EnumToVal(NmeaSignalId::QZSS_L1S):   signalid = NmeaSignalId::QZSS_L1S;   break;
                 case 0xff & types::EnumToVal(NmeaSignalId::QZSS_L2CM):  signalid = NmeaSignalId::QZSS_L2CM;  break;
@@ -664,6 +672,7 @@ bool GetSignalId(NmeaSignalId& signalid, const std::string& field, const NmeaSys
                 default: ok = false; break;
             } break;
             case NmeaSystemId::NAVIC: switch ((int)field[0]) {
+                case 0xff & types::EnumToVal(NmeaSignalId::NONE):       signalid = NmeaSignalId::NONE;       break;
                 case 0xff & types::EnumToVal(NmeaSignalId::NAVIC_L5A):  signalid = NmeaSignalId::NAVIC_L5A;  break;
                 default: ok = false; break;
             } break;
@@ -675,7 +684,8 @@ bool GetSignalId(NmeaSignalId& signalid, const std::string& field, const NmeaSys
     } else {
         ok = false;
     }
-    NMEA_TRACE("GetSignalId(\"%s\")=%s signalid=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(signalid));
+    NMEA_TRACE("GetSignalId(\"%s\", '%c')=%s signalid=%c", field.c_str(), types::EnumToVal(system),
+        ok ? "true" : "false", types::EnumToVal(signalid));
     return ok;
 }
 
@@ -962,6 +972,9 @@ bool NmeaGsvPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     //        0 1  2 3  4  5   6  7  8  9   10 11
     //               ^^^^^^^^^^^^ ^^^^^^^^^^^^ <-- 4th (last) message: 2 sigs/sats
     //
+    // $GAGSV,1,1,01,36,01,124,,0*46..
+    //        0 1 2  3  4  5  6 7
+    //               ^^^^^^^^^^ <-- 1st of 1 message, 1 sig/sat only
     // $GAGSV,1,1,00,1*75
     //        0 1  2 3
     bool ok = false;
@@ -979,6 +992,7 @@ bool NmeaGsvPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
             GetInt(msg_num, m.fields_[1], true, 1, num_msgs.value) && msg_num.valid &&
             // - The total number of satellits in the sequence
             GetInt(tot_num_sat, m.fields_[2], true, 0, MAX_MSGS * SV_PER_MSG) && tot_num_sat.valid);
+
         // Determine the number of sat/sig in this message. The last message has the remainder, other messages have 4.
         int num_sv = 0;
         if (ok) {
