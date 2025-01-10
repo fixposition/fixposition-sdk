@@ -711,6 +711,8 @@ constexpr Int days_from_civil(Int y, unsigned m, unsigned d) noexcept
     return era * 146097 + static_cast<Int>(doe) - 719468;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
 struct LeapSecInfo
 {
     LeapSecInfo(const int leapsec_value, const bool at_leapsec)
@@ -721,20 +723,18 @@ struct LeapSecInfo
     bool at_leapsec_;
 };
 
-// ---------------------------------------------------------------------------------------------------------------------
-
 // "Our" internal atomic timescale starts at the same time as POSIX. So at 1970-01-01 both are value 0. At this point
 // TAI (CLOCK_TAI) has TAI_OFFS leap seconds.
 static constexpr uint32_t MAX_LEAPS = 27;
 static constexpr int TAI_OFFS = 10;  // offset of CLOCK_TAI to our atomic time
 LeapSecInfo getLeapSecInfo(const uint32_t ts, const bool posix)
 {
-    // See IERS "Bulletin C" #68 July 2024 (https://hpiers.obspm.fr/iers/bul/bulc/bulletinc.dat)
+    // See IERS "Bulletin C" #69 January 2025 (https://hpiers.obspm.fr/iers/bul/bulc/bulletinc.dat)
     // See also https://data.iana.org/time-zones/data/leap-seconds.list
     // See also /usr/share/zoneinfo/{leapseconds,leap-seconds.list}
-    // 2025-06-30 12:00:00 (The earliest time there can be a change is at midnight this day)
-    // TZ=UTC date --date "2025-06-30 12:00:00" +%s
-    static constexpr uint32_t max_ts = 1751284837;
+    // 2025-12-31 12:00:00 (The earliest time there can be a change is at midnight this day)
+    // TZ=UTC date --date "2024-12-31 12:00:00" +%s
+    static constexpr uint32_t max_ts = 1767182437;
     if (ts > max_ts) {
         static bool you_have_been_warned = false;
         if (!you_have_been_warned) {
