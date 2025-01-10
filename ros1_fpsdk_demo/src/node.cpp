@@ -33,10 +33,10 @@ namespace Ros1FpsdkDemo {
 /* ****************************************************************************************************************** */
 
 DemoParams::DemoParams() /* clang-format off */ :
-    worker1_interval_ { 1.0 },
-    worker2_interval_ { 1.0 },
-    timer1_interval_ { 1.0 },
-    timer2_interval_ { 1.0 }  // clang-format on
+    worker1_interval_   { 1.0 },
+    worker2_interval_   { 1.0 },
+    timer1_interval_    { 1.0 },
+    timer2_interval_    { 1.0 }  // clang-format on
 {
 }
 

@@ -18,7 +18,6 @@
 /* EXTERNAL */
 #include <fpsdk_ros1/ext/ros.hpp>
 #include <fpsdk_ros1/ext/ros_callback_queue.hpp>
-#include <fpsdk_ros1/ext/ros_msgs.hpp>
 
 /* Fixposition SDK */
 #include <fpsdk_common/app.hpp>

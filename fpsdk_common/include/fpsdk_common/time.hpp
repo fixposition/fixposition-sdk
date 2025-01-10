@@ -541,6 +541,7 @@ struct UtcTime
  *   at/during leapsecond events. It does not use the "Mills" or NTP style of handling these periods and is therefore,
  *   for those timestamps, likely not compatible with the system time (CLOCK_REALTIME) of a typical Linux system. See
  *   references below.
+ * - The from/to UTC calculations are not fully correct for times before 1972.
  * - FromClockTai() and SetClockTai() likely will not give the expected result unless your system (Linux kernel) is
  *   configured for the correct leapsecond.
  * - The precision of all integer getters, setters and operators should be [ns] in all cases
@@ -551,6 +552,8 @@ struct UtcTime
  * Some references:
  *
  * - https://en.wikipedia.org/wiki/Unix_time
+ * - https://en.wikipedia.org/wiki/Atomic_clock
+ * - https://en.wikipedia.org/wiki/Coordinated_Universal_Time
  * - https://docs.ntpsec.org/latest/leapsmear.html
  * - https://www.eecis.udel.edu/~mills/leap.html
  * - https://manpages.org/adjtimex/2
