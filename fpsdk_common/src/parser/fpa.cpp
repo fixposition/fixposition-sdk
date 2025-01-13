@@ -1114,16 +1114,19 @@ bool FpaTfPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
 bool FpaTpPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
 {
     // clang-format off
-    // $FP,TP,1,GNSS1,UTC,USNO,195391,0.000000000000,18*4F\r\n
-    //          0     1   2    3      4              5
+    // $FP,TP,1,GNSS1,UTC,USNO,195391,0.000000000000,18*4F\r\n           version 1
+    // $FP,TP,2,GNSS1,UTC,NONE,124512,0.000000000000,18,2349*66\r\n      version 2
+    //          0     1   2    3      4              5  6
     // clang-format on
     bool ok = false;
     FpaParts m;
-    if (GetParts(m, "TP", msg, msg_size) && (m.meta_.msg_version_ == 1) && (m.fields_.size() == 6)) {
+    if (GetParts(m, "TP", msg, msg_size) && (((m.meta_.msg_version_ == 1) && (m.fields_.size() == 6)) ||
+                                                ((m.meta_.msg_version_ == 2) && (m.fields_.size() == 7)))) {
         ok = (GetText(tp_name, sizeof(tp_name), m.fields_[0], true) && GetTimebase(timebase, m.fields_[1]) &&
               GetTimeref(timeref, m.fields_[2]) && GetInt(tp_tow_sec, m.fields_[3], false, 0) &&
               GetFloat(tp_tow_psec, m.fields_[4], false, 0.0, 0.999999999) &&
-              GetInt(gps_leaps, m.fields_[5], false, 0));
+              GetInt(gps_leaps, m.fields_[5], false, 0) &&
+              ((m.meta_.msg_version_ == 1) || GetInt(tp_week, m.fields_[6], false, 0, 9999)));
     }
     FPA_TRACE("FpaTpPayload %s", ok ? "true" : "false");
     valid_ = ok;

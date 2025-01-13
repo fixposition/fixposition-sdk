@@ -887,14 +887,14 @@ struct FpaTfPayload : public FpaPayload
 };
 
 /**
- * @brief FP_A-TP (version 1) message payload
+ * @brief FP_A-TP (versions 1 and 2) message payload
  */
 struct FpaTpPayload : public FpaPayload
 {  // clang-format off
-    FpaGpsTime  gps_time;                             //!< Time
-    char        tp_name[10] = { 0 };                  //!< Timebulse name (nul-terminated string)
+    char        tp_name[10] = { 0 };                  //!< Timepulse name (nul-terminated string)
     FpaTimebase timebase = FpaTimebase::UNSPECIFIED;  //!< Time base
     FpaTimeref  timeref = FpaTimeref::UNSPECIFIED;    //!< Time reference
+    FpaInt      tp_week;                              //!< Timepulse week number (only since version 2 of the message)
     FpaInt      tp_tow_sec;                           //!< Timepulse time seconds of week, integer second part (0--604799)
     FpaFloat    tp_tow_psec;                          //!< Timepulse time seconds of week, sub-second part (0.000000000000--0.999999999999)
     FpaInt      gps_leaps;                            //!< GPS leapseconds
