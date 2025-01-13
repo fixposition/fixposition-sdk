@@ -785,14 +785,34 @@ TEST(ParserFpaTest, FpaTpPayload)
 {
     {
         FpaTpPayload payload;
-        const char* msg = "$FP,TP,1,GNSS1,UTC,USNO,195391,0.000000000000,18*4F\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        const char* msg_v1 = "$FP,TP,1,GNSS1,UTC,USNO,195391,0.000000000000,18*4F\r\n";
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg_v1, strlen(msg_v1)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_EQ(std::string(payload.tp_name), "GNSS1");
         EXPECT_EQ(payload.timebase, FpaTimebase::UTC);
         EXPECT_EQ(payload.timeref, FpaTimeref::UTC_USNO);
+        EXPECT_FALSE(payload.tp_week.valid);
+        EXPECT_EQ(payload.tp_week.value, 0);
         EXPECT_TRUE(payload.tp_tow_sec.valid);
         EXPECT_EQ(payload.tp_tow_sec.value, 195391);
+        EXPECT_TRUE(payload.tp_tow_psec.valid);
+        EXPECT_NEAR(payload.tp_tow_psec.value, 0.0, 1e-10);
+        EXPECT_TRUE(payload.gps_leaps.valid);
+        EXPECT_EQ(payload.gps_leaps.value, 18);
+    }
+
+    {
+        FpaTpPayload payload;
+        const char* msg_v2 = "$FP,TP,2,GNSS1,UTC,NONE,124512,0.000000000000,18,2349*66\r\n";
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg_v2, strlen(msg_v2)));
+        EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(std::string(payload.tp_name), "GNSS1");
+        EXPECT_EQ(payload.timebase, FpaTimebase::UTC);
+        EXPECT_EQ(payload.timeref, FpaTimeref::UTC_NONE);
+        EXPECT_TRUE(payload.tp_week.valid);
+        EXPECT_EQ(payload.tp_week.value, 2349);
+        EXPECT_TRUE(payload.tp_tow_sec.valid);
+        EXPECT_EQ(payload.tp_tow_sec.value, 124512);
         EXPECT_TRUE(payload.tp_tow_psec.valid);
         EXPECT_NEAR(payload.tp_tow_psec.value, 0.0, 1e-10);
         EXPECT_TRUE(payload.gps_leaps.valid);
