@@ -549,6 +549,22 @@ TEST_F(ParserTest, EmptyNmeaPayload)
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST_F(ParserTest, IncompleteMsg)
+{
+    {
+        Parser parser;
+        ParserMsg msg;
+        //                      012345678901234567890123456789
+        const uint8_t data[] = "$FP,ODOMETRY,2,2348,5744";
+        EXPECT_TRUE(parser.Add(data, sizeof(data) - 1));
+        EXPECT_FALSE(parser.Process(msg));
+        EXPECT_TRUE(parser.Flush(msg));
+        EXPECT_EQ(msg.data_.size(), sizeof(data) - 1);
+    }
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace
 

@@ -461,7 +461,8 @@ struct NmeaFloat
 struct NmeaPayload
 {
     NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;  //!< Talker
-    virtual ~NmeaPayload() = default;                 //!< Virtual dtor for polymorphism
+    bool valid_ = false;               //!< Payload successfully decoded (true), or not (yet) decoded (false)
+    virtual ~NmeaPayload() = default;  //!< Virtual dtor for polymorphism
 };
 
 /**

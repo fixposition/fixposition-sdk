@@ -308,18 +308,21 @@ TEST(ParserNmeaTest, NmeaGgaPayload)
         NmeaGgaPayload gga;
         const char* not_a_gga = "$GNGLL,4724.018931,N,00827.023090,E,110546.800,A,D*4F\r\n";
         EXPECT_FALSE(gga.SetFromMsg((const uint8_t*)not_a_gga, strlen(not_a_gga)));
+        EXPECT_FALSE(gga.valid_);
         EXPECT_EQ(gga.talker, NmeaTalkerId::UNSPECIFIED);  // we should not even get the talker
     }
     {
         NmeaGgaPayload gga;
         const char* bad_gga = "$GNGGA,092207.400,4724.017956,N,00827.022383*2E\r\n";
         EXPECT_FALSE(gga.SetFromMsg((const uint8_t*)bad_gga, strlen(bad_gga)));
+        EXPECT_FALSE(gga.valid_);
         EXPECT_EQ(gga.talker, NmeaTalkerId::GNSS);  // we should still get the talker
     }
     {
         NmeaGgaPayload gga;
         const char* good_gga = "$GNGGA,092207.400,4724.017956,N,00827.022383,E,2,41,0.43,411.542,M,47.989,M,,*79\r\n";
         EXPECT_TRUE(gga.SetFromMsg((const uint8_t*)good_gga, strlen(good_gga)));
+        EXPECT_TRUE(gga.valid_);
         EXPECT_EQ(gga.talker, NmeaTalkerId::GNSS);
         EXPECT_TRUE(gga.time.valid);
         EXPECT_EQ(gga.time.hours, 9);
@@ -345,6 +348,7 @@ TEST(ParserNmeaTest, NmeaGgaPayload)
         const char* rtk_gga =
             "$GNGGA,104022.800,4724.017906,N,00827.021943,E,4,43,0.46,411.424,M,47.990,M,0.8,0000*50\r\n";
         EXPECT_TRUE(gga.SetFromMsg((const uint8_t*)rtk_gga, strlen(rtk_gga)));
+        EXPECT_TRUE(gga.valid_);
         EXPECT_EQ(gga.talker, NmeaTalkerId::GNSS);
         EXPECT_TRUE(gga.time.valid);
         EXPECT_EQ(gga.time.hours, 10);
@@ -369,6 +373,7 @@ TEST(ParserNmeaTest, NmeaGgaPayload)
         NmeaGgaPayload gga;
         const char* good_gga = "$GNGGA,235943.812,,,,,0,00,99.99,,M,,M,,*49\r\n";
         EXPECT_TRUE(gga.SetFromMsg((const uint8_t*)good_gga, strlen(good_gga)));
+        EXPECT_TRUE(gga.valid_);
         EXPECT_EQ(gga.talker, NmeaTalkerId::GNSS);
         EXPECT_TRUE(gga.time.valid);
         EXPECT_EQ(gga.time.hours, 23);
@@ -399,6 +404,7 @@ TEST(ParserNmeaTest, NmeaGllPayload)
         NmeaGllPayload gll;
         const char* good_gll = "$GNGLL,4724.018931,N,00827.023090,E,110546.800,A,D*4F\r\n";
         EXPECT_TRUE(gll.SetFromMsg((const uint8_t*)good_gll, strlen(good_gll)));
+        EXPECT_TRUE(gll.valid_);
         EXPECT_EQ(gll.talker, NmeaTalkerId::GNSS);
         EXPECT_TRUE(gll.time.valid);
         EXPECT_EQ(gll.time.hours, 11);
@@ -416,6 +422,7 @@ TEST(ParserNmeaTest, NmeaGllPayload)
         NmeaGllPayload gll;
         const char* gll_coldstart = "$GNGLL,,,,,235943.612,V,N*6B\r\n";
         EXPECT_TRUE(gll.SetFromMsg((const uint8_t*)gll_coldstart, strlen(gll_coldstart)));
+        EXPECT_TRUE(gll.valid_);
         EXPECT_EQ(gll.talker, NmeaTalkerId::GNSS);
         EXPECT_TRUE(gll.time.valid);
         EXPECT_EQ(gll.time.hours, 23);
@@ -439,6 +446,7 @@ TEST(ParserNmeaTest, NmeaRmcPayload)
         NmeaRmcPayload rmc;
         const char* good_rmc = "$GNRMC,110546.800,A,4724.018931,N,00827.023090,E,0.015,139.17,231024,,,D,V*3D\r\n";
         EXPECT_TRUE(rmc.SetFromMsg((const uint8_t*)good_rmc, strlen(good_rmc)));
+        EXPECT_TRUE(rmc.valid_);
         EXPECT_EQ(rmc.talker, NmeaTalkerId::GNSS);
         EXPECT_TRUE(rmc.time.valid);
         EXPECT_EQ(rmc.time.hours, 11);
@@ -465,6 +473,7 @@ TEST(ParserNmeaTest, NmeaRmcPayload)
         NmeaRmcPayload rmc;
         const char* rmc_coldstart = "$GNRMC,235943.412,V,,,,,,,050180,,,N,V*28\r\n";
         EXPECT_TRUE(rmc.SetFromMsg((const uint8_t*)rmc_coldstart, strlen(rmc_coldstart)));
+        EXPECT_TRUE(rmc.valid_);
         EXPECT_EQ(rmc.talker, NmeaTalkerId::GNSS);
         EXPECT_TRUE(rmc.time.valid);
         EXPECT_EQ(rmc.time.hours, 23);
@@ -491,6 +500,7 @@ TEST(ParserNmeaTest, NmeaRmcPayload)
         NmeaRmcPayload rmc;
         const char* old_rmc = "$GPRMC,094821.1999,A,4724.0179049,N,00827.0219431,E,0.00151,250.7782,080125,,,R*73\r\n";
         EXPECT_TRUE(rmc.SetFromMsg((const uint8_t*)old_rmc, strlen(old_rmc)));
+        EXPECT_TRUE(rmc.valid_);
         EXPECT_EQ(rmc.talker, NmeaTalkerId::GPS_SBAS);
         EXPECT_TRUE(rmc.time.valid);
         EXPECT_EQ(rmc.time.hours, 9);
@@ -518,6 +528,7 @@ TEST(ParserNmeaTest, NmeaRmcPayload)
         const char* south_west_rmc =
             "$GNRMC,110546.800,A,4724.018931,S,00827.023090,W,0.015,139.17,231024,,,D,V*3D\r\n";
         EXPECT_TRUE(rmc.SetFromMsg((const uint8_t*)south_west_rmc, strlen(south_west_rmc)));
+        EXPECT_TRUE(rmc.valid_);
         EXPECT_EQ(rmc.talker, NmeaTalkerId::GNSS);
         EXPECT_TRUE(rmc.time.valid);
         EXPECT_EQ(rmc.time.hours, 11);
@@ -550,6 +561,7 @@ TEST(ParserNmeaTest, NmeaVtgPayload)
         NmeaVtgPayload vtg;
         const char* good_vtg = "$GNVTG,139.17,T,,M,0.015,N,0.027,K,D*2A\r\n";
         EXPECT_TRUE(vtg.SetFromMsg((const uint8_t*)good_vtg, strlen(good_vtg)));
+        EXPECT_TRUE(vtg.valid_);
         EXPECT_EQ(vtg.talker, NmeaTalkerId::GNSS);
         EXPECT_TRUE(vtg.cogt.valid);
         EXPECT_NEAR(vtg.cogt.value, 139.17, 1e-4);
@@ -564,6 +576,7 @@ TEST(ParserNmeaTest, NmeaVtgPayload)
         NmeaVtgPayload vtg;
         const char* vtg_coldstart = "$GNVTG,,T,,M,,N,,K,N*32\r\n";
         EXPECT_TRUE(vtg.SetFromMsg((const uint8_t*)vtg_coldstart, strlen(vtg_coldstart)));
+        EXPECT_TRUE(vtg.valid_);
         EXPECT_EQ(vtg.talker, NmeaTalkerId::GNSS);
         EXPECT_FALSE(vtg.cogt.valid);
         EXPECT_EQ(vtg.cogt.value, 0.0);
@@ -584,6 +597,7 @@ TEST(ParserNmeaTest, NmeaGstPayload)
         NmeaGstPayload gst;
         const char* good_gst = "$GPGST,132419.0000,,0.0515,0.0188,162.6609,0.0495,0.0236,0.0182*7D\r\n";
         EXPECT_TRUE(gst.SetFromMsg((const uint8_t*)good_gst, strlen(good_gst)));
+        EXPECT_TRUE(gst.valid_);
         EXPECT_EQ(gst.talker, NmeaTalkerId::GPS_SBAS);
         EXPECT_TRUE(gst.time.valid);
         EXPECT_EQ(gst.time.hours, 13);
@@ -608,6 +622,7 @@ TEST(ParserNmeaTest, NmeaGstPayload)
         NmeaGstPayload gst;
         const char* empty_gst = "$GPGST,,,,,,,,*XX\r\n";
         EXPECT_TRUE(gst.SetFromMsg((const uint8_t*)empty_gst, strlen(empty_gst)));
+        EXPECT_TRUE(gst.valid_);
         EXPECT_EQ(gst.talker, NmeaTalkerId::GPS_SBAS);
         EXPECT_FALSE(gst.time.valid);
         EXPECT_EQ(gst.time.hours, 0);
@@ -638,6 +653,7 @@ TEST(ParserNmeaTest, NmeaHdtPayload)
         NmeaHdtPayload hdt;
         const char* good_hdt = "$GPHDT,61.7183,T*3F\r\n";
         EXPECT_TRUE(hdt.SetFromMsg((const uint8_t*)good_hdt, strlen(good_hdt)));
+        EXPECT_TRUE(hdt.valid_);
         EXPECT_EQ(hdt.talker, NmeaTalkerId::GPS_SBAS);
         EXPECT_TRUE(hdt.heading.valid);
         EXPECT_NEAR(hdt.heading.value, 61.7183, 1e-9);
@@ -646,6 +662,7 @@ TEST(ParserNmeaTest, NmeaHdtPayload)
         NmeaHdtPayload hdt;
         const char* empty_hdt = "$GPHDT,,*3F\r\n";
         EXPECT_TRUE(hdt.SetFromMsg((const uint8_t*)empty_hdt, strlen(empty_hdt)));
+        EXPECT_TRUE(hdt.valid_);
         EXPECT_EQ(hdt.talker, NmeaTalkerId::GPS_SBAS);
         EXPECT_FALSE(hdt.heading.valid);
         EXPECT_EQ(hdt.heading.value, 0.0);
@@ -660,6 +677,7 @@ TEST(ParserNmeaTest, NmeaZdaPayload)
         NmeaZdaPayload zda;
         const char* good_zda = "$GPZDA,090411.0001,10,10,2023,00,00*69\r\n";
         EXPECT_TRUE(zda.SetFromMsg((const uint8_t*)good_zda, strlen(good_zda)));
+        EXPECT_TRUE(zda.valid_);
         EXPECT_EQ(zda.talker, NmeaTalkerId::GPS_SBAS);
         EXPECT_TRUE(zda.time.valid);
         EXPECT_EQ(zda.time.hours, 9);
@@ -678,6 +696,7 @@ TEST(ParserNmeaTest, NmeaZdaPayload)
         NmeaZdaPayload zda;
         const char* empty_zda = "$GPZDA,,,,,,*XX\r\n";
         EXPECT_TRUE(zda.SetFromMsg((const uint8_t*)empty_zda, strlen(empty_zda)));
+        EXPECT_TRUE(zda.valid_);
         EXPECT_EQ(zda.talker, NmeaTalkerId::GPS_SBAS);
         EXPECT_FALSE(zda.time.valid);
         EXPECT_EQ(zda.time.hours, 0);
@@ -702,6 +721,7 @@ TEST(ParserNmeaTest, NmeaGsaPayload)
         NmeaGsaPayload gsa;
         const char* good_gsa = "$GNGSA,A,3,03,04,06,07,09,11,19,20,26,30,31,,0.79,0.46,0.64,1*0F\r\n";
         EXPECT_TRUE(gsa.SetFromMsg((const uint8_t*)good_gsa, strlen(good_gsa)));
+        EXPECT_TRUE(gsa.valid_);
         EXPECT_EQ(gsa.talker, NmeaTalkerId::GNSS);
         EXPECT_EQ(gsa.opmode, NmeaOpModeGsa::AUTO);
         EXPECT_EQ(gsa.navmode, NmeaNavModeGsa::FIX3D);
@@ -754,6 +774,7 @@ TEST(ParserNmeaTest, NmeaGsaPayload)
         NmeaGsaPayload gsa;
         const char* gsa_coldstart = "$GNGSA,A,1,,,,,,,,,,,,,99.99,99.99,99.99,5*37\r\n";
         EXPECT_TRUE(gsa.SetFromMsg((const uint8_t*)gsa_coldstart, strlen(gsa_coldstart)));
+        EXPECT_TRUE(gsa.valid_);
         EXPECT_EQ(gsa.talker, NmeaTalkerId::GNSS);
         EXPECT_EQ(gsa.opmode, NmeaOpModeGsa::AUTO);
         EXPECT_EQ(gsa.navmode, NmeaNavModeGsa::NOFIX);
@@ -813,6 +834,7 @@ TEST(ParserNmeaTest, NmeaGsvPayload)
         const char* gsv_2_of_4 =  // clang-format off
             "$GPGSV,4,2,14,"  "09,84,270,52,"  "11,,,46,"  "16,03,080,,"  "17,03,218,35,"  "1*XX\r\n";  // clang-format on
         EXPECT_TRUE(gsv.SetFromMsg((const uint8_t*)gsv_2_of_4, strlen(gsv_2_of_4)));
+        EXPECT_TRUE(gsv.valid_);
         EXPECT_EQ(gsv.talker, NmeaTalkerId::GPS_SBAS);
         EXPECT_TRUE(gsv.num_msgs.valid);
         EXPECT_EQ(gsv.num_msgs.value, 4);
@@ -869,6 +891,7 @@ TEST(ParserNmeaTest, NmeaGsvPayload)
         NmeaGsvPayload gsv;
         const char* gsv_4_of_4 = "$GPGSV,4,4,14,31,08,034,46,36,31,149,43,1*62\r\n";
         EXPECT_TRUE(gsv.SetFromMsg((const uint8_t*)gsv_4_of_4, strlen(gsv_4_of_4)));
+        EXPECT_TRUE(gsv.valid_);
         EXPECT_EQ(gsv.talker, NmeaTalkerId::GPS_SBAS);
         EXPECT_TRUE(gsv.num_msgs.valid);
         EXPECT_EQ(gsv.num_msgs.value, 4);
@@ -923,6 +946,7 @@ TEST(ParserNmeaTest, NmeaGsvPayload)
         NmeaGsvPayload gsv;
         const char* gsv_1_of_1_nosv = "$GAGSV,1,1,00,1*75\r\n";
         EXPECT_TRUE(gsv.SetFromMsg((const uint8_t*)gsv_1_of_1_nosv, strlen(gsv_1_of_1_nosv)));
+        EXPECT_TRUE(gsv.valid_);
         EXPECT_EQ(gsv.talker, NmeaTalkerId::GAL);
         EXPECT_TRUE(gsv.num_msgs.valid);
         EXPECT_EQ(gsv.num_msgs.value, 1);
@@ -948,6 +972,7 @@ TEST(ParserNmeaTest, NmeaGsvPayload)
         NmeaGsvPayload gsv;
         const char* bad_gsv_too_many_sv = "$GLGSV,1,1,12,1*75\r\n";
         EXPECT_FALSE(gsv.SetFromMsg((const uint8_t*)bad_gsv_too_many_sv, strlen(bad_gsv_too_many_sv)));
+        EXPECT_FALSE(gsv.valid_);
         EXPECT_EQ(gsv.talker, NmeaTalkerId::GLO);
         EXPECT_TRUE(gsv.num_msgs.valid);
         EXPECT_EQ(gsv.num_msgs.value, 1);
@@ -978,6 +1003,7 @@ TEST(ParserNmeaTest, NmeaGsvPayload)
             "41,02,101,,"
             "0*53..";  // no cnos -> no signal
         EXPECT_TRUE(gsv.SetFromMsg((const uint8_t*)no_cno, strlen(no_cno)));
+        EXPECT_TRUE(gsv.valid_);
         EXPECT_EQ(gsv.talker, NmeaTalkerId::GPS_SBAS);
         EXPECT_TRUE(gsv.num_msgs.valid);
         EXPECT_EQ(gsv.num_msgs.value, 1);
@@ -1075,12 +1101,14 @@ TEST(ParserNmeaTest, NmeaCollectGsaGsv)
             NmeaGsaPayload gsa;
             // fprintf(stderr, "GSA: %s", gsa_msg);
             EXPECT_TRUE(gsa.SetFromMsg((const uint8_t*)gsa_msg, strlen(gsa_msg)));
+            EXPECT_TRUE(gsa.valid_);
             EXPECT_TRUE(coll.AddGsa(gsa));
         }
         for (auto& gsv_msg : gsv_msgs) {
             NmeaGsvPayload gsv;
             // fprintf(stderr, "GSV: %s", gsv_msg);
             EXPECT_TRUE(gsv.SetFromMsg((const uint8_t*)gsv_msg, strlen(gsv_msg)));
+            EXPECT_TRUE(gsv.valid_);
             EXPECT_TRUE(coll.AddGsv(gsv));
         }
         coll.Complete();
@@ -1121,11 +1149,13 @@ TEST(ParserNmeaTest, NmeaCollectGsaGsv)
         for (auto& gsa_msg : gsa_msgs) {
             NmeaGsaPayload gsa;
             EXPECT_TRUE(gsa.SetFromMsg((const uint8_t*)gsa_msg, strlen(gsa_msg)));
+            EXPECT_TRUE(gsa.valid_);
             gsas.push_back(gsa);
         }
         for (auto& gsv_msg : gsv_msgs) {
             NmeaGsvPayload gsv;
             EXPECT_TRUE(gsv.SetFromMsg((const uint8_t*)gsv_msg, strlen(gsv_msg)));
+            EXPECT_TRUE(gsv.valid_);
             gsvs.push_back(gsv);
         }
         EXPECT_TRUE(coll.AddGsaAndGsv(gsas, gsvs));

@@ -802,6 +802,7 @@ bool NmeaGgaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
                   (GetFloat(diff_age, m.fields_[12], false, 0, 1023) && GetInt(diff_sta, m.fields_[13], false, 0.0))));
     }
     NMEA_TRACE("NmeaGgaPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -819,6 +820,7 @@ bool NmeaGllPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               GetLlh(ll, m.fields_, 0, 2, -1, -1, mode != NmeaModeGllVtg::INVALID));
     }
     NMEA_TRACE("NmeaGllPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -842,6 +844,7 @@ bool NmeaRmcPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               ((m.fields_.size() == 12) || GetNavStatusRmc(navstatus, m.fields_[12])));
     }
     NMEA_TRACE("NmeaRmcPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -860,6 +863,7 @@ bool NmeaVtgPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               GetFloat(sogk, m.fields_[6], false) && GetModeGllVtg(mode, m.fields_[8]));
     }
     NMEA_TRACE("NmeaVtgPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -879,6 +883,7 @@ bool NmeaGstPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               GetFloat(std_alt, m.fields_[7], false));
     }
     NMEA_TRACE("NmeaGstPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -895,6 +900,7 @@ bool NmeaHdtPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
         ok = (GetTalker(talker, m.meta_.talker_) && GetFloat(heading, m.fields_[0], false, 0.0, 360.0));
     }
     NMEA_TRACE("NmeaHdtPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -920,6 +926,7 @@ bool NmeaZdaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
         date.days = day.value;
     }
     NMEA_TRACE("NmeaZdaPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -957,6 +964,7 @@ bool NmeaGsaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
         }
     }
     NMEA_TRACE("NmeaGsaPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -1045,6 +1053,7 @@ bool NmeaGsvPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
         }
     }
     NMEA_TRACE("NmeaGsvPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 

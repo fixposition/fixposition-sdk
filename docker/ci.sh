@@ -230,6 +230,26 @@ function build_projs_release_noros_mindeps
     install/${buildname}/bin/fpltool -V || return 1
 }
 
+# ----------------------------------------------------------------------------------------------------------------------
+
+TITLES["build_examples"]="Build examples"
+function build_examples
+{
+    local ok=0
+    # Note: the fpsdk_ros[12]_demo examples are build elsewhere
+    for example in parser_intro fusion_epoch; do
+        cd ${FPSDK_SRC_DIR}/examples/${example}
+
+        if ! cmake -B build -S . -DBUILD_TESTING=OFF; then
+            ok=1
+        elif !make --build build; then
+            ok=1
+        fi
+    done
+
+    return ${ok}
+}
+
 ########################################################################################################################
 
 TITLES["build_toplevel_release_ros1"]="Build top-level project (release, with ROS1)"
@@ -331,7 +351,7 @@ function build_catkin_release
     ln -s ../../../fpsdk_common .
     ln -s ../../../fpsdk_ros1 .
     ln -s ../../../fpsdk_apps .
-    ln -s ../../../ros1_fpsdk_demo .
+    ln -s ../../../examples/ros1_fpsdk_demo .
     cd ..
     catkin init || return 1
     catkin config --cmake-args -DCMAKE_BUILD_TYPE=Release || return 1
@@ -457,7 +477,7 @@ function build_colcon_release
     ln -s ../../../fpsdk_common .
     ln -s ../../../fpsdk_ros2 .
     ln -s ../../../fpsdk_apps .
-    ln -s ../../../ros2_fpsdk_demo .
+    ln -s ../../../examples/ros2_fpsdk_demo .
     cd ..
     colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release || return 1
     set +u
@@ -495,6 +515,8 @@ do_step doxygen_release_noros          || true # continue
 
 do_step build_toplevel_release_noros_mindeps   || true # continue
 do_step build_projs_release_noros_mindeps      || true # continue
+
+do_step build_examples                 || true # continue
 
 # Build ROS stuff resp. stuff with the ROS environment loaded last
 # - Either ROS 1

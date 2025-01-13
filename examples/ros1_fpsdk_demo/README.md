@@ -20,7 +20,7 @@ mkdir -p ws/src
 cd ws/src
 ln -s ../../fpsdk_common .
 ln -s ../../fpsdk_ros1 .
-ln -s ../../ros1_fpsdk_demo .
+ln -s ../../examples/ros1_fpsdk_demo .
 cd ..
 catkin init
 catkin config --cmake-args -DCMAKE_BUILD_TYPE=Debug
