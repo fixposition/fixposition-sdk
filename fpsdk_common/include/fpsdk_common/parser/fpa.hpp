@@ -527,6 +527,7 @@ struct FpaGpsTime
  */
 struct FpaPayload
 {
+    bool valid_ = false;              //!< Payload successfully decoded (true), or not (yet) decoded (false)
     virtual ~FpaPayload() = default;  //!< Virtual dtor for polymorphism
 };
 

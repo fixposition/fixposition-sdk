@@ -1035,7 +1035,9 @@ EXAMPLE_PATH           = fpsdk_doc \
                          fpsdk_common  fpsdk_common/doc \
                          fpsdk_ros1    fpsdk_ros1/doc      fpsdk_ros1/msg \
                          fpsdk_ros2    fpsdk_ros2/doc \
-                         fpsdk_apps    fpsdk_apps/doc
+                         fpsdk_apps    fpsdk_apps/doc \
+                         examples/parser_intro \
+                         examples/fusion_epoch
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and

@@ -843,6 +843,7 @@ bool FpaEoePayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
         ok = (GetGpsTime(gps_time, m.fields_, 0, false) && GetEpoch(epoch, m.fields_[2]));
     }
     FPA_TRACE("FpaEoePayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -861,6 +862,7 @@ bool FpaGnssantPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
               GetInt(gnss2_age, m.fields_[7], false, 0));
     }
     FPA_TRACE("FpaGnssantPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -883,6 +885,7 @@ bool FpaGnsscorrPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_si
               GetFloat3llh(sta_llh, m.fields_, 13, false) && GetInt(sta_dist, m.fields_[16], false, 0));
     }
     FPA_TRACE("FpaGnsscorrPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -902,6 +905,7 @@ bool FpaRawimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size
         which = Which::RAWIMU;
     }
     FPA_TRACE("FpaRawimuPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -921,6 +925,7 @@ bool FpaCorrimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
         which = Which::CORRIMU;
     }
     FPA_TRACE("FpaCorrimuPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -942,6 +947,7 @@ bool FpaImubiasPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
               GetFloatArr(bias_cov_gyr, m.fields_, 15, false));
     }
     FPA_TRACE("FpaImubiasPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -960,6 +966,7 @@ bool FpaLlhPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               GetFloatArr(cov_enu, m.fields_, 5, false));
     }
     FPA_TRACE("FpaLlhPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -983,6 +990,7 @@ bool FpaOdometryPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_si
         which = Which::ODOMETRY;
     }
     FPA_TRACE("FpaOdometryPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -1006,6 +1014,7 @@ bool FpaOdomenuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
         which = Which::ODOMENU;
     }
     FPA_TRACE("FpaOdomenuPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -1029,6 +1038,7 @@ bool FpaOdomshPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size
         which = Which::ODOMSH;
     }
     FPA_TRACE("FpaOdomshPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -1057,6 +1067,7 @@ bool FpaOdomstatusPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_
               GetMarkersConv(markers_conv, m.fields_[27]));
     }
     FPA_TRACE("FpaOdomstatusPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -1074,6 +1085,7 @@ bool FpaTextPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
         ok = (GetTextLevel(level, m.fields_[0]) && GetText(text, sizeof(text), m.fields_[1], false));
     }
     FPA_TRACE("FpaTextPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -1093,6 +1105,7 @@ bool FpaTfPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               GetFloatArr(orientation, m.fields_, 7, true));
     }
     FPA_TRACE("FpaTfPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
@@ -1113,6 +1126,7 @@ bool FpaTpPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               GetInt(gps_leaps, m.fields_[5], false, 0));
     }
     FPA_TRACE("FpaTpPayload %s", ok ? "true" : "false");
+    valid_ = ok;
     return ok;
 }
 
