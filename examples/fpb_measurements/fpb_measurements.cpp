@@ -12,8 +12,7 @@
  *
  * To build and run:
  *
- *     cmake -B build -S .
- *     cmake --build build --parallel 8
+ *     make
  *     ./build/fpb_measurements
  *
  * This program shows how a FP_B-MEASUREMENTS message can be made.

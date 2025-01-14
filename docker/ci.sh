@@ -236,16 +236,9 @@ TITLES["build_examples"]="Build examples"
 function build_examples
 {
     local ok=0
-    # Note: the fpsdk_ros[12]_demo examples are build elsewhere
-    for example in parser_intro fusion_epoch; do
-        cd ${FPSDK_SRC_DIR}/examples/${example}
-
-        if ! cmake -B build -S . -DBUILD_TESTING=OFF; then
-            ok=1
-        elif !make --build build; then
-            ok=1
-        fi
-    done
+    # Note: the fpsdk_ros[12]_demo examples are built elsewhere
+    cd ${FPSDK_SRC_DIR}/examples
+    make build -k
 
     return ${ok}
 }

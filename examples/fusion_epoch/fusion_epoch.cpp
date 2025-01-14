@@ -12,8 +12,7 @@
  *
  * To build and run:
  *
- *     cmake -B build -S .
- *     cmake --build build --parallel 8
+ *     make
  *     ./build/fusion_epoch
  *
  * This program builds on the "parser_intro" example and details how to collect the FP_A fusion messages into

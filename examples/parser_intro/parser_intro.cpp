@@ -12,8 +12,7 @@
  *
  * To build and run:
  *
- *     cmake -B build -S .
- *     cmake --build build --parallel 8
+ *     make
  *     ./build/parser_intro
  *
  * This program demonstrates how to use the fpsdk::common::parser functions to parse FP_A protocol
