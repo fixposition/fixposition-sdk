@@ -10,6 +10,7 @@
 #if defined(__GNUC__) && (__GNUC__ >= 9)
 #  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
 #include <unsupported/Eigen/Splines>
 #pragma GCC diagnostic pop
 // See exmplanation in eigen_core.hpp
