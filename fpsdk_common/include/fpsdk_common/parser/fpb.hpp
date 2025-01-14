@@ -261,6 +261,11 @@ static constexpr const char* FP_B_UNITTEST2_STRID           = "FP_B-UNITTEST2"; 
  *
  * This message is used to input measurements, such as wheelspeeds, to the sensor.
  *
+ * **Notes:**
+ *
+ * - The supported `meas_type`, `meas_loc` and `timestamp_type` values depend on the sensor software and configuration
+ *   used. Refer to the sensor documentation for valid combinations of values for these fields.
+ *
  * **Payload fields:**
  *
  * |         # | Offset    | Field             | Type           | Unit | Description                                                            |
