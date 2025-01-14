@@ -180,9 +180,9 @@ int main(int /*argc*/, char** /*argv*/)
     //     Using position at 2349:059923.000: [ 4278387.7, 635620.5, 4672339.9 ]                 (4)
     //     Local coordinates: 2676373.0 1250433.7 459.5
     //
-    // - (1) The first epoch is incomplete as the FP_A-ODOMETRY for that epoch was is present
-    // - (2) The second epoch is complete (all messages present and matching), but FP_A-ODOMSTATUS.init_status is 1 (and
-    //       need want 2 in order to use the data)
+    // - (1) The first epoch is incomplete as the FP_A-ODOMETRY for that epoch was not present
+    // - (2) The second epoch is complete (all messages present and matching), but FP_A-ODOMSTATUS.init_status is
+    //       LOCAL_INIT and we want status GLOBAL_INIT in order to use the data)
     // - (3) The third epoch is complete, but the FP_A-ODOMETRY.pos_{x,y,z} fields are empty (and we want the position)
     // - (4) The fourth epoch is complete and passes all checks and we can transform the position to the local CRS
 
@@ -227,6 +227,11 @@ static void ProcessCollectedMsgs(const CollectedMsgs& collected_msgs, Transforme
     if (trafo.Transform(pos)) {
         INFO("Local coordinates: %.1f %.1f %.1f", pos(0), pos(1), pos(2));
     }
+
+    // Notes:
+    // - The same approach can be used to collect NMEA messages into an epoch. For example, using the FP_A-EOE for GNSS,
+    //   this lets one reliably combine all NMEA messages for GNSS, including those that do not have a timestamp, into
+    //   a consistent set of messages that are part of the same naviation epoch.
 }
 
 /* ****************************************************************************************************************** */
