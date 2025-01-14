@@ -11,6 +11,7 @@
 #if defined(__GNUC__) && (__GNUC__ >= 9)
 #  pragma GCC diagnostic ignored "-Wdeprecated-copy"
 #endif
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
 #include <Eigen/Core>
 #pragma GCC diagnostic pop
 // For older Eigen (e.g. 3.3.7, which we have in fusion-dev-env and on the sensor), we unfortunately have to disable

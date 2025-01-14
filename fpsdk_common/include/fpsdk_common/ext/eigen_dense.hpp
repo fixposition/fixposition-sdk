@@ -13,6 +13,7 @@
 #endif
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than="
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
 #include <Eigen/Dense>
 #pragma GCC diagnostic pop
 // See exmplanation in eigen_core.hpp
