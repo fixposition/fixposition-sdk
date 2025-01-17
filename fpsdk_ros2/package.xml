@@ -7,7 +7,7 @@
     <maintainer email="support@fixposition.com">Fixposition Support</maintainer>
     <license>MIT</license>
     <export>
-        <build_type>cmake</build_type>
+        <build_type>ament_cmake</build_type>
     </export>
     <depend>fpsdk_common</depend>
 </package>
