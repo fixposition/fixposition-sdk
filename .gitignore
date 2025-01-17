@@ -23,6 +23,8 @@ CMakeCache.txt
 /ros_ws
 /ros1_ws
 /ros2_ws
+CATKIN_IGNORE
+COLCON_IGNORE
 .catkin_tools
 /log
 /src
