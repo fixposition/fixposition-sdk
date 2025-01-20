@@ -23,8 +23,6 @@ CMakeCache.txt
 /ros_ws
 /ros1_ws
 /ros2_ws
-CATKIN_IGNORE
-COLCON_IGNORE
 .catkin_tools
 /log
 /src
@@ -33,3 +31,7 @@ foo*
 bar*
 baz*
 /tmp
+
+# We must not commit such files ever. See section FPSDK_BUILD_ROS in fpsdk_doc/fpsdk_build.hpp
+CATKIN_IGNORE
+COLCON_IGNORE
