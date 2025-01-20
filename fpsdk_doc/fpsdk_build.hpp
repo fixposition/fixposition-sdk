@@ -175,12 +175,28 @@ namespace fpsdk {
 
     @subsection FPSDK_BUILD_ROS ROS workspace
 
-    The packages build in a ROS workspace using catkin) (ROS1) resp. colcon (ROS2). For example:
+    The packages build in a ROS workspace using catkin (ROS1) resp. colcon (ROS2). For example:
 
     @code{sh}
     catkin build fpsdk_common
     @endcode
 
+    Note that if you clone this repository directly to your `ros_workspace/src` directory, you'll have to place
+    CATKIN_IGNORE resp. COLCON_IGNORE files in some places. For example:
+
+    @code{sh}
+    # ROS1 catkin workspace
+    touch src/fixposition-sdk/examples/CATKIN_IGNORE                   # Ignore all examples, or
+    touch src/fixposition-sdk/examples/ros1_fpsdk_demo/CATKIN_IGNORE   # Ignore only this example
+    touch src/fixposition-sdk/fpsdk_ros2/CATKIN_IGNORE
+    @endcode
+
+    @code{sh}
+    # ROS2 colcon workspace
+    touch src/fixposition-sdk/examples/COLCON_IGNORE                   # Ignore all examples, or
+    touch src/fixposition-sdk/examples/ros2_fpsdk_demo/COLCON_IGNORE   # Ignore only this example
+    touch src/fixposition-sdk/fpsdk_ros1/COLCON_IGNORE
+    @endcode
 
     <!-- trick doxygen -->
 
