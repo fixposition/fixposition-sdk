@@ -31,9 +31,11 @@ fi
 # Sources will be here
 if [ -n "${GITHUB_WORKSPACE:-}" ]; then
     FPSDK_SRC_DIR=${GITHUB_WORKSPACE}
+    CMAKE_BUILD_ARGS="--parallel 4"
 # For running it locally via docker.sh...
 else
     FPSDK_SRC_DIR=${SCRIPTDIR}/..
+    CMAKE_BUILD_ARGS="--parallel $(shell nproc --ignore=2)"
 fi
 echo "FPSDK_SRC_DIR=${FPSDK_SRC_DIR}"
 
@@ -160,13 +162,13 @@ function build_projs_release_noros
     cmake -B build/${buildname}/fpsdk_common -S fpsdk_common \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpsdk_common || return 1
+    cmake --build build/${buildname}/fpsdk_common ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname}/fpsdk_common || return 1
 
     cmake -B build/${buildname}/fpsdk_apps -S fpsdk_apps \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpsdk_apps || return 1
+    cmake --build build/${buildname}/fpsdk_apps ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname}/fpsdk_apps || return 1
 
     install/${buildname}/bin/fpltool -V || return 1
@@ -198,7 +200,7 @@ function build_toplevel_release_noros_mindeps
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release \
         -DUSE_PROJ=OFF || return 1
-    cmake --build build/${buildname} || return 1
+    cmake --build build/${buildname} ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname} || return 1
 
     install/${buildname}/bin/fpltool -V || return 1
@@ -218,13 +220,13 @@ function build_projs_release_noros_mindeps
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release \
         -DUSE_PROJ=OFF || return 1
-    cmake --build build/${buildname}/fpsdk_common || return 1
+    cmake --build build/${buildname}/fpsdk_common ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname}/fpsdk_common || return 1
 
     cmake -B build/${buildname}/fpsdk_apps -S fpsdk_apps \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpsdk_apps || return 1
+    cmake --build build/${buildname}/fpsdk_apps ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname}/fpsdk_apps || return 1
 
     install/${buildname}/bin/fpltool -V || return 1
@@ -312,19 +314,19 @@ function build_projs_release_ros1
     cmake -B build/${buildname}/fpsdk_common -S fpsdk_common \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpsdk_common || return 1
+    cmake --build build/${buildname}/fpsdk_common ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname}/fpsdk_common || return 1
 
     cmake -B build/${buildname}/fpsdk_ros1 -S fpsdk_ros1 \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpsdk_ros1 || return 1
+    cmake --build build/${buildname}/fpsdk_ros1 ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname}/fpsdk_ros1 || return 1
 
     cmake -B build/${buildname}/fpsdk_apps -S fpsdk_apps \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpsdk_apps || return 1
+    cmake --build build/${buildname}/fpsdk_apps ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname}/fpsdk_apps || return 1
 
     install/${buildname}/bin/fpltool -V || return 1
@@ -437,20 +439,20 @@ function build_projs_release_ros2
     cmake -B build/${buildname}/fpsdk_common -S fpsdk_common \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpsdk_common || return 1
+    cmake --build build/${buildname}/fpsdk_common ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname}/fpsdk_common || return 1
 
     # TODO: not working yet
     # cmake -B build/${buildname}/fpsdk_ros2 -S fpsdk_ros2 \
     #     -DCMAKE_INSTALL_PREFIX=install/${buildname} \
     #     -DCMAKE_BUILD_TYPE=Release || return 1
-    # cmake --build build/${buildname}/fpsdk_ros2 || return 1
+    # cmake --build build/${buildname}/fpsdk_ros2 ${CMAKE_BUILD_ARGS} || return 1
     # cmake --install build/${buildname}/fpsdk_ros2 || return 1
 
     cmake -B build/${buildname}/fpsdk_apps -S fpsdk_apps \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release || return 1
-    cmake --build build/${buildname}/fpsdk_apps || return 1
+    cmake --build build/${buildname}/fpsdk_apps ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname}/fpsdk_apps || return 1
 
     install/${buildname}/bin/fpltool -V || return 1

@@ -126,10 +126,10 @@ ifneq ($(VERBOSE),0)
 endif
 
 ifeq ($(GITHUB_WORKSPACE),)
-  CMAKE_ARGS_BUILD = --parallel $(shell nproc --ignore=4)
+  CMAKE_ARGS_BUILD = --parallel $(shell nproc --ignore=2)
   NICE_BUILD=$(NICE) -19
 else
-  CMAKE_ARGS_BUILD = --parallel 1
+  CMAKE_ARGS_BUILD = --parallel 4
   NICE_BUILD=
 endif
 
