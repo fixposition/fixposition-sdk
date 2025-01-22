@@ -49,41 +49,41 @@ namespace logging {
 /**
  * @brief Print a fatal message                                                                                         @hideinitializer
  */
-#define FATAL(fmt, ...)   _FPSDK_LOGGING_LOG(FATAL,   "Fatal: "   fmt, ## __VA_ARGS__)
+#define FATAL(...)   _FPSDK_LOGGING_LOG(FATAL,   "Fatal: "    __VA_ARGS__)
 /**
  * @brief Print a error message                                                                                         @hideinitializer
  */
-#define ERROR(fmt, ...)   _FPSDK_LOGGING_LOG(ERROR,   "Error: "   fmt, ## __VA_ARGS__)
+#define ERROR(...)   _FPSDK_LOGGING_LOG(ERROR,   "Error: "    __VA_ARGS__)
 /**
  * @brief Print a warning message                                                                                       @hideinitializer
  */
-#define WARNING(fmt, ...) _FPSDK_LOGGING_LOG(WARNING, "Warning: " fmt, ## __VA_ARGS__)
+#define WARNING(...) _FPSDK_LOGGING_LOG(WARNING, "Warning: "  __VA_ARGS__)
 /**
  * @brief Print a notice message                                                                                        @hideinitializer
  */
-#define NOTICE(fmt, ...)  _FPSDK_LOGGING_LOG(NOTICE,              fmt, ## __VA_ARGS__)
+#define NOTICE(...)  _FPSDK_LOGGING_LOG(NOTICE,               __VA_ARGS__)
 /**
  * @brief Print a info message                                                                                          @hideinitializer
  */
-#define INFO(fmt, ...)    _FPSDK_LOGGING_LOG(INFO,                fmt, ## __VA_ARGS__)
+#define INFO(...)    _FPSDK_LOGGING_LOG(INFO,                 __VA_ARGS__)
 /**
  * @brief Print a debug message                                                                                         @hideinitializer
  */
-#define DEBUG(fmt, ...)   _FPSDK_LOGGING_LOG(DEBUG,               fmt, ## __VA_ARGS__)
+#define DEBUG(...)   _FPSDK_LOGGING_LOG(DEBUG,                __VA_ARGS__)
 /**
  * @brief Print a debug hexdump                                                                                         @hideinitializer
  */
-#define DEBUG_HEXDUMP(data, size, prefix, fmt, ...) _FPSDK_LOGGING_HEX(DEBUG, data, size, prefix, fmt, ## __VA_ARGS__)
+#define DEBUG_HEXDUMP(data, size, prefix, ...) _FPSDK_LOGGING_HEX(DEBUG, data, size, prefix, __VA_ARGS__)
 #if !defined(NDEBUG) || defined(_DOXYGEN_) // Only for non-Release builds
 
 /**
  * @brief Print a trace message (only debug builds, compiled out in release builds)                                     @hideinitializer
  */
-#  define TRACE(fmt, ...) _FPSDK_LOGGING_LOG(TRACE,               fmt, ## __VA_ARGS__)
+#  define TRACE(...) _FPSDK_LOGGING_LOG(TRACE,                __VA_ARGS__)
 /**
  * @brief Print a trace hexdump (only debug builds, compiled out in release builds)                                     @hideinitializer
  */
-#  define TRACE_HEXDUMP(data, size, prefix, fmt, ...) _FPSDK_LOGGING_HEX(TRACE, data, size, prefix, fmt, ## __VA_ARGS__)
+#  define TRACE_HEXDUMP(data, size, prefix, ...) _FPSDK_LOGGING_HEX(TRACE, data, size, prefix, __VA_ARGS__)
 #else
 #  define TRACE(...)         /* nothing */
 #  define TRACE_HEXDUMP(...) /* nothing */
@@ -92,23 +92,23 @@ namespace logging {
 /**
  * @brief Print a error message (throttled)                                                                             @hideinitializer
  */
-#define ERROR_THR(millis, fmt, ...)   _FPSDK_LOGGING_THR(ERROR,   millis, fmt, ## __VA_ARGS__)
+#define ERROR_THR(millis, ...)   _FPSDK_LOGGING_THR(ERROR,   millis, __VA_ARGS__)
 /**
  * @brief Print a warning message (throttled)                                                                           @hideinitializer
  */
-#define WARNING_THR(millis, fmt, ...) _FPSDK_LOGGING_THR(WARNING, millis, fmt, ## __VA_ARGS__)
+#define WARNING_THR(millis, ...) _FPSDK_LOGGING_THR(WARNING, millis, __VA_ARGS__)
 /**
  * @brief Print a notice message (throttled)                                                                            @hideinitializer
  */
-#define NOTICE_THR(millis, fmt, ...)  _FPSDK_LOGGING_THR(NOTICE,  millis, fmt, ## __VA_ARGS__)
+#define NOTICE_THR(millis, ...)  _FPSDK_LOGGING_THR(NOTICE,  millis, __VA_ARGS__)
 /**
  * @brief Print a info message (throttled)                                                                              @hideinitializer
  */
-#define INFO_THR(millis, fmt, ...)    _FPSDK_LOGGING_THR(INFO,    millis, fmt, ## __VA_ARGS__)
+#define INFO_THR(millis, ...)    _FPSDK_LOGGING_THR(INFO,    millis, __VA_ARGS__)
 /**
  * @brief Print a debug message (throttled)                                                                             @hideinitializer
  */
-#define DEBUG_THR(millis, fmt, ...)   _FPSDK_LOGGING_THR(DEBUG,   millis, fmt, ## __VA_ARGS__)
+#define DEBUG_THR(millis, ...)   _FPSDK_LOGGING_THR(DEBUG,   millis, __VA_ARGS__)
 // clang-format on
 ///@}
 
@@ -304,8 +304,7 @@ LoggingParams LoggingGetParams();
  * @note Use INFO(), DEBUG(), WARNING() etc. instead of this function.
  *
  * @param[in]  level  Logging level
- * @param[in]  fmt    printf() style format string
- * @param[in]  ...    arguments to the format string
+ * @param[in]  fmt    printf() style format string and optional arguments to the format string
  */
 void LoggingPrint(const LoggingLevel level, const char* fmt, ...) PRINTF_ATTR(2);
 
@@ -318,30 +317,30 @@ void LoggingPrint(const LoggingLevel level, const char* fmt, ...) PRINTF_ATTR(2)
  * @param[in]  data    Pointer to start of data to dump
  * @param[in]  size    Size of data to dump
  * @param[in]  prefix  Prefix to add to each line, can be NULL to omit
- * @param[in]  fmt     printf() style format string (for a first line to print), can be NULL to omit
- * @param[in]  ...     Arguments to the format string
+ * @param[in]  ...     printf() style format string (for a first line to print), can be NULL to omit, and optional
+ *                     arguments to the format string
  */
 void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const std::size_t size, const char* prefix,
     const char* fmt, ...) PRINTF_ATTR(5);
 
 // Helper macros
 #ifndef _DOXYGEN_
-#  define _FPSDK_LOGGING_LOG(_level_, _fmt_, ...) \
-      ::fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::_level_, _fmt_, ##__VA_ARGS__)
-#  define _FPSDK_LOGGING_HEX(_level_, _data_, _size_, _prefix_, _fmt_, ...) \
-      ::fpsdk::common::logging::LoggingHexdump(                             \
-          fpsdk::common::logging::LoggingLevel::_level_, _data_, _size_, _prefix_, _fmt_, ##__VA_ARGS__)
+#  define _FPSDK_LOGGING_LOG(_level_, ...) \
+      ::fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::_level_, __VA_ARGS__)
+#  define _FPSDK_LOGGING_HEX(_level_, _data_, _size_, _prefix_, ...) \
+      ::fpsdk::common::logging::LoggingHexdump(                      \
+          fpsdk::common::logging::LoggingLevel::_level_, _data_, _size_, _prefix_, __VA_ARGS__)
 #  define _FPSDK_LOGGING_IF(_level_, _code_)                                                         \
       if (::fpsdk::common::logging::LoggingIsLevel(fpsdk::common::logging::LoggingLevel::_level_)) { \
           _code_;                                                                                    \
       }
-#  define _FPSDK_LOGGING_THR(_level_, _millis_, _fmt_, ...)          \
+#  define _FPSDK_LOGGING_THR(_level_, _millis_, ...)                 \
       do {                                                           \
           static uint32_t __last = 0;                                \
           const uint32_t __now = ::fpsdk::common::time::GetMillis(); \
           if ((__now - __last) >= (_millis_)) {                      \
               __last = __now;                                        \
-              _level_(_fmt_, ##__VA_ARGS__);                         \
+              _level_(__VA_ARGS__);                                  \
           }                                                          \
       } while (0)
 #endif  // _DOXYGEN_
