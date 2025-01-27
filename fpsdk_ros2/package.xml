@@ -7,11 +7,7 @@
     <maintainer email="support@fixposition.com">Fixposition Support</maintainer>
     <license>MIT</license>
     <export>
-        <!-- This is not quite correct (it should be "cmake"). However, ROS2 (colcon) doesn't care and ROS1 (catkin)
-             conveniently ignores this package if we set it to something it doesn't know ("ament_camake"). It does so
-             with a warning, though. So the correct way of ignoring is placing a CATKIN_IGNORE file here. See section
-             FPSDK_BUILD_ROS in fpsdk_doc/fpsdk_build.hpp -->
-        <build_type>ament_cmake</build_type>
+        <build_type>cmake</build_type>
     </export>
     <depend>fpsdk_common</depend>
 </package>
