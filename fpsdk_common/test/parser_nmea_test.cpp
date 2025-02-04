@@ -888,8 +888,8 @@ TEST(ParserNmeaTest, NmeaGsvPayload)
         EXPECT_EQ(gsv.signal, NmeaSignalId::GPS_L1CA);
     }
     {
-        NmeaGsvPayload gsv;
-        const char* gsv_4_of_4 = "$GPGSV,4,4,14,31,08,034,46,36,31,149,43,1*62\r\n";
+        NmeaGsvPayload gsv;  // clang-format off
+        const char* gsv_4_of_4 = "$GPGSV,4,4,14,"  "31,08,034,46,"  "36,31,149,43,"  "1*62\r\n";  // clang-format on
         EXPECT_TRUE(gsv.SetFromMsg((const uint8_t*)gsv_4_of_4, strlen(gsv_4_of_4)));
         EXPECT_TRUE(gsv.valid_);
         EXPECT_EQ(gsv.talker, NmeaTalkerId::GPS_SBAS);
@@ -1038,6 +1038,117 @@ TEST(ParserNmeaTest, NmeaGsvPayload)
         EXPECT_EQ(gsv.cnos[0].svid, 0);
         EXPECT_EQ(gsv.cnos[0].signal, NmeaSignalId::UNSPECIFIED);
         EXPECT_EQ(gsv.cnos[0].cno, 0);
+        EXPECT_FALSE(gsv.cnos[1].valid);
+        EXPECT_EQ(gsv.cnos[1].system, NmeaSystemId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[1].svid, 0);
+        EXPECT_EQ(gsv.cnos[1].signal, NmeaSignalId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[1].cno, 0);
+        EXPECT_FALSE(gsv.cnos[2].valid);
+        EXPECT_EQ(gsv.cnos[2].system, NmeaSystemId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[2].svid, 0);
+        EXPECT_EQ(gsv.cnos[2].signal, NmeaSignalId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[2].cno, 0);
+        EXPECT_FALSE(gsv.cnos[3].valid);
+        EXPECT_EQ(gsv.cnos[3].system, NmeaSystemId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[3].svid, 0);
+        EXPECT_EQ(gsv.cnos[3].signal, NmeaSignalId::UNSPECIFIED);
+        EXPECT_EQ(gsv.cnos[3].cno, 0);
+    }
+    {
+        NmeaGsvPayload gsv;
+        const char* gsv_2_of_3 =  // clang-format off
+            "$GBGSV,3,2,09," "25,65,282,09," "26,06,081,14," "35,17,044,08," "40,14,034,08," "B*00\r\n";  // clang-format on
+        EXPECT_TRUE(gsv.SetFromMsg((const uint8_t*)gsv_2_of_3, strlen(gsv_2_of_3)));
+        EXPECT_TRUE(gsv.valid_);
+        EXPECT_EQ(gsv.talker, NmeaTalkerId::BDS);
+        EXPECT_TRUE(gsv.num_msgs.valid);
+        EXPECT_EQ(gsv.num_msgs.value, 3);
+        EXPECT_TRUE(gsv.msg_num.valid);
+        EXPECT_EQ(gsv.msg_num.value, 2);
+        EXPECT_TRUE(gsv.tot_num_sat.valid);
+        EXPECT_EQ(gsv.tot_num_sat.value, 9);
+        EXPECT_EQ(gsv.num_azels, 4);
+        EXPECT_TRUE(gsv.azels[0].valid);
+        EXPECT_EQ(gsv.azels[0].system, NmeaSystemId::BDS);
+        EXPECT_EQ(gsv.azels[0].svid, 25);
+        EXPECT_EQ(gsv.azels[0].el, 65);
+        EXPECT_EQ(gsv.azels[0].az, 282);
+        EXPECT_TRUE(gsv.azels[1].valid);
+        EXPECT_EQ(gsv.azels[1].system, NmeaSystemId::BDS);
+        EXPECT_EQ(gsv.azels[1].svid, 26);
+        EXPECT_EQ(gsv.azels[1].el, 6);
+        EXPECT_EQ(gsv.azels[1].az, 81);
+        EXPECT_TRUE(gsv.azels[2].valid);
+        EXPECT_EQ(gsv.azels[2].system, NmeaSystemId::BDS);
+        EXPECT_EQ(gsv.azels[2].svid, 35);
+        EXPECT_EQ(gsv.azels[2].el, 17);
+        EXPECT_EQ(gsv.azels[2].az, 44);
+        EXPECT_TRUE(gsv.azels[3].valid);
+        EXPECT_EQ(gsv.azels[3].system, NmeaSystemId::BDS);
+        EXPECT_EQ(gsv.azels[3].svid, 40);
+        EXPECT_EQ(gsv.azels[3].el, 14);
+        EXPECT_EQ(gsv.azels[3].az, 34);
+        EXPECT_EQ(gsv.num_cnos, 4);
+        EXPECT_TRUE(gsv.cnos[0].valid);
+        EXPECT_EQ(gsv.cnos[0].system, NmeaSystemId::BDS);
+        EXPECT_EQ(gsv.cnos[0].svid, 25);
+        EXPECT_EQ(gsv.cnos[0].signal, NmeaSignalId::BDS_B2ID);
+        EXPECT_EQ(gsv.cnos[0].cno, 9);
+        EXPECT_TRUE(gsv.cnos[1].valid);
+        EXPECT_EQ(gsv.cnos[1].system, NmeaSystemId::BDS);
+        EXPECT_EQ(gsv.cnos[1].svid, 26);
+        EXPECT_EQ(gsv.cnos[1].signal, NmeaSignalId::BDS_B2ID);
+        EXPECT_EQ(gsv.cnos[1].cno, 14);
+        EXPECT_TRUE(gsv.cnos[2].valid);
+        EXPECT_EQ(gsv.cnos[2].system, NmeaSystemId::BDS);
+        EXPECT_EQ(gsv.cnos[2].svid, 35);
+        EXPECT_EQ(gsv.cnos[2].signal, NmeaSignalId::BDS_B2ID);
+        EXPECT_EQ(gsv.cnos[2].cno, 8);
+        EXPECT_TRUE(gsv.cnos[3].valid);
+        EXPECT_EQ(gsv.cnos[3].system, NmeaSystemId::BDS);
+        EXPECT_EQ(gsv.cnos[3].svid, 40);
+        EXPECT_EQ(gsv.cnos[3].signal, NmeaSignalId::BDS_B2ID);
+        EXPECT_EQ(gsv.cnos[3].cno, 8);
+    }
+    {
+        NmeaGsvPayload gsv;  // clang-format off
+        const char* gsv_3_of_3 = "$GBGSV,3,3,09," "41,43,264,13," "B*3C\r\n";  // clang-format on
+        EXPECT_TRUE(gsv.SetFromMsg((const uint8_t*)gsv_3_of_3, strlen(gsv_3_of_3)));
+        EXPECT_TRUE(gsv.valid_);
+        EXPECT_EQ(gsv.talker, NmeaTalkerId::BDS);
+        EXPECT_TRUE(gsv.num_msgs.valid);
+        EXPECT_EQ(gsv.num_msgs.value, 3);
+        EXPECT_TRUE(gsv.msg_num.valid);
+        EXPECT_EQ(gsv.msg_num.value, 3);
+        EXPECT_TRUE(gsv.tot_num_sat.valid);
+        EXPECT_EQ(gsv.tot_num_sat.value, 9);
+        EXPECT_EQ(gsv.num_azels, 1);
+        EXPECT_TRUE(gsv.azels[0].valid);
+        EXPECT_EQ(gsv.azels[0].system, NmeaSystemId::BDS);
+        EXPECT_EQ(gsv.azels[0].svid, 41);
+        EXPECT_EQ(gsv.azels[0].el, 43);
+        EXPECT_EQ(gsv.azels[0].az, 264);
+        EXPECT_FALSE(gsv.azels[1].valid);
+        EXPECT_EQ(gsv.azels[1].system, NmeaSystemId::UNSPECIFIED);
+        EXPECT_EQ(gsv.azels[1].svid, 0);
+        EXPECT_EQ(gsv.azels[1].el, 0);
+        EXPECT_EQ(gsv.azels[1].az, 0);
+        EXPECT_FALSE(gsv.azels[2].valid);
+        EXPECT_EQ(gsv.azels[2].system, NmeaSystemId::UNSPECIFIED);
+        EXPECT_EQ(gsv.azels[2].svid, 0);
+        EXPECT_EQ(gsv.azels[2].el, 0);
+        EXPECT_EQ(gsv.azels[2].az, 0);
+        EXPECT_FALSE(gsv.azels[3].valid);
+        EXPECT_EQ(gsv.azels[3].system, NmeaSystemId::UNSPECIFIED);
+        EXPECT_EQ(gsv.azels[3].svid, 0);
+        EXPECT_EQ(gsv.azels[3].el, 0);
+        EXPECT_EQ(gsv.azels[3].az, 0);
+        EXPECT_EQ(gsv.num_cnos, 1);
+        EXPECT_TRUE(gsv.cnos[0].valid);
+        EXPECT_EQ(gsv.cnos[0].system, NmeaSystemId::BDS);
+        EXPECT_EQ(gsv.cnos[0].svid, 41);
+        EXPECT_EQ(gsv.cnos[0].signal, NmeaSignalId::BDS_B2ID);
+        EXPECT_EQ(gsv.cnos[0].cno, 13);
         EXPECT_FALSE(gsv.cnos[1].valid);
         EXPECT_EQ(gsv.cnos[1].system, NmeaSystemId::UNSPECIFIED);
         EXPECT_EQ(gsv.cnos[1].svid, 0);
