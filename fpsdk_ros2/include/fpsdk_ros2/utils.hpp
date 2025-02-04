@@ -61,7 +61,7 @@ void RedirectLoggingToRosConsole(const char* logger_name = "fpsdk_ros2");
  *
  * @returns the ROS time object (POSIX)
  */
-rclcpp::Time ConvTime(const fpsdk::common::time::Time& time);
+rclcpp::Time ConvTime(const fpsdk::common::time::Time& time, rcl_clock_type_t clock_type = RCL_ROS_TIME);
 
 /**
  * @brief Convert from ROS time (POSIX -> atomic)
