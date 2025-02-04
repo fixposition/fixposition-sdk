@@ -150,14 +150,43 @@ int64_t Rtcm3GetSigned(const uint8_t* data, const std::size_t offs, const std::s
 std::size_t Rtcm3CountBits(const uint64_t mask);
 
 /**
+ * @brief Set RTCM3 unsigned integer
+ *
+ * @param[in,out]  data  Pointer to the start of the RTCM3 data (at offset RTCM3_HEAD_SIZE into the message)
+ * @param[in]      offs  Offset in [bits] to the start of the value
+ * @param[in]      size  Size in [bits] of the value
+ * @param[in]      value The value to set
+ */
+void Rtcm3SetUnsigned(uint8_t* data, const std::size_t offs, const std::size_t size, const uint64_t value);
+
+/**
+ * @brief Get RTCM3 signed integer
+ *
+ * @param[in,out]  data  Pointer to the start of the RTCM3 data (at offset RTCM3_HEAD_SIZE into the message)
+ * @param[in]      offs  Offset in [bits] to the start of the value
+ * @param[in]      size  Size in [bits] of the value
+ * @param[in]      value The value to set
+ */
+void Rtcm3SetSigned(uint8_t* data, const std::size_t offs, const std::size_t size, const int64_t value);
+
+/**
  * @brief Antenna reference point
  */
 struct Rtcm3Arp
 {
-    int ref_sta_id_;  //!< Reference station ID
-    double ecef_x_;   //!< ECEF X [m]
-    double ecef_y_;   //!< ECEF Y [m]
-    double ecef_z_;   //!< ECEF Z [m]
+    // clang-format off
+    int    ref_sta_id_ = -1;   //!< Reference station ID
+    double ecef_x_     = 0.0;  //!< ECEF X [m]
+    double ecef_y_     = 0.0;  //!< ECEF Y [m]
+    double ecef_z_     = 0.0;  //!< ECEF Z [m]
+    int    phy_sta_id_ = -1;   //!< Physical station ID           (only type 1032)
+    double ant_height_ = 0.0;  //!< Antenna height [m]            (only type 1006)
+    int    gps_ind_    = -1;   //!< GPS indicator                 (only type 1005/1006)
+    int    glo_ind_    = -1;   //!< GLONASS indicator             (only type 1005/1006)
+    int    gal_ind_    = -1;   //!< Galileo indicator             (only type 1005/1006)
+    int    ref_ind_    = -1;   //!< Reference station indicator   (only type 1005/1006)
+    int    osc_ind_    = -1;   //!< Oscillator indicator          (only type 1005/1006)
+    int    cyc_ind_    = -1;   //!< Quarter cycle indicator       (only type 1005/1006)
 };
 
 /**

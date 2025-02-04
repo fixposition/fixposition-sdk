@@ -1,0 +1,23 @@
+.red: &red "#ff0000"
+.green: &green "#00ff00"
+.blue: &blue "#0000ff"
+.one-two-three: &one-two-three
+    - 1
+    - &two 2
+    - 3
+.params: &params
+    foo: 0
+    bar: &bar "nope"
+
+
+apple: *green
+cherry: *red
+ocean: *blue
+a_list: *one-two-three
+a_number: *two
+a_string: *bar
+
+# Doesn't work with yaml-cpp.. :-/
+# some_params:
+#     <<: *params
+#     foo: 123

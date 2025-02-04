@@ -23,6 +23,7 @@
 /* LIBC/STL */
 #include <algorithm>
 #include <cstdint>
+#include <string>
 #include <vector>
 
 /* EXTERNAL */
@@ -57,6 +58,13 @@ const char* GetCopyrightString();
  * @returns the license string
  */
 const char* GetLicenseString();
+
+/**
+ * @brief Get a HTTP User-Agent string
+ *
+ * @returns a string suitable as the value for the HTTP User-Agent header
+ */
+std::string GetUserAgentStr();
 
 /**
  * Circular buffer for chunks of data (bytes, memory). For objects use use boost::circular_buffer or std::deque.

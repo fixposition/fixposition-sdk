@@ -22,7 +22,9 @@
 /* EXTERNAL */
 
 /* PACKAGE */
+#include "fpsdk_common/math.hpp"
 #include "fpsdk_common/parser/rtcm3.hpp"
+#include "fpsdk_common/trafo.hpp"
 #include "fpsdk_common/types.hpp"
 
 namespace fpsdk {
@@ -277,6 +279,31 @@ std::size_t Rtcm3CountBits(const uint64_t mask)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+void Rtcm3SetUnsigned(uint8_t* data, const std::size_t offs, const std::size_t size, const uint64_t value)
+{
+    if ((data != NULL) && (size > 0) && (size <= 64)) {
+        uint64_t mask = math::Bit<uint64_t>(size - 1);
+        for (std::size_t ix = offs; ix < (offs + size); ix++) {
+            const uint8_t bit = math::Bit<uint8_t>(7 - (ix % 8));
+            if (math::CheckBitsAll(value, mask)) {
+                math::SetBits(data[ix / 8], bit);
+            } else {
+                math::ClearBits(data[ix / 8], bit);
+            }
+            mask >>= 1;
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void Rtcm3SetSigned(uint8_t* data, const std::size_t offs, const std::size_t size, const int64_t value)
+{
+    Rtcm3SetUnsigned(data, offs, size, static_cast<uint64_t>(value));
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool Rtcm3GetArp(const uint8_t* msg, Rtcm3Arp& arp)
 {
     bool ok = false;
@@ -284,19 +311,27 @@ bool Rtcm3GetArp(const uint8_t* msg, Rtcm3Arp& arp)
         const uint8_t* data = &msg[RTCM3_HEAD_SIZE];
         const uint16_t msg_type = Rtcm3Type(msg);
         switch (msg_type) {  // clang-format off
-            case RTCM3_TYPE1005_MSGID: /* FALLTHROUGH */
             case RTCM3_TYPE1006_MSGID:
-                arp.ref_sta_id_ =       Rtcm3GetUnsigned(data,  12, 12);          // DF003
-                arp.ecef_x_     = (double)Rtcm3GetSigned(data,  34, 38) * 0.0001; // DF025
-                arp.ecef_y_     = (double)Rtcm3GetSigned(data,  74, 38) * 0.0001; // DF026
-                arp.ecef_z_     = (double)Rtcm3GetSigned(data, 114, 38) * 0.0001; // DF027
+                arp.ant_height_ = (double)Rtcm3GetUnsigned(data, 34, 38) * 0.0001; // DF028
+                /* FALLTHROUGH */
+            case RTCM3_TYPE1005_MSGID:
+                arp.ref_sta_id_ =         Rtcm3GetUnsigned(data,  12, 12);          // DF003
+                arp.gps_ind_    =         Rtcm3GetUnsigned(data,  30,  1);          // DF022
+                arp.glo_ind_    =         Rtcm3GetUnsigned(data,  31,  1);          // DF023
+                arp.gal_ind_    =         Rtcm3GetUnsigned(data,  32,  1);          // DF024
+                arp.ref_ind_    =         Rtcm3GetUnsigned(data,  33,  1);          // DF141
+                arp.ecef_x_     = (double)Rtcm3GetSigned(  data,  34, 38) * 0.0001; // DF025
+                arp.osc_ind_    =         Rtcm3GetUnsigned(data,  72,  1);          // DF142
+                arp.ecef_y_     = (double)Rtcm3GetSigned(  data,  74, 38) * 0.0001; // DF026
+                arp.cyc_ind_    =         Rtcm3GetUnsigned(data, 112,  2);          // DF142
+                arp.ecef_z_     = (double)Rtcm3GetSigned(  data, 114, 38) * 0.0001; // DF027
                 ok = true;
                 break;
             case RTCM3_TYPE1032_MSGID:
-                arp.ref_sta_id_ =       Rtcm3GetUnsigned(data,  12, 12);          // DF003
-                arp.ecef_x_     = (double)Rtcm3GetSigned(data,  42, 38) * 0.0001; // DF025
-                arp.ecef_y_     = (double)Rtcm3GetSigned(data,  80, 38) * 0.0001; // DF026
-                arp.ecef_z_     = (double)Rtcm3GetSigned(data, 118, 38) * 0.0001; // DF027
+                arp.ref_sta_id_ =         Rtcm3GetUnsigned(data,  12, 12);          // DF003
+                arp.ecef_x_     = (double)Rtcm3GetSigned(  data,  42, 38) * 0.0001; // DF025
+                arp.ecef_y_     = (double)Rtcm3GetSigned(  data,  80, 38) * 0.0001; // DF026
+                arp.ecef_z_     = (double)Rtcm3GetSigned(  data, 118, 38) * 0.0001; // DF027
                 ok = true;
                 break;
         }  // clang-format on
@@ -442,7 +477,11 @@ bool Rtcm3GetMessageInfo(char* info, const std::size_t size, const uint8_t* msg,
 
     Rtcm3Arp arp;
     if ((len < size) && Rtcm3GetArp(msg, arp)) {
-        len = std::snprintf(info, size, "(#%d) %.2f %.2f %.2f", arp.ref_sta_id_, arp.ecef_x_, arp.ecef_y_, arp.ecef_z_);
+        const auto llh = trafo::TfWgs84LlhEcef({ arp.ecef_x_, arp.ecef_y_, arp.ecef_z_ });
+        len =
+            std::snprintf(info, size, "(#%d) %.2f %.2f %.2f (gps %d, glo %d, gal %d, ref %d, osc %d, cyc %d) %.6f/%.6f",
+                arp.ref_sta_id_, arp.ecef_x_, arp.ecef_y_, arp.ecef_z_, arp.gps_ind_, arp.glo_ind_, arp.gal_ind_,
+                arp.ref_ind_, arp.osc_ind_, arp.cyc_ind_, math::RadToDeg(llh.x()), math::RadToDeg(llh.y()));
     }
 
     Rtcm3Ant ant;

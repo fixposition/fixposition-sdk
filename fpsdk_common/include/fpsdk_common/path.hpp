@@ -47,6 +47,60 @@ namespace path {
 bool PathExists(const std::string& path);
 
 /**
+ * @brief Check if path is a directory
+ *
+ * @param[in]  path  Path to check
+ *
+ * @returns true if path is a directory, false otherwise
+ */
+bool PathIsDirectory(const std::string& path);
+
+/**
+ * @brief Check if path is a regular file
+ *
+ * @param[in]  path  Path to check
+ *
+ * @returns true if path is a regular file, false otherwise
+ */
+bool PathIsFile(const std::string& path);
+
+/**
+ * @brief Check if path is a symlink
+ *
+ * @param[in]  path  Path to check
+ *
+ * @returns true if path is a symlink, false otherwise
+ */
+bool PathIsSymlink(const std::string& path);
+
+/**
+ * @brief Check if path is readable
+ *
+ * @param[in]  path  Path (file or directory) to check
+ *
+ * @returns true if path is readable, false otherwise
+ */
+bool PathIsReadable(const std::string& path);
+
+/**
+ * @brief Check if path is writable
+ *
+ * @param[in]  path  Path (file or directory) to check
+ *
+ * @returns true if path is writable, false otherwise
+ */
+bool PathIsWritable(const std::string& path);
+
+/**
+ * @brief Check if path is executable
+ *
+ * @param[in]  path  Path (file or directory) to check
+ *
+ * @returns true if path is executable, false otherwise
+ */
+bool PathIsExecutable(const std::string& path);
+
+/**
  * @brief Get file size
  *
  * @param[in]  path  Path to file

@@ -102,10 +102,10 @@ TEST(TrafoTest, LlhEcef)
         llh_vec_.push_back(llh);
         ecef_vec_.push_back(ecef);
     }
-    const size_t num_tests = llh_vec_.size();
+    const std::size_t num_tests = llh_vec_.size();
     EXPECT_GT(num_tests, 0);
 
-    for (size_t i = 0; i < num_tests; ++i) {
+    for (std::size_t i = 0; i < num_tests; ++i) {
         const Eigen::Vector3d llh = LlhDegToRad(llh_vec_.at(i));
         const Eigen::Vector3d ecef = ecef_vec_.at(i);
 
@@ -141,10 +141,10 @@ TEST(TrafoTest, EnuEcef)
         enu_vec_.push_back(enu);
         ecef_vec_.push_back(ecef);
     }
-    const size_t num_tests = llh_vec_.size();
+    const std::size_t num_tests = llh_vec_.size();
     EXPECT_GT(num_tests, 0);
 
-    for (size_t i = 0; i < num_tests; ++i) {
+    for (std::size_t i = 0; i < num_tests; ++i) {
         const Eigen::Vector3d llh = LlhDegToRad(llh_vec_.at(i));
         const Eigen::Vector3d enu = enu_vec_.at(i);
         const Eigen::Vector3d ecef = ecef_vec_.at(i);
@@ -155,7 +155,7 @@ TEST(TrafoTest, EnuEcef)
         EXPECT_NEAR_EIGEN_VECTOR3D(enu, resenu, ECEF_ERR);
     }
 
-    for (size_t i = 0; i < num_tests; ++i) {
+    for (std::size_t i = 0; i < num_tests; ++i) {
         const Eigen::Vector3d llh = LlhDegToRad(llh_vec_.at(i));
         const Eigen::Vector3d enu = enu_vec_.at(i);
         const Eigen::Vector3d ecef = ecef_vec_.at(i);
@@ -189,10 +189,10 @@ TEST(TrafoTest, NedEcef)
         ned_vec_.push_back(ned);
         ecef_vec_.push_back(ecef);
     }
-    const size_t num_tests = llh_vec_.size();
+    const std::size_t num_tests = llh_vec_.size();
     EXPECT_GT(num_tests, 0);
 
-    for (size_t i = 0; i < num_tests; ++i) {
+    for (std::size_t i = 0; i < num_tests; ++i) {
         const Eigen::Vector3d llh = LlhDegToRad(llh_vec_.at(i));
         const Eigen::Vector3d ned = ned_vec_.at(i);
         const Eigen::Vector3d ecef = ecef_vec_.at(i);
@@ -203,7 +203,7 @@ TEST(TrafoTest, NedEcef)
         EXPECT_NEAR_EIGEN_VECTOR3D(ned, resned, ECEF_ERR);
     }
 
-    for (size_t i = 0; i < num_tests; ++i) {
+    for (std::size_t i = 0; i < num_tests; ++i) {
         const Eigen::Vector3d llh = LlhDegToRad(llh_vec_.at(i));
         const Eigen::Vector3d ned = ned_vec_.at(i);
         const Eigen::Vector3d ecef = ecef_vec_.at(i);
@@ -238,10 +238,10 @@ TEST(TrafoTest, QuatEul)
         q_vec_.push_back(q);
         eul_vec_.push_back(eul);
     }
-    const size_t num_tests = rotmat_vec_.size();
+    const std::size_t num_tests = rotmat_vec_.size();
     EXPECT_GT(num_tests, 0);
 
-    for (size_t i = 0; i < num_tests; ++i) {
+    for (std::size_t i = 0; i < num_tests; ++i) {
         const Eigen::Vector4d q = q_vec_.at(i);
         const Eigen::Quaterniond quat(q(0), q(1), q(2), q(3));
         const Eigen::Vector3d eul = eul_vec_.at(i);

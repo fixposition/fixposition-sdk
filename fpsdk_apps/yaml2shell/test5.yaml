@@ -1,0 +1,49 @@
+str1: i'm a sting
+str2: "a quoted string"
+str3: this linefeed\nisn't a linefeed
+str4: >
+    some multiple lines string
+    that is is just one lone string
+    with the whitespace on the left removed
+str5: |
+    also multiple
+    lines newlines kept
+str6: |-
+    what about this?
+    the following empty line isn't included
+
+str7: |+
+    and this?
+    the following empty line is included
+    but bash will strip it
+
+str8: >-
+    and this?
+    should be the same as |-
+
+str9: >-
+    and this?
+    should be the same as |+
+
+# $ eval $(yaml2shell test5.yaml)
+# $ echo $str1
+# i'm a sting
+# $ echo $str7
+# and this? the following empty line is included but bash will strip it
+# $ echo $str1
+# i'm a sting
+# $ echo $str2
+# a quoted string
+# $ echo $str3
+# this linefeed\nisn't a linefeed
+# $ echo $str4
+# some multiple lines string that is is just one lone string with the whitespace on the left removed
+# $ echo $str5
+# also multiple lines newlines kept
+# $ echo $str6
+# what about this? the following empty line isn't included
+# $ echo $str7
+# and this? the following empty line is included but bash will strip it
+# $ echo $str8
+# and this? should be the same as |-
+# $ echo $str9

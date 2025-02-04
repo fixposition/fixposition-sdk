@@ -29,6 +29,41 @@ TEST(YamlTest, Dummy)
     EXPECT_TRUE(true);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+static const char* yaml_str_1 = R"yaml(
+.red:   &red   "#ff0000"
+.green: &green "#00ff00"
+.blue:  &blue  "#0000ff"
+.one-two-three: &one-two-three
+    - 1
+    - &two 2
+    - 3
+.params: &params
+    foo: 0
+    bar: &bar "nope"
+apple: *green
+cherry: *red
+ocean: *blue
+a_list: *one-two-three
+a_number: *two
+a_string: *bar
+)yaml";
+
+TEST(YamlTest, StringToYaml)
+{
+    YAML::Node node;
+    EXPECT_TRUE(StringToYaml(yaml_str_1, node));
+    EXPECT_EQ(node["apple"].as<std::string>(), "#00ff00");
+    EXPECT_EQ(node["cherry"].as<std::string>(), "#ff0000");
+    EXPECT_EQ(node["ocean"].as<std::string>(), "#0000ff");
+    EXPECT_EQ(node["a_list"][0].as<int>(), 1);
+    EXPECT_EQ(node["a_list"][1].as<int>(), 2);
+    EXPECT_EQ(node["a_list"][2].as<int>(), 3);
+    EXPECT_EQ(node["a_number"].as<int>(), 2);
+    EXPECT_EQ(node["a_string"].as<std::string>(), "nope");
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace
 

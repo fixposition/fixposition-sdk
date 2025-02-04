@@ -58,10 +58,10 @@ void RedirectLoggingToRosConsole(const char* logger_name)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-rclcpp::Time ConvTime(const fpsdk::common::time::Time& time)
+rclcpp::Time ConvTime(const fpsdk::common::time::Time& time, rcl_clock_type_t clock_type)
 {
     const auto rt = time.GetRosTime();
-    return rclcpp::Time(rt.sec_, rt.nsec_);
+    return rclcpp::Time(rt.sec_, rt.nsec_, clock_type);
 }
 
 fpsdk::common::time::Time ConvTime(const rclcpp::Time& time)

@@ -17,6 +17,7 @@
 /* EXTERNAL */
 
 /* PACKAGE */
+#include "fpsdk_common/string.hpp"
 #include "fpsdk_common/utils.hpp"
 
 namespace fpsdk {
@@ -26,7 +27,7 @@ namespace utils {
 
 const char* GetVersionString()
 {
-    return FP_VERSION_STRING;
+    return FP_VERSION_STRING;  // "0.0.0", "0.0.0-heads/feature/bla-g123456-dirty"
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -41,6 +42,13 @@ const char* GetCopyrightString()
 const char* GetLicenseString()
 {
     return "License: see the LICENSE files included in the source distribution";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string GetUserAgentStr()
+{
+    return "FixpositionSDK/" + string::StrSplit(GetVersionString(), "-")[0];
 }
 
 /* ****************************************************************************************************************** */
