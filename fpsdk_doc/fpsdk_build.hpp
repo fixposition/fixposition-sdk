@@ -27,14 +27,15 @@ namespace fpsdk {
     For building the libraries and apps:
 
     - **Linux**, GCC (C++-17), glibc, cmake, bash, etc. (tested with Ubuntu 20.04/22.04/24.04 and Debian Bookworm)
-    - boost           (≥ 1.71.0, tested with 1.71.0, 1.74.1, 1.83.0)
-    - curl            (≥ 7.68.0, tested with 7.68.0, 7.88.1, 8.5.0)
-    - Eigen3          (≥ 3.3.7,  tested with 3.3.7, 3.4.0)
-    - yaml-cpp        (≥ 0.6.2,  tested with 0.6.2, 0.7.0, 0.8.0)
-    - zlib1g          (≥ 1.2.11, tested with 1.2.11, 1.2.13, 1.3)
-    - PROJ        (*) (≥ 9.4.x,  tested with 9.4.0, 9.4.1)
-    - ROS1        (*) (Noetic), or
-    - ROS2        (*) (Humble or Jazzy)
+    - boost            (≥ 1.71.0, tested with 1.71.0, 1.74.1, 1.83.0)
+    - curl             (≥ 7.68.0, tested with 7.68.0, 7.88.1, 8.5.0)
+    - Eigen3           (≥ 3.3.7,  tested with 3.3.7, 3.4.0)
+    - yaml-cpp         (≥ 0.6.2,  tested with 0.6.2, 0.7.0, 0.8.0)
+    - zlib1g           (≥ 1.2.11, tested with 1.2.11, 1.2.13, 1.3)
+    - OpenSSL (libssl) (≥ 1.1.x,  tested with 1.1.1, 3.0.2, 3.0.13, 3.0.15)
+    - PROJ         (*) (≥ 9.4.x,  tested with 9.4.0, 9.4.1)
+    - ROS1         (*) (Noetic), or
+    - ROS2         (*) (Humble or Jazzy)
 
     (*) Optional dependencies. Without these some functionality in the libraries and apps is unavailable (compiled out).
 

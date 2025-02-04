@@ -38,6 +38,51 @@ bool PathExists(const std::string& path)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool PathIsDirectory(const std::string& path)
+{
+    struct stat st;
+    return (stat(path.c_str(), &st) == 0) && S_ISDIR(st.st_mode);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool PathIsFile(const std::string& path)
+{
+    struct stat st;
+    return (stat(path.c_str(), &st) == 0) && S_ISREG(st.st_mode);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool PathIsSymlink(const std::string& path)
+{
+    struct stat st;
+    return (stat(path.c_str(), &st) == 0) && S_ISLNK(st.st_mode);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool PathIsReadable(const std::string& path)
+{
+    return access(path.c_str(), R_OK) == 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool PathIsWritable(const std::string& path)
+{
+    return access(path.c_str(), W_OK) == 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool PathIsExecutable(const std::string& path)
+{
+    return access(path.c_str(), X_OK) == 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::size_t FileSize(const std::string& path)
 {
     uint64_t size = 0;

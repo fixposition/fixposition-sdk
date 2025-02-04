@@ -36,6 +36,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    libevdev-dev
     noetic.humble.jazzy.bookworm    libgpiod-dev
     noetic.humble.jazzy.bookworm    libiio-dev
+    noetic.humble.jazzy.bookworm    libssl-doc
     ....................bookworm    linux-perf
     noetic.humble.jazzy.........    linux-tools-common                          # perf
     noetic.humble.jazzy.bookworm    lsb-release

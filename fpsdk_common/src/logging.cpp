@@ -32,7 +32,7 @@ namespace logging {
 static LoggingColour g_colour_init = LoggingColour::AUTO;
 static LoggingParams g_params;
 std::mutex g_mutex;
-static char g_line[0xffff];
+static char g_line[0x1fff];
 static struct timespec g_time0 = { 0, 0 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -159,6 +159,10 @@ static void LoggingDefaultFn(const LoggingParams& params, const LoggingLevel lev
             break;
     }
 
+    // We want to output the entire line at once or it may interleave with stdout output
+    static char output[0x1fff];
+    std::size_t len = 0;
+
     // Timestamps. Note: deliberately *not* using fpsdk::common::time
     if (params.timestamps_ != LoggingTimestamps::NONE) {
         if (g_time0.tv_sec == 0) {
@@ -168,30 +172,34 @@ static void LoggingDefaultFn(const LoggingParams& params, const LoggingLevel lev
         clock_gettime(CLOCK_REALTIME, &now);
 
         if (tscol != NULL) {
-            std::fputs(tscol, stderr);
+            len += std::snprintf(&output[len], sizeof(output) - len, "%s", tscol);
         }
         if (params.timestamps_ == LoggingTimestamps::RELATIVE) {
             now.tv_sec -= g_time0.tv_sec;
             now.tv_nsec -= g_time0.tv_nsec;
-            std::fprintf(stderr, "%09.3f ", (double)now.tv_sec + ((double)now.tv_nsec * 1e-9));
+            len += std::snprintf(&output[len], sizeof(output) - len, "%09.3f ", (double)now.tv_sec + ((double)now.tv_nsec * 1e-9));
         } else {
             struct tm tm;
             localtime_r(&now.tv_sec, &tm);
-            char tstr[100];
-            strftime(tstr, sizeof(tstr), "%Y-%m-%d %H:%M:%S", &tm);
-            snprintf(&tstr[19], sizeof(tstr) - 19, ".%03d ", (int)(now.tv_nsec / 1000000));
-            std::fputs(tstr, stderr);
+            len += std::strftime(&output[len], sizeof(output) - len, "%Y-%m-%d %H:%M:%S", &tm);
+            len += std::snprintf(&output[len], sizeof(output) - len, ".%03d ", (int)(now.tv_nsec / 1000000));
         }
     }
 
     if (prefix != NULL) {
-        std::fputs(prefix, stderr);
+        len += std::snprintf(&output[len], sizeof(output) - len, "%s", prefix);
+    }
+    len += std::snprintf(&output[len], sizeof(output) - len, "%s", str);
+    if (suffix != NULL) {
+        // Truncate to accommodate suffix
+        if (len >= sizeof(output)) {
+            len = sizeof(output) - 10;
+        }
+        len += std::snprintf(&output[len], sizeof(output) - len, "%s", suffix);
     }
 
-    std::fputs(str, stderr);
-    if (suffix != NULL) {
-        std::fputs(suffix, stderr);
-    }
+    // Put the entire output line at once (see comment above)
+    std::fputs(output, stderr);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

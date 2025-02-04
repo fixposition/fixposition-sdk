@@ -7,7 +7,7 @@
  * /__/  \__\
  *
  * Parts copyright (c) 2008, Willow Garage, Inc., see time.cpp and the LICENSE file for details
- * Based on work by flipflip (https://github.com/phkehl)
+ * Written by flipflip (https://github.com/phkehl)
  * \endverbatim
  *
  * @file

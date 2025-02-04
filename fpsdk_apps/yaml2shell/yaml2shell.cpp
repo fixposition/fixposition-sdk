@@ -265,9 +265,10 @@ class YamlToShell
 
     bool Dump(const YAML::Node& node, const std::string& prefix, const int depth = 0)
     {
-        TRACE("%*sDump(%s, %d) defined=%s null=%s scalar=%s map=%s sequence=%s", 4 * depth, "", prefix.c_str(), depth,
-            node.IsDefined() ? "true" : "false", node.IsNull() ? "true" : "false", node.IsScalar() ? "true" : "false",
-            node.IsMap() ? "true" : "false", node.IsSequence() ? "true" : "false");
+        TRACE("%*sDump(%s, %d) defined=%s null=%s scalar=%s map=%s sequence=%s tag=%s", 4 * depth, "", prefix.c_str(),
+            depth, node.IsDefined() ? "true" : "false", node.IsNull() ? "true" : "false",
+            node.IsScalar() ? "true" : "false", node.IsMap() ? "true" : "false", node.IsSequence() ? "true" : "false",
+            node.Tag().c_str());
         if (depth > MAX_DEPTH) {
             WARNING("max depth exceeded");
             return false;
@@ -283,7 +284,21 @@ class YamlToShell
                 ok = PrintVar(prefix, "");
                 break;
             case YAML::NodeType::Scalar:
-                ok = PrintVar(prefix, node.as<std::string>());
+                if (node.Tag().size() > 1) {
+                    WARNING("Ignoring node '%s' with tag %s", prefix.c_str(), node.Tag().c_str());
+                } else {
+                    ok = PrintVar(prefix, node.as<std::string>());
+                }
+                // {
+                //     // clang-format off
+                //     bool b; int64_t i; double d;
+                //     if      (node.Tag() == "!")                       { TRACE("--> string (1)"); }
+                //     else if (YAML::convert<bool>::decode(node, b))    { TRACE("--> bool"); }
+                //     else if (YAML::convert<int64_t>::decode(node, i)) { TRACE("--> int"); }
+                //     else if (YAML::convert<double>::decode(node, d))  { TRACE("--> double"); }
+                //     else                                              { TRACE("--> string (2)"); }
+                //     // clang-format on
+                // }
                 break;
             case YAML::NodeType::Sequence:
                 for (std::size_t ix = 0; ok && (ix < node.size()); ix++) {

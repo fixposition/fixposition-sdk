@@ -64,8 +64,10 @@ void Thread::Stop()
         abort_ = true;
         Wakeup();
         thread_->join();
-        thread_ = nullptr;
+        thread_.reset();
         running_ = false;
+    } else if (thread_) {
+        WARNING("Thread::Stop() called from thread %lx", ThisThreadId());
     }
 }
 

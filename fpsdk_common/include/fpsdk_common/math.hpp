@@ -101,7 +101,7 @@ double RoundToFracDigits(const double value, const int digits);
  * @code{cpp}
  * uint8_t mask = 0;
  * SetBits(mask, Bit(0) | Bit(1) | Bit(7));  // mask is now 0x83
- * const bool bit_7_is_set = CheckBits(mask, Bit(7));  // true
+ * const bool bit_7_is_set = CheckBitsAll(mask, Bit(7));  // true
  * @endcode
  *
  * @{
@@ -115,7 +115,7 @@ double RoundToFracDigits(const double value, const int digits);
  * @returns the mask (value) with the desired bit set
  */
 template <typename T>
-constexpr T Bit(const size_t bit)
+constexpr T Bit(const std::size_t bit)
 {
     return static_cast<T>(static_cast<uint64_t>(1) << bit);
 }

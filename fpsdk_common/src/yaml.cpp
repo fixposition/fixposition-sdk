@@ -41,6 +41,7 @@ bool StringToYaml(const std::string& yaml_str, YAML::Node& yaml_node)
 std::string YamlToString(const YAML::Node& yaml_node)
 {
     YAML::Emitter emitter;
+    emitter.SetIndent(4);
     emitter << yaml_node;
     return std::string(emitter.c_str()) + "\n";
 }

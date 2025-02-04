@@ -62,27 +62,27 @@ static const uint8_t RANDOM_64_BYTES[] = { 0xfc, 0xf3, 0xbb, 0x2b, 0x6f, 0xf0, 0
 
 TEST(ParserCrcTest, Data)
 {
-    EXPECT_EQ(sizeof(RANDOM_1_BYTE), (size_t)1);
-    EXPECT_EQ(sizeof(RANDOM_2_BYTES), (size_t)2);
-    EXPECT_EQ(sizeof(RANDOM_3_BYTES), (size_t)3);
-    EXPECT_EQ(sizeof(RANDOM_4_BYTES), (size_t)4);
-    EXPECT_EQ(sizeof(RANDOM_5_BYTES), (size_t)5);
-    EXPECT_EQ(sizeof(RANDOM_6_BYTES), (size_t)6);
-    EXPECT_EQ(sizeof(RANDOM_7_BYTES), (size_t)7);
-    EXPECT_EQ(sizeof(RANDOM_8_BYTES), (size_t)8);
-    EXPECT_EQ(sizeof(RANDOM_9_BYTES), (size_t)9);
-    EXPECT_EQ(sizeof(RANDOM_10_BYTES), (size_t)10);
-    EXPECT_EQ(sizeof(RANDOM_11_BYTES), (size_t)11);
-    EXPECT_EQ(sizeof(RANDOM_12_BYTES), (size_t)12);
-    EXPECT_EQ(sizeof(RANDOM_13_BYTES), (size_t)13);
-    EXPECT_EQ(sizeof(RANDOM_14_BYTES), (size_t)14);
-    EXPECT_EQ(sizeof(RANDOM_15_BYTES), (size_t)15);
-    EXPECT_EQ(sizeof(RANDOM_16_BYTES), (size_t)16);
-    EXPECT_EQ(sizeof(RANDOM_29_BYTES), (size_t)29);
-    EXPECT_EQ(sizeof(RANDOM_30_BYTES), (size_t)30);
-    EXPECT_EQ(sizeof(RANDOM_31_BYTES), (size_t)31);
-    EXPECT_EQ(sizeof(RANDOM_32_BYTES), (size_t)32);
-    EXPECT_EQ(sizeof(RANDOM_64_BYTES), (size_t)64);
+    EXPECT_EQ(sizeof(RANDOM_1_BYTE), (std::size_t)1);
+    EXPECT_EQ(sizeof(RANDOM_2_BYTES), (std::size_t)2);
+    EXPECT_EQ(sizeof(RANDOM_3_BYTES), (std::size_t)3);
+    EXPECT_EQ(sizeof(RANDOM_4_BYTES), (std::size_t)4);
+    EXPECT_EQ(sizeof(RANDOM_5_BYTES), (std::size_t)5);
+    EXPECT_EQ(sizeof(RANDOM_6_BYTES), (std::size_t)6);
+    EXPECT_EQ(sizeof(RANDOM_7_BYTES), (std::size_t)7);
+    EXPECT_EQ(sizeof(RANDOM_8_BYTES), (std::size_t)8);
+    EXPECT_EQ(sizeof(RANDOM_9_BYTES), (std::size_t)9);
+    EXPECT_EQ(sizeof(RANDOM_10_BYTES), (std::size_t)10);
+    EXPECT_EQ(sizeof(RANDOM_11_BYTES), (std::size_t)11);
+    EXPECT_EQ(sizeof(RANDOM_12_BYTES), (std::size_t)12);
+    EXPECT_EQ(sizeof(RANDOM_13_BYTES), (std::size_t)13);
+    EXPECT_EQ(sizeof(RANDOM_14_BYTES), (std::size_t)14);
+    EXPECT_EQ(sizeof(RANDOM_15_BYTES), (std::size_t)15);
+    EXPECT_EQ(sizeof(RANDOM_16_BYTES), (std::size_t)16);
+    EXPECT_EQ(sizeof(RANDOM_29_BYTES), (std::size_t)29);
+    EXPECT_EQ(sizeof(RANDOM_30_BYTES), (std::size_t)30);
+    EXPECT_EQ(sizeof(RANDOM_31_BYTES), (std::size_t)31);
+    EXPECT_EQ(sizeof(RANDOM_32_BYTES), (std::size_t)32);
+    EXPECT_EQ(sizeof(RANDOM_64_BYTES), (std::size_t)64);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

@@ -7,7 +7,7 @@
  * /__/  \__\
  *
  * Parts copyright (c) 2008, Willow Garage, Inc., look for "[ros-code]" below
- * Based on work by flipflip (https://github.com/phkehl)
+ * Written by flipflip (https://github.com/phkehl)
  * \endverbatim
  *
  * @file
