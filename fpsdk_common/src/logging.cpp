@@ -177,7 +177,8 @@ static void LoggingDefaultFn(const LoggingParams& params, const LoggingLevel lev
         if (params.timestamps_ == LoggingTimestamps::RELATIVE) {
             now.tv_sec -= g_time0.tv_sec;
             now.tv_nsec -= g_time0.tv_nsec;
-            len += std::snprintf(&output[len], sizeof(output) - len, "%09.3f ", (double)now.tv_sec + ((double)now.tv_nsec * 1e-9));
+            len += std::snprintf(
+                &output[len], sizeof(output) - len, "%09.3f ", (double)now.tv_sec + ((double)now.tv_nsec * 1e-9));
         } else {
             struct tm tm;
             localtime_r(&now.tv_sec, &tm);
