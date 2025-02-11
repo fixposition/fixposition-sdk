@@ -24,8 +24,13 @@ endif()
 ########################################################################################################################
 # Check if we have ROS, and add to cmake path to that require(rosbag) works. User can either specify it as a cmake
 # argument or we can detect it from the environment
+# - ROS2 environment loaded
+if("$ENV{ROS_VERSION}" STREQUAL "2")
+    message(STATUS "fpsdk: Using ROS2")
+    set(FP_USE_ROS2 ON)
+    # TODO: Maybe this also needs some stuff added to CMAKE_PREFIX_PATH?
 # - ROS1 package path explicitly given on cmake command line. Not recommended. Enough to build, but not enough to run.
-if(NOT "${ROS_PACKAGE_PATH}" STREQUAL "")
+elseif(NOT "${ROS_PACKAGE_PATH}" STREQUAL "")
     message(STATUS "fpsdk: Using ROS1 (cmake arg ROS_PACKAGE_PATH=${ROS_PACKAGE_PATH})")
     string(REPLACE ":" ";" ROS_PACKAGE_PATH_LIST ${ROS_PACKAGE_PATH})
     list(APPEND CMAKE_PREFIX_PATH ${ROS_PACKAGE_PATH_LIST})
@@ -37,11 +42,6 @@ elseif(NOT "$ENV{ROS_PACKAGE_PATH}" STREQUAL "")
     # Environment (catkin) should already set CMAKE_PREFIX_PATH correctly. However, we seem to need this:
     list(APPEND CMAKE_PREFIX_PATH /opt/ros/noetic)
     set(FP_USE_ROS1 ON)
-# - ROS2 environment loaded
-elseif("$ENV{ROS_VERSION}" STREQUAL "2")
-    message(STATUS "fpsdk: Using ROS2")
-set(FP_USE_ROS2 ON)
-    # TODO: Maybe this also needs some stuff added to CMAKE_PREFIX_PATH?
 else()
     message(STATUS "fpsdk: No ROS environment detected")
 endif()
