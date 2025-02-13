@@ -121,11 +121,11 @@ Band SignalToBand(const Signal signal)
         case Signal::QZSS_L1S:   /* FALLTHROUGH */
         case Signal::SBAS_L1CA:  return Band::L1;
         case Signal::GPS_L2C:    /* FALLTHROUGH */
-        case Signal::BDS_B2A:    /* FALLTHROUGH */
         case Signal::BDS_B2I:    /* FALLTHROUGH */
         case Signal::GAL_E5B:    /* FALLTHROUGH */
         case Signal::GLO_L2OF:   /* FALLTHROUGH */
         case Signal::QZSS_L2C:   return Band::L2;
+        case Signal::BDS_B2A:    /* FALLTHROUGH */
         case Signal::GPS_L5:     /* FALLTHROUGH */
         case Signal::QZSS_L5:    /* FALLTHROUGH */
         case Signal::GAL_E5A:    /* FALLTHROUGH */
