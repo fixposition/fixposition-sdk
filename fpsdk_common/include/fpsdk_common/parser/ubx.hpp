@@ -385,6 +385,8 @@ static constexpr uint16_t    UBX_NAV_TIMELS_MSGID           = 0x26;             
 static constexpr const char* UBX_NAV_TIMELS_STRID           = "UBX-NAV-TIMELS";         //!< UBX-NAV-TIMELS message name
 static constexpr uint16_t    UBX_NAV_TIMEQZSS_MSGID         = 0x27;                     //!< UBX-NAV-TIMEQZSS message ID
 static constexpr const char* UBX_NAV_TIMEQZSS_STRID         = "UBX-NAV-TIMEQZSS";       //!< UBX-NAV-TIMEQZSS message name
+static constexpr uint16_t    UBX_NAV_TIMENAVIC_MSGID        = 0x63;                     //!< UBX-NAV-TIMENAVIC message ID
+static constexpr const char* UBX_NAV_TIMENAVIC_STRID        = "UBX-NAV-TIMENAVIC";      //!< UBX-NAV-TIMENAVIC message name
 static constexpr uint16_t    UBX_NAV_TIMETRUSTED_MSGID      = 0x64;                     //!< UBX-NAV-TIMETRUSTED message ID
 static constexpr const char* UBX_NAV_TIMETRUSTED_STRID      = "UBX-NAV-TIMETRUSTED";    //!< UBX-NAV-TIMETRUSTED message name
 static constexpr uint16_t    UBX_NAV_TIMEUTC_MSGID          = 0x21;                     //!< UBX-NAV-TIMEUTC message ID
@@ -433,6 +435,8 @@ static constexpr uint16_t    UBX_NAV2_TIMELS_MSGID          = UBX_NAV_TIMELS_MSG
 static constexpr const char* UBX_NAV2_TIMELS_STRID          = "UBX-NAV2-TIMELS";        //!< UBX-NAV2-TIMELS message name
 static constexpr uint16_t    UBX_NAV2_TIMEQZSS_MSGID        = UBX_NAV_TIMEQZSS_MSGID;   //!< UBX-NAV2-TIMEQZSS message ID
 static constexpr const char* UBX_NAV2_TIMEQZSS_STRID        = "UBX-NAV2-TIMEQZSS";      //!< UBX-NAV2-TIMEQZSS message name
+static constexpr uint16_t    UBX_NAV2_TIMENAVIC_MSGID       = UBX_NAV_TIMENAVIC_MSGID;  //!< UBX-NAV2-TIMENAVIC message ID
+static constexpr const char* UBX_NAV2_TIMENAVIC_STRID       = "UBX-NAV2-TIMENAVIC";     //!< UBX-NAV2-TIMENAVIC message name
 static constexpr uint16_t    UBX_NAV2_TIMEUTC_MSGID         = UBX_NAV_TIMEUTC_MSGID;    //!< UBX-NAV2-TIMEUTC message ID
 static constexpr const char* UBX_NAV2_TIMEUTC_STRID         = "UBX-NAV2-TIMEUTC";       //!< UBX-NAV2-TIMEUTC message name
 static constexpr uint16_t    UBX_NAV2_VELECEF_MSGID         = UBX_NAV_VELECEF_MSGID;    //!< UBX-NAV2-VELECEF message ID
@@ -604,7 +608,7 @@ struct UbxMsgInfo
 
 // @fp_codegen_begin{FPSDK_COMMON_PARSER_UBX_MSGINFO_HPP}
 using UbxClassesInfo = std::array<UbxMsgInfo, 15>;    //!< UBX classes lookup table
-using UbxMessagesInfo = std::array<UbxMsgInfo, 183>;  //!< UBX messages lookup table
+using UbxMessagesInfo = std::array<UbxMsgInfo, 185>;  //!< UBX messages lookup table
 // @fp_codegen_end{FPSDK_COMMON_PARSER_UBX_MSGINFO_HPP}
 
 /**
