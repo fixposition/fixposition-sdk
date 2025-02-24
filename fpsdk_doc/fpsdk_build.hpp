@@ -57,6 +57,7 @@ namespace fpsdk {
     ./docker/docker.sh pull noetic-dev       # Or "docker.sh build noetic-dev" to build the image locally
     ./docker/docker.sh run noetic-dev bash
     # Now inside Docker do:
+    source /opt/ros/noetic/setup.bash
     make install
     ./fpsdk/bin/fpltool -h
     @endcode
@@ -81,9 +82,15 @@ namespace fpsdk {
     @code{sh}
     ./docker/docker.sh pull noetic-dev       # Or "docker.sh build noetic-dev" to build the image locally
     ./docker/docker.sh run noetic-dev bash
+    source /opt/ros/noetic/setup.bash
     make install
     ./fpsdk/bin/fpltool
     @endcode
+
+    Note that the "docker.sh" script does not give you a suitable ROS runtime (or development, playground, ...)
+    environment! Its only purpose is to run the CI for this repo and to demonstrate the building here. For a ROS
+    run-time environment please setup a docker *container* yourself elsewhere (perhaps using the docker *image* provided
+    here). See ROS and Docker documentation and the Internet for help.
 
     <!-- trick doxygen -->
 
