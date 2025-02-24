@@ -108,7 +108,7 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
             "\n"
             "Generate a ROS bag from a .fpl logfile\n"
             "\n"
-            "    fpltool [-vqpPfoSD] <fpl-file>\n"
+            "    fpltool [-vqpPfoSD] robag <fpl-file>\n"
 #endif
             "\n"
             "Trim start and/or end of .fpl logfile, i.e. extract a portion of the file. Note that this process is\n"
@@ -116,6 +116,10 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
             "Therefore, both the start time (-S) and the duration (-D) must be at least 60 seconds.\n"
             "\n"
             "    fpltool [-vqpPfo] -S <sec> -D <sec> <fpl-file>\n"
+            "\n"
+            "Extract (som) non-ROS data from the .fpl logfile\n"
+            "\n"
+            "    fpltool [-vqpP] extract <fpl-file>\n"
             "\n"
             "Examples:\n"
 #ifdef FP_USE_ROS1
@@ -139,7 +143,7 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
             "\n"
             "    Extract data from some.fpl:\n"
             "\n"
-            "        fpltool output some.fpl\n"
+            "        fpltool extract some.fpl\n"
             "\n"
             "        This results in various data files suitable for further processing. For example, the input/output\n"
             "        messages received/sent by the sensor can be processed by the parsertool:\n"
