@@ -149,6 +149,7 @@ function do_run
     else
         flags="${flags} --user $(id -u):$(id -g)"
     fi
+
     local hostname=fpsdk-${service}-$(id -un)
     mkdir -p /tmp/home-${hostname}
     flags="${flags} --hostname ${hostname} --network host"
