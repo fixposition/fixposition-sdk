@@ -4,27 +4,34 @@ services:
 
     # ----- no ROS -----------------------------------------------------------------------------------------------------
 
-    bookworm-base:
+    build-bookworm-base:
         image: ghcr.io/fixposition/fixposition-sdk:bookworm-base
         build:
             context: ..
             dockerfile: docker/Dockerfile.bookworm-base
-        command: tail -f
-    bookworm-ci:
+    build-bookworm-ci:
         image: ghcr.io/fixposition/fixposition-sdk:bookworm-ci
         build:
             context: ..
             dockerfile: docker/Dockerfile.bookworm-ci
         depends_on:
-            - bookworm-base
-        command: tail -f
-    bookworm-dev:
+            - build-bookworm-base
+    build-bookworm-dev:
         image: ghcr.io/fixposition/fixposition-sdk:bookworm-dev
         build:
             context: ..
             dockerfile: docker/Dockerfile.bookworm-dev
         depends_on:
-            - bookworm-base
+            - build-bookworm-base
+
+    bookworm-base:
+        image: ghcr.io/fixposition/fixposition-sdk:bookworm-base
+        command: tail -f
+    bookworm-ci:
+        image: ghcr.io/fixposition/fixposition-sdk:bookworm-ci
+        command: tail -f
+    bookworm-dev:
+        image: ghcr.io/fixposition/fixposition-sdk:bookworm-dev
         volumes:
             # Bash config
             - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
@@ -42,27 +49,37 @@ services:
 
     # ----- ROS1 -------------------------------------------------------------------------------------------------------
 
-    noetic-base:
+    build-noetic-base:
         image: ghcr.io/fixposition/fixposition-sdk:noetic-base
         build:
             context: ..
             dockerfile: docker/Dockerfile.noetic-base
         command: tail -f
-    noetic-ci:
+    build-noetic-ci:
         image: ghcr.io/fixposition/fixposition-sdk:noetic-ci
         build:
             context: ..
             dockerfile: docker/Dockerfile.noetic-ci
         depends_on:
-            - noetic-base
+            - build-noetic-base
         command: tail -f
-    noetic-dev:
+    build-noetic-dev:
         image: ghcr.io/fixposition/fixposition-sdk:noetic-dev
         build:
             context: ..
             dockerfile: docker/Dockerfile.noetic-dev
         depends_on:
-            - noetic-base
+            - build-noetic-base
+        command: tail -f
+
+    noetic-base:
+        image: ghcr.io/fixposition/fixposition-sdk:noetic-base
+        command: tail -f
+    noetic-ci:
+        image: ghcr.io/fixposition/fixposition-sdk:noetic-ci
+        command: tail -f
+    noetic-dev:
+        image: ghcr.io/fixposition/fixposition-sdk:noetic-dev
         volumes:
             - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
@@ -76,27 +93,37 @@ services:
 
     # ----- ROS2 -------------------------------------------------------------------------------------------------------
 
-    humble-base:
+    build-humble-base:
         image: ghcr.io/fixposition/fixposition-sdk:humble-base
         build:
             context: ..
             dockerfile: docker/Dockerfile.humble-base
         command: tail -f
-    humble-ci:
+    build-humble-ci:
         image: ghcr.io/fixposition/fixposition-sdk:humble-ci
         build:
             context: ..
             dockerfile: docker/Dockerfile.humble-ci
         depends_on:
-            - humble-base
+            - build-humble-base
         command: tail -f
-    humble-dev:
+    build-humble-dev:
         image: ghcr.io/fixposition/fixposition-sdk:humble-dev
         build:
             context: ..
             dockerfile: docker/Dockerfile.humble-dev
+        command: tail -f
         depends_on:
-            - humble-base
+            - build-humble-base
+    humble-base:
+        image: ghcr.io/fixposition/fixposition-sdk:humble-base
+        command: tail -f
+
+    humble-ci:
+        image: ghcr.io/fixposition/fixposition-sdk:humble-ci
+        command: tail -f
+    humble-dev:
+        image: ghcr.io/fixposition/fixposition-sdk:humble-dev
         volumes:
             - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
@@ -108,27 +135,37 @@ services:
         hostname: fpsdk-humble-dev-${USER}
         command: tail -f
 
-    jazzy-base:
+
+    build-jazzy-base:
         image: ghcr.io/fixposition/fixposition-sdk:jazzy-base
         build:
             context: ..
             dockerfile: docker/Dockerfile.jazzy-base
         command: tail -f
-    jazzy-ci:
+    build-jazzy-ci:
         image: ghcr.io/fixposition/fixposition-sdk:jazzy-ci
         build:
             context: ..
             dockerfile: docker/Dockerfile.jazzy-ci
         depends_on:
-            - jazzy-base
+            - build-jazzy-base
         command: tail -f
-    jazzy-dev:
+    build-jazzy-dev:
         image: ghcr.io/fixposition/fixposition-sdk:jazzy-dev
         build:
             context: ..
             dockerfile: docker/Dockerfile.jazzy-dev
         depends_on:
-            - jazzy-base
+            - build-jazzy-base
+
+    jazzy-base:
+        image: ghcr.io/fixposition/fixposition-sdk:jazzy-base
+        command: tail -f
+    jazzy-ci:
+        image: ghcr.io/fixposition/fixposition-sdk:jazzy-ci
+        command: tail -f
+    jazzy-dev:
+        image: ghcr.io/fixposition/fixposition-sdk:jazzy-dev
         volumes:
             - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout

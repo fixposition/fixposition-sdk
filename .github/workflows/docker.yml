@@ -22,11 +22,11 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build bookworm-base bookworm-ci bookworm-dev
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-bookworm-base build-bookworm-ci build-bookworm-dev
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push bookworm-base bookworm-ci bookworm-dev
+                  docker compose push build-bookworm-base build-bookworm-ci build-bookworm-dev
 
     docker-fpsdk-noetic:
         runs-on: ubuntu-latest
@@ -42,11 +42,11 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build noetic-base noetic-ci noetic-dev
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-noetic-base build-noetic-ci build-noetic-dev
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push noetic-base noetic-ci noetic-dev
+                  docker compose push build-noetic-base build-noetic-ci build-noetic-dev
 
     docker-fpsdk-humble:
         runs-on: ubuntu-latest
@@ -62,11 +62,11 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build humble-base humble-ci humble-dev
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-humble-base build-humble-ci build-humble-dev
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push humble-base humble-ci humble-dev
+                  docker compose push build-humble-base build-humble-ci build-humble-dev
 
     docker-fpsdk-jazzy:
         runs-on: ubuntu-latest
@@ -82,8 +82,24 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build jazzy-base jazzy-ci jazzy-dev
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-jazzy-base build-jazzy-ci build-jazzy-dev
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push jazzy-base jazzy-ci jazzy-dev
+                  docker compose push build-jazzy-base build-jazzy-ci build-jazzy-dev
+
+    docker-fpsdk-cleanup:
+        runs-on: ubuntu-latest
+        needs:
+            - docker-fpsdk-bookworm
+            - docker-fpsdk-noetic
+            - docker-fpsdk-humble
+            - docker-fpsdk-jazzy
+        steps:
+            - name: Expire old images
+              uses: actions/delete-package-versions@v5
+              with:
+                  package-name:                  ${{ github.event.repository.name }}
+                  package-type:                  container
+                  min-versions-to-keep:          0
+                  delete-only-untagged-versions: true
