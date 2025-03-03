@@ -203,9 +203,9 @@ TEST_F(ParserTest, Parser)
     // Bad arguments
     uint8_t data[] = { 0x55, 0xaa, 0x55, 0xaa };
     EXPECT_FALSE(parser.Add(NULL, 0));
-    EXPECT_FALSE(parser.Add(NULL, -1));
-    EXPECT_FALSE(parser.Add(data, 0));
-    EXPECT_FALSE(parser.Add(data, -1));
+
+    // No data is okay
+    EXPECT_TRUE(parser.Add(data, 0));
 
     // Overflow
     std::vector<uint8_t> too_large(MAX_ADD_SIZE * 10);

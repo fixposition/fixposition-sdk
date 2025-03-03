@@ -66,28 +66,30 @@ const char* GnssStr(const Gnss gnss)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const char* SignalStr(const Signal signal)
+const char* SignalStr(const Signal signal, const bool kurz)
 {
     switch (signal) {  // clang-format off
-        case Signal::UNKNOWN:    return "UNKNOWN";
-        case Signal::BDS_B1C:    return "BDS_B1C";
-        case Signal::BDS_B1I:    return "BDS_B1I";
-        case Signal::BDS_B2A:    return "BDS_B2A";
-        case Signal::BDS_B2I:    return "BDS_B2I";
-        case Signal::GAL_E1:     return "GAL_E1";
-        case Signal::GAL_E5A:    return "GAL_E5A";
-        case Signal::GAL_E5B:    return "GAL_E5B";
-        case Signal::GLO_L1OF:   return "GLO_L1OF";
-        case Signal::GLO_L2OF:   return "GLO_L2OF";
-        case Signal::GPS_L1CA:   return "GPS_L1CA";
-        case Signal::GPS_L2C:    return "GPS_L2C";
-        case Signal::GPS_L5:     return "GPS_L5";
-        case Signal::QZSS_L1CA:  return "QZSS_L1CA";
-        case Signal::QZSS_L1S:   return "QZSS_L1S";
-        case Signal::QZSS_L2C:   return "QZSS_L2C";
-        case Signal::QZSS_L5:    return "QZSS_L5";
-        case Signal::SBAS_L1CA:  return "SBAS_L1CA";
-        case Signal::NAVIC_L5A:  return "NAVIC_L5A";
+        case Signal::UNKNOWN:    return kurz ? "UNKN"  : "UNKNOWN";
+        case Signal::BDS_B1C:    return kurz ? "B1C"   : "BDS_B1C";
+        case Signal::BDS_B1I:    return kurz ? "B1I"   : "BDS_B1I";
+        case Signal::BDS_B2A:    return kurz ? "B2A"   : "BDS_B2A";
+        case Signal::BDS_B2I:    return kurz ? "B2I"   : "BDS_B2I";
+        case Signal::BDS_B3I:    return kurz ? "B3I"   : "BDS_B3I";
+        case Signal::GAL_E1:     return kurz ? "E1"    : "GAL_E1";
+        case Signal::GAL_E5A:    return kurz ? "E5A"   : "GAL_E5A";
+        case Signal::GAL_E5B:    return kurz ? "E5B"   : "GAL_E5B";
+        case Signal::GAL_E6:     return kurz ? "E6"    : "GAL_E6";
+        case Signal::GLO_L1OF:   return kurz ? "L1OF"  : "GLO_L1OF";
+        case Signal::GLO_L2OF:   return kurz ? "L2OF"  : "GLO_L2OF";
+        case Signal::GPS_L1CA:   return kurz ? "L1CA"  : "GPS_L1CA";
+        case Signal::GPS_L2C:    return kurz ? "L2C"   : "GPS_L2C";
+        case Signal::GPS_L5:     return kurz ? "L5"    : "GPS_L5";
+        case Signal::QZSS_L1CA:  return kurz ? "L1CA"  : "QZSS_L1CA";
+        case Signal::QZSS_L1S:   return kurz ? "L1S"   : "QZSS_L1S";
+        case Signal::QZSS_L2C:   return kurz ? "L2C"   : "QZSS_L2C";
+        case Signal::QZSS_L5:    return kurz ? "L5"    : "QZSS_L5";
+        case Signal::SBAS_L1CA:  return kurz ? "L1CA"  : "SBAS_L1CA";
+        case Signal::NAVIC_L5A:  return kurz ? "L5A"   : "NAVIC_L5A";
     }  // clang-format on
 
     return "?";
@@ -101,6 +103,7 @@ const char* BandStr(const Band band)
         case Band::UNKNOWN: return "UNKNOWN";
         case Band::L1:      return "L1";
         case Band::L2:      return "L2";
+        case Band::E6:      return "E6";
         case Band::L5:      return "L5";
     }  // clang-format on
 
@@ -125,6 +128,8 @@ Band SignalToBand(const Signal signal)
         case Signal::GAL_E5B:    /* FALLTHROUGH */
         case Signal::GLO_L2OF:   /* FALLTHROUGH */
         case Signal::QZSS_L2C:   return Band::L2;
+        case Signal::BDS_B3I:    /* FALLTHROUGH */
+        case Signal::GAL_E6:     return Band::E6;
         case Signal::BDS_B2A:    /* FALLTHROUGH */
         case Signal::GPS_L5:     /* FALLTHROUGH */
         case Signal::QZSS_L5:    /* FALLTHROUGH */
@@ -350,23 +355,29 @@ Signal UbxGnssIdSigIdToSignal(const uint8_t gnssId, const uint8_t sigId)
             break;
         case UBX_GNSSID_GAL :
             switch (sigId) {
-                case UBX_SIGID_GAL_E1C  : /* FALLTHROUGH */
-                case UBX_SIGID_GAL_E1B  : return Signal::GAL_E1;
-                case UBX_SIGID_GAL_E5AI : /* FALLTHROUGH */
-                case UBX_SIGID_GAL_E5AQ : return Signal::GAL_E5A;
-                case UBX_SIGID_GAL_E5BI : /* FALLTHROUGH */
-                case UBX_SIGID_GAL_E5BQ : return Signal::GAL_E5B;
+                case UBX_SIGID_GAL_E1C:  /* FALLTHROUGH */
+                case UBX_SIGID_GAL_E1B:  return Signal::GAL_E1;
+                case UBX_SIGID_GAL_E5AI: /* FALLTHROUGH */
+                case UBX_SIGID_GAL_E5AQ: return Signal::GAL_E5A;
+                case UBX_SIGID_GAL_E5BI: /* FALLTHROUGH */
+                case UBX_SIGID_GAL_E5BQ: return Signal::GAL_E5B;
+                case UBX_SIGID_GAL_E6B:  /* FALLTHROUGH */
+                case UBX_SIGID_GAL_E6C:  /* FALLTHROUGH */
+                case UBX_SIGID_GAL_E6A:  return Signal::GAL_E6;
+
             }
             break;
         case UBX_GNSSID_BDS :
             switch (sigId) {
                 case UBX_SIGID_BDS_B1ID1: /* FALLTHROUGH */
                 case UBX_SIGID_BDS_B1ID2: return Signal::BDS_B1I;
-                case UBX_SIGID_BDS_B1CD: /* FALLTHROUGH */
+                case UBX_SIGID_BDS_B1CD:  /* FALLTHROUGH */
                 case UBX_SIGID_BDS_B1CP:  return Signal::BDS_B1C;
                 case UBX_SIGID_BDS_B2ID1: /* FALLTHROUGH */
                 case UBX_SIGID_BDS_B2ID2: return Signal::BDS_B2I;
-                case UBX_SIGID_BDS_B2AP: /* FALLTHROUGH */
+                case UBX_SIGID_BDS_B3ID1: /* FALLTHROUGH */
+                case UBX_SIGID_BDS_B3ID2: return Signal::BDS_B3I;
+                case UBX_SIGID_BDS_B2AP:  /* FALLTHROUGH */
                 case UBX_SIGID_BDS_B2AD:  return Signal::BDS_B2A;
             }
             break;

@@ -92,6 +92,16 @@ constexpr inline T RadToDeg(T radians)
  */
 double RoundToFracDigits(const double value, const int digits);
 
+/**
+ * @brief Clip to desired number of fractional digits (of precision)
+ *
+ * @param[in]  value   The value
+ * @param[in]  digits  Number of digits (0-12), param clamped to range
+ *
+ * @returns the value clipped to the given number of fractional digits, or the original value if it is not finite
+ */
+double ClipToFracDigits(const double value, const int digits);
+
 // ---------------------------------------------------------------------------------------------------------------------
 /**
  * @name Bit manipulation functions

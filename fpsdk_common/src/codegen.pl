@@ -19,6 +19,7 @@ use FindBin;
 use Path::Tiny;
 use Data::Dumper;
 use Digest::SHA;
+use Clone;
 
 ########################################################################################################################
 
@@ -608,7 +609,6 @@ do
         "}};\n");
 };
 
-
 ########################################################################################################################
 # Generate code for UBX
 do
@@ -628,7 +628,7 @@ do
         my $strid = "UBX_$entry->{name}_STRID";
         # print(Dumper($entry);)
         push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_UBX_CLASSES}},
-            sprintf("static constexpr uint16_t    %-30s = 0x%02x;                     //!< $name class ID\n", $clsid, $entry->{clsid}),
+            sprintf("static constexpr uint8_t     %-30s = 0x%02x;                     //!< $name class ID\n", $clsid, $entry->{clsid}),
             sprintf("static constexpr const char* %-30s = %-25s //!< $name class name\n", $strid, "\"${name}\";"),
         );
         push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_UBX_MSGINFO_CPP}},
@@ -656,8 +656,8 @@ do
         my $strid = "UBX_$entry->{class}_$entry->{name}_STRID";
         push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_UBX_MESSAGES}},
             ($entry->{msgid} =~ m{^UBX} ?
-                sprintf("static constexpr uint16_t    %-30s = %-24s  //!< $name message ID\n", $msgid, "$entry->{msgid};") :
-                sprintf("static constexpr uint16_t    %-30s = 0x%02x;                     //!< $name message ID\n", $msgid, $entry->{msgid})
+                sprintf("static constexpr uint8_t     %-30s = %-24s  //!< $name message ID\n", $msgid, "$entry->{msgid};") :
+                sprintf("static constexpr uint8_t     %-30s = 0x%02x;                     //!< $name message ID\n", $msgid, $entry->{msgid})
             ),
             sprintf("static constexpr const char* %-30s = %-25s //!< $name message name\n", "UBX_$entry->{class}_$entry->{name}_STRID", "\"${name}\";"),
         );
@@ -669,7 +669,6 @@ do
         "}};\n",
     );
 };
-
 
 ########################################################################################################################
 # Generate code for RTCM3

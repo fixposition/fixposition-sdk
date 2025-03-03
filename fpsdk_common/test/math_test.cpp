@@ -54,33 +54,68 @@ TEST(MathTest, RadToDeg)
 TEST(MathTest, RoundToFracDigits)
 {
     // clang-format off
-    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  0),  1.000000000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  1),  1.100000000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  2),  1.120000000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  3),  1.123000000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  4),  1.123500000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  5),  1.123460000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  6),  1.123457000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  7),  1.123456800000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  8),  1.123456790000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  9),  1.123456789000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239, 10),  1.123456789100, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239, 11),  1.123456789120, 1e-15);
+    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  0),  1.0           , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  1),  1.1           , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  2),  1.12          , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  3),  1.123         , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  4),  1.1235        , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  5),  1.12346       , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  6),  1.123457      , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  7),  1.1234568     , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  8),  1.12345679    , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239,  9),  1.123456789   , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239, 10),  1.1234567891  , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits( 1.1234567891239, 11),  1.12345678912 , 1e-15);
     EXPECT_NEAR(RoundToFracDigits( 1.1234567891239, 12),  1.123456789124, 1e-15);
 
-    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  0), -1.000000000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  1), -1.100000000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  2), -1.120000000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  3), -1.123000000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  4), -1.123500000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  5), -1.123460000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  6), -1.123457000000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  7), -1.123456800000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  8), -1.123456790000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  9), -1.123456789000, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239, 10), -1.123456789100, 1e-15);
-    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239, 11), -1.123456789120, 1e-15);
+    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  0), -1.0           , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  1), -1.1           , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  2), -1.12          , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  3), -1.123         , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  4), -1.1235        , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  5), -1.12346       , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  6), -1.123457      , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  7), -1.1234568     , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  8), -1.12345679    , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239,  9), -1.123456789   , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239, 10), -1.1234567891  , 1e-15);
+    EXPECT_NEAR(RoundToFracDigits(-1.1234567891239, 11), -1.12345678912 , 1e-15);
     EXPECT_NEAR(RoundToFracDigits(-1.1234567891239, 12), -1.123456789124, 1e-15);
+    // clang-format on
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(MathTest, ClipToFracDigits)
+{
+    // clang-format off
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239,  0),  1.0           , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239,  1),  1.1           , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239,  2),  1.12          , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239,  3),  1.123         , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239,  4),  1.1234        , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239,  5),  1.12345       , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239,  6),  1.123456      , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239,  7),  1.1234567     , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239,  8),  1.12345678    , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239,  9),  1.123456789   , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239, 10),  1.1234567891  , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239, 11),  1.12345678912 , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits( 1.1234567891239, 12),  1.123456789123, 1e-15);
+
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239,  0), -1.0           , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239,  1), -1.1           , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239,  2), -1.12          , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239,  3), -1.123         , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239,  4), -1.1234        , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239,  5), -1.12345       , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239,  6), -1.123456      , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239,  7), -1.1234567     , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239,  8), -1.12345678    , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239,  9), -1.123456789   , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239, 10), -1.1234567891  , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239, 11), -1.12345678912 , 1e-15);
+    EXPECT_NEAR(ClipToFracDigits(-1.1234567891239, 12), -1.123456789123, 1e-15);
     // clang-format on
 }
 

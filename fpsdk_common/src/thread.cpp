@@ -87,7 +87,7 @@ void Thread::Wakeup()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Thread::Sleep(const uint32_t millis)
+WaitRes Thread::Sleep(const uint32_t millis)
 {
     // Sleep, but wake up early in case we're notified
     return sem_.WaitFor(millis);
@@ -95,7 +95,7 @@ bool Thread::Sleep(const uint32_t millis)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Thread::SleepUntil(const uint32_t period, const uint32_t min_sleep)
+WaitRes Thread::SleepUntil(const uint32_t period, const uint32_t min_sleep)
 {
     return sem_.WaitUntil(period, min_sleep);
 }
@@ -169,18 +169,19 @@ void BinarySemaphore::Notify()
     cond_.notify_all();
 }
 
-bool BinarySemaphore::WaitFor(const uint32_t millis)
+WaitRes BinarySemaphore::WaitFor(const uint32_t millis)
 {
     std::unique_lock<std::mutex> lock(mutex_);
-    return cond_.wait_for(lock, std::chrono::milliseconds(millis)) != std::cv_status::timeout;
+    return cond_.wait_for(lock, std::chrono::milliseconds(millis)) ==  // clang-format off
+        std::cv_status::timeout ? WaitRes::TIMEOUT : WaitRes::WOKEN;  // clang-format on
 }
 
-bool BinarySemaphore::WaitUntil(const uint32_t period, const uint32_t min_sleep)
+WaitRes BinarySemaphore::WaitUntil(const uint32_t period, const uint32_t min_sleep)
 {
     using namespace std::chrono;
 
     if (period == 0) {
-        return false;
+        return WaitRes::TIMEOUT;
     }
 
     // Now, in [ms]
@@ -203,7 +204,7 @@ bool BinarySemaphore::WaitUntil(const uint32_t period, const uint32_t min_sleep)
 
     // Sleep, but wake up early in case we're notified
     std::unique_lock<std::mutex> lock(mutex_);
-    return cond_.wait_until(lock, wakeup_time) != std::cv_status::timeout;
+    return cond_.wait_until(lock, wakeup_time) == std::cv_status::timeout ? WaitRes::TIMEOUT : WaitRes::WOKEN;
 }
 
 /* ****************************************************************************************************************** */

@@ -77,12 +77,12 @@ bool SigIntHelper::WaitAbort(const uint32_t millis)
 {
     // Wait with timeout
     if (millis > 0) {
-        return g_sigint_sem.WaitFor(millis);
+        return g_sigint_sem.WaitFor(millis) == thread::WaitRes::WOKEN;
     }
     // Wait forever
     else {
         while (true) {
-            if (g_sigint_sem.WaitFor(1234)) {
+            if (g_sigint_sem.WaitFor(1234) == thread::WaitRes::WOKEN) {
                 return true;
             }
         }

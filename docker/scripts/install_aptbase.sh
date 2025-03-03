@@ -28,6 +28,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.bookworm    libtiff-dev
     noetic.humble.jazzy.bookworm    libyaml-cpp-dev
     noetic.humble.jazzy.bookworm    netbase
+    noetic.humble.jazzy.bookworm    nlohmann-json3-dev
     .......humble.jazzy.bookworm    pre-commit
     ..............jazzy.........    proj-data
     ..............jazzy.........    proj-bin

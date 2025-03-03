@@ -119,6 +119,20 @@ bool FpaGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaEpochStr(const FpaEpoch epoch)
+{
+    switch (epoch) {  // clang-format off
+        case FpaEpoch::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaEpoch::GNSS1:       return "GNSS1";
+        case FpaEpoch::GNSS2:       return "GNSS2";
+        case FpaEpoch::GNSS:        return "GNSS";
+        case FpaEpoch::FUSION:      return "FUSION";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 // Various helpers for the SetFromMsg() FP_A decoding functions
 
 // Debug prints, for development
