@@ -181,7 +181,8 @@ class Parser
      * @param[in]  data  Pointer to data
      * @param[in]  size  Size of data (should be <= #MAX_ADD_SIZE)
      *
-     * @returns true if data was added to the parser, false if there was not enough space left
+     * @returns true if data was added to the parser (or data was empty, that is, data != NULL and size = 0),
+     *          false if there was not enough space left
      */
     bool Add(const uint8_t* data, const std::size_t size);
 
@@ -190,7 +191,7 @@ class Parser
      *
      * @param[in]  data  data, can be empty (should be <= #MAX_ADD_SIZE)
      *
-     * @returns true if data was added to the parser, false if there was not enough space left
+     * @returns true if data was added to the parser (or data was empty), false if there was not enough space left
      */
     bool Add(const std::vector<uint8_t>& data);
 

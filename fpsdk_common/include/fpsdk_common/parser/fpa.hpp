@@ -397,6 +397,15 @@ enum class FpaEpoch : int
 };
 
 /**
+ * @brief Stringify epoch type
+ *
+ * @param[in]  epoch  The epoch type
+ *
+ * @returns the stringification of the epoch type ("FUSION", "GNSS1", etc.)
+ */
+const char* FpaEpochStr(const FpaEpoch epoch);
+
+/**
  * @brief FP_A GNSS antenna state
  */
 enum class FpaAntState : int

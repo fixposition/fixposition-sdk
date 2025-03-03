@@ -33,6 +33,7 @@ namespace fpsdk {
     - yaml-cpp         (≥ 0.6.2,  tested with 0.6.2, 0.7.0, 0.8.0)
     - zlib1g           (≥ 1.2.11, tested with 1.2.11, 1.2.13, 1.3)
     - OpenSSL (libssl) (≥ 1.1.x,  tested with 1.1.1, 3.0.2, 3.0.13, 3.0.15)
+    - nlohmann-json3   (≥ 3.7.3,  tested with 3.7.3, 3.11.3)
     - PROJ         (*) (≥ 9.4.x,  tested with 9.4.0, 9.4.1)
     - ROS1         (*) (Noetic), or
     - ROS2         (*) (Humble or Jazzy)

@@ -97,9 +97,11 @@ enum class Signal : uint8_t
     BDS_B1I,      //!< BeiDou B1I signal    (B1I D1 and B1I D2)
     BDS_B2A,      //!< BeiDou B2a signal    (B2 ap and B2 ad)
     BDS_B2I,      //!< BeiDou B2I signal    (B2I D1 and B2I D2)
+    BDS_B3I,      //!< BeiDou B3I signal    (B3I D1 and B3I D2)
     GAL_E1,       //!< Galileo E1 signal    (E1 C and E1 B)
     GAL_E5A,      //!< Galileo E5a signal   (E5 aI and E5 aQ)
     GAL_E5B,      //!< Galileo E5b signal   (E5 bI and E5 bQ)
+    GAL_E6,       //!< Galileo E6 signal    (E6A, E6B, adn E6C)
     GLO_L1OF,     //!< GLONASS L1 OF signal
     GLO_L2OF,     //!< GLONASS L2 OF signal
     GPS_L1CA,     //!< GPS L1 C/A signal
@@ -117,10 +119,11 @@ enum class Signal : uint8_t
  * @brief Stringify signal
  *
  * @param[in]  signal  The signal
+ * @param[in]  kurz   Get short string (for example, "L1CA" instead of "GPS_L1CA")
  *
  * @returns a concise and unique string for the signal, "?" for bad values
  */
-const char* SignalStr(const Signal signal);
+const char* SignalStr(const Signal signal, const bool kurz = false);
 
 /**
  * @brief Frequency bands
@@ -130,6 +133,7 @@ enum class Band : uint8_t
     UNKNOWN = 0,  //!< Unknown/unspecified band
     L1,           //!< L1 band (~1.5GHz)
     L2,           //!< L2 band (~1.2GHz)
+    E6,           //!< E6 band (~1.3GHz)
     L5,           //!< L5 band (~1.1GHz)
 };
 

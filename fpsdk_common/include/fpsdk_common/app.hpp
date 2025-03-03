@@ -80,7 +80,7 @@ class SigIntHelper
      *
      * @param[in]  millis  Wait at most this long [ms], 0 = forever
      *
-     * @returns true if the signal was raised, fals if timeout expired
+     * @returns true if the signal was raised, false if timeout expired
      */
     bool WaitAbort(const uint32_t millis = 0);
 };

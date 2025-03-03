@@ -41,6 +41,15 @@ namespace thread {
 /* ****************************************************************************************************************** */
 
 /**
+ * @brief Thread sleep result
+ */
+enum class WaitRes
+{
+    WOKEN,    //!< Thread was woken up (sleep interrupted), or semaphore was taken (wait interrupted)
+    TIMEOUT,  //!< Sleep or wait timeout has expired (no wakeup, no interrupt)
+};
+
+/**
  * @brief A binary semaphore, useful for thread synchronisation
  *
  * The default state is "taken", that is, WaitFor() and WaitUntil() block (sleep) until the semaphore is "given" using
@@ -61,9 +70,9 @@ class BinarySemaphore
      *
      * @param[in]  millis  Number of [ms] to sleep, must be > 0
      *
-     * @returns true if taken (within time limit), false if the timeout has expired
+     * @returns WaitRes::WOKEN if taken (within time limit), WaitRes::TIMEOUT if the timeout has expired
      */
-    bool WaitFor(const uint32_t millis);
+    WaitRes WaitFor(const uint32_t millis);
 
     /**
      * @brief Wait (take), with timout aligned to a period
@@ -79,9 +88,9 @@ class BinarySemaphore
      * @param[in]  period     Period duration [ms], must be > 0
      * @param[in]  min_sleep  Minimal sleep duration [ms], must be < period
      *
-     * @returns true if taken (within time limit), false if the timeout has expired or period was 0
+     * @returns WaitRes::WOKEN if taken (within time limit), WaitRes::TIMEOUT if the timeout has expired or period was 0
      */
-    bool WaitUntil(const uint32_t period, const uint32_t min_sleep = 0);
+    WaitRes WaitUntil(const uint32_t period, const uint32_t min_sleep = 0);
 
    private:
     std::mutex mutex_;              //!< Mutex
@@ -129,7 +138,7 @@ class BinarySemaphore
  *
  *     void Worker(void *) {
  *          while (!thread_.ShouldAbort()) {
- *              if (thread_.Sleep(1000)) {   // = BinarySemaphore::SleepFor(1000)
+ *              if (thread_.Sleep(1000) == WaitRes::WOKEN) {   // = BinarySemaphore::SleepFor(1000)
  *                  // We have been woken up
  *              } else {
  *                  // Timeout expired
@@ -220,11 +229,11 @@ class Thread
      *
      * @param[in]  millis  Number of [ms] to sleep
      *
-     * @returns true if the thread has been woken up, false if the timeout has expired
+     * @returns WaitRes::WOKEN if the thread has been woken up, WaitRes::TIMEOUT if the timeout has expired
      *
      * @note This method is used by the worker thread
      */
-    bool Sleep(const uint32_t millis);
+    WaitRes Sleep(const uint32_t millis);
 
     /**
      * @brief Sleep until next period start or woken up
@@ -234,11 +243,12 @@ class Thread
      * @param[in]  period     Period duration [ms], must be > 0
      * @param[in]  min_sleep  Minimal sleep duration [ms], must be < period
      *
-     * @returns true if the thread has been woken up, false if the timeout has expired or period was 0
+     * @returns WaitRes::WOKEN if the thread has been woken up, WaitRes::TIMEOUT if the timeout has expired or period
+     *          was 0
      *
      * @note This method is used by the worker thread
      */
-    bool SleepUntil(const uint32_t period, const uint32_t min_sleep = 0);
+    WaitRes SleepUntil(const uint32_t period, const uint32_t min_sleep = 0);
 
     /**
      * @brief Check if we should abort

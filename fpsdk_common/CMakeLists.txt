@@ -42,7 +42,10 @@ else()
 endif()
 find_package(ZLIB REQUIRED)
 find_package(Eigen3 REQUIRED)
-find_package (Threads REQUIRED)
+find_package(nlohmann_json REQUIRED)
+find_package(Threads REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_search_module(OPENSSL REQUIRED openssl)
 
 # PROJ is optional, unless explicitly requested with -DUSE_PROJ=ON
 if (USE_PROJ STREQUAL "ON")
@@ -64,12 +67,13 @@ include_directories(include
     ${Boost_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}
     ${EIGEN3_INCLUDE_DIR}
+    ${OPENSSL_INCLUDE_DIRS}
 )
 
 
 # SHARED LIBRARY =======================================================================================================
 
-file(GLOB CPP_FILES src/*.cpp src/parser/*.cpp)
+file(GLOB CPP_FILES src/*.cpp src/parser/*.cpp src/stream/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${CPP_FILES})
 
 if (FP_USE_PROJ)
@@ -88,10 +92,12 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         ${YAML_CPP_LIBRARIES}
         ${EIGEN3_LIBRARIES}
-    PRIVATE
+        PRIVATE
         ${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
         ${ZLIB_LIBRARIES}
+        ${OPENSSL_LIBRARIES}
         Threads::Threads
+        nlohmann_json::nlohmann_json
         $<$<BOOL:${FP_USE_PROJ}>:PROJ::proj>
 )
 

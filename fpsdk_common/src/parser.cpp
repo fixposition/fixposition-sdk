@@ -69,8 +69,11 @@ void Parser::Reset()
 
 bool Parser::Add(const uint8_t* data, const std::size_t size)
 {
-    if ((size == 0) || (data == NULL)) {
+    if (data == NULL) {
         return false;
+    }
+    if (size == 0) {
+        return true;
     }
 
     // Overflow (no space for data)
