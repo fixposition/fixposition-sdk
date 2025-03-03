@@ -57,7 +57,8 @@ void RedirectLoggingToRosConsole(const char* logger_name = "fpsdk_ros2");
 /**
  * @brief Convert to ROS time (atomic -> POSIX)
  *
- * @param[in]  time  The Time object (atomic)
+ * @param[in]  time        The Time object (atomic)
+ * @param[in]  clock_type  The clock to use (to assume)
  *
  * @returns the ROS time object (POSIX)
  */
