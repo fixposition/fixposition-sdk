@@ -192,9 +192,11 @@ class Thread
     /**
      * @brief Start the thread
      *
+     * @param[in]  try_catch  Run user-supplied thread function in a try ... catch block
+     *
      * @note This method is used by the main, controlling thread
      */
-    bool Start();
+    bool Start(const bool try_catch = true);
 
     /**
      * @brief Stop the thread
@@ -212,10 +214,12 @@ class Thread
 
     /**
      * @brief Check if thread is running
-     * @returns true if thread is running, false if it has stopped
+     *
      * @note This method is used by the main, controlling thread
+     *
+     * @returns true if thread is running, false if it has stopped
      */
-    bool IsRunning();
+    bool IsRunning() const;
 
     //@}
 
@@ -227,11 +231,11 @@ class Thread
     /**
      * @brief Sleep until timeout or woken up
      *
+     * @note This method is used by the worker thread
+     *
      * @param[in]  millis  Number of [ms] to sleep
      *
      * @returns WaitRes::WOKEN if the thread has been woken up, WaitRes::TIMEOUT if the timeout has expired
-     *
-     * @note This method is used by the worker thread
      */
     WaitRes Sleep(const uint32_t millis);
 
@@ -240,13 +244,13 @@ class Thread
      *
      * See BinarySemaphore::WaitUntil() for a detailed explanation.
      *
+     * @note This method is used by the worker thread
+     *
      * @param[in]  period     Period duration [ms], must be > 0
      * @param[in]  min_sleep  Minimal sleep duration [ms], must be < period
      *
      * @returns WaitRes::WOKEN if the thread has been woken up, WaitRes::TIMEOUT if the timeout has expired or period
      *          was 0
-     *
-     * @note This method is used by the worker thread
      */
     WaitRes SleepUntil(const uint32_t period, const uint32_t min_sleep = 0);
 
@@ -271,10 +275,10 @@ class Thread
     PrepFunc                     prep_;    //!< Thread prepare function
     CleanFunc                    clean_;   //!< Thread cleanup function
     std::atomic<bool>            abort_;   //!< Abort signal
-    bool                         running_; //!< Running flag
+    std::atomic<bool>            running_; //!< Running flag
     BinarySemaphore              sem_;     //!< Semaphore
     // clang-format on
-    void _Thread();  //!< Wrapper function to call the user thread function
+    void _Thread(const bool try_catch);  //!< Wrapper function to call the user thread function
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
