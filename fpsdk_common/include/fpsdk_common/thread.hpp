@@ -275,7 +275,7 @@ class Thread
     PrepFunc                     prep_;    //!< Thread prepare function
     CleanFunc                    clean_;   //!< Thread cleanup function
     std::atomic<bool>            abort_;   //!< Abort signal
-    bool                         running_; //!< Running flag
+    std::atomic<bool>            running_; //!< Running flag
     BinarySemaphore              sem_;     //!< Semaphore
     // clang-format on
     void _Thread(const bool try_catch);  //!< Wrapper function to call the user thread function
