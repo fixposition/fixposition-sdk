@@ -212,8 +212,10 @@ class Thread
 
     /**
      * @brief Check if thread is running
-     * @returns true if thread is running, false if it has stopped
+     *
      * @note This method is used by the main, controlling thread
+     *
+     * @returns true if thread is running, false if it has stopped
      */
     bool IsRunning();
 
@@ -227,11 +229,11 @@ class Thread
     /**
      * @brief Sleep until timeout or woken up
      *
+     * @note This method is used by the worker thread
+     *
      * @param[in]  millis  Number of [ms] to sleep
      *
      * @returns WaitRes::WOKEN if the thread has been woken up, WaitRes::TIMEOUT if the timeout has expired
-     *
-     * @note This method is used by the worker thread
      */
     WaitRes Sleep(const uint32_t millis);
 
@@ -240,13 +242,13 @@ class Thread
      *
      * See BinarySemaphore::WaitUntil() for a detailed explanation.
      *
+     * @note This method is used by the worker thread
+     *
      * @param[in]  period     Period duration [ms], must be > 0
      * @param[in]  min_sleep  Minimal sleep duration [ms], must be < period
      *
      * @returns WaitRes::WOKEN if the thread has been woken up, WaitRes::TIMEOUT if the timeout has expired or period
      *          was 0
-     *
-     * @note This method is used by the worker thread
      */
     WaitRes SleepUntil(const uint32_t period, const uint32_t min_sleep = 0);
 
