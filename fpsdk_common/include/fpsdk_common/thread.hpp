@@ -119,7 +119,7 @@ class BinarySemaphore
  *         }
  *
  *         int n = 0;
- *         while (thread_.IsRunning()) {
+ *         while (thread_.GetStatus() == Thread::Status::RUNNING) {
  *
  *             sleep(500);
  *             thread_.Wakeup()  // = BinarySemaphore::Notify()
@@ -136,14 +136,15 @@ class BinarySemaphore
  *
  *    private:
  *
- *     void Worker(void *) {
+ *     bool Worker(void *) {
  *          while (!thread_.ShouldAbort()) {
- *              if (thread_.Sleep(1000) == WaitRes::WOKEN) {   // = BinarySemaphore::SleepFor(1000)
+ *              if (thread_.Sleep(123) == WaitRes::WOKEN) {   // = BinarySemaphore::SleepFor(1000)
  *                  // We have been woken up
  *              } else {
  *                  // Timeout expired
  *              }
  *          }
+ *          return true;
  *     }
  *
  *    Thread thread_;
@@ -153,7 +154,7 @@ class BinarySemaphore
 class Thread
 {
    public:
-    using ThreadFunc = std::function<void(Thread*, void*)>;  //!< Thread main function
+    using ThreadFunc = std::function<bool(Thread*, void*)>;  //!< Thread main function
     using PrepFunc = std::function<void(void*)>;             //!< Thread prepare function
     using CleanFunc = std::function<void(void*)>;            //!< Thread cleanup function
 
@@ -180,58 +181,67 @@ class Thread
 
     /**
      * @brief Get thread name
+     *
      * @returns the thread name
      */
     const std::string& GetName();
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    //! \name Main (controlling) thread methods
-    //@{
+    /**
+     * @name Main (controlling) thread methods
+     * @{
+     */
 
     /**
      * @brief Start the thread
      *
      * @param[in]  try_catch  Run user-supplied thread function in a try ... catch block
      *
-     * @note This method is used by the main, controlling thread
+     * @returns true if the thread was started, false otherwise
      */
     bool Start(const bool try_catch = true);
 
     /**
      * @brief Stop the thread
      *
-     * @note This method is used by the main, controlling thread
+     * @returns true if the thread was stopped, false otherwise
      */
-    void Stop();
+    bool Stop();
 
     /**
      * @brief Wakup a sleeping thread
-     *
-     * @note This method is used by the main, controlling thread
      */
     void Wakeup();
 
     /**
-     * @brief Check if thread is running
-     *
-     * @note This method is used by the main, controlling thread
-     *
-     * @returns true if thread is running, false if it has stopped
+     * @brief Thread status
      */
-    bool IsRunning() const;
+    enum Status
+    {
+        STOPPED,  //!< Stopped (not Start()ed, or properly and happily Stop()ped)
+        RUNNING,  //!< Running (Start(ed) and happily running)
+        FAILED,   //!< Failed (was Start()ed, but crashed due to an exception)
+    };
+
+    /**
+     * @brief Check thread status
+     *
+     * @returns the thread status
+     */
+    Status GetStatus();
 
     //@}
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    //! \name Worker thread methods
-    //@{
+    /**
+     * @name Worker thread methods
+     * @{
+     */
 
     /**
      * @brief Sleep until timeout or woken up
-     *
-     * @note This method is used by the worker thread
      *
      * @param[in]  millis  Number of [ms] to sleep
      *
@@ -256,9 +266,6 @@ class Thread
 
     /**
      * @brief Check if we should abort
-     *
-     * @note This method is used by the worker thread, typically as the predicate in the main loop, e.g.
-     *       `while (!thread_.ShouldAbort()) { do_stuff(); }`
      */
     bool ShouldAbort();
 
@@ -268,15 +275,16 @@ class Thread
 
    private:
     // clang-format off
-    std::string                  name_;    //!< Thread name
-    std::unique_ptr<std::thread> thread_;  //!< Thread handle
-    ThreadFunc                   func_;    //!< Thread function
-    void                        *arg_;     //!< Thread function argument
-    PrepFunc                     prep_;    //!< Thread prepare function
-    CleanFunc                    clean_;   //!< Thread cleanup function
-    std::atomic<bool>            abort_;   //!< Abort signal
-    std::atomic<bool>            running_; //!< Running flag
-    BinarySemaphore              sem_;     //!< Semaphore
+    std::string                  name_;                       //!< Thread name
+    std::unique_ptr<std::thread> thread_;                     //!< Thread handle
+    ThreadFunc                   func_;                       //!< Thread function
+    void                        *arg_;                        //!< Thread function argument
+    PrepFunc                     prep_;                       //!< Thread prepare function
+    CleanFunc                    clean_;                      //!< Thread cleanup function
+    std::atomic<bool>            abort_   = false;            //!< Abort signal
+    std::atomic<bool>            started_ = false;            //!< Thread was started
+    std::atomic<Status>          status_  = Status::STOPPED;  //!< Thread status
+    BinarySemaphore              sem_;                        //!< Semaphore
     // clang-format on
     void _Thread(const bool try_catch);  //!< Wrapper function to call the user thread function
 };

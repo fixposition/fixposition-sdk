@@ -1,6 +1,6 @@
 /**:
     ros__parameters:
-        worker1_interval: 1.5
-        worker2_interval: 3.0
-        timer1_interval:  2.0
-        timer2_interval:  4.0
+        worker1_interval: 1.5  # must be a float!
+        worker2_interval: 3.0  # must be a float!
+        timer1_interval:  2.0  # must be a float!
+        timer2_interval:  4.0  # must be a float!

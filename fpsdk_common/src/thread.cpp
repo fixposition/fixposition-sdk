@@ -30,26 +30,32 @@ namespace thread {
 
 Thread::Thread(
     const std::string& name, Thread::ThreadFunc func, void* arg, Thread::PrepFunc prep, Thread::CleanFunc clean)
-    : name_{ name }, func_{ func }, arg_{ arg }, prep_{ prep }, clean_{ clean }, abort_{ false }, running_{ false }
+    : name_{ name }, func_{ func }, arg_{ arg }, prep_{ prep }, clean_{ clean }
 {
 }
 
 Thread::~Thread()
 {
-    Stop();
+    if (started_) {
+        Stop();
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 bool Thread::Start(const bool try_catch)
 {
+    if (started_) {
+        WARNING("%s thread already started", name_.c_str());
+        return false;
+    }
     bool res = true;
-    Stop();
     try {
         abort_ = false;
         thread_ = std::make_unique<std::thread>(&Thread::_Thread, this, try_catch);
         res = true;
-        running_ = true;
+        started_ = true;
+        status_ = Status::RUNNING;
     } catch (std::exception& e) {
         WARNING("%s thread fail: %s", name_.c_str(), e.what());
     }
@@ -58,24 +64,34 @@ bool Thread::Start(const bool try_catch)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Thread::Stop()
+bool Thread::Stop()
 {
-    if (thread_ && (std::this_thread::get_id() != thread_->get_id())) {
-        abort_ = true;
-        Wakeup();
-        thread_->join();
-        thread_.reset();
-        running_ = false;
-    } else if (thread_) {
-        WARNING("Thread::Stop() called from thread %lx", ThisThreadId());
+    if (!started_) {
+        WARNING("%s thread not started", name_.c_str());
+        return false;
     }
+
+    // Signal that we want to stop
+    abort_ = true;
+    Wakeup();
+    thread_->join();
+    thread_.reset();
+
+    // Crashed
+    if (status_ == Status::RUNNING) {
+        status_ = Status::FAILED;
+    }
+
+    started_ = false;
+
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Thread::IsRunning() const
+Thread::Status Thread::GetStatus()
 {
-    return running_;
+    return status_;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -128,21 +144,27 @@ void Thread::_Thread(const bool try_catch)
     // Run user thread function
     if (try_catch) {
         try {
-            func_(this, arg_);
+            if (func_(this, arg_)) {
+                status_ = Status::STOPPED;
+            } else {
+                status_ = Status::FAILED;
+            }
         } catch (const std::exception& e) {
             WARNING("%s thread unhandled exception: %s", name_.c_str(), e.what());
+            status_ = Status::FAILED;
         }
     } else {
-        func_(this, arg_);
+        if (func_(this, arg_)) {
+            status_ = Status::STOPPED;
+        } else {
+            status_ = Status::FAILED;
+        }
     }
 
     // Run optional user cleanup function
     if (clean_) {
         clean_(arg_);
     }
-
-    abort_ = true;
-    running_ = false;
 }
 
 /* ****************************************************************************************************************** */

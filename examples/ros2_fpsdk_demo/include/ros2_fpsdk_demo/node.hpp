@@ -61,8 +61,8 @@ class DemoNode
     rclcpp::TimerBase::SharedPtr timer2_;
     rclcpp::Publisher<std_msgs::msg::String>::SharedPtr publisher_;
 
-    void Worker1(void* arg);
-    void Worker2(void* arg);
+    bool Worker1();
+    bool Worker2();
     void Timer1();
     void Timer2();
 };

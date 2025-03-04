@@ -91,8 +91,8 @@ bool DemoParams::LoadFromRos(const std::string& ns)
 DemoNode::DemoNode(const DemoParams& params, ros::NodeHandle& nh) /* clang-format off */ :
     params_   { params },
     nh_       { nh },
-    worker1_  { "worker1", std::bind(&DemoNode::Worker1, this, std::placeholders::_1) },
-    worker2_  { "worker2", std::bind(&DemoNode::Worker2, this, std::placeholders::_1) }  // clang-format on
+    worker1_  { "worker1", std::bind(&DemoNode::Worker1, this) },
+    worker2_  { "worker2", std::bind(&DemoNode::Worker2, this) }  // clang-format on
 {
     ROS_DEBUG("DemoNode()");
 }
@@ -123,14 +123,18 @@ void DemoNode::Stop()
     ROS_DEBUG("DemoNode::Stop()");
     timer1_.stop();
     timer2_.stop();
-    worker1_.Stop();
-    worker2_.Stop();
+    if (worker1_.GetStatus() == worker1_.Status::RUNNING) {
+        worker1_.Stop();
+    }
+    if (worker2_.GetStatus() == worker2_.Status::RUNNING) {
+        worker2_.Stop();
+    }
     publisher_.shutdown();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DemoNode::Worker1(void* /*arg*/)
+bool DemoNode::Worker1()
 {
     ROS_DEBUG("DemoNode::Worker1() start 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     while (!worker1_.ShouldAbort()) {
@@ -141,11 +145,12 @@ void DemoNode::Worker1(void* /*arg*/)
         ros::Duration(params_.worker1_interval_).sleep();
     }
     ROS_DEBUG("DemoNode::Worker1() done");
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DemoNode::Worker2(void* /*arg*/)
+bool DemoNode::Worker2()
 {
     ROS_DEBUG("DemoNode::Worker2() start 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     while (!worker2_.ShouldAbort()) {
@@ -156,6 +161,7 @@ void DemoNode::Worker2(void* /*arg*/)
         ros::Duration(params_.worker2_interval_).sleep();
     }
     ROS_DEBUG("DemoNode::Worker() done");
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

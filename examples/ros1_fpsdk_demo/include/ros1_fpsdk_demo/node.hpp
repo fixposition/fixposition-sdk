@@ -58,8 +58,8 @@ class DemoNode
     ros::Timer timer2_;
     ros::Publisher publisher_;
 
-    void Worker1(void* arg);
-    void Worker2(void* arg);
+    bool Worker1();
+    bool Worker2();
     void Timer1(const ros::TimerEvent& event);
     void Timer2(const ros::TimerEvent& event);
 };
