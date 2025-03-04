@@ -100,8 +100,8 @@ DemoNode::DemoNode(std::shared_ptr<rclcpp::Node> nh, const DemoParams& params) /
     nh_       { nh },
     params_   { params },
     logger_   { nh_->get_logger() },
-    worker1_  { "worker1", std::bind(&DemoNode::Worker1, this, std::placeholders::_1) },
-    worker2_  { "worker2", std::bind(&DemoNode::Worker2, this, std::placeholders::_1) }  // clang-format on
+    worker1_  { "worker1", std::bind(&DemoNode::Worker1, this) },
+    worker2_  { "worker2", std::bind(&DemoNode::Worker2, this) }  // clang-format on
 {
     RCLCPP_DEBUG(logger_, "i am debug");
     RCLCPP_INFO(logger_, "i am info");
@@ -143,14 +143,18 @@ void DemoNode::Stop()
     RCLCPP_DEBUG(logger_, "DemoNode::Stop()");
     // timer1_.stop();
     // timer2_.stop();
-    worker1_.Stop();
-    worker2_.Stop();
+    if (worker1_.GetStatus() == worker1_.Status::RUNNING) {
+        worker1_.Stop();
+    }
+    if (worker2_.GetStatus() == worker2_.Status::RUNNING) {
+        worker2_.Stop();
+    }
     // publisher_.shutdown();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DemoNode::Worker1(void* /*arg*/)
+bool DemoNode::Worker1()
 {
     RCLCPP_DEBUG(logger_, "DemoNode::Worker1() start 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     while (!worker1_.ShouldAbort()) {
@@ -162,11 +166,12 @@ void DemoNode::Worker1(void* /*arg*/)
             rclcpp::Duration::from_seconds(params_.worker1_interval_).to_chrono<std::chrono::milliseconds>());
     }
     RCLCPP_DEBUG(logger_, "DemoNode::Worker1() done");
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void DemoNode::Worker2(void* /*arg*/)
+bool DemoNode::Worker2()
 {
     RCLCPP_DEBUG(logger_, "DemoNode::Worker2() start 0x%" PRIxMAX, fpsdk::common::thread::ThisThreadId());
     while (!worker2_.ShouldAbort()) {
@@ -178,6 +183,7 @@ void DemoNode::Worker2(void* /*arg*/)
             rclcpp::Duration::from_seconds(params_.worker2_interval_).to_chrono<std::chrono::milliseconds>());
     }
     RCLCPP_DEBUG(logger_, "DemoNode::Worker() done");
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
