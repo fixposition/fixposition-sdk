@@ -521,19 +521,18 @@ struct UtcTime
  * different GNSS times you will get negative week numbers (GPS, Galileo, BeiDou) or a negative offset "M4" value
  * (GLONASS) for timestamps before the beginning of respective timescales.
  *
- * \verbatim
- *                       ---1970-------------1980-------1996-1999----2006--------------------2106---//--fuuuuuture----> time
+ *                           ---1970-------------1980-------1996-1999----2006--------------------2106---//--fuuuuuture----> time
  *
- * 1970-01-01 00:00:00.0 UTC |<----- std::time_t ---------------------------------------------------//----->|
- *                           |<----- ros::Time/rclcpp::Time----------------------------------->|
- * 1980-01-06 00:00:00.0 UTC                  |<---- GPS time---------------------------------------//----->
- * 1996-01-01 00:00:00.0 UTC(SU)                         |<---- GLONASS time -----------------------//----->
- * 1999-08-21 23:59:47.0 UTC                                  |<---- Galileo time ------------------//----->
- * 2006-01-01 00:00:00.0 UTC                                          |<---- BeiDou time -----------//----->
+ *     1970-01-01 00:00:00.0 UTC |<----- std::time_t ---------------------------------------------------//----->|
+ *                               |<----- ros::Time/rclcpp::Time----------------------------------->|
+ *     1980-01-06 00:00:00.0 UTC                  |<---- GPS time---------------------------------------//----->
+ *     1996-01-01 00:00:00.0 UTC(SU)                         |<---- GLONASS time -----------------------//----->
+ *     1999-08-21 23:59:47.0 UTC                                  |<---- Galileo time ------------------//----->
+ *     2006-01-01 00:00:00.0 UTC                                          |<---- BeiDou time -----------//----->
  *
- *                           |<======================= Time object ===========================>|
- *                         T_MIN                                                             T_MAX
- *              1970-01-01 00:00:0.0 UTC                                   2106-02-06 06:28:16.0 UTC (approximately!)
+ *                               |<======================= Time object ===========================>|
+ *                             T_MIN                                                             T_MAX
+ *                  1970-01-01 00:00:0.0 UTC                                   2106-02-06 06:28:16.0 UTC (approximately!)
  *
  * Some notes:
  *
@@ -558,7 +557,6 @@ struct UtcTime
  * - https://www.eecis.udel.edu/~mills/leap.html
  * - https://manpages.org/adjtimex/2
  *
- * \endverbatim
  */
 // clang-format on
 class Time
@@ -568,7 +566,7 @@ class Time
     /**
      * @name Make Time object
      *
-     * @note These throw std::runtime_error if the time is out of range
+     * @note These throw std::runtime_error if the time (the arguments) is out of range
      * @{
      */
 
@@ -686,8 +684,6 @@ class Time
      * @name Set time
      *
      * These do not throw and instead return true/false.
-     *
-     * @note These throw std::runtime_error if the values are out of range.
      * @{
      */
 
@@ -994,7 +990,7 @@ class Time
     /**
      * @name Arithmetic operators
      *
-     * @note These throw std::runtime_error if the values are out of range.
+     * @note These throw std::runtime_error if the arguments (the time) are out of range.
      * @{
      */
 

@@ -317,8 +317,8 @@ void LoggingPrint(const LoggingLevel level, const char* fmt, ...) PRINTF_ATTR(2)
  * @param[in]  data    Pointer to start of data to dump
  * @param[in]  size    Size of data to dump
  * @param[in]  prefix  Prefix to add to each line, can be NULL to omit
- * @param[in]  ...     printf() style format string (for a first line to print), can be NULL to omit, and optional
- *                     arguments to the format string
+ * @param[in]  fmt     printf() style format string, can be NULL to omit
+ * @param[in]  ...     printf() style format arguments
  */
 void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const std::size_t size, const char* prefix,
     const char* fmt, ...) PRINTF_ATTR(5);
