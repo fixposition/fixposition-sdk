@@ -192,9 +192,11 @@ class Thread
     /**
      * @brief Start the thread
      *
+     * @param[in]  try_catch  Run user-supplied thread function in a try ... catch block
+     *
      * @note This method is used by the main, controlling thread
      */
-    bool Start();
+    bool Start(const bool try_catch = true);
 
     /**
      * @brief Stop the thread
@@ -217,7 +219,7 @@ class Thread
      *
      * @returns true if thread is running, false if it has stopped
      */
-    bool IsRunning();
+    bool IsRunning() const;
 
     //@}
 
@@ -276,7 +278,7 @@ class Thread
     bool                         running_; //!< Running flag
     BinarySemaphore              sem_;     //!< Semaphore
     // clang-format on
-    void _Thread();  //!< Wrapper function to call the user thread function
+    void _Thread(const bool try_catch);  //!< Wrapper function to call the user thread function
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

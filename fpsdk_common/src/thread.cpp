@@ -41,13 +41,13 @@ Thread::~Thread()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Thread::Start()
+bool Thread::Start(const bool try_catch)
 {
     bool res = true;
     Stop();
     try {
         abort_ = false;
-        thread_ = std::make_unique<std::thread>(&Thread::_Thread, this);
+        thread_ = std::make_unique<std::thread>(&Thread::_Thread, this, try_catch);
         res = true;
         running_ = true;
     } catch (std::exception& e) {
@@ -73,7 +73,7 @@ void Thread::Stop()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool Thread::IsRunning()
+bool Thread::IsRunning() const
 {
     return running_;
 }
@@ -116,7 +116,7 @@ const std::string& Thread::GetName()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void Thread::_Thread()
+void Thread::_Thread(const bool try_catch)
 {
     SetThreadName(name_);
 
@@ -126,10 +126,14 @@ void Thread::_Thread()
     }
 
     // Run user thread function
-    try {
+    if (try_catch) {
+        try {
+            func_(this, arg_);
+        } catch (const std::exception& e) {
+            WARNING("%s thread unhandled exception: %s", name_.c_str(), e.what());
+        }
+    } else {
         func_(this, arg_);
-    } catch (const std::exception& e) {
-        WARNING("%s thread unhandled exception: %s", name_.c_str(), e.what());
     }
 
     // Run optional user cleanup function
