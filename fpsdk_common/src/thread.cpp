@@ -89,7 +89,7 @@ bool Thread::Stop()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-Thread::Status Thread::GetStatus()
+Thread::Status Thread::GetStatus() const
 {
     return status_;
 }

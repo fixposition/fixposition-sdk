@@ -229,7 +229,7 @@ class Thread
      *
      * @returns the thread status
      */
-    Status GetStatus();
+    Status GetStatus() const;
 
     //@}
 
@@ -253,8 +253,6 @@ class Thread
      * @brief Sleep until next period start or woken up
      *
      * See BinarySemaphore::WaitUntil() for a detailed explanation.
-     *
-     * @note This method is used by the worker thread
      *
      * @param[in]  period     Period duration [ms], must be > 0
      * @param[in]  min_sleep  Minimal sleep duration [ms], must be < period
