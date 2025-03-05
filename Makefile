@@ -26,13 +26,13 @@ else ifeq ($(ROS_VERSION),2)
 endif
 
 # A unique ID for this exact config we're using
-configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING)" | md5sum | cut -d " " -f1)
+configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING) ${VERSION_STRING}" | md5sum | cut -d " " -f1)
 
 .PHONY: help
 help:
 	@echo "Usage:"
 	@echo
-	@echo "    make <target> [INSTALL_PREFIX=...] [BUILD_TYPE=Debug|Release] [BUILD_TESTING=|ON|OFF] [VERBOSE=1]"
+	@echo "    make <target> [INSTALL_PREFIX=...] [BUILD_TYPE=Debug|Release] [BUILD_TESTING=|ON|OFF] [VERSION_STRING=x.x.x-gggggggg] [VERBOSE=1]"
 	@echo
 	@echo "Where possible <target>s are:"
 	@echo
@@ -116,6 +116,9 @@ ifneq ($(ROS_PACKAGE_PATH),)
 endif
 ifneq ($(BUILD_TESTING),)
   CMAKE_ARGS += -DBUILD_TESTING=$(BUILD_TESTING)
+endif
+ifneq ($(VERSION_STRING),)
+  CMAKE_ARGS += -DVERSION_STRING=$(VERSION_STRING)
 endif
 
 MAKEFLAGS = --no-print-directory
