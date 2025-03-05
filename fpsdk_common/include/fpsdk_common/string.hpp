@@ -337,6 +337,23 @@ bool StrToValue(const std::string& str, float& value);
 bool StrToValue(const std::string& str, double& value);
 
 /**
+ * @brief Convert string to value (bool)
+ *
+ * The following strings (case insensitive) are considered true resp. false:
+ * - true: "true", "yes", "1"
+ * - false: "false", "no", "0"
+ *
+ * @note White-space or other spurious characters in the string result in a failure (return false). The output value is
+ *       only modified on success.
+ *
+ * @param[in]  str    The string, anything %f understands (but not infinite or NaN)
+ * @param[out] value  The value
+ *
+ * @returns true if the string could be converted, false otherwise
+ */
+bool StrToValue(const std::string& str, bool& value);
+
+/**
  * @brief Convert string to all upper case
  *
  * @param[in]  str  The string
