@@ -54,13 +54,20 @@ endif()
 # https://github.com/andrew-hardin/cmake-git-version-tracking/tree/master, but they're quite involved, too.
 
 if (NOT FP_VERSION_IS_SET) # Do this only once. E.g. when running the top-level CMakeLists.txt
-    # - Version supplied on cmake command line (-DFP_VERSION_NUMBER=x.x.x)
-    if (FP_VERSION_NUMBER)
-        set(FP_VERSION_STRING "${FP_VERSION_NUMBER}")
+    # - Version supplied on cmake command line (-DVERSION_STRING=x.x.x, -DVERSION_STRING=x.x.x-gggggg)
+    if (VERSION_STRING)
+        string(REGEX MATCH "^([0-9]+\.[0-9]+\.[0-9]+).*$" _ ${VERSION_STRING})
+        if ("${CMAKE_MATCH_1}" STREQUAL "")
+            message(FATAL_ERROR "fpsdk: bad VERSION_STRING=${VERSION_STRING}, must be x.x.x or x.x.x-ggggggg")
+        endif()
+        set(FP_VERSION_NUMBER "${CMAKE_MATCH_1}")
+        set(FP_VERSION_STRING "${VERSION_STRING}")
     # - Version supplied from VERSION file (release tarballs), but ignore file if fpsdk is a git repo
-    elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../VERSION AND NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../.git)
-        file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/../../VERSION FP_VERSION_NUMBER LIMIT_COUNT 1)
-        set(FP_VERSION_STRING "${FP_VERSION_NUMBER}")
+    elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../FP_VERSION_NUMBER AND NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../.git)
+        file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/../../FP_VERSION_NUMBER FP_VERSION_NUMBER LIMIT_COUNT 1)
+        set(FP_VERSION_NUMBER "${FP_VERSION_NUMBER}")
+        file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/../../FP_VERSION_STRING FP_VERSION_STRING LIMIT_COUNT 1)
+        set(FP_VERSION_STRING "${FP_VERSION_STRING}")
     # - Version from git
     else()
         execute_process(
@@ -96,6 +103,7 @@ if (NOT FP_VERSION_IS_SET) # Do this only once. E.g. when running the top-level 
     add_compile_definitions(FP_VERSION_STRING="${FP_VERSION_STRING}")
 
     # write version info to file
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/FP_VERSION_NUMBER "${FP_VERSION_NUMBER}")
     file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/FP_VERSION_STRING "${FP_VERSION_STRING}")
 
     set(FP_VERSION_IS_SET ON)
