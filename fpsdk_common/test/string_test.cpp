@@ -579,6 +579,46 @@ TEST(StringTest, StrToValue_double)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+TEST(StringTest, StrToValue_bool)
+{
+    // clang-format off
+    const bool egal = false;
+    const struct { const char* str; bool value; bool res; } tests[] = {
+        { "1",      true,  true },
+        { "true",   true,  true },
+        { "yes",    true,  true },
+        { "True",   true,  true },
+        { "Yes",    true,  true },
+        { "TrUe",   true,  true },
+        { "YeS",    true,  true },
+
+        { "0",      false, true },
+        { "false",  false, true },
+        { "no",     false, true },
+        { "False",  false, true },
+        { "No",     false, true },
+        { "FaLsE",  false, true },
+        { "nO",     false, true },
+        { "false",  false, true },
+
+        { "nope",   egal,  false },
+        { "yes!",   egal,  false },
+        { "00",     egal,  false },
+        { "11",     egal,  false },
+    };  // clang-format on
+
+    for (auto& test : tests) {
+        bool value = false;
+        const bool res = StrToValue(test.str, value);
+        EXPECT_EQ(res, test.res);
+        if (res) {
+            EXPECT_DOUBLE_EQ(value, test.value);
+        }
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(StringTest, StrToUpper)
 {
     EXPECT_EQ(StrToUpper("foobar 123#%^"), std::string("FOOBAR 123#%^"));

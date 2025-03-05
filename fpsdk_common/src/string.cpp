@@ -429,6 +429,19 @@ bool StrToValue(const std::string& str, double& value)
     }
 }
 
+bool StrToValue(const std::string& str, bool& value)
+{
+    const auto lc = StrToLower(str);
+    if ((lc == "1") || (lc == "true") || (lc == "yes")) {
+        value = true;
+        return true;
+    } else if ((lc == "0") || (lc == "false") || (lc == "no")) {
+        value = false;
+        return true;
+    }
+    return false;
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 std::string StrToUpper(const std::string& str)
