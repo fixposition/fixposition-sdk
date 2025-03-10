@@ -338,6 +338,81 @@ bool UbxMakeMessage(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+#define UbxSvStr(gnssId, svId) fpsdk::common::gnss::SatStr(fpsdk::common::gnss::UbxGnssIdSvIdToSat(gnssId, svId))
+
+static const char* UbxSigStr(const uint8_t gnssId, const uint8_t sigId)
+{
+    switch (gnssId) {
+            // clang-format off
+        case UBX_GNSSID_GPS:
+            switch (sigId) {
+                case UBX_SIGID_GPS_L1CA: return "L1CA";
+                case UBX_SIGID_GPS_L2CL: return "L2CL";
+                case UBX_SIGID_GPS_L2CM: return "L2CM";
+                case UBX_SIGID_GPS_L5I:  return "L5I";
+                case UBX_SIGID_GPS_L5Q:  return "L5Q";
+            }
+            break;
+        case UBX_GNSSID_SBAS:
+            switch (sigId) {
+                case UBX_SIGID_SBAS_L1CA: return "L1CA";
+            }
+            break;
+        case UBX_GNSSID_GAL:
+            switch (sigId) {
+                case UBX_SIGID_GAL_E1C:  return "E1C";
+                case UBX_SIGID_GAL_E1B:  return "E1B";
+                case UBX_SIGID_GAL_E5BI: return "E5BI";
+                case UBX_SIGID_GAL_E5BQ: return "E5BQ";
+                case UBX_SIGID_GAL_E5AI: return "E5AI";
+                case UBX_SIGID_GAL_E5AQ: return "E5AQ";
+                case UBX_SIGID_GAL_E6B:  return "E6B";
+                case UBX_SIGID_GAL_E6C:  return "E6C";
+                case UBX_SIGID_GAL_E6A:  return "E6A";
+
+            }
+            break;
+        case UBX_GNSSID_BDS:
+            switch (sigId) {
+                case UBX_SIGID_BDS_B1ID1: return "B1ID1";
+                case UBX_SIGID_BDS_B1ID2: return "B1ID2";
+                case UBX_SIGID_BDS_B2ID1: return "B2ID1";
+                case UBX_SIGID_BDS_B2ID2: return "B2ID2";
+                case UBX_SIGID_BDS_B1CP:  return "B1CP";
+                case UBX_SIGID_BDS_B1CD:  return "B1CD";
+                case UBX_SIGID_BDS_B2AP:  return "B2AP";
+                case UBX_SIGID_BDS_B2AD:  return "B2AD";
+                case UBX_SIGID_BDS_B3ID1: return "B3ID1";
+                case UBX_SIGID_BDS_B3ID2: return "B3ID2";
+            }
+            break;
+        case UBX_GNSSID_QZSS:
+            switch (sigId) {
+                case UBX_SIGID_QZSS_L1CA: return "L1CA";
+                case UBX_SIGID_QZSS_L1S:  return "L1S";
+                case UBX_SIGID_QZSS_L2CM: return "L2CM";
+                case UBX_SIGID_QZSS_L2CL: return "L2CL";
+                case UBX_SIGID_QZSS_L5I:  return "L5I";
+                case UBX_SIGID_QZSS_L5Q:  return "L5Q";
+            }
+            break;
+        case UBX_GNSSID_GLO:
+            switch (sigId) {
+                case UBX_SIGID_GLO_L1OF: return "L1OF";
+                case UBX_SIGID_GLO_L2OF: return "L2OF";
+            }
+            break;
+        case UBX_GNSSID_NAVIC:
+            switch (sigId) {
+                case UBX_SIGID_NAVIC_L5A: return "L5A";
+            }
+            break;
+    }
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
     if ((UBX_RXM_SFRBX_VERSION_GET(msg) != UBX_RXM_SFRBX_V2_VERSION) || (msg_size < UBX_RXM_SFRBX_V2_MIN_SIZE)) {
@@ -347,15 +422,17 @@ std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* m
     // Meta information
     UBX_RXM_SFRBX_V2_GROUP0 head;
     std::memcpy(&head, &msg[UBX_HEAD_SIZE], sizeof(head));
+    int len = std::snprintf(info, size, "%-4s %-5s ", UbxSvStr(head.gnssId, head.svId), UbxSigStr(head.gnssId, head.sigId));
 
     // Raw sub_frame words
     uint32_t dwrd[30];
     std::size_t n_dwrd = (msg_size - UBX_FRAME_SIZE - (sizeof(head)) / sizeof(*dwrd));
     if (n_dwrd == 0) {
-        return std::snprintf(info, size, "empty");
+        return std::snprintf(&info[len], size - len, "empty");
     }
     std::memcpy(
         &dwrd[0], &msg[UBX_HEAD_SIZE + sizeof(head)], std::min(sizeof(dwrd) / sizeof(*dwrd), n_dwrd) * sizeof(*dwrd));
+    len += std::snprintf(&info[len], size - len, "%2" PRIuMAX " ", n_dwrd);
 
     // Sources:
     // - ZED-F9P Integration Manual, 3.13.1 Broadcast navigation data
@@ -368,42 +445,42 @@ std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* m
         // const uint16_t towCount = (info.dwrd[1] & 0x3fffe000) >> 13;
         const uint8_t sub_frame = (dwrd[1] & 0x00000700) >> 8;
         if ((1 <= sub_frame) && (sub_frame <= 3)) {
-            return std::snprintf(info, size, "GPS LNAV eph %u/3", sub_frame);
+            return len + std::snprintf(&info[len], size, "GPS LNAV eph %u/3", sub_frame);
         } else {
             const uint8_t data_id = (dwrd[2] & 0x30000000) >> 28;
             if (data_id == 1) {
                 const uint8_t sv_id = (dwrd[2] & 0x0fc00000) >> 22;  // 20.3.3.5.1, 20.3.3.5.1.1 (Table 20-V)
                 // sub frame 5 pages 1-24, sub_frame 4 pages 2-5 and 7-10
                 if ((1 <= sv_id) && (sv_id <= 32)) {
-                    return std::snprintf(info, size, "GPS LNAV alm %0u", sv_id);
+                    return len + std::snprintf(&info[len], size - len, "GPS LNAV alm %0u", sv_id);
                 }
                 // sub frame 5, page 25
                 else if (sv_id == 51) {
-                    return std::snprintf(info, size, "GPS LNAV toa, health");  // health 1-24, ALM reference time
+                    return len + std::snprintf(&info[len], size - len, "GPS LNAV toa, health");  // health 1-24, ALM reference time
                 }
                 // sub frame 4, page 13
                 else if (sv_id == 52) {
-                    return std::snprintf(info, size, "GPS LNAV NCMT");
+                    return len + std::snprintf(&info[len], size - len, "GPS LNAV NCMT");
                 }
                 // sub frame 4, page 17
                 else if (sv_id == 55) {
-                    return std::snprintf(info, size, "GPS LNAV special");
+                    return len + std::snprintf(&info[len], size - len, "GPS LNAV special");
                 }
                 // sub frame 4, page 18
                 else if (sv_id == 56) {
-                    return std::snprintf(info, size, "GPS LNAV iono, UTC");
+                    return len + std::snprintf(&info[len], size - len, "GPS LNAV iono, UTC");
                 }
                 // sub frame 4, page 25
                 else if (sv_id == 63) {
-                    return std::snprintf(info, size, "GPS LNAV AS, health");  // anti-spoofing flags, health 25-32
+                    return len + std::snprintf(&info[len], size - len, "GPS LNAV AS, health");  // anti-spoofing flags, health 25-32
                 }
                 // reserved
                 else {
-                    return std::snprintf(info, size, "GPS LNAV reserved");
+                    return len + std::snprintf(&info[len], size - len, "GPS LNAV reserved");
                 }
             }
         }
-        return std::snprintf(info, size, "bad GPS sf?");  // Hmm.. should we check the parity first?
+        return len + std::snprintf(&info[len], size - len, "bad GPS sf?");  // Hmm.. should we check the parity first?
     }
 
     // GPS CNAV message (12 seconds, 300 bits)
@@ -422,10 +499,11 @@ std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* m
             /* 35 */ "clock, GGTO", /* 36 */ "clock, text", /* 37 */ "clock, mid alm", NULL, NULL,
             /* 40 */ "integrity",
         };  // clang-format on
-        return std::snprintf(info, size, "GPS CNAV msg %u %s", msg_type_id,
-            (msg_type_id < (sizeof(msg_type_descs) / sizeof(*msg_type_descs))) && msg_type_descs[msg_type_id]
-                ? msg_type_descs[msg_type_id]
-                : "");
+        return len +
+               std::snprintf(&info[len], size - len, "GPS CNAV msg %u %s", msg_type_id,
+                   (msg_type_id < (sizeof(msg_type_descs) / sizeof(*msg_type_descs))) && msg_type_descs[msg_type_id]
+                       ? msg_type_descs[msg_type_id]
+                       : "");
     }
 
     // GLONASS strings
@@ -435,12 +513,13 @@ std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* m
         const uint16_t super_frame = (dwrd[3] & 0xffff0000) >> 16;
         const uint16_t frame       = (dwrd[3] & 0x0000000f);
         // clang-format on
-        return std::snprintf(info, size, "GLO sup %u fr %u str %u", super_frame, frame, string);
+        return len + std::snprintf(&info[len], size - len, "GLO sup %u fr %u str %u", super_frame, frame, string);
     }
 
     // Galileo I/NAV
     else if ((head.gnssId == UBX_GNSSID_GAL) &&
-             ((head.sigId == UBX_SIGID_GAL_E1B) || (head.sigId == UBX_SIGID_GAL_E5BI))) {
+             ((head.sigId == UBX_SIGID_GAL_E1B) || (head.sigId == UBX_SIGID_GAL_E5BI) ||
+                 (head.sigId == UBX_SIGID_GAL_E5BQ))) {
         // FIXME: to check.. the u-blox manual is weird here
         // clang-format off
         const char    even_odd_1  = (dwrd[0] & 0x80000000) == 0x80000000 ? 'o' : 'e'; // even (0) or odd (1)
@@ -450,12 +529,19 @@ std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* m
         const char    page_type_2 = (dwrd[4] & 0x40000000) == 0x40000000 ? 'a' : 'n'; // nominal (0) or alert (1)
         const uint8_t word_type_2 = (dwrd[4] & 0x3f000000) >> 24;
         // clang-format on
-        return std::snprintf(info, size, "GAL I/NAV %c %c %u, %c %c %u", page_type_1, even_odd_1, word_type_1,
-            page_type_2, even_odd_2, word_type_2);
+        return len + std::snprintf(&info[len], size - len, "GAL I/NAV %c %c %u, %c %c %u", page_type_1, even_odd_1,
+                         word_type_1, page_type_2, even_odd_2, word_type_2);
+    }
+    // Galileo F/NAV
+    else if ((head.gnssId == UBX_GNSSID_GAL) &&
+             ((head.sigId == UBX_SIGID_GAL_E5AI) || (head.sigId == UBX_SIGID_GAL_E5AQ))) {
+        const uint8_t pageType = (dwrd[0] & 0xfc000000) >> 26;
+        return len + std::snprintf(&info[len], size - len, "GAL F/NAV %u", pageType);
     }
 
     // unknown
-    return std::snprintf(info, size, "unknown (n=%d, 0x%08x, 0x%08x, ...)", (int)n_dwrd, dwrd[0], dwrd[1]);
+    return len +
+           std::snprintf(&info[len], size - len, "unknown (n=%d, 0x%08x, 0x%08x, ...)", (int)n_dwrd, dwrd[0], dwrd[1]);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -516,8 +602,6 @@ std::size_t UbxMonVerToVerStr(char* str, const std::size_t size, const uint8_t* 
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-
-#define UbxSvStr(gnssId, svId) fpsdk::common::gnss::SatStr(fpsdk::common::gnss::UbxGnssIdSvIdToSat(gnssId, svId))
 
 static std::size_t StrUbxNav(
     char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size, const std::size_t iTowOffs)
@@ -792,10 +876,8 @@ static std::size_t StrUbxRxmSfrbx(char* info, const std::size_t size, const uint
     if (size < 10) {
         return 0;
     }
-    const int nDwrd = (msg_size - UBX_FRAME_SIZE - sizeof(UBX_RXM_SFRBX_V2_GROUP0)) / sizeof(uint32_t);
-    const std::size_t len =
-        std::snprintf(info, size, "%s %d: ", UbxSvStr(msg[UBX_HEAD_SIZE], msg[UBX_HEAD_SIZE + 1]), nDwrd);
-    return len + UbxRxmSfrbxInfo(&info[len], size - len, msg, msg_size);
+
+    return UbxRxmSfrbxInfo(info, size, msg, msg_size);
 }
 
 static std::size_t StrUbxCfgValset(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
