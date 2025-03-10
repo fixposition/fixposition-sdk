@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: Common types
+ * @brief Fixposition SDK: Common types and type helpers
  */
 
 /* LIBC/STL */

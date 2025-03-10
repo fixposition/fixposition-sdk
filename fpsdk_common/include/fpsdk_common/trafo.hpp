@@ -27,6 +27,7 @@
 #include "fpsdk_common/ext/eigen_geometry.hpp"
 
 /* PACKAGE */
+#include "types.hpp"
 
 namespace fpsdk {
 namespace common {
@@ -212,7 +213,7 @@ Eigen::Vector3d LlhRadToDeg(const Eigen::Vector3d& llh_rad);
 /**
  * @brief "Universal" coordinate transformer, backed by PROJ
  */
-class Transformer
+class Transformer : private types::NoCopyNoMove
 {
    public:
     /**
@@ -270,12 +271,6 @@ class Transformer
      * @returns true on success, false otherwise
      */
     bool Transform(const Eigen::Vector4d& in, Eigen::Vector4d& out, const bool inv = false);
-
-    // No copy, no move
-    Transformer& operator=(const Transformer&) = delete;
-    Transformer(const Transformer&) = delete;
-    Transformer(Transformer&&) = delete;
-    Transformer& operator=(Transformer&&) = delete;
 
    private:
     const std::string name_;  //!< Name, for debugging

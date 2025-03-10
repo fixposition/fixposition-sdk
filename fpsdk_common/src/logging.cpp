@@ -140,7 +140,7 @@ static void LoggingDefaultFn(const LoggingParams& params, const LoggingLevel lev
                 case LoggingLevel::ERROR:   prefix = "\033[1;31m"; suffix = "\033[m\n"; break;
                 case LoggingLevel::FATAL:   prefix = "\033[1;35m"; suffix = "\033[m\n"; break;
             }  // clang-format on
-            tscol = "\033[0;30m";
+            tscol = "\033[0;33m";
             break;
         case LoggingColour::JOURNAL:
             switch (params.level_) {  // clang-format off

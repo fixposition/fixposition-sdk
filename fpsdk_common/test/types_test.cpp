@@ -12,6 +12,8 @@
  */
 
 /* LIBC/STL */
+#include <array>
+#include <cstdint>
 
 /* EXTERNAL */
 #include <gtest/gtest.h>
@@ -22,11 +24,61 @@
 
 namespace {
 /* ****************************************************************************************************************** */
-using namespace fpsdk::common::app;
+using namespace fpsdk::common::types;
 
-TEST(AppTest, Dummy)
+TEST(TypesTest, NumOf)
 {
-    EXPECT_TRUE(true);
+    std::array<int, 5> a5;
+    EXPECT_EQ(a5.size(), 5);
+    EXPECT_EQ(std::tuple_size<decltype(a5)>{}, 5);
+    EXPECT_EQ(NumOf(a5), 5);
+
+    using ArrayFour = std::array<int, 4>;
+    EXPECT_EQ(std::tuple_size<ArrayFour>{}, 4);
+    EXPECT_EQ(NumOf<ArrayFour>(), 4);
+
+    int i6[6];
+    EXPECT_EQ(sizeof(i6) / sizeof(i6[0]), 6);
+    EXPECT_EQ(NumOf(i6), 6);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(TypesTest, NoCopyNoMove)
+{
+    class DoesItCompile : private NoCopyNoMove
+    {
+       public:
+        DoesItCompile()
+        {
+            a = 3;
+        }
+        int a = 5;
+    };
+    DoesItCompile doesitcompile;
+    EXPECT_EQ(doesitcompile.a, 3);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(TypesTest, Macros)
+{
+    int u1 = 5;
+    UNUSED(u1);
+
+#define FIFTEEN 15
+    const std::string fifteen = STRINGIFY(FIFTEEN);
+    EXPECT_EQ(fifteen, "15");
+#define ZEROZERO 00
+    const int fifteenhundred = CONCAT(FIFTEEN, ZEROZERO);
+    EXPECT_EQ(fifteenhundred, 1500);
+
+    struct SomeStruct
+    {
+        int a;
+        uint8_t b[3];
+    };
+    EXPECT_EQ(SIZEOF_FIELD(SomeStruct, b), 3 * sizeof(uint8_t));
 }
 
 /* ****************************************************************************************************************** */

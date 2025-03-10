@@ -109,7 +109,7 @@ class BinarySemaphore
  *    public:
  *
  *        Example() :
- *            thread_ { "worker", std::bind(&Example::Worker, this, std::placeholders::_1) }
+ *            thread_ { "worker", std::bind(&Example::Worker, this) }
  *        { }
  *
  *    void Run() {
