@@ -28,7 +28,7 @@ using namespace fpsdk::common::types;
 
 TEST(TypesTest, NumOf)
 {
-    std::array<int, 5> a5;
+    std::array<int, 5> a5 = { { 1, 2, 3, 4, 5 } };
     EXPECT_EQ(a5.size(), 5);
     EXPECT_EQ(std::tuple_size<decltype(a5)>{}, 5);
     EXPECT_EQ(NumOf(a5), 5);
@@ -37,7 +37,7 @@ TEST(TypesTest, NumOf)
     EXPECT_EQ(std::tuple_size<ArrayFour>{}, 4);
     EXPECT_EQ(NumOf<ArrayFour>(), 4);
 
-    int i6[6];
+    int i6[6] = { 1, 2, 3, 4, 5, 6 };
     EXPECT_EQ(sizeof(i6) / sizeof(i6[0]), 6);
     EXPECT_EQ(NumOf(i6), 6);
 }
