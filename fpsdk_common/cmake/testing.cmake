@@ -1,3 +1,9 @@
+# Override the standard BUILD_TESTING variable
+if (DEFINED FPSDK_BUILD_TESTING)
+    message(STATUS "fpsdk: FPSDK_BUILD_TESTING=${FPSDK_BUILD_TESTING}")
+    set(BUILD_TESTING ${FPSDK_BUILD_TESTING})
+endif()
+
 # User requested to build testing (-DBUILD_TESTING=ON), abort if no suitable version available
 if (BUILD_TESTING STREQUAL "ON")
 
@@ -74,7 +80,7 @@ if(BUILD_TESTING)
 
 else()
 
-macro(add_gtest)
+    macro(add_gtest)
         # nothing...
     endmacro()
 
