@@ -135,6 +135,8 @@ namespace fpsdk {
         - Force ROS1 package path: `-DROS_PACKAGE_PATH=/path/to/ros` (default: auto-detect)
         - Explicitly enable or disable testing: `-DBUILD_TESTING=OFF` or `-DBUILD_TESTING=ON`.
           The default is to automatically enable testing if a suitable GTest library is found.
+          Note that the instead of the standard BUILD_TESTING variable the variable `FPSDK_BUILD_TESTING=...`
+          can be used.
         - Explicitly enable or disable use of the PROJ library: `-DUSE_PROJ=ON` or `-DUSE_PROJ=OFF`.
           The default is to automatically use the PROJ library if a suitable version is found
 
