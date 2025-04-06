@@ -32,7 +32,6 @@ namespace fpltool {
  *
  * @param[in]  opts  Options
  */
-
 bool DoDump(const FplToolOptions& opts);
 
 /* ****************************************************************************************************************** */

@@ -98,9 +98,11 @@ class TicToc
     /**
      * @brief Get elapsed wallclock time
      *
+     * @param[in]  reset  Reset (restart) measurements
+     *
      * @returns the elapsed time since object constructed resp. last call to Tic()
      */
-    Duration Toc() const;
+    Duration Toc(const bool reset = false);
 
    private:
     std::chrono::time_point<std::chrono::steady_clock> t0_;

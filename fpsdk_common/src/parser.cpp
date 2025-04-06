@@ -260,11 +260,8 @@ void Parser::EmitMessage(ParserMsg& msg, const std::size_t size, const Protocol 
     if (size_ > 0) {
         std::memmove(&buf_[0], &buf_[size], size_);
     }
-    stats_.s_msgs_ += size;
-    stats_.n_msgs_++;
     // Make message
     msg.proto_ = proto;
-    msg.seq_ = stats_.n_msgs_;
     msg.info_.clear();
     char sname[MAX_NAME_SIZE];
     const uint8_t* mdata = msg.data_.data();
@@ -273,50 +270,37 @@ void Parser::EmitMessage(ParserMsg& msg, const std::size_t size, const Protocol 
         case Protocol::FP_A:  // Handled in case Protocol::NMEA below                                                   // GCOVR_EXCL_LINE
             break;                                                                                                      // GCOVR_EXCL_LINE
         case Protocol::FP_B:
-            stats_.n_fpb_++;
-            stats_.s_fpb_ += size;
             msg.name_ = (FpbGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "FP_B-?");                     // GCOVR_EXCL_LINE
             break;
         case Protocol::NMEA: // resp. FP_A
             if ((msg.data_[1] == 'F') && (msg.data_[2] == 'P') && (msg.data_[3] == ',')) {
                 msg.name_ =  (FpaGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "FP_A-?");                // GCOVR_EXCL_LINE
                 msg.proto_ = Protocol::FP_A;
-                stats_.n_fpa_++;
-                stats_.s_fpa_ += size;
             } else {
                 msg.name_ = (NmeaGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "NMEA-?-?");              // GCOVR_EXCL_LINE
-                stats_.n_nmea_++;
-                stats_.s_nmea_ += size;
             }
             break;
         case Protocol::UBX:
-            stats_.n_ubx_++;
-            stats_.s_ubx_ += size;
             msg.name_ = (UbxGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "UBX-?-?");                    // GCOVR_EXCL_LINE
             break;
         case Protocol::RTCM3:
-            stats_.n_rtcm3_++;
-            stats_.s_rtcm3_ += size;
             msg.name_ = (Rtcm3GetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "RTCM3-?");                  // GCOVR_EXCL_LINE
             break;
         case Protocol::UNI_B:
-            stats_.n_unib_++;
-            stats_.s_unib_ += size;
             msg.name_ = (UnibGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "UNI_B-?");                   // GCOVR_EXCL_LINE
             break;
         case Protocol::NOV_B:
-            stats_.n_novb_++;
-            stats_.s_novb_ += size;
             msg.name_ = (NovbGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "NOV_B-?");                   // GCOVR_EXCL_LINE
             break;
         case Protocol::SPARTN:
-            stats_.n_spartn_++;
-            stats_.s_spartn_ += size;
             msg.name_ = (SpartnGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "SPARTN-?-?");              // GCOVR_EXCL_LINE
             break;
         case Protocol::OTHER:  // Handled in EmitGarbage()                                                              // GCOVR_EXCL_LINE
             break;                                                                                                      // GCOVR_EXCL_LINE
     }  // clang-format on
+
+    stats_.Update(msg);
+    msg.seq_ = stats_.n_msgs_;
     PARSER_TRACE("process: emit %s, size %d", msg.name_.c_str(), (int)msg.data_.size());
 }
 
@@ -335,16 +319,14 @@ void Parser::EmitGarbage(ParserMsg& msg)
     // PARSER_TRACE("garb move 0 <- %d (%d) ", size, size_);
     std::memmove(&buf_[0], &buf_[size], size_);
     offs_ = 0;
-    stats_.n_msgs_++;
-    stats_.s_msgs_ += size;
-    stats_.n_other_++;
-    stats_.s_other_ += size;
 
     // Make message
     msg.proto_ = Protocol::OTHER;
-    msg.seq_ = stats_.n_msgs_;
     msg.name_ = PROTOCOL_NAME_OTHER;
     msg.info_.clear();
+    stats_.Update(msg);
+    msg.seq_ = stats_.n_msgs_;
+
     PARSER_TRACE("process: emit %s, size %d ", msg.name_.c_str(), (int)msg.data_.size());
 }
 

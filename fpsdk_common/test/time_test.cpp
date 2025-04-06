@@ -123,6 +123,32 @@ TEST(TimeTest, RosTime)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+TEST(TimeTest, TicToc)
+{
+    const double s = 0.1;
+    const Duration dur = Duration::FromSec(s);
+    TicToc tt1;
+    TicToc tt2;
+
+    dur.Sleep();
+
+    const auto d1a = tt1.Toc();
+    const auto d2a = tt2.Toc(true);
+    // DEBUG("d1a=%.3f d2a=%.3f", d1a.GetSec(), d2a.GetSec());
+    EXPECT_NEAR(d1a.GetSec(), s, 5e-3);
+    EXPECT_NEAR(d2a.GetSec(), s, 5e-3);
+
+    dur.Sleep();
+
+    const auto d1b = tt1.Toc();
+    const auto d2b = tt2.Toc(true);
+    // DEBUG("d1b=%.3f d2b=%.3f", d1b.GetSec(), d2b.GetSec());
+    EXPECT_NEAR(d1b.GetSec(), 2.0 * s, 5e-3);
+    EXPECT_NEAR(d2b.GetSec(), s, 5e-3);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(TimeTest, Duration_FromSecNSec)
 {
     const Duration dur1;  // 0.0
@@ -452,7 +478,7 @@ TEST(TimeTest, Duration_Sleep)
     const Duration dur = Duration::FromSec(0.1);
     const double s0 = GetSecs();
     const uint64_t t0 = GetMillis();
-    const TicToc tt;
+    TicToc tt;
     dur.Sleep();
     const double s1 = GetSecs();
     const uint64_t t1 = GetMillis();

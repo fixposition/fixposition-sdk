@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: fpltool args (command line arguments)
+ * @brief Fixposition SDK: fpltool options (command line arguments)
  */
 #ifndef __FPSDK_APPS_FPLTOOL_FPLTOOL_ARGS_HPP__
 #define __FPSDK_APPS_FPLTOOL_FPLTOOL_ARGS_HPP__

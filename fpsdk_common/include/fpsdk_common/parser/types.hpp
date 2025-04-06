@@ -135,6 +135,13 @@ struct ParserStats {
     uint64_t s_spartn_ = 0;  //!< Total size of Protocol::SPARTN messages
     uint64_t n_other_ = 0;   //!< Number of Protocol::OTHER messages
     uint64_t s_other_ = 0;   //!< Total size of Protocol::OTHER messages
+
+    /**
+     * @brief Update stats
+     *
+     * @param[in]  msg  Message to account for
+     */
+    void Update(const ParserMsg& msg);
 };
 
 /**

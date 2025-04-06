@@ -68,12 +68,15 @@ void TicToc::Tic()
     t0_ = std::chrono::steady_clock::now();
 }
 
-Duration TicToc::Toc() const
+Duration TicToc::Toc(const bool reset)
 {
     const std::chrono::time_point<std::chrono::steady_clock> t1 = std::chrono::steady_clock::now();
     const std::uint64_t nsec = std::chrono::duration_cast<std::chrono::nanoseconds>(t1 - t0_).count();
     Duration dur;
     dur.SetNSec(nsec);
+    if (reset) {
+        t0_ = t1;
+    }
     return dur;
 }
 
