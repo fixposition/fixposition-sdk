@@ -275,7 +275,7 @@ bool ProgramOptions::LoadFromArgv(int argc, char** argv)
     }
 
     if (!ok) {
-        WARNING("Try '%s -h'...", app_name_.c_str());
+        WARNING("Bad options. Try '%s -h'...", app_name_.c_str());
     }
 
     return ok;

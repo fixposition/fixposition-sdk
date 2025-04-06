@@ -67,6 +67,7 @@ Protocol StrProtocol(const char* name)
     }  // clang-format on
     return Protocol::OTHER;
 }
+
 // ---------------------------------------------------------------------------------------------------------------------
 
 void ParserMsg::MakeInfo() const
@@ -121,6 +122,53 @@ void ParserMsg::MakeInfo() const
             break;
         }
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void ParserStats::Update(const ParserMsg& msg)
+{
+    const auto size = msg.data_.size();
+    switch (msg.proto_) {
+        case Protocol::FP_A:
+            n_fpa_++;
+            s_fpa_ += size;
+            break;
+        case Protocol::FP_B:
+            n_fpb_++;
+            s_fpb_ += size;
+            break;
+        case Protocol::NMEA:
+            n_nmea_++;
+            s_nmea_ += size;
+            break;
+        case Protocol::UBX:
+            n_ubx_++;
+            s_ubx_ += size;
+            break;
+        case Protocol::RTCM3:
+            n_rtcm3_++;
+            s_rtcm3_ += size;
+            break;
+        case Protocol::UNI_B:
+            n_unib_++;
+            s_unib_ += size;
+            break;
+        case Protocol::NOV_B:
+            n_novb_++;
+            s_novb_ += size;
+            break;
+        case Protocol::SPARTN:
+            n_spartn_++;
+            s_spartn_ += size;
+            break;
+        case Protocol::OTHER:
+            n_other_++;
+            s_other_ += size;
+            break;
+    }
+    n_msgs_++;
+    s_msgs_ += size;
 }
 
 /* ****************************************************************************************************************** */

@@ -71,6 +71,12 @@ bool Thread::Stop()
         return false;
     }
 
+    // Thread cannot stop itself (using this method)
+    if (std::this_thread::get_id() == thread_->get_id()) {
+        WARNING("Thread::Stop() called from thread");
+        return false;
+    }
+
     // Signal that we want to stop
     abort_ = true;
     Wakeup();

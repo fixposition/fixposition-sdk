@@ -123,7 +123,7 @@ const char* LoggingTimestampsStr(const LoggingTimestamps timestamps)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static void LoggingDefaultFn(const LoggingParams& params, const LoggingLevel level, const char* str)
+static void LoggingDefaultWriteFn(const LoggingParams& params, const LoggingLevel level, const char* str)
 {
     const char* prefix = NULL;
     const char* suffix = NULL;
@@ -140,7 +140,7 @@ static void LoggingDefaultFn(const LoggingParams& params, const LoggingLevel lev
                 case LoggingLevel::ERROR:   prefix = "\033[1;31m"; suffix = "\033[m\n"; break;
                 case LoggingLevel::FATAL:   prefix = "\033[1;35m"; suffix = "\033[m\n"; break;
             }  // clang-format on
-            tscol = "\033[0;33m";
+            tscol = "\033[0;34m";
             break;
         case LoggingColour::JOURNAL:
             switch (params.level_) {  // clang-format off
@@ -210,7 +210,7 @@ LoggingParams::LoggingParams(
     level_        { level },
     colour_       { colour },
     timestamps_   { timestamps },
-    fn_           { LoggingDefaultFn }  // clang-format on
+    fn_           { LoggingDefaultWriteFn }  // clang-format on
 {
     // User wants us to decide...
     if (colour_ == LoggingColour::AUTO) {
@@ -240,7 +240,7 @@ LoggingParams LoggingGetParams()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-void LoggingPrint(const LoggingLevel level, const char* fmt, ...)
+void LoggingPrint(const LoggingLevel level, const std::size_t repeat, const char* fmt, ...)
 {
     if (!LoggingIsLevel(level)) {
         return;
@@ -249,8 +249,15 @@ void LoggingPrint(const LoggingLevel level, const char* fmt, ...)
 
     va_list args;
     va_start(args, fmt);
-    std::vsnprintf(g_line, sizeof(g_line), fmt, args);
+    int len = std::vsnprintf(g_line, sizeof(g_line), fmt, args);
     va_end(args);
+
+    if (repeat > 1) {
+        if (len > (int)(sizeof(g_line) - 10)) {
+            len -= 10;
+        }
+        std::snprintf(&g_line[len], sizeof(g_line) - len, " [%" PRIuMAX "x]", repeat);
+    }
 
     g_params.fn_(g_params, level, g_line);
 }

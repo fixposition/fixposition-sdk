@@ -123,33 +123,33 @@ namespace logging {
 /**
  * @brief Print a fatal message                                                                                         @hideinitializer
  */
-#define FATAL_S(expr)   _FPSDK_LOGGING_IF(FATAL,   std::stringstream ss; ss << expr; FATAL("%s", ss.str().c_str()))
+#define FATAL_S(expr)   _FPSDK_LOGGING_STR(FATAL,   expr)
 /**
  * @brief Print a error message                                                                                         @hideinitializer
  */
-#define ERROR_S(expr)   _FPSDK_LOGGING_IF(ERROR,   std::stringstream ss; ss << expr; ERROR("%s", ss.str().c_str()))
+#define ERROR_S(expr)   _FPSDK_LOGGING_STR(ERROR,   expr)
 /**
  * @brief Print a warning message                                                                                       @hideinitializer
  */
-#define WARNING_S(expr) _FPSDK_LOGGING_IF(WARNING, std::stringstream ss; ss << expr; WARNING("%s", ss.str().c_str()))
+#define WARNING_S(expr) _FPSDK_LOGGING_STR(WARNING, expr)
 /**
  * @brief Print a debug message                                                                                         @hideinitializer
  */
-#define DEBUG_S(expr)   _FPSDK_LOGGING_IF(DEBUG,   std::stringstream ss; ss << expr; DEBUG("%s", ss.str().c_str()))
+#define DEBUG_S(expr)   _FPSDK_LOGGING_STR(DEBUG,   expr)
 /**
  * @brief Print a notice message                                                                                        @hideinitializer
  */
-#define NOTICE_S(expr)  _FPSDK_LOGGING_IF(NOTIC,   std::stringstream ss; ss << expr; NOTICE("%s", ss.str().c_str()))
+#define NOTICE_S(expr)  _FPSDK_LOGGING_STR(NOTIC,   expr)
 /**
  * @brief Print a info message                                                                                          @hideinitializer
  */
-#define INFO_S(expr)    _FPSDK_LOGGING_IF(INFO,    std::stringstream ss; ss << expr; INFO("%s", ss.str().c_str()))
+#define INFO_S(expr)    _FPSDK_LOGGING_STR(INFO,    expr)
 
 #if !defined(NDEBUG) || defined(_DOXYGEN_) // Only for non-Release builds
 /**
  * @brief Print a trace message (only debug builds, compiled out in release builds)                                     @hideinitializer
  */
-#  define TRACE_S(expr) _FPSDK_LOGGING_IF(TRACE,   std::stringstream ss; ss << expr; TRACE("%s", ss.str().c_str()))
+#  define TRACE_S(expr) _FPSDK_LOGGING_STR(TRACE,   std::stringstream ss; ss << expr; TRACE("%s", ss.str().c_str()))
 #else
 #  define TRACE_S(...) /* nothing */
 #endif
@@ -250,9 +250,9 @@ const char* LoggingTimestampsStr(const LoggingTimestamps timestamps);
 struct LoggingParams;  // forward declaration
 
 /**
- * @brief Custom logging print function signature
+ * @brief Custom logging write (to screen, file, ...) function signature
  */
-using LoggingPrintFunc = void (*)(const LoggingParams&, const LoggingLevel, const char*);
+using LoggingWriteFunc = void (*)(const LoggingParams&, const LoggingLevel, const char*);
 
 /**
  * @brief Logging parameters
@@ -271,7 +271,7 @@ struct LoggingParams
     LoggingLevel level_;            //!< Logging level
     LoggingColour colour_;          //!< Level colours
     LoggingTimestamps timestamps_;  //!< Timestamps
-    LoggingPrintFunc fn_;           //!< Custom logging print function
+    LoggingWriteFunc fn_;           //!< Custom logging write function
 };
 
 /**
@@ -303,10 +303,11 @@ LoggingParams LoggingGetParams();
  *
  * @note Use INFO(), DEBUG(), WARNING() etc. instead of this function.
  *
- * @param[in]  level  Logging level
- * @param[in]  fmt    printf() style format string and optional arguments to the format string
+ * @param[in]  level   Logging level
+ * @param[in]  repeat  Number of times the message was repeated (for DEBUG_THR() etc.)
+ * @param[in]  fmt     printf() style format string and optional arguments to the format string
  */
-void LoggingPrint(const LoggingLevel level, const char* fmt, ...) PRINTF_ATTR(2);
+void LoggingPrint(const LoggingLevel level, const std::size_t repeat, const char* fmt, ...) PRINTF_ATTR(3);
 
 /**
  * @brief Print a hexdump
@@ -326,22 +327,29 @@ void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const std::si
 // Helper macros
 #ifndef _DOXYGEN_
 #  define _FPSDK_LOGGING_LOG(_level_, ...) \
-      ::fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::_level_, __VA_ARGS__)
+      ::fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::_level_, 0, __VA_ARGS__)
 #  define _FPSDK_LOGGING_HEX(_level_, _data_, _size_, _prefix_, ...) \
       ::fpsdk::common::logging::LoggingHexdump(                      \
           fpsdk::common::logging::LoggingLevel::_level_, _data_, _size_, _prefix_, __VA_ARGS__)
-#  define _FPSDK_LOGGING_IF(_level_, _code_)                                                         \
+#  define _FPSDK_LOGGING_STR(_level_, _expr_)                                                        \
       if (::fpsdk::common::logging::LoggingIsLevel(fpsdk::common::logging::LoggingLevel::_level_)) { \
-          _code_;                                                                                    \
+          std::stringstream ss;                                                                      \
+          ss << _expr_;                                                                              \
+          ::fpsdk::common::logging::LoggingPrint(                                                    \
+              fpsdk::common::logging::LoggingLevel::_level_, 0, "%s", ss.str().c_str());             \
       }
-#  define _FPSDK_LOGGING_THR(_level_, _millis_, ...)                 \
-      do {                                                           \
-          static uint32_t __last = 0;                                \
-          const uint32_t __now = ::fpsdk::common::time::GetMillis(); \
-          if ((__now - __last) >= (_millis_)) {                      \
-              __last = __now;                                        \
-              _level_(__VA_ARGS__);                                  \
-          }                                                          \
+#  define _FPSDK_LOGGING_THR(_level_, _millis_, ...)                                     \
+      do {                                                                               \
+          static uint32_t __last = 0;                                                    \
+          static uint32_t __repeat = 0;                                                  \
+          const uint32_t __now = ::fpsdk::common::time::GetMillis();                     \
+          __repeat++;                                                                    \
+          if ((__now - __last) >= (_millis_)) {                                          \
+              __last = __now;                                                            \
+              ::fpsdk::common::logging::LoggingPrint(                                    \
+                  fpsdk::common::logging::LoggingLevel::_level_, __repeat, __VA_ARGS__); \
+              __repeat = 0;                                                              \
+          }                                                                              \
       } while (0)
 #endif  // _DOXYGEN_
 
