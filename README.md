@@ -4,7 +4,8 @@
 
 The Fixposition SDK consists of C++ libraries and apps for using Fixposition products with Linux.
 
-The documentation is in Doxygen. Start here: [fpsdk_doc/fpsdk_doc.hpp](fpsdk_doc/fpsdk_doc.hpp).
+The documentation (dependencies, build instructions, API, etc.) is in Doxygen. Start here:
+[fpsdk_doc/fpsdk_doc.hpp](fpsdk_doc/fpsdk_doc.hpp).
 
 A generated HTML version of the main branch can be found here:
 https://fixposition.github.io/fixposition-sdk/fixposition-sdk-docs
