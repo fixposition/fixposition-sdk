@@ -5,9 +5,9 @@ An example ROS1 package with a node demonstrating the use of the Fixpositon SDK.
 ---
 ## Dependencies
 
-- [Fixposition SDK dependencies](../fpsdk_doc/README.md#dependencies)
-- [fpsdk_common](../fpsdk_common/README.md)
-- [fpsdk_ros1](../fpsdk_ros1/README.md)
+- [Fixposition SDK dependencies](../../README.md)
+- [fpsdk_common](../../fpsdk_common/README.md)
+- [fpsdk_ros1](../../fpsdk_ros1/README.md)
 
 
 ---
