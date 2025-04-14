@@ -53,7 +53,10 @@ enum class WaitRes
  * @brief A binary semaphore, useful for thread synchronisation
  *
  * The default state is "taken", that is, WaitFor() and WaitUntil() block (sleep) until the semaphore is "given" using
- * Notify(). See the example in the Thread class documentation below.
+ * Notify(). See the example in the Thread class documentation below. Note that this semaphore can be "taken"
+ * immediately if it has been "given" before. That is, if Notify() was called before WaitFor() or WaitUntil(), the
+ * latter return immediately on the first call. Subsequent calls wait until the next Notify(), be it before or while
+ * waiting.
  */
 class BinarySemaphore
 {
@@ -93,8 +96,9 @@ class BinarySemaphore
     WaitRes WaitUntil(const uint32_t period, const uint32_t min_sleep = 0);
 
    private:
-    std::mutex mutex_;              //!< Mutex
-    std::condition_variable cond_;  //!< Condition
+    std::mutex mutex_;                //!< Mutex
+    std::condition_variable cond_;    //!< Condition
+    std::atomic<bool> pend_ = false;  //!< Pending
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
