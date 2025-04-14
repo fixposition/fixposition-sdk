@@ -198,14 +198,23 @@ BinarySemaphore::BinarySemaphore()
 
 void BinarySemaphore::Notify()
 {
+    pend_ = true;
     cond_.notify_all();
 }
 
 WaitRes BinarySemaphore::WaitFor(const uint32_t millis)
 {
+    if (pend_) {
+        pend_ = false;
+        return WaitRes::WOKEN;
+    }
     std::unique_lock<std::mutex> lock(mutex_);
-    return cond_.wait_for(lock, std::chrono::milliseconds(millis)) ==  // clang-format off
-        std::cv_status::timeout ? WaitRes::TIMEOUT : WaitRes::WOKEN;  // clang-format on
+    if (cond_.wait_for(lock, std::chrono::milliseconds(millis)) == std::cv_status::timeout) {
+        return WaitRes::TIMEOUT;
+    } else {
+        pend_ = false;
+        return WaitRes::WOKEN;
+    }
 }
 
 WaitRes BinarySemaphore::WaitUntil(const uint32_t period, const uint32_t min_sleep)
