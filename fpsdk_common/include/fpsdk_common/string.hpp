@@ -177,6 +177,16 @@ std::vector<std::string> HexDump(const std::vector<uint8_t> data);
 std::vector<std::string> HexDump(const uint8_t* data, const std::size_t size);
 
 /**
+ * @brief Format value to "bits string"
+ *
+ * @param[in]  value  The value
+ * @param[in]  size   The number of bits to format (clamped to 1-64)
+ *
+ * @returns a "0b...." string with the bits formatted as '0' and '1'
+ */
+std::string StrFormatBits(const uint64_t value, const std::size_t size = 64);
+
+/**
  * @brief Check if one string starts with another string
  *
  * @param[in]  str     String to check
@@ -225,7 +235,7 @@ bool StrToValue(const std::string& str, int8_t& value);
  * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
  *       target value type result in a failure (return false). The output value is only modified on success.
  *
- * @param[in]  str    The string, decimal, hex ("0x...") or octal ("0..."), valid range: 0..UINT8_MAX
+ * @param[in]  str    The string, decimal, hex ("0x..."), bin ("0b...") or octal ("0..."), valid range: 0..UINT8_MAX
  * @param[out] value  The value
  *
  * @returns true if the string could be converted, false otherwise
@@ -251,7 +261,7 @@ bool StrToValue(const std::string& str, int16_t& value);
  * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
  *       target value type result in a failure (return false). The output value is only modified on success.
  *
- * @param[in]  str    The string, decimal, hex ("0x...") or octal ("0..."), valid range: 0..UINT16_MAX
+ * @param[in]  str    The string, decimal, hex ("0x..."), bin ("0b...")  or octal ("0..."), valid range: 0..UINT16_MAX
  * @param[out] value  The value
  *
  * @returns true if the string could be converted, false otherwise
@@ -277,7 +287,7 @@ bool StrToValue(const std::string& str, int32_t& value);
  * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
  *       target value type result in a failure (return false). The output value is only modified on success.
  *
- * @param[in]  str    The string, decimal, hex ("0x...") or octal ("0..."), valid range: 0..UINT32_MAX
+ * @param[in]  str    The string, decimal, hex ("0x..."), bin ("0b...")  or octal ("0..."), valid range: 0..UINT32_MAX
  * @param[out] value  The value
  *
  * @returns true if the string could be converted, false otherwise
@@ -303,7 +313,7 @@ bool StrToValue(const std::string& str, int64_t& value);
  * @note White-space or other spurious characters in the string or valid number strings that are out of range of the
  *       target value type result in a failure (return false). The output value is only modified on success.
  *
- * @param[in]  str    The string, decimal, hex ("0x...") or octal ("0..."), valid range: 0..(INT64_MAX-1)
+ * @param[in]  str    The string, decimal, hex ("0x..."), bin ("0b...") or octal ("0..."), valid range: 0..(INT64_MAX-1)
  * @param[out] value  The value
  *
  * @returns true if the string could be converted, false otherwise

@@ -13,6 +13,7 @@
 
 /* LIBC/STL */
 #include <exception>
+#include <thread>
 
 /* EXTERNAL */
 #include <gtest/gtest.h>
@@ -128,6 +129,27 @@ TEST(ThreadTest, CrashedThread)
     EXPECT_EQ(thread.GetStatus(), Thread::Status::FAILED);
     EXPECT_TRUE(thread.Stop());
     EXPECT_EQ(thread.GetStatus(), Thread::Status::FAILED);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ThreadTest, BinarySemaphore)
+{
+    BinarySemaphore sem;
+
+    EXPECT_EQ(sem.WaitFor(10), WaitRes::TIMEOUT);
+    EXPECT_NE(sem.WaitFor(10), WaitRes::WOKEN);
+
+    sem.Notify();
+    EXPECT_EQ(sem.WaitFor(10), WaitRes::WOKEN);
+    EXPECT_EQ(sem.WaitFor(10), WaitRes::TIMEOUT);
+
+    std::thread thread([&sem] {
+        fpsdk::common::time::Duration::FromSec(0.05).Sleep();
+        sem.Notify();
+    });
+    EXPECT_EQ(sem.WaitFor(100), WaitRes::WOKEN);
+    thread.join();
 }
 
 /* ****************************************************************************************************************** */
