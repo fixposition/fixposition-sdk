@@ -174,6 +174,47 @@ TEST(StringTest, HexDump)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+TEST(StringTest, StrFormatBits)
+{
+    // clang-format off
+    EXPECT_EQ(StrFormatBits(0x000000ff, 32), "0b0000" "0000" "0000" "0000" "0000" "0000" "1111" "1111");
+    EXPECT_EQ(StrFormatBits(0xff000000, 32), "0b1111" "1111" "0000" "0000" "0000" "0000" "0000" "0000");
+    EXPECT_EQ(StrFormatBits(0x55555555, 32), "0b0101" "0101" "0101" "0101" "0101" "0101" "0101" "0101");
+    EXPECT_EQ(StrFormatBits(0xaaaaaaaa, 32), "0b1010" "1010" "1010" "1010" "1010" "1010" "1010" "1010");
+    EXPECT_EQ(StrFormatBits(0xc6318420, 32), "0b1100" "0110" "0011" "0001" "1000" "0100" "0010" "0000");
+
+    EXPECT_EQ(StrFormatBits(0xffffffffffffffff,  0), "0b1");
+    EXPECT_EQ(StrFormatBits(0xffffffffffffffff,  1), "0b1");
+    EXPECT_EQ(StrFormatBits(0xffffffffffffffff,  2), "0b11");
+    EXPECT_EQ(StrFormatBits(0xffffffffffffffff,  3), "0b111");
+    EXPECT_EQ(StrFormatBits(0xffffffffffffffff,  4), "0b1111");
+    EXPECT_EQ(StrFormatBits(0xffffffffffffffff,  5), "0b11111");
+
+    EXPECT_EQ(StrFormatBits(0xffffffffffffffff, 60), "0b111111111111111111111111111111111111111111111111111111111111");
+    EXPECT_EQ(StrFormatBits(0xffffffffffffffff, 61), "0b1111111111111111111111111111111111111111111111111111111111111");
+    EXPECT_EQ(StrFormatBits(0xffffffffffffffff, 62), "0b11111111111111111111111111111111111111111111111111111111111111");
+    EXPECT_EQ(StrFormatBits(0xffffffffffffffff, 63), "0b111111111111111111111111111111111111111111111111111111111111111");
+    EXPECT_EQ(StrFormatBits(0xffffffffffffffff, 64), "0b1111111111111111111111111111111111111111111111111111111111111111");
+    EXPECT_EQ(StrFormatBits(0xffffffffffffffff, 65), "0b1111111111111111111111111111111111111111111111111111111111111111");
+
+    EXPECT_EQ(StrFormatBits(0x0000000000000001,  0), "0b1");
+    EXPECT_EQ(StrFormatBits(0x0000000000000001,  1), "0b1");
+    EXPECT_EQ(StrFormatBits(0x0000000000000001,  2), "0b01");
+    EXPECT_EQ(StrFormatBits(0x0000000000000001,  3), "0b001");
+    EXPECT_EQ(StrFormatBits(0x0000000000000001,  4), "0b0001");
+    EXPECT_EQ(StrFormatBits(0x0000000000000001,  5), "0b00001");
+
+    EXPECT_EQ(StrFormatBits(0x0000000000000001, 60), "0b000000000000000000000000000000000000000000000000000000000001");
+    EXPECT_EQ(StrFormatBits(0x0000000000000001, 61), "0b0000000000000000000000000000000000000000000000000000000000001");
+    EXPECT_EQ(StrFormatBits(0x0000000000000001, 62), "0b00000000000000000000000000000000000000000000000000000000000001");
+    EXPECT_EQ(StrFormatBits(0x0000000000000001, 63), "0b000000000000000000000000000000000000000000000000000000000000001");
+    EXPECT_EQ(StrFormatBits(0x0000000000000001, 64), "0b0000000000000000000000000000000000000000000000000000000000000001");
+    EXPECT_EQ(StrFormatBits(0x0000000000000001, 65), "0b0000000000000000000000000000000000000000000000000000000000000001");
+    // clang-format on
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 TEST(StringTest, StrStartsWith)
 {
     EXPECT_EQ(StrStartsWith("", ""), false);
@@ -277,6 +318,14 @@ TEST(StringTest, StrToValue_uint8)
         { "",               0, false }, // Empty string
         { "  ",             0, false }, // No value
         { "abc",            0, false }, // Not a value
+        { "0b11111111",  0xff, true  }, // Binary
+        { "0b10101010",  0xaa, true  }, // Binary
+        {     "0b1010",  0x0a, true  }, // Binary
+        {        "0b1",  0x01, true  }, // Binary
+        {        "0b0",  0x00, true  }, // Binary
+        { "0b11112111",  0xff, false }, // Binary
+        { "0b111111111", 0xff, false }, // Binary
+        { "0b",          0x00, false }, // Binary
     };  // clang-format on
 
     const uint8_t canary = 0x55;

@@ -24,6 +24,7 @@
 /* EXTERNAL */
 
 /* PACKAGE */
+#include "fpsdk_common/math.hpp"
 #include "fpsdk_common/string.hpp"
 
 namespace fpsdk {
@@ -225,6 +226,23 @@ std::vector<std::string> HexDump(const uint8_t* data, const std::size_t size)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+std::string StrFormatBits(const uint64_t value, const std::size_t size)
+{
+    char buf[1000];
+    snprintf(buf, sizeof(buf), "%d %d", (int)value, (int)size);
+
+    buf[0] = '0';
+    buf[1] = 'b';
+    const uint64_t s = std::clamp(size, (std::size_t)1, (std::size_t)64);
+    for (std::size_t ix = 0; ix < s; ix++) {
+        buf[s - ix + 1] = (math::CheckBitsAll(value, math::Bit<uint64_t>(ix)) ? '1' : '0');
+    }
+    buf[s + 2] = '\0';
+    return buf;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool StrStartsWith(const std::string& str, const std::string& prefix)
 {
     const auto str_len = str.size();
@@ -289,6 +307,25 @@ static bool StrToValueUnsigned(const std::string& str, uint64_t& value)
     // Hex
     if ((str.size() > 2) && (str[0] == '0') && ((str[1] == 'x') || (str[1] == 'X'))) {
         count = std::sscanf(str.data(), "%" SCNx64 "%n", &value, &num);
+    }
+    // Bin
+    else if ((str.size() > 2) && (str[0] == '0') && ((str[1] == 'b') || (str[1] == 'B'))) {
+        const std::size_t n = str.size() - 2;
+        if ((n < 1) || (n > 64)) {
+            return false;
+        }
+        uint64_t v = 0;
+        for (std::size_t ix = 0; ix < n; ix++) {
+            const char c = str[n - ix + 1];
+            if (c == '1') {
+                v |= math::Bit<uint64_t>(ix);
+            } else if (c != '0') {
+                return false;
+            }
+        }
+        value = v;
+        count = 1;
+        num = str.size();
     }
     // Octal
     else if (str[0] == '0') {
