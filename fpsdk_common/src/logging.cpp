@@ -252,7 +252,7 @@ void LoggingPrint(const LoggingLevel level, const std::size_t repeat, const char
     int len = std::vsnprintf(g_line, sizeof(g_line), fmt, args);
     va_end(args);
 
-    if (repeat > 1) {
+    if (repeat > 0) {
         if (len > (int)(sizeof(g_line) - 10)) {
             len -= 10;
         }
