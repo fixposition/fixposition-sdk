@@ -1420,6 +1420,135 @@ TEST(TimeTest, Diff)
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(TimeTest, SetCurrentLeapseconds)
+{
+    const uint32_t sec0 = 4118083225;  // 2100-06-30 23:59:58.0 (at the time of writing)
+
+    // Silence logging and trigger the "leapseconds knowledge outdated" warning, so that the following GetPosix() etc.
+    // don't carp again
+    {
+        using namespace fpsdk::common::logging;
+        auto params = LoggingGetParams();
+        const auto old_level = params.level_;
+        params.level_ = LoggingLevel::ERROR;
+        LoggingSetParams(params);
+        auto t = Time::FromSecNSec(sec0, 0);
+        DEBUG("dummy %s", t.StrUtcTime().c_str());
+        params.level_ = old_level;
+        LoggingSetParams(params);
+    }
+
+    // Without current leapseconds set
+    const auto at1 = Time::FromSecNSec(sec0, 0);
+    const auto at2 = Time::FromSecNSec(at1.sec_ + 1, 0);
+    const auto at3 = Time::FromSecNSec(at1.sec_ + 2, 0);
+    const auto at4 = Time::FromSecNSec(at1.sec_ + 3, 0);
+    const auto at5 = Time::FromSecNSec(at1.sec_ + 4, 0);
+
+    const int64_t as1 = (int64_t)at1.sec_;
+    const int64_t as2 = (int64_t)at2.sec_;
+    const int64_t as3 = (int64_t)at3.sec_;
+    const int64_t as4 = (int64_t)at4.sec_;
+    const int64_t as5 = (int64_t)at5.sec_;
+    const int64_t ap1 = (int64_t)at1.GetPosix();
+    const int64_t ap2 = (int64_t)at2.GetPosix();
+    const int64_t ap3 = (int64_t)at3.GetPosix();
+    const int64_t ap4 = (int64_t)at4.GetPosix();
+    const int64_t ap5 = (int64_t)at5.GetPosix();
+
+    // Latest leapseconds from built-in table (assuming it ends long before at1)
+    const int aleaps = as1 - ap1;
+    DEBUG("aleaps=%d", aleaps);  // 27
+
+    // clang-format off
+    DEBUG("at1: %s %" PRIi64 " %" PRIi64 " %" PRIi64, at1.StrUtcTime().c_str(), as1, ap1, as1 - ap1);
+    DEBUG("at2: %s %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64, at2.StrUtcTime().c_str(), as2, ap2, as2 - ap2, as2 - as1, ap2 - ap1);
+    DEBUG("at3: %s %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64, at3.StrUtcTime().c_str(), as3, ap3, as3 - ap3, as3 - as2, ap3 - ap2);
+    DEBUG("at4: %s %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64, at4.StrUtcTime().c_str(), as4, ap4, as4 - ap4, as4 - as3, ap4 - ap3);
+    DEBUG("at5: %s %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64, at5.StrUtcTime().c_str(), as5, ap5, as5 - ap5, as5 - as4, ap5 - ap4);
+    // at1: 2100-06-30 23:59:58.000 4118083225 4118083198 27
+    // at2: 2100-06-30 23:59:59.000 4118083226 4118083199 27 1 1
+    // at3: 2100-07-01 00:00:00.000 4118083227 4118083200 27 1 1
+    // at4: 2100-07-01 00:00:01.000 4118083228 4118083201 27 1 1
+    // at5: 2100-07-01 00:00:02.000 4118083229 4118083202 27 1 1
+    // clang-format on
+
+    // Atomic time increments by 1
+    EXPECT_EQ(as2 - as1, 1);
+    EXPECT_EQ(as3 - as2, 1);
+    EXPECT_EQ(as4 - as3, 1);
+    EXPECT_EQ(as5 - as4, 1);
+
+    // POSIX time increments by 1
+    EXPECT_EQ(ap2 - ap1, 1);
+    EXPECT_EQ(ap3 - ap2, 1);
+    EXPECT_EQ(ap4 - ap3, 1);
+    EXPECT_EQ(ap5 - ap4, 1);
+
+    // Delta (= leapseconds) is constant
+    EXPECT_EQ(as1 - ap1, aleaps);
+    EXPECT_EQ(as2 - ap2, aleaps);
+    EXPECT_EQ(as3 - ap3, aleaps);
+    EXPECT_EQ(as4 - ap4, aleaps);
+    EXPECT_EQ(as5 - ap5, aleaps);
+
+    // With current leapseconds set
+    const int bleaps = aleaps + 1;
+    DEBUG("bleaps=%d", bleaps);
+    EXPECT_TRUE(at3.SetCurrentLeapseconds(bleaps));
+
+    const auto bt1 = Time::FromSecNSec(sec0, 0);
+    const auto bt2 = Time::FromSecNSec(bt1.sec_ + 1, 0);
+    const auto bt3 = Time::FromSecNSec(bt1.sec_ + 2, 0);
+    const auto bt4 = Time::FromSecNSec(bt1.sec_ + 3, 0);
+    const auto bt5 = Time::FromSecNSec(bt1.sec_ + 4, 0);
+
+    const int64_t bs1 = (int64_t)bt1.sec_;
+    const int64_t bs2 = (int64_t)bt2.sec_;
+    const int64_t bs3 = (int64_t)bt3.sec_;
+    const int64_t bs4 = (int64_t)bt4.sec_;
+    const int64_t bs5 = (int64_t)bt5.sec_;
+    const int64_t bp1 = (int64_t)bt1.GetPosix();
+    const int64_t bp2 = (int64_t)bt2.GetPosix();
+    const int64_t bp3 = (int64_t)bt3.GetPosix();
+    const int64_t bp4 = (int64_t)bt4.GetPosix();
+    const int64_t bp5 = (int64_t)bt5.GetPosix();
+
+    // clang-format off
+    DEBUG("bt1: %s %" PRIi64 " %" PRIi64 " %" PRIi64, bt1.StrUtcTime().c_str(), bs1, bp1, bs1 - bp1);
+    DEBUG("bt2: %s %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64, bt2.StrUtcTime().c_str(), bs2, bp2, bs2 - bp2, bs2 - bs1, bp2 - bp1);
+    DEBUG("bt3: %s %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64, bt3.StrUtcTime().c_str(), bs3, bp3, bs3 - bp3, bs3 - bs2, bp3 - bp2);
+    DEBUG("bt4: %s %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64, bt4.StrUtcTime().c_str(), bs4, bp4, bs4 - bp4, bs4 - bs3, bp4 - bp3);
+    DEBUG("bt5: %s %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64 " %" PRIi64, bt5.StrUtcTime().c_str(), bs5, bp5, bs5 - bp5, bs5 - bs4, bp5 - bp4);
+    // bt1: 2100-06-30 23:59:58.000 4118083225 4118083198 27
+    // bt2: 2100-06-30 23:59:59.000 4118083226 4118083199 27 1 1
+    // bt3: 2100-06-30 23:59:60.000 4118083227 4118083200 27 1 1  // at event
+    // bt4: 2100-07-01 00:00:00.000 4118083228 4118083200 28 1 0
+    // bt5: 2100-07-01 00:00:01.000 4118083229 4118083201 28 1 1
+    // clang-format on
+
+    // Atomic time increments by 1
+    EXPECT_EQ(bs2 - bs1, 1);
+    EXPECT_EQ(bs3 - bs2, 1);
+    EXPECT_EQ(bs4 - bs3, 1);
+    EXPECT_EQ(bs5 - bs4, 1);
+
+    // // POSIX time increments by 1, but not at / just after the event
+    EXPECT_EQ(bp2 - bp1, 1);
+    EXPECT_EQ(bp3 - bp2, 1);
+    EXPECT_EQ(bp4 - bp3, 0);
+    EXPECT_EQ(bp5 - bp4, 1);
+
+    // Delta (= leapseconds) changes
+    EXPECT_EQ(bs1 - bp1, aleaps);
+    EXPECT_EQ(bs2 - bp2, aleaps);
+    EXPECT_EQ(bs3 - bp3, aleaps);  // at event
+    EXPECT_EQ(bs4 - bp4, bleaps);
+    EXPECT_EQ(bs5 - bp5, bleaps);
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace
 

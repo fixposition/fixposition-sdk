@@ -191,7 +191,7 @@ class TimeConv
                 std::vector<std::string> input;
                 const char* sep = " \t\n";
                 for (char *save = NULL, *tok = strtok_r(line, sep, &save); tok != NULL;
-                     tok = strtok_r(NULL, sep, &save)) {
+                    tok = strtok_r(NULL, sep, &save)) {
                     input.push_back(tok);
                 }
                 // Ignore empty lines

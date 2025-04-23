@@ -1064,6 +1064,39 @@ class Time
 
     ///@}
     // -----------------------------------------------------------------------------------------------------------------
+    /**
+     * @name Leapseconds
+     *
+     * @{
+     */
+
+    /**
+     * @brief Set or change current leapseconds
+     *
+     * This extends the build-in leapseconds table with the current value. The given value is assumed to be the
+     * leapseconds value (TAI - UTC) that is valid from the object's time (truncated to integer seconds). The object's
+     * time must be past (later than) and the value must be greater or equal than the information in the latest entry in
+     * the built-in table.
+     *
+     * The built-in table and the "current leapseconds" information are global per process. Setting or changing the
+     * current leapseconds value affects all existing and future Time objects immediately.
+     *
+     * For example, the latest entry in the built-in table may be 2017-01-01 00:00:00 UTC with TAI-UTC = 37. So it could
+     * be updated with a time of 2035-06-01 00:00:00 UTC and a value of 38.
+     *
+     * The idea is to use this in real-time applications where an upcoming leapseconds event can be learned from on-line
+     * data, such as GNSS navigation data. Calling this method at and appropriate time with appropriate arguments is up
+     * to the application. For example, if multiple future leapseconds events are known, the right event must be
+     * "activated" at the right time.
+     *
+     * @param[in]  value  The current leapseconds value
+     *
+     * @returns true if the objects time and the leapseconds value were acceptable and set, false otherwise
+     */
+    bool SetCurrentLeapseconds(const int value) const;
+
+    ///@}
+    // -----------------------------------------------------------------------------------------------------------------
 
     static const Time MIN;   //!< Minimum representable time
     static const Time MAX;   //!< Maximum representable time
