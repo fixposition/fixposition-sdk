@@ -251,8 +251,12 @@ struct LoggingParams;  // forward declaration
 
 /**
  * @brief Custom logging write (to screen, file, ...) function signature
+ *
+ * @param[in]  params  Logging parameters
+ * @param[in]  level   Logging level for the message
+ * @param[in]  str     The message
  */
-using LoggingWriteFunc = void (*)(const LoggingParams&, const LoggingLevel, const char*);
+using LoggingWriteFunc = void (*)(const LoggingParams& params, const LoggingLevel level, const char* str);
 
 /**
  * @brief Logging parameters
@@ -327,29 +331,29 @@ void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const std::si
 // Helper macros
 #ifndef _DOXYGEN_
 #  define _FPSDK_LOGGING_LOG(_level_, ...) \
-      ::fpsdk::common::logging::LoggingPrint(fpsdk::common::logging::LoggingLevel::_level_, 0, __VA_ARGS__)
+      ::fpsdk::common::logging::LoggingPrint(::fpsdk::common::logging::LoggingLevel::_level_, 0, __VA_ARGS__)
 #  define _FPSDK_LOGGING_HEX(_level_, _data_, _size_, _prefix_, ...) \
       ::fpsdk::common::logging::LoggingHexdump(                      \
-          fpsdk::common::logging::LoggingLevel::_level_, _data_, _size_, _prefix_, __VA_ARGS__)
-#  define _FPSDK_LOGGING_STR(_level_, _expr_)                                                        \
-      if (::fpsdk::common::logging::LoggingIsLevel(fpsdk::common::logging::LoggingLevel::_level_)) { \
-          std::stringstream ss;                                                                      \
-          ss << _expr_;                                                                              \
-          ::fpsdk::common::logging::LoggingPrint(                                                    \
-              fpsdk::common::logging::LoggingLevel::_level_, 0, "%s", ss.str().c_str());             \
+          ::fpsdk::common::logging::LoggingLevel::_level_, _data_, _size_, _prefix_, __VA_ARGS__)
+#  define _FPSDK_LOGGING_STR(_level_, _expr_)                                                          \
+      if (::fpsdk::common::logging::LoggingIsLevel(::fpsdk::common::logging::LoggingLevel::_level_)) { \
+          std::stringstream ss;                                                                        \
+          ss << _expr_;                                                                                \
+          ::fpsdk::common::logging::LoggingPrint(                                                      \
+              ::fpsdk::common::logging::LoggingLevel::_level_, 0, "%s", ss.str().c_str());             \
       }
-#  define _FPSDK_LOGGING_THR(_level_, _millis_, ...)                                     \
-      do {                                                                               \
-          static uint32_t __last = 0;                                                    \
-          static uint32_t __repeat = 0;                                                  \
-          const uint32_t __now = ::fpsdk::common::time::GetMillis();                     \
-          __repeat++;                                                                    \
-          if ((__now - __last) >= (_millis_)) {                                          \
-              __last = __now;                                                            \
-              ::fpsdk::common::logging::LoggingPrint(                                    \
-                  fpsdk::common::logging::LoggingLevel::_level_, __repeat, __VA_ARGS__); \
-              __repeat = 0;                                                              \
-          }                                                                              \
+#  define _FPSDK_LOGGING_THR(_level_, _millis_, ...)                                       \
+      do {                                                                                 \
+          static uint32_t __last = 0;                                                      \
+          static uint32_t __repeat = 0;                                                    \
+          const uint32_t __now = ::fpsdk::common::time::GetMillis();                       \
+          __repeat++;                                                                      \
+          if ((__now - __last) >= (_millis_)) {                                            \
+              __last = __now;                                                              \
+              ::fpsdk::common::logging::LoggingPrint(                                      \
+                  ::fpsdk::common::logging::LoggingLevel::_level_, __repeat, __VA_ARGS__); \
+              __repeat = 0;                                                                \
+          }                                                                                \
       } while (0)
 #endif  // _DOXYGEN_
 
