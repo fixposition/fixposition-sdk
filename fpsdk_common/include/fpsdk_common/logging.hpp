@@ -139,7 +139,7 @@ namespace logging {
 /**
  * @brief Print a notice message                                                                                        @hideinitializer
  */
-#define NOTICE_S(expr)  _FPSDK_LOGGING_STR(NOTIC,   expr)
+#define NOTICE_S(expr)  _FPSDK_LOGGING_STR(NOTICE,   expr)
 /**
  * @brief Print a info message                                                                                          @hideinitializer
  */
