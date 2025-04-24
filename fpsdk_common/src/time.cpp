@@ -728,61 +728,74 @@ struct LeapSecInfo
 
 // "Our" internal atomic timescale starts at the same time as POSIX. So at 1970-01-01 both are value 0. At this point
 // TAI (CLOCK_TAI) has TAI_OFFS leap seconds.
-static constexpr uint32_t MAX_LEAPS = 27;
 static constexpr int TAI_OFFS = 10;  // offset of CLOCK_TAI to our atomic time
+
+// See IERS "Bulletin C" #69 January 2025 (https://hpiers.obspm.fr/iers/bul/bulc/bulletinc.dat)
+// See also https://data.iana.org/time-zones/data/leap-seconds.list
+// See also /usr/share/zoneinfo/{leapseconds,leap-seconds.list}
+// 2025-12-31 12:00:00 (The earliest time there can be a change is at midnight this day)
+// TZ=UTC date --date "2024-12-31 12:00:00" +%s
+static constexpr uint32_t max_ts = 1767182437;
+static constexpr uint32_t NUM_LEAPS = 27;
+static constexpr std::array<std::array<uint32_t, 2>, NUM_LEAPS> LEAPSECONDS = { {
+    // clang-format off
+    // POSIX      Atomic
+    { 1483228800, 1483228800 + 27 - 1 },  // TAI-UTC = 37 (GPS 18) 2017-01-01 (see IERS "Bulletin C" #52 January 2016)
+    { 1435708800, 1435708800 + 26 - 1 },  // TAI-UTC = 36 (GPS 17) 2015-07-01
+    { 1341100800, 1341100800 + 25 - 1 },  // TAI-UTC = 35 (GPS 16) 2012-07-01
+    { 1230768000, 1230768000 + 24 - 1 },  // TAI-UTC = 34 (GPS 15) 2009-01-01
+    { 1136073600, 1136073600 + 23 - 1 },  // TAI-UTC = 33 (GPS 14) 2006-01-01
+    {  915148800,  915148800 + 22 - 1 },  // TAI-UTC = 32 (GPS 13) 1999-01-01
+    {  867715200,  867715200 + 21 - 1 },  // TAI-UTC = 31 (GPS 12) 1997-07-01
+    {  820454400,  820454400 + 20 - 1 },  // TAI-UTC = 30 (GPS 11) 1996-01-01
+    {  773020800,  773020800 + 19 - 1 },  // TAI-UTC = 29 (GPS 10) 1994-07-01
+    {  741484800,  741484800 + 18 - 1 },  // TAI-UTC = 28 (GPS  9) 1993-07-01
+    {  709948800,  709948800 + 17 - 1 },  // TAI-UTC = 27 (GPS  8) 1992-07-01
+    {  662688000,  662688000 + 16 - 1 },  // TAI-UTC = 26 (GPS  7) 1991-01-01
+    {  631152000,  631152000 + 15 - 1 },  // TAI-UTC = 25 (GPS  6) 1990-01-01
+    {  567993600,  567993600 + 14 - 1 },  // TAI-UTC = 24 (GPS  5) 1988-01-01
+    {  489024000,  489024000 + 13 - 1 },  // TAI-UTC = 23 (GPS  4) 1985-07-01
+    {  425865600,  425865600 + 12 - 1 },  // TAI-UTC = 22 (GPS  3) 1983-07-01
+    {  394329600,  394329600 + 11 - 1 },  // TAI-UTC = 21 (GPS  2) 1982-07-01
+    {  362793600,  362793600 + 10 - 1 },  // TAI-UTC = 20 (GPS  1) 1981-07-01
+    {  315532800,  315532800 +  9 - 1 },  // TAI-UTC = 19 (GPS  0) 1980-01-01
+    {  283996800,  283996800 +  8 - 1 },  // TAI-UTC = 18          1979-01-01
+    {  252460800,  252460800 +  7 - 1 },  // TAI-UTC = 17          1978-01-01
+    {  220924800,  220924800 +  6 - 1 },  // TAI-UTC = 16          1977-01-01
+    {  189302400,  189302400 +  5 - 1 },  // TAI-UTC = 15          1976-01-01
+    {  157766400,  157766400 +  4 - 1 },  // TAI-UTC = 14          1975-01-01
+    {  126230400,  126230400 +  3 - 1 },  // TAI-UTC = 13          1974-01-01
+    {   94694400,   94694400 +  2 - 1 },  // TAI-UTC = 12          1973-01-01
+    {   78796800,   78796800 +  1 - 1 },  // TAI-UTC = 11          1972-07-01
+    //         0           0                 TAI-UTC = 10          1970-01-01 --> TAI_OFFS
+}};  // clang-format on
+
+static uint32_t current_leapsec_ts = 0;
+static int current_leapsec_value = 0;
+
 LeapSecInfo getLeapSecInfo(const uint32_t ts, const bool posix)
 {
-    // See IERS "Bulletin C" #69 January 2025 (https://hpiers.obspm.fr/iers/bul/bulc/bulletinc.dat)
-    // See also https://data.iana.org/time-zones/data/leap-seconds.list
-    // See also /usr/share/zoneinfo/{leapseconds,leap-seconds.list}
-    // 2025-12-31 12:00:00 (The earliest time there can be a change is at midnight this day)
-    // TZ=UTC date --date "2024-12-31 12:00:00" +%s
-    static constexpr uint32_t max_ts = 1767182437;
+    // We may have current leapsecond info
+    if (current_leapsec_ts > 0) {
+        const uint32_t check = ts + (posix ? (current_leapsec_value - 1) : 0);
+        // TIME_TRACE("getLeapSecInfo %" PRIu32 " %" PRIu32 " %" PRIu32, ts, check, current_leapsec_ts);
+        if (check >= current_leapsec_ts) {
+            return { current_leapsec_value, check == current_leapsec_ts };
+        }
+    }
+
     if (ts > max_ts) {
         static bool you_have_been_warned = false;
         if (!you_have_been_warned) {
-            WARNING("time::Time() Leapsecond knowledge outdated (at %" PRIu32 "), assuming unchanged since  %" PRIu32,
+            WARNING("time::Time() Leapsecond knowledge outdated (at %" PRIu32 "), assuming unchanged since %" PRIu32,
                 ts, max_ts);
             you_have_been_warned = true;
         }
         return getLeapSecInfo(max_ts, true);
     }
 
-    static const std::array<std::array<uint32_t, 2>, MAX_LEAPS> leapseconds = { {
-        // clang-format off
-        // POSIX      Atomic
-        { 1483228800, 1483228800 + 27 - 1 },  // UTC-TAI = -37 (GPS 18) 2017-01-01 (see IERS "Bulletin C" #52 January 2016)
-        { 1435708800, 1435708800 + 26 - 1 },  // UTC-TAI = -36 (GPS 17) 2015-07-01
-        { 1341100800, 1341100800 + 25 - 1 },  // UTC-TAI = -35 (GPS 16) 2012-07-01
-        { 1230768000, 1230768000 + 24 - 1 },  // UTC-TAI = -34 (GPS 15) 2009-01-01
-        { 1136073600, 1136073600 + 23 - 1 },  // UTC-TAI = -33 (GPS 14) 2006-01-01
-        {  915148800,  915148800 + 22 - 1 },  // UTC-TAI = -32 (GPS 13) 1999-01-01
-        {  867715200,  867715200 + 21 - 1 },  // UTC-TAI = -31 (GPS 12) 1997-07-01
-        {  820454400,  820454400 + 20 - 1 },  // UTC-TAI = -30 (GPS 11) 1996-01-01
-        {  773020800,  773020800 + 19 - 1 },  // UTC-TAI = -29 (GPS 10) 1994-07-01
-        {  741484800,  741484800 + 18 - 1 },  // UTC-TAI = -28 (GPS  9) 1993-07-01
-        {  709948800,  709948800 + 17 - 1 },  // UTC-TAI = -27 (GPS  8) 1992-07-01
-        {  662688000,  662688000 + 16 - 1 },  // UTC-TAI = -26 (GPS  7) 1991-01-01
-        {  631152000,  631152000 + 15 - 1 },  // UTC-TAI = -25 (GPS  6) 1990-01-01
-        {  567993600,  567993600 + 14 - 1 },  // UTC-TAI = -24 (GPS  5) 1988-01-01
-        {  489024000,  489024000 + 13 - 1 },  // UTC-TAI = -23 (GPS  4) 1985-07-01
-        {  425865600,  425865600 + 12 - 1 },  // UTC-TAI = -22 (GPS  3) 1983-07-01
-        {  394329600,  394329600 + 11 - 1 },  // UTC-TAI = -21 (GPS  2) 1982-07-01
-        {  362793600,  362793600 + 10 - 1 },  // UTC-TAI = -20 (GPS  1) 1981-07-01
-        {  315532800,  315532800 +  9 - 1 },  // UTC-TAI = -19 (GPS  0) 1980-01-01
-        {  283996800,  283996800 +  8 - 1 },  // UTC-TAI = -18          1979-01-01
-        {  252460800,  252460800 +  7 - 1 },  // UTC-TAI = -17          1978-01-01
-        {  220924800,  220924800 +  6 - 1 },  // UTC-TAI = -16          1977-01-01
-        {  189302400,  189302400 +  5 - 1 },  // UTC-TAI = -15          1976-01-01
-        {  157766400,  157766400 +  4 - 1 },  // UTC-TAI = -14          1975-01-01
-        {  126230400,  126230400 +  3 - 1 },  // UTC-TAI = -13          1974-01-01
-        {   94694400,   94694400 +  2 - 1 },  // UTC-TAI = -12          1973-01-01
-        {   78796800,   78796800 +  1 - 1 },  // UTC-TAI = -11          1972-07-01
-        //         0           0                 UTC-TAI = -10          1970-01-01 --> TAI_OFFS
-    }};  // clang-format on
-
-    int leapsec = leapseconds.size();
-    for (auto entry : leapseconds) {
+    int leapsec = LEAPSECONDS.size();
+    for (auto entry : LEAPSECONDS) {
         const uint32_t ls_ts = entry[posix ? 0 : 1];
         if (ts == ls_ts) {
             return { leapsec, true };
@@ -792,6 +805,22 @@ LeapSecInfo getLeapSecInfo(const uint32_t ts, const bool posix)
         leapsec--;
     }
     return { 0, false };
+}
+
+bool Time::SetCurrentLeapseconds(const int value) const
+{
+    if ((sec_ <= LEAPSECONDS[0][0]) || (value < (int)NUM_LEAPS)) {
+        TIME_TRACE("SetCurrentLeapseconds %" PRIu32 " <= %" PRIu32 " or %d < %d", sec_, LEAPSECONDS[0][0], value,
+            (int)NUM_LEAPS);
+        return false;
+    }
+
+    current_leapsec_ts = sec_;
+    current_leapsec_value = value;
+    TIME_TRACE("SetCurrentLeapseconds %" PRIu32 " > %" PRIu32 " and %d >= %d", current_leapsec_ts, LEAPSECONDS[0][0],
+        current_leapsec_value, (int)NUM_LEAPS);
+
+    return true;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -983,7 +1012,7 @@ bool Time::SetSec(const double sec)
 
 bool Time::SetPosix(const time_t posix)
 {
-    if ((posix < 0) || (posix > (std::numeric_limits<int32_t>::max() - MAX_LEAPS))) {
+    if ((posix < 0) || (posix > (std::numeric_limits<int32_t>::max() - NUM_LEAPS))) {
         return false;
     }
     const auto lsinfo = getLeapSecInfo(posix, true);
@@ -1001,7 +1030,7 @@ bool Time::SetPosix(const time_t posix)
 
 bool Time::SetRosTime(const RosTime& rostime)
 {
-    if ((rostime.sec_ > (std::numeric_limits<uint32_t>::max() - MAX_LEAPS))) {
+    if ((rostime.sec_ > (std::numeric_limits<uint32_t>::max() - NUM_LEAPS))) {
         return false;
     }
     const auto lsinfo = getLeapSecInfo(rostime.sec_, true);
@@ -1113,7 +1142,7 @@ bool Time::SetUtcTime(const UtcTime& utctime)
 
 bool Time::SetTai(const time_t tai)
 {
-    if ((tai < TAI_OFFS) || (tai > (std::numeric_limits<int32_t>::max() - MAX_LEAPS - TAI_OFFS))) {
+    if ((tai < TAI_OFFS) || (tai > (std::numeric_limits<int32_t>::max() - NUM_LEAPS - TAI_OFFS))) {
         return false;
     }
     sec_ = tai - TAI_OFFS;
@@ -1127,7 +1156,7 @@ bool Time::SetClockRealtime()
     timespec tsnow;
     clock_gettime(CLOCK_REALTIME, &tsnow);
     TIME_TRACE("SetClockRealtime %.3f", (double)tsnow.tv_sec + ((double)tsnow.tv_nsec * 1e-9));
-    return (tsnow.tv_sec >= 0) && (tsnow.tv_sec < (std::numeric_limits<uint32_t>::max() - MAX_LEAPS)) &&
+    return (tsnow.tv_sec >= 0) && (tsnow.tv_sec < (std::numeric_limits<uint32_t>::max() - NUM_LEAPS)) &&
            (tsnow.tv_nsec >= 0) && (tsnow.tv_nsec < 1000000000) &&
            SetRosTime({ static_cast<uint32_t>(tsnow.tv_sec), static_cast<uint32_t>(tsnow.tv_nsec) });
 }
