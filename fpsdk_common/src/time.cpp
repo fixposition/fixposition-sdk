@@ -15,6 +15,7 @@
  */
 
 /* LIBC/STL */
+#include <algorithm>
 #include <array>
 #include <chrono>
 #include <cmath>
@@ -283,7 +284,7 @@ int64_t Duration::GetNSec() const
 double Duration::GetSec(const int prec) const
 {
     return math::RoundToFracDigits(
-        static_cast<double>(sec_) + (1e-9 * static_cast<double>(nsec_)), math::Clamp(prec, 0, 9));
+        static_cast<double>(sec_) + (1e-9 * static_cast<double>(nsec_)), std::clamp(prec, 0, 9));
 }
 
 std::chrono::milliseconds Duration::GetChronoMilli() const
@@ -555,7 +556,7 @@ bool Duration::operator<=(const Duration& rhs) const
 
 std::string Duration::Stringify(const int prec) const
 {
-    const int n_frac = math::Clamp(prec, 0, 9);
+    const int n_frac = std::clamp(prec, 0, 9);
 
     std::string str;
     double sec = GetSec();
@@ -1193,7 +1194,7 @@ uint64_t Time::GetNSec() const
 double Time::GetSec(const int prec) const
 {
     return math::RoundToFracDigits(
-        static_cast<double>(sec_) + (1e-9 * static_cast<double>(nsec_)), math::Clamp(prec, 0, 9));
+        static_cast<double>(sec_) + (1e-9 * static_cast<double>(nsec_)), std::clamp(prec, 0, 9));
 }
 
 time_t Time::GetPosix() const
@@ -1227,7 +1228,7 @@ WnoTow Time::GetWnoTow(const WnoTow::Sys sys, const int prec) const
 {
     int wno = sec_ / SEC_IN_WEEK_I;
     int tow = sec_ % SEC_IN_WEEK_I;
-    double towf = math::RoundToFracDigits(static_cast<double>(nsec_) * 1e-9, math::Clamp(prec, 0, 9));
+    double towf = math::RoundToFracDigits(static_cast<double>(nsec_) * 1e-9, std::clamp(prec, 0, 9));
     if (towf >= (1.0 - std::numeric_limits<double>::epsilon())) {
         towf -= 1.0;
         tow += 1;
@@ -1272,7 +1273,7 @@ GloTime Time::GetGloTime(const int prec) const
     const int N4 = 1 + (glo_days / 1461);
     const int Nt = 1 + (glo_days % 1461);
     const double TOD = math::RoundToFracDigits(
-        static_cast<double>(sec % SEC_IN_DAY_I) + static_cast<double>(nsec_ * 1e-9), math::Clamp(prec, 0, 9));
+        static_cast<double>(sec % SEC_IN_DAY_I) + static_cast<double>(nsec_ * 1e-9), std::clamp(prec, 0, 9));
     TIME_TRACE("GetGloTime %" PRIu32 " %" PRIu32 " lsinfo %d %s -> %" PRIi64 " %d -> %d %d %.9f", sec_, nsec_,
         lsinfo.leapsec_value_, lsinfo.at_leapsec_ ? "true" : "false", sec, glo_days, N4, Nt, TOD);
     return GloTime(N4, Nt, TOD);
@@ -1281,7 +1282,7 @@ GloTime Time::GetGloTime(const int prec) const
 UtcTime Time::GetUtcTime(const int prec) const
 {
     // Will the subsection round to > 1.0s?
-    const int n_frac = math::Clamp(prec, 0, 9);
+    const int n_frac = std::clamp(prec, 0, 9);
     uint32_t isec = sec_;
     double fsec = math::RoundToFracDigits(static_cast<double>(nsec_) * 1e-9, n_frac);
     if (fsec >= (1.0 - std::numeric_limits<double>::epsilon())) {
@@ -1340,7 +1341,7 @@ double Time::GetDayOfYear(const int prec) const
 
     const double doyf = ((double)((utc.hour_ * SEC_IN_HOUR_I) + (utc.min_ + SEC_IN_MIN_I)) + utc.sec_) /
                         (leap_year ? SEC_IN_DAY_D : SEC_IN_DAY_D);
-    const double doyfr = math::RoundToFracDigits(doyf, math::Clamp(prec, 0, 12));
+    const double doyfr = math::RoundToFracDigits(doyf, std::clamp(prec, 0, 12));
 
     TIME_TRACE("GetDayOfYear %d %d %d %d %d %.9f %s -> %d %.12f %.12f", utc.year_, utc.month_, utc.day_, utc.hour_,
         utc.min_, utc.sec_, leap_year ? "true" : "false", doyi, doyf, doyfr);
@@ -1622,14 +1623,14 @@ bool Time::operator<=(const Time& rhs) const
 
 std::string Time::StrWnoTow(const WnoTow::Sys sys, const int prec) const
 {
-    const int n_frac = math::Clamp(prec, 0, 9);
+    const int n_frac = std::clamp(prec, 0, 9);
     const auto wnotow = GetWnoTow(sys, n_frac);
     return string::Sprintf("%04d:%0*.*f", wnotow.wno_, n_frac > 0 ? (n_frac + 7) : (n_frac + 6), n_frac, wnotow.tow_);
 }
 
 std::string Time::StrUtcTime(const int prec) const
 {
-    const int n_frac = math::Clamp(prec, 0, 9);
+    const int n_frac = std::clamp(prec, 0, 9);
     const auto utctime = GetUtcTime(n_frac);
     return string::Sprintf("%04d-%02d-%02d %02d:%02d:%0*.*f", utctime.year_, utctime.month_, utctime.day_,
         utctime.hour_, utctime.min_, n_frac > 0 ? (n_frac + 3) : (n_frac + 2), n_frac, utctime.sec_);
@@ -1637,7 +1638,7 @@ std::string Time::StrUtcTime(const int prec) const
 
 std::string Time::StrIsoTime(const int prec) const
 {
-    const int n_frac = math::Clamp(prec, 0, 9);
+    const int n_frac = std::clamp(prec, 0, 9);
     const auto utctime = GetUtcTime(n_frac);
     return string::Sprintf("%04d%02d%02dT%02d%02d%0*.*fZ", utctime.year_, utctime.month_, utctime.day_, utctime.hour_,
         utctime.min_, n_frac > 0 ? (n_frac + 3) : (n_frac + 2), n_frac, utctime.sec_);
