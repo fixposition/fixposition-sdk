@@ -12,6 +12,7 @@
  */
 
 /* LIBC/STL */
+#include <algorithm>
 
 /* EXTERNAL */
 
@@ -28,7 +29,7 @@ double RoundToFracDigits(const double value, const int digits)
     if (std::isfinite(value)) {
         double ivalue = 0.0;
         double fvalue = std::modf(value, &ivalue);
-        switch (Clamp(digits, 0, 12))  // clang-format off
+        switch (std::clamp(digits, 0, 12))  // clang-format off
         {
             case  0: return ivalue + std::round(fvalue);
             case  1: return ivalue + std::round(fvalue *  1e1) *  1e-1;
@@ -55,7 +56,7 @@ double ClipToFracDigits(const double value, const int digits)
     if (std::isfinite(value)) {
         double ivalue = 0.0;
         double fvalue = std::modf(value, &ivalue);
-        switch (Clamp(digits, 0, 12))  // clang-format off
+        switch (std::clamp(digits, 0, 12))  // clang-format off
         {
             case  0: return ivalue + (ivalue < 0.0 ? std::ceil(fvalue)                : std::floor(fvalue));
             case  1: return ivalue + (ivalue < 0.0 ? std::ceil(fvalue *  1e1) *  1e-1 : std::floor(fvalue *  1e1) *  1e-1);

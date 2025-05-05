@@ -36,24 +36,6 @@ namespace math {
 /* ****************************************************************************************************************** */
 
 /**
- * @brief Clamp value in range
- *
- * @tparam T numeric type
- * @param[in]  val  The value
- * @param[in]  min  Minimum value
- * @param[in]  max  Maximum value
- *
- * @note c++-17 has std::clamp() doing exactly (?) this...
- *
- * @returns the value clamped to the given range
- */
-template <typename T>
-constexpr T Clamp(const T val, const T min, const T max)
-{
-    return std::max(min, std::min(val, max));
-}
-
-/**
  * @brief Convert degrees to radians
  *
  * @tparam  T  value type
