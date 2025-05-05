@@ -1469,8 +1469,10 @@ TEST(TimeTest, SetCurrentLeapseconds)
     const int64_t ap5 = (int64_t)at5.GetPosix();
 
     // Latest leapseconds from built-in table (assuming it ends long before at1)
-    const int aleaps = as1 - ap1;
-    DEBUG("aleaps=%d", aleaps);  // 27
+
+    const int adiff = as1 - ap1;
+    const int aleaps = at1.GetLeapseconds();
+    DEBUG("adiff=%d aleaps=%d", adiff, aleaps);  // 27, 37
 
     // clang-format off
     DEBUG("at1: %s %" PRIi64 " %" PRIi64 " %" PRIi64, at1.StrUtcTime().c_str(), as1, ap1, as1 - ap1);
@@ -1498,15 +1500,16 @@ TEST(TimeTest, SetCurrentLeapseconds)
     EXPECT_EQ(ap5 - ap4, 1);
 
     // Delta (= leapseconds) is constant
-    EXPECT_EQ(as1 - ap1, aleaps);
-    EXPECT_EQ(as2 - ap2, aleaps);
-    EXPECT_EQ(as3 - ap3, aleaps);
-    EXPECT_EQ(as4 - ap4, aleaps);
-    EXPECT_EQ(as5 - ap5, aleaps);
+    EXPECT_EQ(as1 - ap1, adiff);
+    EXPECT_EQ(as2 - ap2, adiff);
+    EXPECT_EQ(as3 - ap3, adiff);
+    EXPECT_EQ(as4 - ap4, adiff);
+    EXPECT_EQ(as5 - ap5, adiff);
 
     // With current leapseconds set
+    const int bdiff = adiff + 1;
     const int bleaps = aleaps + 1;
-    DEBUG("bleaps=%d", bleaps);
+    DEBUG("bdiff=%d bleaps=%d", bdiff, bleaps);
     EXPECT_TRUE(at3.SetCurrentLeapseconds(bleaps));
 
     const auto bt1 = Time::FromSecNSec(sec0, 0);
@@ -1552,11 +1555,11 @@ TEST(TimeTest, SetCurrentLeapseconds)
     EXPECT_EQ(bp5 - bp4, 1);
 
     // Delta (= leapseconds) changes
-    EXPECT_EQ(bs1 - bp1, aleaps);
-    EXPECT_EQ(bs2 - bp2, aleaps);
-    EXPECT_EQ(bs3 - bp3, aleaps);  // at event
-    EXPECT_EQ(bs4 - bp4, bleaps);
-    EXPECT_EQ(bs5 - bp5, bleaps);
+    EXPECT_EQ(bs1 - bp1, adiff);
+    EXPECT_EQ(bs2 - bp2, adiff);
+    EXPECT_EQ(bs3 - bp3, adiff);  // at event
+    EXPECT_EQ(bs4 - bp4, bdiff);
+    EXPECT_EQ(bs5 - bp5, bdiff);
 }
 
 /* ****************************************************************************************************************** */

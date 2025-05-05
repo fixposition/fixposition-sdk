@@ -679,8 +679,8 @@ class Time
     /**
      * @brief From system clock current (now) atomic time (CLOCK_TAI)
      *
-     * @note This will only produce the right result if your system is configured accordingly (which is unlikely). See
-     *       comments in the Time class description.
+     * @note This will only produce the right result if your system is configured accordingly (which may not be the
+     *       case). See comments in the Time class description.
      *
      * @returns the Time object
      */
@@ -1101,6 +1101,13 @@ class Time
      * @returns true if the objects time and the leapseconds value were acceptable and set, false otherwise
      */
     bool SetCurrentLeapseconds(const int value) const;
+
+    /**
+     * @brief Get leapseconds (TAI - UTC)
+     *
+     * @returns the leapseconds for the time
+     */
+    int GetLeapseconds() const;
 
     ///@}
     // -----------------------------------------------------------------------------------------------------------------

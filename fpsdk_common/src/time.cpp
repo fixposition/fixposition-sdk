@@ -815,18 +815,24 @@ LeapSecInfo getLeapSecInfo(const uint32_t ts, const bool posix)
 
 bool Time::SetCurrentLeapseconds(const int value) const
 {
-    if ((sec_ <= LEAPSECONDS[0][0]) || (value < (int)NUM_LEAPS)) {
+    if ((sec_ <= LEAPSECONDS[0][0]) || (value < ((int)NUM_LEAPS + TAI_OFFS))) {
         TIME_TRACE("SetCurrentLeapseconds %" PRIu32 " <= %" PRIu32 " or %d < %d", sec_, LEAPSECONDS[0][0], value,
-            (int)NUM_LEAPS);
+            (int)NUM_LEAPS + TAI_OFFS);
         return false;
     }
 
     current_leapsec_ts = sec_;
-    current_leapsec_value = value;
+    current_leapsec_value = value - (int)TAI_OFFS;
     TIME_TRACE("SetCurrentLeapseconds %" PRIu32 " > %" PRIu32 " and %d >= %d", current_leapsec_ts, LEAPSECONDS[0][0],
-        current_leapsec_value, (int)NUM_LEAPS);
+        current_leapsec_value + (int)TAI_OFFS, (int)NUM_LEAPS + (int)TAI_OFFS);
 
     return true;
+}
+
+int Time::GetLeapseconds() const
+{
+    const LeapSecInfo lsinfo = getLeapSecInfo(sec_, false);
+    return lsinfo.leapsec_value_ + TAI_OFFS;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
