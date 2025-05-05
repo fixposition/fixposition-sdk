@@ -101,6 +101,11 @@ double RosTime::ToSec() const
     return (double)sec_ + ((double)nsec_ * 1e-9);
 }
 
+uint64_t RosTime::ToNSec() const
+{
+    return (static_cast<uint64_t>(sec_) * (uint64_t)1000000000) + static_cast<uint64_t>(nsec_);
+}
+
 bool RosTime::IsZero() const
 {
     return (sec_ == 0) && (nsec_ == 0);

@@ -132,6 +132,13 @@ struct RosTime
     double ToSec() const;
 
     /**
+     * @brief Convert to nanoseconds
+     *
+     * @returns the time value (time since epoch) in [ns]
+     */
+    uint64_t ToNSec() const;
+
+    /**
      * @brief Check if time is zero (invalid, unset)
      *
      * @returns true if time is zero (invalid, unset)
