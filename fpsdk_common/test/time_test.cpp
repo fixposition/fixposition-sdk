@@ -1469,7 +1469,6 @@ TEST(TimeTest, SetCurrentLeapseconds)
     const int64_t ap5 = (int64_t)at5.GetPosix();
 
     // Latest leapseconds from built-in table (assuming it ends long before at1)
-
     const int adiff = as1 - ap1;
     const int aleaps = at1.GetLeapseconds();
     DEBUG("adiff=%d aleaps=%d", adiff, aleaps);  // 27, 37

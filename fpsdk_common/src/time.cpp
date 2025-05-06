@@ -43,7 +43,7 @@ namespace time {
 uint64_t GetMillis()
 {
     struct timespec tp;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &tp);
+    clock_gettime(CLOCK_MONOTONIC, &tp);
     return (tp.tv_sec * 1000) + (tp.tv_nsec / 1000000);
 }
 
@@ -52,7 +52,7 @@ uint64_t GetMillis()
 double GetSecs()
 {
     struct timespec tp;
-    clock_gettime(CLOCK_MONOTONIC_RAW, &tp);
+    clock_gettime(CLOCK_MONOTONIC, &tp);
     return (double)tp.tv_sec + ((double)tp.tv_nsec * 1e-9);
 }
 
