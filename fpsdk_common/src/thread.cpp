@@ -58,6 +58,7 @@ bool Thread::Start(const bool try_catch)
         status_ = Status::RUNNING;
     } catch (std::exception& e) {
         WARNING("%s thread fail: %s", name_.c_str(), e.what());
+        res = false;
     }
     return res;
 }
