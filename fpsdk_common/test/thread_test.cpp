@@ -43,6 +43,7 @@ TEST(ThreadTest, HappyThread)
 
     EXPECT_EQ(thread.GetStatus(), Thread::Status::STOPPED);
     EXPECT_TRUE(thread.Start());
+    EXPECT_FALSE(thread.Start());
     EXPECT_EQ(thread.GetStatus(), Thread::Status::RUNNING);
     s.Sleep();
     EXPECT_TRUE(thread.Stop());
