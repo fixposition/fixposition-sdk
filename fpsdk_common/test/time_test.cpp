@@ -1561,6 +1561,19 @@ TEST(TimeTest, SetCurrentLeapseconds)
     EXPECT_EQ(bs5 - bp5, bdiff);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(TimeTest, PosixNs)
+{
+    const auto t1 = Time::FromSecNSec(800000000, 123456789);
+    EXPECT_EQ(t1.GetPosixNs(), (uint64_t)799999981123456789);
+
+    const auto t2 = Time::FromPosixNs(799999981123456789);
+    EXPECT_EQ(t2.GetNSec(), 800000000123456789);
+
+    EXPECT_EQ(t1.GetRosTime().ToNSec(), t1.GetPosixNs());
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace
 
