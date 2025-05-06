@@ -81,6 +81,11 @@ Duration TicToc::Toc(const bool reset)
     return dur;
 }
 
+double TicToc::TocMs(const bool reset)
+{
+    return Toc(reset).GetSec() * 1e-3;
+}
+
 #endif
 /* ****************************************************************************************************************** */
 #if 1
@@ -917,10 +922,19 @@ Time::Time() : sec_{ 0 }, nsec_{ 0 }
     return time;
 }
 
-/*static*/ Time Time::FromPosix(const time_t posix)
+/*static*/ Time Time::FromPosix(const std::time_t posix)
 {
     Time time;
     if (!time.SetPosix(posix)) {
+        throw std::runtime_error(TIME_THROW_MSG);
+    }
+    return time;
+}
+
+/*static*/ Time Time::FromPosixNs(const uint64_t posix_ns)
+{
+    Time time;
+    if (!time.SetPosixNs(posix_ns)) {
         throw std::runtime_error(TIME_THROW_MSG);
     }
     return time;
@@ -962,7 +976,7 @@ Time::Time() : sec_{ 0 }, nsec_{ 0 }
     return time;
 }
 
-/*static*/ Time Time::FromTai(const time_t tai)
+/*static*/ Time Time::FromTai(const std::time_t tai)
 {
     Time time;
     if (!time.SetTai(tai)) {
@@ -1022,7 +1036,7 @@ bool Time::SetSec(const double sec)
     return timeSecToIsecNsec(sec, sec_, nsec_);
 }
 
-bool Time::SetPosix(const time_t posix)
+bool Time::SetPosix(const std::time_t posix)
 {
     if ((posix < 0) || (posix > (std::numeric_limits<int32_t>::max() - NUM_LEAPS))) {
         return false;
@@ -1038,6 +1052,18 @@ bool Time::SetPosix(const time_t posix)
     TIME_TRACE("SetPosix %" PRIiMAX " lsinfo %d %s -> %" PRIu32 " %" PRIu32, posix, lsinfo.leapsec_value_,
         lsinfo.at_leapsec_ ? "true" : "false", sec_, nsec_);
     return true;
+}
+
+bool Time::SetPosixNs(const uint64_t posix_ns)
+{
+    uint64_t sec64 = 0;
+    uint64_t nsec64 = posix_ns;
+    if (timeNormalizeSecNSec(sec64, nsec64) && SetPosix(static_cast<std::time_t>(sec64))) {
+        nsec_ = nsec64;
+        return true;
+    } else {
+        return false;
+    }
 }
 
 bool Time::SetRosTime(const RosTime& rostime)
@@ -1152,7 +1178,7 @@ bool Time::SetUtcTime(const UtcTime& utctime)
     return true;
 }
 
-bool Time::SetTai(const time_t tai)
+bool Time::SetTai(const std::time_t tai)
 {
     if ((tai < TAI_OFFS) || (tai > (std::numeric_limits<int32_t>::max() - NUM_LEAPS - TAI_OFFS))) {
         return false;
@@ -1203,10 +1229,10 @@ double Time::GetSec(const int prec) const
         static_cast<double>(sec_) + (1e-9 * static_cast<double>(nsec_)), std::clamp(prec, 0, 9));
 }
 
-time_t Time::GetPosix() const
+std::time_t Time::GetPosix() const
 {
     const auto lsinfo = getLeapSecInfo(sec_, false);
-    time_t posix = static_cast<time_t>(sec_);
+    std::time_t posix = static_cast<std::time_t>(sec_);
     posix -= lsinfo.leapsec_value_;
     if (lsinfo.at_leapsec_) {
         posix += 1;
@@ -1214,6 +1240,11 @@ time_t Time::GetPosix() const
     TIME_TRACE("GetPosix %" PRIu32 " lsinfo %d %s -> %" PRIiMAX, sec_, lsinfo.leapsec_value_,
         lsinfo.at_leapsec_ ? "true" : "false", posix);
     return posix;
+}
+
+uint64_t Time::GetPosixNs() const
+{
+    return (static_cast<uint64_t>(GetPosix()) * (uint64_t)1000000000) + static_cast<uint64_t>(nsec_);
 }
 
 RosTime Time::GetRosTime() const
@@ -1355,22 +1386,22 @@ double Time::GetDayOfYear(const int prec) const
     return (double)doyi + doyfr;
 }
 
-time_t Time::GetTai() const
+std::time_t Time::GetTai() const
 {
-    time_t tai = static_cast<time_t>(sec_) + TAI_OFFS;
+    std::time_t tai = static_cast<std::time_t>(sec_) + TAI_OFFS;
     TIME_TRACE("GetTai %" PRIu32 " -> %" PRIiMAX, sec_, tai);
     return tai;
 }
 
 std::chrono::milliseconds Time::GetChronoMilli() const
 {
-    time_t posix = GetPosix();
+    std::time_t posix = GetPosix();
     return std::chrono::milliseconds((static_cast<uint64_t>(posix) * 1000) + ((nsec_ + 500000) / 1000000));
 }
 
 std::chrono::nanoseconds Time::GetChronoNano() const
 {
-    time_t posix = GetPosix();
+    std::time_t posix = GetPosix();
     return std::chrono::nanoseconds((static_cast<uint64_t>(posix) * 1000000000) + nsec_);
 }
 

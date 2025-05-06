@@ -104,6 +104,15 @@ class TicToc
      */
     Duration Toc(const bool reset = false);
 
+    /**
+     * @brief Get elapsed wallclock time in [ms]
+     *
+     * @param[in]  reset  Reset (restart) measurements
+     *
+     * @returns the elapsed time since object constructed resp. last call to Tic() in [ms]
+     */
+    double TocMs(const bool reset = false);
+
    private:
     std::chrono::time_point<std::chrono::steady_clock> t0_;
 };
@@ -613,7 +622,7 @@ class Time
     static Time FromSec(const double sec);
 
     /**
-     * @brief From POSIX time (POSIX)
+     * @brief From POSIX time (POSIX, seconds)
      *
      * @note See comments in the class description regarding POSIX time!
      *
@@ -622,6 +631,17 @@ class Time
      * @returns the Time object
      */
     static Time FromPosix(const std::time_t posix);
+
+    /**
+     * @brief From POSIX time (POSIX, nanoseconds)
+     *
+     * @note See comments in the class description regarding POSIX time!
+     *
+     * @param[in]  posix_ns  Time value nanoseconds (> 0)
+     *
+     * @returns the Time object
+     */
+    static Time FromPosixNs(const uint64_t posix);
 
     /**
      * @brief From ROS time (POSIX)
@@ -666,7 +686,7 @@ class Time
      *
      * @returns true if successful, false otherwise (bad time)
      */
-    static Time FromTai(const time_t tai);
+    static Time FromTai(const std::time_t tai);
 
     /**
      * @brief From system clock current (now) system time (CLOCK_REALTIME)
@@ -725,15 +745,26 @@ class Time
     bool SetSec(const double sec);
 
     /**
-     * @brief Set time from POSIX time (POSIX)
+     * @brief Set time from POSIX time (POSIX, seconds)
      *
      * @note See comments in the class description regarding POSIX time!
      *
-     * @param[in]  posix  The POSIX time
+     * @param[in]  posix  Time value seconds (> 0)
      *
      * @returns true if successful, false otherwise (bad time)
      */
-    bool SetPosix(const time_t posix);
+    bool SetPosix(const std::time_t posix);
+
+    /**
+     * @brief Set time from POSIX time (POSIX, nanoseconds)
+     *
+     * @note See comments in the class description regarding POSIX time!
+     *
+     * @param[in]  posix_ns  Time value nanoseconds (> 0)
+     *
+     * @returns true if successful, false otherwise (bad time)
+     */
+    bool SetPosixNs(const uint64_t posix_ns);
 
     /**
      * @brief Set time from ROS time (POSIX)
@@ -780,7 +811,7 @@ class Time
      *
      * @returns true if successful, false otherwise (bad time)
      */
-    bool SetTai(const time_t tai);
+    bool SetTai(const std::time_t tai);
 
     /**
      * @brief Set time from system clock current (now) system time (CLOCK_REALTIME)
@@ -826,13 +857,22 @@ class Time
     double GetSec(const int prec = 9) const;
 
     /**
-     * @brief Get time as POSIX time (POSIX)
+     * @brief Get time as POSIX time (POSIX, seconds)
      *
      * @note See comments in the class description regarding POSIX time!
      *
      * @returns the POSIX time, truncated (rounded down, sub-seconds ignored)
      */
     std::time_t GetPosix() const;
+
+    /**
+     * @brief Get time as POSIX time (POSIX, nanoseconds)
+     *
+     * @note See comments in the class description regarding POSIX time!
+     *
+     * @returns the POSIX time, truncated (rounded down, sub-seconds ignored)
+     */
+    uint64_t GetPosixNs() const;
 
     /**
      * @brief Get time as ROS time (POSIX)
