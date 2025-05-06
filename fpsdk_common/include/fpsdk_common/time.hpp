@@ -832,7 +832,7 @@ class Time
      *
      * @returns the POSIX time, truncated (rounded down, sub-seconds ignored)
      */
-    time_t GetPosix() const;
+    std::time_t GetPosix() const;
 
     /**
      * @brief Get time as ROS time (POSIX)
@@ -887,7 +887,7 @@ class Time
      *
      * @returns the TAI time, truncated (rounded down, sub-seconds ignored)
      */
-    time_t GetTai() const;
+    std::time_t GetTai() const;
 
     /**
      * @brief Get time as std::chrono::duration (milliseconds since epoch) (POSIX)
