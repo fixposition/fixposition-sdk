@@ -335,13 +335,15 @@ void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const std::si
 #  define _FPSDK_LOGGING_HEX(_level_, _data_, _size_, _prefix_, ...) \
       ::fpsdk::common::logging::LoggingHexdump(                      \
           ::fpsdk::common::logging::LoggingLevel::_level_, _data_, _size_, _prefix_, __VA_ARGS__)
-#  define _FPSDK_LOGGING_STR(_level_, _expr_)                                                          \
-      if (::fpsdk::common::logging::LoggingIsLevel(::fpsdk::common::logging::LoggingLevel::_level_)) { \
-          std::stringstream ss;                                                                        \
-          ss << _expr_;                                                                                \
-          ::fpsdk::common::logging::LoggingPrint(                                                      \
-              ::fpsdk::common::logging::LoggingLevel::_level_, 0, "%s", ss.str().c_str());             \
-      }
+#  define _FPSDK_LOGGING_STR(_level_, _expr_)                                                              \
+      do {                                                                                                 \
+          if (::fpsdk::common::logging::LoggingIsLevel(::fpsdk::common::logging::LoggingLevel::_level_)) { \
+              std::stringstream ss;                                                                        \
+              ss << _expr_;                                                                                \
+              ::fpsdk::common::logging::LoggingPrint(                                                      \
+                  ::fpsdk::common::logging::LoggingLevel::_level_, 0, "%s", ss.str().c_str());             \
+          }                                                                                                \
+      } while (0)
 #  define _FPSDK_LOGGING_THR(_level_, _millis_, ...)                                       \
       do {                                                                                 \
           static uint32_t __last = 0;                                                      \
