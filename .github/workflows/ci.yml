@@ -90,6 +90,7 @@ jobs:
 
             - name: Build documentation
               run: |
+                  source /opt/ros/${ROS_DISTRO}/setup.bash
                   echo "github.ref: ${{ github.ref }}"
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   buildname=doc-release
@@ -114,12 +115,12 @@ jobs:
 
             # https://github.com/actions/configure-pages
             - name: Configure pages
-              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/108/merge' }}
+              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/109/merge' }}
               uses: actions/configure-pages@v5
 
             # https://github.com/actions/deploy-pages
             - name: Deploy pages
-              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/108/merge' }}
+              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/109/merge' }}
               uses: actions/deploy-pages@v4
               with:
                   artifact_name: github-pages
