@@ -65,6 +65,8 @@ CMAKE      := cmake
 DOXYGEN    := doxygen
 NICE       := nice
 CAT        := cat
+PYTHON     := python
+SED        := sed
 
 ifeq ($(VERBOSE),1)
 V =
@@ -224,16 +226,26 @@ endif
 
 .PHONY: doc
 doc: $(BUILD_DIR)/.make-doc
+	@echo "now run: xdg-open $(BUILD_DIR)/doc/index.html"
 
-$(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-cmake fpsdk_doc/Doxyfile
+$(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-build fpsdk_doc/Doxyfile
 	@echo "$(HLW)***** Doc ($(BUILD_TYPE)) *****$(HLO)"
+	$(V)$(MKDIR) -p $(BUILD_DIR)/helpscreens
+	$(V)$(BUILD_DIR)/fpsdk_apps/fpltool    -h > $(BUILD_DIR)/helpscreens/fpltool_helpscreen.txt
+	$(V)$(BUILD_DIR)/fpsdk_apps/parsertool -h > $(BUILD_DIR)/helpscreens/parsertool_helpscreen.txt
+	$(V)$(BUILD_DIR)/fpsdk_apps/timeconv   -h > $(BUILD_DIR)/helpscreens/timeconv_helpscreen.txt
+	$(V)$(BUILD_DIR)/fpsdk_apps/yaml2shell -h > $(BUILD_DIR)/helpscreens/yaml2shell_helpscreen.txt
 	$(V)( \
             cat fpsdk_doc/Doxyfile; \
             echo "PROJECT_NUMBER = $$(cat $(BUILD_DIR)/FP_VERSION_STRING || echo 'unknown revision')"; \
             echo "OUTPUT_DIRECTORY = $(BUILD_DIR)"; \
+			echo "EXAMPLE_PATH += $(BUILD_DIR)/helpscreens"; \
         ) | $(DOXYGEN) -
 	$(V)$(TOUCH) $@
-	@echo "now run: xdg-open $(BUILD_DIR)/doc/index.html"
+
+.PHONY: doc-dev
+doc-dev: $(BUILD_DIR)/.make-doc
+	$(V)(cd $(BUILD_DIR)/doc && $(PYTHON) -m http.server 8000)
 
 # ----------------------------------------------------------------------------------------------------------------------
 

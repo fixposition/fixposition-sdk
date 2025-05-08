@@ -641,7 +641,7 @@ class Time
      *
      * @returns the Time object
      */
-    static Time FromPosixNs(const uint64_t posix);
+    static Time FromPosixNs(const uint64_t posix_ns);
 
     /**
      * @brief From ROS time (POSIX)

@@ -27,7 +27,10 @@ namespace apps {
 
     @section FPSDK_APPS_OVERVIEW Overview
 
-    @todo add documentation
+    Several apps ("tools", "utilities") are provided. They are useful as-is but are also meant to demonstrate the
+    use of the @ref FPSDK_COMMON_DOC and serve as a basis for users to build their own tools.
+
+    See @ref FPSDK_BUILD_DOC on how to build and run the apps.
 
     @section FPSDK_APPS_APPS Apps
 

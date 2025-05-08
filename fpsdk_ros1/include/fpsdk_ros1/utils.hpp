@@ -41,7 +41,7 @@ namespace utils {
 /* ****************************************************************************************************************** */
 
 /**
- * @brief Redirect fp:common::logging to ROS console
+ * @brief Redirect fpsdk:common::logging to ROS console
  *
  * This configures the fpsdk::common::logging facility to output via the ROS console. This does *not* configure the ROS
  * console (logger level, logger name, etc.).

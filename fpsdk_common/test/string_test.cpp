@@ -705,6 +705,24 @@ TEST(StringTest, StrError)
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(StringTest, ToStr)
+{
+    EXPECT_EQ(ToStr(false), "false");
+    EXPECT_EQ(ToStr(true), "true");
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(StringTest, StrToVec)
+{
+    const std::string str = "gugus";
+    const std::vector<uint8_t> vec = { 0x67, 0x75, 0x67, 0x75, 0x73 };
+    EXPECT_EQ(StrToVec(str), vec);
+    EXPECT_EQ(str.length(), vec.size());
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace
 

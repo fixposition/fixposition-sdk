@@ -28,12 +28,15 @@ namespace fpltool {
 
     @section FPSDK_APPS_FPLTOOL_OVERVIEW Overview
 
-    See the built-in help:
+    Tool to process .fpl logfiles (recordings). This demonstrates the use of the @ref FPSDK_COMMON_FPL
 
-    @verbatim
-    $ fpltool -h
-    @endverbatim
-*/
+    See @ref FPSDK_BUILD_DOC on how to build and run the apps.
+
+    @section FPSDK_APPS_FPLTOOL_HELP Command line help
+
+    @include fpltool_helpscreen.txt
+
+    */
 
 /* ****************************************************************************************************************** */
 // clang-format on

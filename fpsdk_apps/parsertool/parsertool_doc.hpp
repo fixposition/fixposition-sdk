@@ -30,7 +30,13 @@ namespace parsertool {
 
     This demonstrates the use of the @ref FPSDK_COMMON_PARSER
 
-    For example:
+    See @ref FPSDK_BUILD_DOC on how to build and run the apps.
+
+    @section FPSDK_APPS_PARSERTOOL_HELP Command line help
+
+    @include parsertool_helpscreen.txt
+
+    @section FPSDK_APPS_PARSERTOOL_EXAMPLES Examples
 
     @verbatim
     $ parsertool fpsdk_common/test/data/mixed.bin
@@ -78,7 +84,8 @@ namespace parsertool {
     SPARTN            4 ( 15.4%)        527 ( 19.3%)
     OTHER             8 ( 30.8%)        962 ( 35.2%)
     @endverbatim
-*/
+
+    */
 
 /* ****************************************************************************************************************** */
 // clang-format on

@@ -21,6 +21,7 @@
 /* LIBC/STL */
 #include <cinttypes>
 #include <cstdarg>
+#include <cstdint>
 #include <functional>
 #include <string>
 #include <vector>
@@ -392,6 +393,27 @@ std::string StrToLower(const std::string& str);
  * @returns a string describing the error
  */
 std::string StrError(const int errnum);
+
+/**
+ * @brief Stringify value (bool)
+ *
+ * @param[in]  value  The value
+ *
+ * @returns a stringification of the value
+ */
+constexpr const char* ToStr(const bool value)
+{
+    return value ? "true" : "false";
+}
+
+/**
+ * @brief Convert string to buffer
+ *
+ * @param[in]  str  The string
+ *
+ * @returns a buffer with the string's data
+ */
+std::vector<uint8_t> StrToVec(const std::string& str);
 
 /* ****************************************************************************************************************** */
 }  // namespace string

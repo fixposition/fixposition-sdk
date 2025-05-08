@@ -139,7 +139,7 @@ namespace logging {
 /**
  * @brief Print a notice message                                                                                        @hideinitializer
  */
-#define NOTICE_S(expr)  _FPSDK_LOGGING_STR(NOTICE,   expr)
+#define NOTICE_S(expr)  _FPSDK_LOGGING_STR(NOTICE,  expr)
 /**
  * @brief Print a info message                                                                                          @hideinitializer
  */
@@ -149,7 +149,7 @@ namespace logging {
 /**
  * @brief Print a trace message (only debug builds, compiled out in release builds)                                     @hideinitializer
  */
-#  define TRACE_S(expr) _FPSDK_LOGGING_STR(TRACE,   std::stringstream ss; ss << expr; TRACE("%s", ss.str().c_str()))
+#  define TRACE_S(expr) _FPSDK_LOGGING_STR(TRACE,   expr)
 #else
 #  define TRACE_S(...) /* nothing */
 #endif
