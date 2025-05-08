@@ -89,6 +89,7 @@ jobs:
             ##### Generate HTML content
 
             - name: Build documentation
+              shell: bash
               run: |
                   source /opt/ros/${ROS_DISTRO}/setup.bash
                   echo "github.ref: ${{ github.ref }}"
