@@ -43,7 +43,7 @@ namespace novb {
 /* ****************************************************************************************************************** */
 
 // Doxygen is easily confused.. :-/
-//! Message truct that must be packed
+//! Message struct that must be packed
 #ifndef _DOXYGEN_
 #  define NOV_B_PACKED __attribute__((packed))
 #else
@@ -191,17 +191,17 @@ static constexpr const char* NOV_B_TIME_STRID               = "NOV_B-TIME";     
  */
 struct NovbLongHeader
 {  // clang-format off
-    uint8_t  sync1;             //!< = NOV_B_SYNC_1
-    uint8_t  sync2;             //!< = NOV_B_SYNC_2
-    uint8_t  sync3;             //!< = NOV_B_SYNC_3_LONG
-    uint8_t  header_length;     //!< sizeof(NovbLongHeader)
+    uint8_t  sync1;             //!< = #NOV_B_SYNC_1
+    uint8_t  sync2;             //!< = #NOV_B_SYNC_2
+    uint8_t  sync3;             //!< = #NOV_B_SYNC_3_LONG
+    uint8_t  header_length;     //!< = sizeof(NovbLongHeader)
     uint16_t message_id;        //!< Message ID
-    uint8_t  message_type;      //!< Message type (see NovbMsgTypeSource)
-    uint8_t  port_address;      //!< Port address (see NovbPortAddr)
+    uint8_t  message_type;      //!< Message type (see #NovbMsgTypeSource)
+    uint8_t  port_address;      //!< Port address (see #NovbPortAddr)
     uint16_t message_length;    //!< Message (payload) length
     uint16_t sequence;          //!< Sequence for groups of same messages
     uint8_t  idle_time;         //!< CPU idle [%]
-    uint8_t  time_status;       //!< Time quality indicator (see NovbTimeStatus)
+    uint8_t  time_status;       //!< Time quality indicator (see #NovbTimeStatus)
     uint16_t gps_week;          //!< GPS week number
     int32_t  gps_milliseconds;  //!< GPS time of week [ms]
     uint32_t receiver_status;   //!< Receiver status flags
@@ -218,9 +218,9 @@ static_assert(sizeof(NovbLongHeader) == NOV_B_HEAD_SIZE_LONG, "");
  */
 struct NovbShortHeader
 {  // clang-format off
-    uint8_t  sync1;             //!< = NOV_B_SYNC_1
-    uint8_t  sync2;             //!< = NOV_B_SYNC_2
-    uint8_t  sync3;             //!< = NOV_B_SYNC_3_LONG
+    uint8_t  sync1;             //!< = #NOV_B_SYNC_1
+    uint8_t  sync2;             //!< = #NOV_B_SYNC_2
+    uint8_t  sync3;             //!< = #NOV_B_SYNC_3_LONG
     uint8_t  message_length;    //!< Message (payload) length
     uint16_t message_id;        //!< Message ID
     uint16_t gps_week;          //!< GPS week number
@@ -557,10 +557,10 @@ struct NOV_B_PACKED NovbRawimu
     double   seconds;   //!< GNSS time of week [s]
     uint32_t imu_stat;  //!< The status of the IMU
     int32_t  z_accel;   //!< Change in velocity count along z axis
-    int32_t  y_accel;   //!< -change in velocity count along y axis
+    int32_t  y_accel;   //!< Change in velocity count along y axis
     int32_t  x_accel;   //!< Change in velocity count along x axis
     int32_t  z_gyro;    //!< Change in angle count around z axis
-    int32_t  y_gyro;    //!< -change in angle count around y axis
+    int32_t  y_gyro;    //!< Change in angle count around y axis
     int32_t  x_gyro;    //!< Change in angle count around x axis
 };  // clang-format on
 
@@ -573,13 +573,13 @@ static_assert(sizeof(NovbRawimu) == 40, "");
  */
 struct NovbBestgnsspos
 {  // clang-format off
-    uint32_t sol_stat;                 //!< See NovbGnssSolStat
-    uint32_t pos_type;                 //!< See NovbPosOrVelType
+    uint32_t sol_stat;                 //!< See #NovbGnssSolStat
+    uint32_t pos_type;                 //!< See #NovbPosOrVelType
     double   lat;                      //!< @todo document
     double   lon;                      //!< @todo document
     double   hgt;                      //!< @todo document
     float    undulation;               //!< @todo document
-    uint32_t datum_id;                 //!< See NovbDatumId
+    uint32_t datum_id;                 //!< See #NovbDatumId
     float    lat_stdev;                //!< @todo document
     float    lon_stdev;                //!< @todo document
     float    hgt_stdev;                //!< @todo document
@@ -591,9 +591,9 @@ struct NovbBestgnsspos
     uint8_t  num_sol_l1_svs;           //!< @todo document
     uint8_t  num_sol_multi_svs;        //!< @todo document
     uint8_t  reserved;                 //!< @todo document
-    uint8_t  ext_sol_stat;             //!< See NovbGnssSolExtStat
-    uint8_t  galileo_beidou_sig_mask;  //!< See NovbSigUsedGalBds
-    uint8_t  gps_glonass_sig_mask;     //!< See NovbSigUsedGpsGlo
+    uint8_t  ext_sol_stat;             //!< See #NovbGnssSolExtStat
+    uint8_t  galileo_beidou_sig_mask;  //!< See #NovbSigUsedGalBds
+    uint8_t  gps_glonass_sig_mask;     //!< See #NovbSigUsedGpsGlo
 };  // clang-format on
 
 static_assert(sizeof(NovbBestgnsspos) == 72, "");
@@ -605,8 +605,8 @@ static_assert(sizeof(NovbBestgnsspos) == 72, "");
  */
 struct NOV_B_PACKED NovbBestvel
 {  // clang-format off
-    uint32_t sol_stat;                 //!< See NovbGnssSolStat
-    uint32_t vel_type;                 //!< See NovbPosOrVelType
+    uint32_t sol_stat;                 //!< See #NovbGnssSolStat
+    uint32_t vel_type;                 //!< See #NovbPosOrVelType
     float    latency;                  //!< @todo document
     float    age;                      //!< @todo document
     double   hor_spd;                  //!< @todo document
@@ -624,8 +624,8 @@ static_assert(sizeof(NovbBestvel) == 44, "");
  */
 struct NovbHeading2
 {  // clang-format off
-    uint32_t sol_status;               //!< See NovbGnssSolStat
-    uint32_t pos_type;                 //!< See NovbPosOrVelType
+    uint32_t sol_status;               //!< See #NovbGnssSolStat
+    uint32_t pos_type;                 //!< See #NovbPosOrVelType
     float    length;                   //!< @todo document
     float    heading;                  //!< @todo document
     float    pitch;                    //!< @todo document
@@ -638,10 +638,10 @@ struct NovbHeading2
     uint8_t  num_sv_in_sol;            //!< @todo document
     uint8_t  num_sv_obs;               //!< @todo document
     uint8_t  num_sv_multi;             //!< @todo document
-    uint8_t  sol_source;               //!< See NovbSolSource
-    uint8_t  ext_sol_status;           //!< See NovbGnssSolExtStat
-    uint8_t  galileo_beidou_sig_mask;  //!< See NovbSigUsedGalBds
-    uint8_t  gps_glonass_sig_mask;     //!< See NovbSigUsedGpsGlo
+    uint8_t  sol_source;               //!< See #NovbSolSource
+    uint8_t  ext_sol_status;           //!< See #NovbGnssSolExtStat
+    uint8_t  galileo_beidou_sig_mask;  //!< See #NovbSigUsedGalBds
+    uint8_t  gps_glonass_sig_mask;     //!< See #NovbSigUsedGpsGlo
 };  // clang-format on
 
 static_assert(sizeof(NovbHeading2) == 48, "");
@@ -653,8 +653,8 @@ static_assert(sizeof(NovbHeading2) == 48, "");
  */
 struct NOV_B_PACKED NovbInspvax
 {  // clang-format off
-    uint32_t ins_status;            //!< See NovbInsSolStatus
-    uint32_t pos_type;              //!< See NovbPosOrVelType
+    uint32_t ins_status;            //!< See #NovbInsSolStatus
+    uint32_t pos_type;              //!< See #NovbPosOrVelType
     double   latitude;              //!< @todo document
     double   longitude;             //!< @todo document
     double   height;                //!< @todo document
@@ -674,7 +674,7 @@ struct NOV_B_PACKED NovbInspvax
     float    roll_stdev;            //!< @todo document
     float    pitch_stdev;           //!< @todo document
     float    azimuth_stdev;         //!< @todo document
-    uint32_t extended_status;       //!< See NovbInsSolExtStatus
+    uint32_t extended_status;       //!< See #NovbInsSolExtStatus
     uint16_t time_since_update;     //!< @todo document
 };  // clang-format on
 

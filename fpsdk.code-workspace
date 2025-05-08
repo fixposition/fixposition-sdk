@@ -81,14 +81,18 @@
         "cmake.configureOnOpen": false,
         "python.autoComplete.extraPaths": [
             "${workspaceFolder}/sources/poky/bitbake/lib",
-            "${workspaceFolder}/sources/poky/meta/lib"
+            "${workspaceFolder}/sources/poky/meta/lib",
+            "${workspaceFolder}/poky/bitbake/lib",
+            "${workspaceFolder}/poky/meta/lib"
         ],
         "python.analysis.extraPaths": [
             "/home/flip/core/sw/gnss/misc/scripts",
             "${workspaceFolder}/scripts",
             "/opt/ros/noetic/lib/python3/dist-packages",
             "${workspaceFolder}/sources/poky/bitbake/lib",
-            "${workspaceFolder}/sources/poky/meta/lib"
+            "${workspaceFolder}/sources/poky/meta/lib",
+            "${workspaceFolder}/poky/bitbake/lib",
+            "${workspaceFolder}/poky/meta/lib"
         ],
         "[python]": {
             "diffEditor.ignoreTrimWhitespace": false,
@@ -197,7 +201,23 @@
             "format": "cpp",
             "stdfloat": "cpp",
             "*.ipp": "cpp",
-            "forward_list": "cpp"
+            "forward_list": "cpp",
+            "cerrno": "cpp",
+            "text_encoding": "cpp",
+            "barrier": "cpp",
+            "cuchar": "cpp",
+            "netfwd": "cpp",
+            "rope": "cpp",
+            "slist": "cpp",
+            "generator": "cpp",
+            "latch": "cpp",
+            "print": "cpp",
+            "scoped_allocator": "cpp",
+            "spanstream": "cpp",
+            "stacktrace": "cpp",
+            "syncstream": "cpp",
+            "*.conf": "bitbake",
+            "*.inc": "bitbake"
         },
         "workbench.remoteIndicator.showExtensionRecommendations": true,
         "yaml.extension.recommendations": false
@@ -207,8 +227,7 @@
             "ms-vscode.cpptools",
             "ms-vscode.cmake-tools",
             "ms-vscode-remote.remote-ssh",
-            "ms-vscode-remote.remote-containers",
-            "twxs.cmake"
+            "ms-vscode-remote.remote-containers"
         ],
         "unwantedRecommendations": [
         ]
@@ -285,6 +304,36 @@
                 "preLaunchTask" : "Fixposition SDK: build",
                 "program": "${workspaceFolder}/build/Debug/fpsdk_common/fpsdk_common_trafo_test",
                 "args": [ "-v", "-v", "-v", "-v" ],
+                "cwd": "${workspaceFolder}",
+                "setupCommands": [
+                    { "text": "set auto-load safe-path ${workspaceFolder}", "description": "", "ignoreFailures": true },
+                    { "text": "-enable-pretty-printing", "description": "enable pretty printing", "ignoreFailures": true },
+                    { "text": "handle SIGPIPE nostop noprint pass", "description": "ignore SIGPIPE", "ignoreFailures": true },
+                    { "text": "source ${workspaceFolder}/.devcontainer/.gdb/gdbinit", "description": "load local gdbinit", "ignoreFailures": false }
+                ]
+            },
+            {
+                "name": "Fixposition SDK: debug streamtool",
+                "type": "cppdbg", "request": "launch", "MIMode": "gdb", "miDebuggerPath" : "gdb",
+                "stopAtEntry": true,
+                "preLaunchTask" : "Fixposition SDK: build",
+                "program": "${workspaceFolder}/build/Debug/fpsdk_apps/streamtool",
+                "args": [ "-v", "-v", "-v", "tcpsvr://:12345" ],
+                "cwd": "${workspaceFolder}",
+                "setupCommands": [
+                    { "text": "set auto-load safe-path ${workspaceFolder}", "description": "", "ignoreFailures": true },
+                    { "text": "-enable-pretty-printing", "description": "enable pretty printing", "ignoreFailures": true },
+                    { "text": "handle SIGPIPE nostop noprint pass", "description": "ignore SIGPIPE", "ignoreFailures": true },
+                    { "text": "source ${workspaceFolder}/.devcontainer/.gdb/gdbinit", "description": "load local gdbinit", "ignoreFailures": false }
+                ]
+            },
+            {
+                "name": "Fixposition SDK: debug streammux",
+                "type": "cppdbg", "request": "launch", "MIMode": "gdb", "miDebuggerPath" : "gdb",
+                "stopAtEntry": false,
+                "preLaunchTask" : "Fixposition SDK: build",
+                "program": "${workspaceFolder}/build/Debug/fpsdk_apps/streammux",
+                "args": [ "-v", "-v", "-v", "-s", "tcpsvr://:10001", "-s", "tcpsvr://:10002", "-m", "1=2", "-a", ":20000/meier" ],
                 "cwd": "${workspaceFolder}",
                 "setupCommands": [
                     { "text": "set auto-load safe-path ${workspaceFolder}", "description": "", "ignoreFailures": true },

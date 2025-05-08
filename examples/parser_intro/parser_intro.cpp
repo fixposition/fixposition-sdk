@@ -81,7 +81,7 @@ const uint8_t SAMPLE_DATA_1[] = {
                "-0.00008,-0.00002,0.00019,fp_vrtk2-integ_6912e460-1703*01\r\n"
     /*  (8) */ "$FP,ODOMSTATUS,1,2348,574452.500000,2,2,1,1,1,1,,0,,,,,,0,1,3,8,8,3,5,5,,0,6,,,,,,,,,,,,*2E\r\n"
     /*  (9) */ "$FP,EOE,1,2348,574452.500000,FUSION*6F\r\n"
-    // Hmmm... there seems to be some kine of errors in the reception of the data. Perhaps a bad cable or a shaky connector?
+    // Hmmm... there seems to be some kind of errors in the reception of the data. Perhaps a bad cable or a shaky connector?
     /* (10) */ "$FP,ODOM3TRY,2,2348,574453.000000,4278387.6988,6\xaa\x55\xaa\x55.604077,0.312982\xba\xad\xc0\xff\xee.71"
                "0587,0.0010,-0.0005,0.0018,0.00368,-0.00044,0.00092,0.2163,0.1214,9.8162,4,0,8,8,-1,0.00073,0.00294,"
                "0.00107,0.00141,-0.00170,-0.00083,0.02269,0.00042,0.02650,0.00283,-0.00305,-0.02448,0.00100,0.00053,"
@@ -126,7 +126,6 @@ int main(int /*argc*/, char** /*argv*/)
     // stream of data into individual messages (als known as "frames"). The Parser recgonises a variety of protocols and
     // it can reliably split data into messages of all the protocols it understands. It can do so in streams of mixed
     // data, such as FP_A, NMEA and NOV_B messages in the same stream.
-    //
 
     // Create a parser instance. Note that one parser should be used per stream of data. If multiple streams (inputs)
     // are handled, they should all be processed by a separate Parser instance.

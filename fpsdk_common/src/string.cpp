@@ -509,6 +509,13 @@ std::string StrError(const int errnum)
 #endif
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::vector<uint8_t> StrToVec(const std::string& str)
+{
+    return { (const uint8_t*)str.data(), (const uint8_t*)str.data() + str.size() };
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace string
 }  // namespace common

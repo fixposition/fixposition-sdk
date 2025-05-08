@@ -28,11 +28,13 @@ namespace timeconv {
 
     @section FPSDK_APPS_TIMECONV_OVERVIEW Overview
 
-    See the built-in help:
+    Tool to convert time. This demonstrates the use of the @ref FPSDK_COMMON_TIME
 
-    @verbatim
-    $ timeconv -h
-    @endverbatim
+    See @ref FPSDK_BUILD_DOC on how to build and run the apps.
+
+    @section FPSDK_APPS_TIMECONV_HELP Command line help
+
+    @include timeconv_helpscreen.txt
 
 */
 

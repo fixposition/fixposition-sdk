@@ -24,15 +24,17 @@ namespace streammux {
 /* ****************************************************************************************************************** */
 
 /*!
-    @page FPSDK_APPS_YAML2SHELL yaml2shell tool
+    @page FPSDK_APPS_YAML2SHELL yaml2shell
 
     @section FPSDK_APPS_YAML2SHELL_OVERVIEW Overview
 
-    See the built-in help:
+    Tool to convert a yaml document to shell variables.
 
-    @verbatim
-    $ yaml2shell -h
-    @endverbatim
+    See @ref FPSDK_BUILD_DOC on how to build and run the apps.
+
+    @section FPSDK_APPS_YAML2SHELL_HELP Command line help
+
+    @include yaml2shell_helpscreen.txt
 
 */
 
