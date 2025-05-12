@@ -633,6 +633,17 @@ class Time
     static Time FromPosix(const std::time_t posix);
 
     /**
+     * @brief From POSIX seconds (POSIX)
+     *
+     * @note See comments in the class description regarding POSIX time!
+     *
+     * @param[in]  posix_sec  Time value seconds (> 0.0)
+     *
+     * @returns the Time object
+     */
+    static Time FromPosixSec(const double posix_sec);
+
+    /**
      * @brief From POSIX time (POSIX, nanoseconds)
      *
      * @note See comments in the class description regarding POSIX time!
@@ -756,6 +767,17 @@ class Time
     bool SetPosix(const std::time_t posix);
 
     /**
+     * @brief Set time from POSIX seconds (POSIX)
+     *
+     * @note See comments in the class description regarding POSIX time!
+     *
+     * @param[in]  posix_sec  Time value seconds (> 0.0)
+     *
+     * @returns true if successful, false otherwise (bad time)
+     */
+    bool SetPosixSec(const double posix_sec);
+
+    /**
      * @brief Set time from POSIX time (POSIX, nanoseconds)
      *
      * @note See comments in the class description regarding POSIX time!
@@ -864,6 +886,17 @@ class Time
      * @returns the POSIX time, truncated (rounded down, sub-seconds ignored)
      */
     std::time_t GetPosix() const;
+
+    /**
+     * @brief Get time as POSIX seconds (POSIX)
+     *
+     * @note See comments in the class description regarding POSIX time!
+     *
+     * @param[in]  prec  Round the seconds to this many fractional digits (0-9)
+     *
+     * @returns the POSIX time in seconds
+     */
+    double GetPosixSec(const int prec = 9) const;
 
     /**
      * @brief Get time as POSIX time (POSIX, nanoseconds)

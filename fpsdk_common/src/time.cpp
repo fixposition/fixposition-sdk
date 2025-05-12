@@ -931,6 +931,15 @@ Time::Time() : sec_{ 0 }, nsec_{ 0 }
     return time;
 }
 
+/*static*/ Time Time::FromPosixSec(const double posix_sec)
+{
+    Time time;
+    if (!time.SetPosixSec(posix_sec)) {
+        throw std::runtime_error(TIME_THROW_MSG);
+    }
+    return time;
+}
+
 /*static*/ Time Time::FromPosixNs(const uint64_t posix_ns)
 {
     Time time;
@@ -1051,6 +1060,23 @@ bool Time::SetPosix(const std::time_t posix)
     nsec_ = 0;
     TIME_TRACE("SetPosix %" PRIiMAX " lsinfo %d %s -> %" PRIu32 " %" PRIu32, posix, lsinfo.leapsec_value_,
         lsinfo.at_leapsec_ ? "true" : "false", sec_, nsec_);
+    return true;
+}
+
+bool Time::SetPosixSec(const double posix_sec)
+{
+    uint32_t isec = 0;
+    uint32_t nsec = 0;
+    if (!timeSecToIsecNsec(posix_sec, isec, nsec)) {
+        return false;
+    }
+    const auto lsinfo = getLeapSecInfo(isec, true);
+    isec += lsinfo.leapsec_value_;
+    if (lsinfo.at_leapsec_) {
+        isec -= 1;
+    }
+    sec_ = isec;
+    nsec_ = nsec;
     return true;
 }
 
@@ -1240,6 +1266,12 @@ std::time_t Time::GetPosix() const
     TIME_TRACE("GetPosix %" PRIu32 " lsinfo %d %s -> %" PRIiMAX, sec_, lsinfo.leapsec_value_,
         lsinfo.at_leapsec_ ? "true" : "false", posix);
     return posix;
+}
+
+double Time::GetPosixSec(const int prec) const
+{
+    return math::RoundToFracDigits(
+        static_cast<double>(GetPosix()) + (1e-9 * static_cast<double>(nsec_)), std::clamp(prec, 0, 9));
 }
 
 uint64_t Time::GetPosixNs() const
