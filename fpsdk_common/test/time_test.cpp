@@ -1574,6 +1574,19 @@ TEST(TimeTest, PosixNs)
     EXPECT_EQ(t1.GetRosTime().ToNSec(), t1.GetPosixNs());
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(TimeTest, PosixSec)
+{
+    const auto t1 = Time::FromSecNSec(800000000, 123456789);
+    EXPECT_NEAR(t1.GetPosixSec(), 799999981.123456789, 1e-9);
+
+    const auto t2 = Time::FromPosixSec(799999981.123456789);
+    EXPECT_NEAR(t2.GetSec(), 800000000.123456789, 1e-9);
+
+    EXPECT_EQ(t1.GetRosTime().ToSec(), t1.GetPosixSec());
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace
 
