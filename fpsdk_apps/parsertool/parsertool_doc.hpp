@@ -38,6 +38,8 @@ namespace parsertool {
 
     @section FPSDK_APPS_PARSERTOOL_EXAMPLES Examples
 
+    <b>Print info on all messages found in a file:</b>
+
     @verbatim
     $ parsertool fpsdk_common/test/data/mixed.bin
     @endverbatim
@@ -86,6 +88,8 @@ namespace parsertool {
     OTHER             8 ( 29.6%)        962 ( 33.9%)
     @endverbatim
 
+
+    <b>Print info on selected messages found in a file:</b>
 
     @verbatim
     $ parsertool -f NMEA,FP_A fpsdk_common/test/data/mixed.bin
