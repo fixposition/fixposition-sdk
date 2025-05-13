@@ -38,7 +38,7 @@ namespace parsertool {
 
     @section FPSDK_APPS_PARSERTOOL_EXAMPLES Examples
 
-    **Print info on all messages found in a file:**
+    <b>Print info on all messages found in a file:</b>
 
     @verbatim
     $ parsertool fpsdk_common/test/data/mixed.bin
@@ -89,7 +89,7 @@ namespace parsertool {
     @endverbatim
 
 
-    **Print info on selected messages found in a file:**
+    <b>Print info on selected messages found in a file:</b>
 
     @verbatim
     $ parsertool -f NMEA,FP_A fpsdk_common/test/data/mixed.bin
