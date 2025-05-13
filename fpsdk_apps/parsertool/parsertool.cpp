@@ -77,9 +77,9 @@ class ParserToolOptions : public ProgramOptions
         std::fputs(
             "    -x       -- Print hexdump of each message, not with -c\n"
             "    -s       -- Save each (!) message into a separate (!) file in the current directory, not with -c\n"
-            "    -f <filter> -- Filter input. <filter> is a comma-separated list of full or partial message names.\n"
-            "                Multiple -f can be given.\n"
-            "    -c          -- Write messages to stdout instead of printing info, useful with -f\n"
+            "    -f <filter> -- Filter input, where <filter> is a comma-separated list of full or partial message.\n"
+            "                names. Multiple -f can be given.\n"
+            "    -c       -- Write messages to stdout instead of printing info, useful with -f\n"
             "    <input>  -- File or device to read data from (instead of stdin)\n"
             "\n"
             "Examples:\n"
