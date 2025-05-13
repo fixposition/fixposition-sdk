@@ -116,12 +116,12 @@ jobs:
 
             # https://github.com/actions/configure-pages
             - name: Configure pages
-              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/109/merge' }}
+              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/111/merge' }}
               uses: actions/configure-pages@v5
 
             # https://github.com/actions/deploy-pages
             - name: Deploy pages
-              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/109/merge' }}
+              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/111/merge' }}
               uses: actions/deploy-pages@v4
               with:
                   artifact_name: github-pages

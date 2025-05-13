@@ -49,12 +49,14 @@ class ParserToolOptions : public ProgramOptions
 {
    public:
     ParserToolOptions()  // clang-format off
-        : ProgramOptions("parsertool", { { 'x', false }, { 's', false } }) {};  // clang-format on
+        : ProgramOptions("parsertool", { { 'x', false }, { 's', false }, { 'f', true }, { 'c', false } }) {};  // clang-format on
 
     // clang-format off
     bool                      hexdump_ = false;  //!< Do hexdump of messages
     bool                      split_   = false;  //!< Split individual messages and save to files
     std::vector<std::string>  inputs_;           //!< Input file(s)
+    std::vector<std::string>  filters_;          //!< Filters
+    bool                      stdout_  = false;  //!< Write message to stdout instead of info about it
     // clang-format on
 
     void PrintHelp() final
@@ -73,8 +75,11 @@ class ParserToolOptions : public ProgramOptions
             "\n" ,stdout);
         std::fputs(COMMON_FLAGS_HELP, stdout);
         std::fputs(
-            "    -x       -- Print hexdump of each message\n"
-            "    -s       -- Save each (!) message into a separate (!) file in the current directory\n"
+            "    -x       -- Print hexdump of each message, not with -c\n"
+            "    -s       -- Save each (!) message into a separate (!) file in the current directory, not with -c\n"
+            "    -f <filter> -- Filter input. <filter> is a comma-separated list of full or partial message names.\n"
+            "                Multiple -f can be given.\n"
+            "    -c          -- Write messages to stdout instead of printing info, useful with -f\n"
             "    <input>  -- File or device to read data from (instead of stdin)\n"
             "\n"
             "Examples:\n"
@@ -95,11 +100,25 @@ class ParserToolOptions : public ProgramOptions
             "    Read from a serial port (such as a USB to serial converter):\n"
             "\n"
             "        stty -F /dev/ttyUSB0 115200 raw -echo; parsertool /dev/ttyUSB0\n"
+            "\n"
+            "    Filter all FP_A-ODOMETRY:\n"
+            "\n"
+            "        parsertool -f FP_A-ODOMETRY fpsdk_common/test/data/mixed.bin\n"
+            "\n"
+            "    Filter all NMEA and FP_A messages. Either command does the same.\n"
+            "\n"
+            "        parsertool -f FP_A -f NMEA fpsdk_common/test/data/mixed.bin\n"
+            "        parsertool -f FP_A,NMEA fpsdk_common/test/data/mixed.bin\n"
+            "\n"
+            "    Filter all NMEA and FP_A messages and store to output.txt file:\n"
+            "\n"
+            "        parsertool -f FP_A,NMEA -c fpsdk_common/test/data/mixed.bin > output.txt\n"
+            "\n"
             "\n", stdout);
         // clang-format on
     }
 
-    bool HandleOption(const Option& option, const std::string& /*argument*/) final
+    bool HandleOption(const Option& option, const std::string& argument) final
     {
         bool ok = true;
         switch (option.flag) {
@@ -108,6 +127,14 @@ class ParserToolOptions : public ProgramOptions
                 break;
             case 's':
                 split_ = true;
+                break;
+            case 'f':
+                for (auto& f : StrSplit(argument, ",")) {
+                    filters_.push_back(f);
+                }
+                break;
+            case 'c':
+                stdout_ = true;
                 break;
             default:
                 ok = false;
@@ -126,8 +153,12 @@ class ParserToolOptions : public ProgramOptions
         for (std::size_t ix = 0; ix < inputs_.size(); ix++) {
             DEBUG("inputs_[%" PRIuMAX "] = '%s'", ix, inputs_[ix].c_str());
         }
-        DEBUG("hexdump    = %s", hexdump_ ? "true" : "false");
-        DEBUG("split      = %s", split_ ? "true" : "false");
+        DEBUG("hexdump    = %s", ToStr(hexdump_));
+        DEBUG("split      = %s", ToStr(split_));
+        for (std::size_t ix = 0; ix < filters_.size(); ix++) {
+            DEBUG("filters[%" PRIuMAX "] = %s", ix, filters_[ix].c_str());
+        }
+        DEBUG("stdout     = %s", ToStr(stdout_));
 
         return ok;
     }
@@ -145,7 +176,9 @@ class ParserTool
     bool Run()
     {
         // Print header
-        PrintMessageHeader();
+        if (!opts_.stdout_) {
+            PrintMessageHeader();
+        }
 
         // Process data from stdin
         if (opts_.inputs_.empty()) {
@@ -171,7 +204,9 @@ class ParserTool
         }
 
         //! Print statistics
-        PrintParserStats(parser_.GetStats());
+        if (!opts_.stdout_) {
+            PrintParserStats();
+        }
 
         return ok;
     }
@@ -183,6 +218,7 @@ class ParserTool
     SigIntHelper sigint_;     //!< Handle SIGINT (C-c) to abort nicely
     Parser parser_;           //!< Parser
     std::size_t offs_;        //!< Offset of message in input data
+    ParserStats stats_;       //!< Parser statistics
 
     // -----------------------------------------------------------------------------------------------------------------
 
@@ -222,20 +258,12 @@ class ParserTool
             // Run parser and print messages to the screen
             while (parser_.Process(msg)) {
                 PrintMessageData(msg, offs_, opts_.hexdump_);
-                offs_ += msg.data_.size();
-                if (opts_.split_) {
-                    SaveMessage(msg);
-                }
             }
         }
 
         // There may be some remaining data in the parser
         while (parser_.Flush(msg)) {
             PrintMessageData(msg, offs_, opts_.hexdump_);
-            offs_ += msg.data_.size();
-            if (opts_.split_) {
-                SaveMessage(msg);
-            }
         }
     }
 
@@ -261,21 +289,36 @@ class ParserTool
 
     void PrintMessageData(const ParserMsg& msg, const std::size_t offs, const bool hexdump)
     {
-        msg.MakeInfo();
-        std::printf("message %06" PRIuMAX " %8" PRIuMAX " %5" PRIuMAX " %-8s %-30s %s\n", msg.seq_, offs,
-            msg.data_.size(), ProtocolStr(msg.proto_), msg.name_.c_str(), msg.info_.empty() ? "-" : msg.info_.c_str());
-        if (hexdump) {
-            for (auto& line : HexDump(msg.data_)) {
-                std::printf("%s\n", line.c_str());
+        if (!CheckFilter(msg)) {
+            return;
+        }
+
+        if (opts_.stdout_) {
+            std::fwrite(msg.data_.data(), msg.data_.size(), 1, stdout);
+        } else {
+            msg.MakeInfo();
+            std::printf("message %06" PRIuMAX " %8" PRIuMAX " %5" PRIuMAX " %-8s %-30s %s\n", msg.seq_, offs,
+                msg.data_.size(), ProtocolStr(msg.proto_), msg.name_.c_str(),
+                msg.info_.empty() ? "-" : msg.info_.c_str());
+            if (hexdump) {
+                for (auto& line : HexDump(msg.data_)) {
+                    std::printf("%s\n", line.c_str());
+                }
+            }
+            if (opts_.split_) {
+                SaveMessage(msg);
             }
         }
+
+        stats_.Update(msg);
+        offs_ += msg.data_.size();
     }
 
     // -----------------------------------------------------------------------------------------------------------------
 
-    void PrintParserStats(const ParserStats& stats)
+    void PrintParserStats()
     {
-        auto& s = stats;
+        const auto& s = stats_;
         const double p_n = (s.n_msgs_ > 0 ? 100.0 / (double)s.n_msgs_ : 0.0);
         const double p_s = (s.s_msgs_ > 0 ? 100.0 / (double)s.s_msgs_ : 0.0);
         std::printf("Stats:     Messages               Bytes\n");
@@ -292,6 +335,21 @@ class ParserTool
         std::printf(fmt, ProtocolStr(Protocol::SPARTN), s.n_spartn_, (double)s.n_spartn_ * p_n, s.s_spartn_, (double)s.s_spartn_ * p_s);
         std::printf(fmt, ProtocolStr(Protocol::OTHER),  s.n_other_,  (double)s.n_other_  * p_n, s.s_other_,  (double)s.s_other_  * p_s);
         // clang-format on
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+
+    bool CheckFilter(const ParserMsg& msg)
+    {
+        if (opts_.filters_.empty()) {
+            return true;
+        }
+        for (const auto& f : opts_.filters_) {
+            if (StrStartsWith(msg.name_, f)) {
+                return true;
+            }
+        }
+        return false;
     }
 };
 
