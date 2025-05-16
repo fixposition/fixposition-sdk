@@ -22,6 +22,16 @@ namespace fpsdk {
 
     @page FPSDK_BUILD_DOC Fixposition SDK: Build and installation
 
+    @section FPSDK_BUILD_DOC_OVERVIEW Overview
+
+    This page describes how the Fixposition SDK can be built and installed. This is intended for users who are familiar
+    with developing c++ code and building software and who want to build their own applications using the @ref
+    FPSDK_COMMON_DOC (etc.)
+
+    For users interested in simply *using* the @ref FPSDK_APPS_DOC it is recommended to use the @ref FPSDK_RUN_DOC
+    instead of building and installing those themselves.
+
+
     @section FPSDK_BUILD_DEPS Dependencies
 
     For building the libraries and apps:

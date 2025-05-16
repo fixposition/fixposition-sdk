@@ -1,3 +1,12 @@
+########################################################################################################################
+# ___    ___
+# \  \  /  /
+#  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+#  /  /\  \   License: see the LICENSE file
+# /__/  \__\
+#
+########################################################################################################################
+
 FROM ghcr.io/fixposition/fixposition-sdk:bookworm-base
 
 # Metadata for github packages
@@ -13,8 +22,10 @@ COPY docker/scripts/install_precommithooks.sh /tmp
 RUN /tmp/install_precommithooks.sh && rm -f /tmp/install_precommithooks.sh /tmp/.pre-commit-config.yaml
 
 # Install useful stuff
-COPY docker/scripts/install_aptci.sh /tmp
-RUN /tmp/install_aptci.sh && rm -f /tmp/install_aptci.share
+COPY docker/scripts/install_apt_ci.sh /tmp
+RUN /tmp/install_apt_ci.sh && rm -f /tmp/install_apt_ci.share
 
 # For debugging docker builds... (last layer!)
 RUN date > /fixposition-sdk-${FPSDK_IMAGE}
+
+########################################################################################################################

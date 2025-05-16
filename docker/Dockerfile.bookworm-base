@@ -1,3 +1,12 @@
+########################################################################################################################
+# ___    ___
+# \  \  /  /
+#  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+#  /  /\  \   License: see the LICENSE file
+# /__/  \__\
+#
+########################################################################################################################
+
 # Debian Bookworm (LTS until (at least) June 2026)
 FROM debian:bookworm
 
@@ -10,8 +19,8 @@ ENV FPSDK_IMAGE=bookworm-base
 ENV ROS_DISTRO=
 
 # Install stuff
-COPY docker/scripts/install_aptbase.sh /tmp
-RUN /tmp/install_aptbase.sh && rm -f /tmp/install_aptbase.sh
+COPY docker/scripts/install_apt_base.sh /tmp
+RUN /tmp/install_apt_base.sh && rm -f /tmp/install_apt_base.sh
 
 # Download, build and install clang-format
 COPY docker/scripts/install_clangformat.sh /tmp
@@ -55,3 +64,5 @@ EOF
 
 # For automation and debugging docker builds... (last layer!)
 RUN date > /fixposition-sdk-${FPSDK_IMAGE}
+
+########################################################################################################################
