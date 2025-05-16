@@ -14,9 +14,11 @@
 /* LIBC/STL */
 #include <cctype>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <mutex>
+#include <algorithm>
 
 /* EXTERNAL */
 #include <unistd.h>
@@ -29,7 +31,6 @@ namespace common {
 namespace logging {
 /* ****************************************************************************************************************** */
 
-static LoggingColour g_colour_init = LoggingColour::AUTO;
 static LoggingParams g_params;
 std::mutex g_mutex;
 static char g_line[0x1fff];
@@ -212,13 +213,45 @@ LoggingParams::LoggingParams(
     timestamps_   { timestamps },
     fn_           { LoggingDefaultWriteFn }  // clang-format on
 {
+    printf("init! %s %s %s\n", LoggingLevelStr(level_), LoggingColourStr(colour_), LoggingTimestampsStr(timestamps_));
+
+    // Change defaults from environment variables when g_params ctor is called, before any user calls to
+    // LoggingParams()/LoggingSetParams()
+    static bool s_defaults_init = false;
+    if (!s_defaults_init) {
+        const char* env_logging = std::getenv("FP_LOGGING");
+        if ((env_logging != nullptr) && (env_logging[0] != '\0')) {
+            // Copy string and lower-case it
+            char words[1000];
+            std::snprintf(words, sizeof(words), "%s,", env_logging);
+            std::transform(words, &words[std::strlen(words)], words, [](const char c){ return std::tolower(c); } );
+            for (char *word = std::strtok(words, ","); word != nullptr; word = std::strtok(nullptr, ",")) {
+                // clang-format off
+                if      (std::strcmp(word, "trace")    == 0) { level_      = LoggingLevel::TRACE;         }
+                else if (std::strcmp(word, "debug")    == 0) { level_      = LoggingLevel::DEBUG;         }
+                else if (std::strcmp(word, "info")     == 0) { level_      = LoggingLevel::INFO;          }
+                else if (std::strcmp(word, "notice")   == 0) { level_      = LoggingLevel::NOTICE;        }
+                else if (std::strcmp(word, "warning")  == 0) { level_      = LoggingLevel::WARNING;       }
+                else if (std::strcmp(word, "error")    == 0) { level_      = LoggingLevel::ERROR;         }
+                else if (std::strcmp(word, "fatal")    == 0) { level_      = LoggingLevel::FATAL;         }
+                else if (std::strcmp(word, "auto")     == 0) { colour_     = LoggingColour::AUTO;         }
+                else if (std::strcmp(word, "yes")      == 0) { colour_     = LoggingColour::YES;          }
+                else if (std::strcmp(word, "no")       == 0) { colour_     = LoggingColour::NO;           }
+                else if (std::strcmp(word, "journal")  == 0) { colour_     = LoggingColour::JOURNAL;      }
+                else if (std::strcmp(word, "none")     == 0) { timestamps_ = LoggingTimestamps::NONE;     }
+                else if (std::strcmp(word, "relative") == 0) { timestamps_ = LoggingTimestamps::RELATIVE; }
+                else if (std::strcmp(word, "absolute") == 0) { timestamps_ = LoggingTimestamps::ABSOLUTE; }
+                // clang-format off
+            }
+        }
+
+        s_defaults_init = true;
+    }
+
+
     // User wants us to decide...
     if (colour_ == LoggingColour::AUTO) {
-        // Determine this once on first call
-        if (g_colour_init == LoggingColour::AUTO) {
-            g_colour_init = (isatty(fileno(stderr)) == 1 ? LoggingColour::YES : LoggingColour::NO);
-        }
-        colour_ = g_colour_init;
+        colour_ = (isatty(fileno(stderr)) == 1 ? LoggingColour::YES : LoggingColour::NO);
     }
 }
 

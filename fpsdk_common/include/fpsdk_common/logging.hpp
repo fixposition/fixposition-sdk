@@ -14,6 +14,26 @@
  *
  * **API**: fpsdk_common/logging.hpp and fpsdk::common::logging
  *
+ * @section FPSDK_COMMON_LOGGIN_CONFIG Logging configuration
+ *
+ * The defaults are:
+ *
+ * - fpsdk::common::logging::LoggingLevel::INFO
+ * - fpsdk::common::logging::LoggingColour::AUTO
+ * - fpsdk::common::logging::LoggingTimestamps::NONE
+ *
+ * The defaults can be changed by setting the FPSDK_LOGGING environment variable to a comma-separated list of words that
+ * correspond to the above parameters. The parameters are case-insensitive and they are applied in the order of
+ * appearance. Examples:
+ *
+ * @code{sh}
+ * export FPSDK_LOGGING=DEBUG                   # Changes the level to DEBUG
+ * export FPSDK_LOGGING=Warning,JOURNAL         # Changes the level to WARNING and the "colour" to JOURNAL
+ * export FPSDK_LOGGING=Warning,relative,debug  # Changes the level to DEBUG and the timestamps to RELATIVE
+ * @endcode
+ *
+ * Apps can configure the logging using the fpsdk::common::logging::LoggingSetParams(). See also the implementation of
+ * fpsdk::common::app::ProgramOptions().
  */
 #ifndef __FPSDK_COMMON_LOGGING_HPP__
 #define __FPSDK_COMMON_LOGGING_HPP__

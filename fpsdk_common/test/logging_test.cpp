@@ -60,12 +60,12 @@ TEST(LoggingTest, LoggingPrint)
 int main(int argc, char** argv)
 {
     testing::InitGoogleTest(&argc, argv);
-    auto level = fpsdk::common::logging::LoggingLevel::WARNING;
+    //auto level = fpsdk::common::logging::LoggingLevel::WARNING;
     for (int ix = 0; ix < argc; ix++) {
         if ((argv[ix][0] == '-') && argv[ix][1] == 'v') {
-            level++;
+      //      level++;
         }
     }
-    fpsdk::common::logging::LoggingSetParams(level);
+    //fpsdk::common::logging::LoggingSetParams(level);
     return RUN_ALL_TESTS();
 }
