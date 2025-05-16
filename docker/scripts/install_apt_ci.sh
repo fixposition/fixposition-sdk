@@ -1,4 +1,5 @@
 #!/bin/bash
+#!/bin/bash
 ########################################################################################################################
 # ___    ___
 # \  \  /  /
@@ -8,20 +9,25 @@
 #
 ########################################################################################################################
 #
-# Set timezone, sane language and locale
+# Install stuff for the *-ci images (CI)
 #
 ########################################################################################################################
 set -eEu
 
-set -e
+# List of packages, with filter for the different images we make
+packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
+    noetic.humble.jazzy.bookworm    rsync
+EOF
+)
+
+echo "Installing: ${packages}"
+
 export DEBIAN_FRONTEND=noninteractive
+
 apt-get -y update
 apt-get -y --with-new-pkgs upgrade
-apt-get -y install locales sudo
+apt-get -y --no-install-recommends install ${packages}
+apt-get -y autoremove
 apt-get clean
-ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
-echo $TZ > /etc/timezone
-sed -i '/en_GB.UTF-8/s/^# //g' /etc/locale.gen
-locale-gen
 
 ########################################################################################################################

@@ -52,6 +52,10 @@ namespace fpsdk {
 
     See @ref FPSDK_BUILD_DOC.
 
+    @section FPSDK_RUN Running pre-built apps
+
+    See @ref FPSDK_RUN_DOC.
+
     @section FP_REFS References
 
     - Fixposition SDK source code repository: https://github.com/fixposition/fixposition-sdk

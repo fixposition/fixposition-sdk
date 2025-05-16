@@ -1,3 +1,12 @@
+########################################################################################################################
+# ___    ___
+# \  \  /  /
+#  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+#  /  /\  \   License: see the LICENSE file
+# /__/  \__\
+#
+########################################################################################################################
+
 FROM ghcr.io/fixposition/fixposition-sdk:bookworm-base
 
 # Metadata for github packages
@@ -38,8 +47,10 @@ COPY docker/scripts/install_mcap.sh /tmp
 RUN /tmp/install_mcap.sh && rm -f /tmp/install_mcap.sh
 
 # Install useful stuff
-COPY docker/scripts/install_aptdev.sh /tmp
-RUN /tmp/install_aptdev.sh && rm -f /tmp/install_aptdev.share
+COPY docker/scripts/install_apt_dev.sh /tmp
+RUN /tmp/install_apt_dev.sh && rm -f /tmp/install_apt_dev.share
 
 # For debugging docker builds... (last layer!)
 RUN date > /fixposition-sdk-${FPSDK_IMAGE}
+
+########################################################################################################################

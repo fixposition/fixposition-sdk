@@ -1,7 +1,18 @@
 #!/bin/bash
-set -eEu
-####################################################################################################
+#!/bin/bash
+########################################################################################################################
+# ___    ___
+# \  \  /  /
+#  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+#  /  /\  \   License: see the LICENSE file
+# /__/  \__\
+#
+########################################################################################################################
+#
 # Add user for devcontainer, see ../.devcontainer/devcontainer.json
+#
+########################################################################################################################
+set -eEu
 #
 # We deliberately use UID and GID 1000 as that is typically the first user on any (Debian/Ubuntu)
 # system. Since we want to use vscode's devcontainer remoteUser/updateRemoteUserUID feature, we want
@@ -19,4 +30,4 @@ adduser --uid 1000 --gid 1000 fpsdk
 echo "fpsdk ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/fpsdk
 chmod 0440 /etc/sudoers.d/fpsdk
 
-####################################################################################################
+########################################################################################################################

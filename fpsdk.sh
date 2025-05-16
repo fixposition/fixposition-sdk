@@ -1,0 +1,204 @@
+#!/bin/bash
+########################################################################################################################
+# ___    ___
+# \  \  /  /
+#  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+#  /  /\  \   License: see the LICENSE file
+# /__/  \__\
+#
+########################################################################################################################
+#
+# Script to run fpsdk apps in a temporary container
+#
+########################################################################################################################
+set -eEu
+set -o pipefail
+set -o errtrace
+
+SCRIPTDIR=$(dirname $(readlink -f $0))
+DEBUG=0
+
+function main
+{
+    # Get command line options
+    OPTERR=1
+    local image=bookworm
+    local update=0
+    local volume_args=
+    while getopts ":hdui:v:" opt; do
+        case $opt in
+            h)
+                echo
+                echo "Run Fixposition SDK apps"
+                echo
+                echo "This uses Docker images which contain pre-build binaries of the Fixposition SDK apps."
+                echo
+                echo "Usage: $0 [-d] [-u] [-i <image>] [-v <volume> ...] <command> ..."
+                echo
+                echo "Where:"
+                echo
+                echo "    -d          Enable debug output (of this script)"
+                echo "    -u          Update (pull) the necessary Docker <image>"
+                echo "    -i <image>  Specifies which Docker image to use (default: bookworm). Available images are:"
+                echo "                bookworm  -- Debian Bookworm (no ROS, some functionality not available)"
+                echo "                noetic    -- ROS1 Noetic (additional ROS1 functionality available)"
+                echo "                humble    -- ROS2 Humble (additional ROS2 functionality available)"
+                echo "                jazzy     -- ROS2 Jazzy (additional ROS2 functionality available)"
+                echo "    -v <dir>    Additional directory to mount as volumes in docker (see examples below)"
+                echo "    <command>   The command to run,"
+                echo "    ...         and its arguments (if any)"
+                echo
+                echo "Examples:"
+                echo
+                echo "    Run some fpltool command:"
+                echo
+                echo "        $0 fpltool -h"
+                echo
+                echo "    Extract .fpl to ROS1 .bag file in current directory:"
+                echo
+                echo "        $0 -i noetic fpltool rosbag some.fpl"
+                echo
+                echo "    If the .fpl file is in another directory, we must mount that explicitly:"
+                echo
+                echo "        $0 -i noetic -v ~/Downloads fpltool rosbag ~/Downloads/some.fpl"
+                echo
+                echo "    User fpltool to extract a .fpl file and then use the parsertool to extract the"
+                echo "    NMEA and FP_A messages from the output messages:"
+                echo
+                echo "        $0 fpltool extract some.fpl"
+                echo "        $0 parsertool -f NMEA,FP_A -c some_userio.raw > some_userio.txt"
+                echo
+                exit 0
+                ;;
+            d)
+                DEBUG=1
+                ;;
+            u)
+                update=1
+                ;;
+            i)
+                image=${OPTARG}
+                ;;
+            v)
+                volume_args="${volume_args} --volume ${OPTARG}:${OPTARG}"
+                ;;
+            *)
+                exit_fail "Illegal option -${OPTARG}!"
+                ;;
+        esac
+    done
+    if [ ${OPTIND} -gt 1 ]; then
+        shift $(expr $OPTIND - 1)
+    fi
+    local have_command=0
+    if [ $# -gt 0 ]; then
+        have_command=1
+    fi
+
+    debug "SCRIPTDIR=${SCRIPTDIR} image=${image} volume_args=${volume_args} command=$@"
+
+    # Check that script is run as user and docker is setup properly
+    if ! which docker >/dev/null; then
+        exit_fail "Docker does not seem to be installed here"
+    fi
+    if [ $(id -u) -eq 0 ]; then
+        exit_fail "This script should not be run as root"
+        exit 1
+    fi
+    if ! id -nG | grep -qw docker; then
+        exit_fail "User $USER is not in the docker group"
+    fi
+
+    local res=0
+
+    # The image (see docker/docker-compose.yaml, which we're not using to let this script to run stand-alone)
+    image="ghcr.io/fixposition/fixposition-sdk:${image}-run"
+    if ! docker image inspect ${image} >/dev/null; then
+        update=1
+    fi
+
+    # Pull image
+    if [ ${update} -gt 0 ]; then
+        info "Pulling image ${image}..."
+        if ! docker pull ${image}; then
+            error "Failed to pull ${image} :-("
+            exit 1
+        fi
+    fi
+
+    if [ ${have_command} -eq 0 -a ${update} -eq 0 ]; then
+        exit_fail "Need command"
+    fi
+
+    # Docker run command
+    local args=
+    # - interactive with tty, single-use container, no funny network
+    args="${args} --interactive --tty --rm --network host"
+    # - Mount current directory as /data and run command inside docker from there
+    args="${args} --volume ${PWD}:/data --workdir /data"
+    # - Additional mounts
+    args="${args} ${volume_args}"
+    # - Set user, mount passwd and group file
+    args="${args} --user $(id -u):$(id -g) --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro"
+
+
+    [ ${DEBUG} -gt 0 ] && set -x
+    if ! docker run ${args} ${image} "$@"; then
+        res=1
+    fi
+    [ ${DEBUG} -gt 0 ] && set +x
+
+    # Happy?
+    debug "res=${res}"
+    if [ ${res} -eq 0 ]; then
+        exit 0
+    else
+        exit 1
+    fi
+}
+
+function exit_fail
+{
+    error "$@"
+    echo "Try '$0 -h' for help." 1>&2
+    exit 1
+}
+
+function notice
+{
+    echo -e "\033[1;37m$@\033[m" 1>&2
+}
+
+function info
+{
+    echo -e "\033[0m$@\033[m" 1>&2
+}
+
+function warning
+{
+    echo -e "\033[1;33mWarning: $@\033[m" 1>&2
+}
+
+function error
+{
+    echo -e "\033[1;31mError: $@\033[m" 1>&2
+}
+
+function debug
+{
+    if [ ${DEBUG} -gt 0 ]; then
+        echo -e "\033[0;36mDebug: $@\033[m" 1>&2
+    fi
+}
+
+function panic
+{
+    local res=$?
+    echo -e "\033[1;35mPanic at ${BASH_SOURCE[1]}:${BASH_LINENO[0]}! ${BASH_COMMAND} (res=$res)\033[m" 1>&2
+    exit $res
+}
+
+main "$@"
+exit 99
+
+########################################################################################################################

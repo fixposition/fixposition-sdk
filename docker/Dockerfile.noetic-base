@@ -1,3 +1,12 @@
+########################################################################################################################
+# ___    ___
+# \  \  /  /
+#  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+#  /  /\  \   License: see the LICENSE file
+# /__/  \__\
+#
+########################################################################################################################
+
 # ROS Noetic (until May, 2025) base image (Ubuntu 20.04.6 LTS "Focal")
 FROM ros:noetic-ros-base
 
@@ -11,8 +20,8 @@ ENV ROS_DISTRO=noetic
 ENTRYPOINT []
 
 # Install stuff
-COPY docker/scripts/install_aptbase.sh /tmp
-RUN /tmp/install_aptbase.sh && rm -f /tmp/install_aptbase.sh
+COPY docker/scripts/install_apt_base.sh /tmp
+RUN /tmp/install_apt_base.sh && rm -f /tmp/install_apt_base.sh
 
 # Download, build and install clang-format
 COPY docker/scripts/install_clangformat.sh /tmp
@@ -60,3 +69,5 @@ EOF
 
 # For debugging docker builds... (last layer!)
 RUN date > /fixposition-sdk-${FPSDK_IMAGE}
+
+########################################################################################################################
