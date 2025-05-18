@@ -24,12 +24,13 @@
  *
  * The defaults can be changed by setting the FPSDK_LOGGING environment variable to a comma-separated list of words that
  * correspond to the above parameters. The parameters are case-insensitive and they are applied in the order of
- * appearance. Examples:
+ * appearance. Unknown words are silently ignored. Examples:
  *
  * @code{sh}
  * export FPSDK_LOGGING=DEBUG                   # Changes the level to DEBUG
  * export FPSDK_LOGGING=Warning,JOURNAL         # Changes the level to WARNING and the "colour" to JOURNAL
  * export FPSDK_LOGGING=Warning,relative,debug  # Changes the level to DEBUG and the timestamps to RELATIVE
+ * export FPSDK_LOGGING=Warning,retalive,debgu  # Changes the level to WARNING, and nothing else
  * @endcode
  *
  * Apps can configure the logging using the fpsdk::common::logging::LoggingSetParams(). See also the implementation of
