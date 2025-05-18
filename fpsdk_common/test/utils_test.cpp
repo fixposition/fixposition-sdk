@@ -20,8 +20,8 @@
 
 /* PACKAGE */
 #include <fpsdk_common/logging.hpp>
-#include <fpsdk_common/utils.hpp>
 #include <fpsdk_common/string.hpp>
+#include <fpsdk_common/utils.hpp>
 
 namespace {
 /* ****************************************************************************************************************** */
