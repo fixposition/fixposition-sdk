@@ -30,7 +30,7 @@ namespace fpltool {
 
     Tool to process .fpl logfiles (recordings). This demonstrates the use of the @ref FPSDK_COMMON_FPL
 
-    See @ref FPSDK_BUILD_DOC on how to build and run the apps.
+    See @ref FPSDK_BUILD_DOC on how to build and run the apps, or @ref FPSDK_RUN_DOC on how to run the apps.
 
     @section FPSDK_APPS_FPLTOOL_HELP Command line help
 

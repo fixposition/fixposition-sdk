@@ -1,3 +1,12 @@
+########################################################################################################################
+# ___    ___
+# \  \  /  /
+#  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+#  /  /\  \   License: see the LICENSE file
+# /__/  \__\
+#
+########################################################################################################################
+
 name: fixposition-sdk
 
 services:
@@ -176,3 +185,53 @@ services:
           - SYS_PTRACE
         hostname: fpsdk-jazzy-dev-${USER}
         command: tail -f
+
+
+    # ----- containers to run pre-built apps ---------------------------------------------------------------------------
+
+    build-bookworm-run:
+        image: ghcr.io/fixposition/fixposition-sdk:bookworm-run
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.bookworm-run
+        depends_on:
+            - bookworm-base
+    bookworm-run:
+        image: ghcr.io/fixposition/fixposition-sdk:bookworm-run
+        command: tail -f
+
+    build-noetic-run:
+        image: ghcr.io/fixposition/fixposition-sdk:noetic-run
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.noetic-run
+        depends_on:
+            - noetic-base
+    noetic-run:
+        image: ghcr.io/fixposition/fixposition-sdk:noetic-run
+        command: tail -f
+
+    build-humble-run:
+        image: ghcr.io/fixposition/fixposition-sdk:humble-run
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.humble-run
+        depends_on:
+            - humble-base
+    humble-run:
+        image: ghcr.io/fixposition/fixposition-sdk:humble-run
+        command: tail -f
+
+    build-jazzy-run:
+        image: ghcr.io/fixposition/fixposition-sdk:jazzy-run
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.jazzy-run
+        depends_on:
+            - jazzy-base
+    jazzy-run:
+        image: ghcr.io/fixposition/fixposition-sdk:jazzy-run
+        command: tail -f
+
+
+########################################################################################################################

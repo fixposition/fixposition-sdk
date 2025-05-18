@@ -178,7 +178,7 @@ $(BUILD_DIR)/.make-uid: | $(BUILD_DIR)
 .PHONY: cmake
 cmake: $(BUILD_DIR)/.make-cmake
 
-deps = $(sort $(wildcard CMakeList.txt Makefile fpsdk_doc/* \
+deps = $(sort $(wildcard CMakeList.txt Makefile fpsdk.sh fpsdk_doc/* \
     fpsdk_common/* fpsdk_common/*/* fpsdk_common/*/*/* fpsdk_common/*/*/*/* \
     fpsdk_ros1/* fpsdk_ros1/*/* fpsdk_ros1/*/*/* fpsdk_ros1/*/*/*/* \
     fpsdk_ros2/* fpsdk_ros2/*/* fpsdk_ros2/*/*/* fpsdk_ros2/*/*/*/* \
@@ -235,6 +235,7 @@ $(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-build fpsdk_doc/Doxyfile
 	$(V)$(BUILD_DIR)/fpsdk_apps/parsertool -h > $(BUILD_DIR)/helpscreens/parsertool_helpscreen.txt
 	$(V)$(BUILD_DIR)/fpsdk_apps/timeconv   -h > $(BUILD_DIR)/helpscreens/timeconv_helpscreen.txt
 	$(V)$(BUILD_DIR)/fpsdk_apps/yaml2shell -h > $(BUILD_DIR)/helpscreens/yaml2shell_helpscreen.txt
+	$(V)./fpsdk.sh -h                         > $(BUILD_DIR)/helpscreens/fpsdk_helpscreen.txt
 	$(V)( \
             cat fpsdk_doc/Doxyfile; \
             echo "PROJECT_NUMBER = $$(cat $(BUILD_DIR)/FP_VERSION_STRING || echo 'unknown revision')"; \

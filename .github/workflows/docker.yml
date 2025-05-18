@@ -4,7 +4,7 @@ on:
     # We build this only by manually triggering this job from the actions tab
     workflow_dispatch:
 
-# Splitting into three jobs to make stuff build in parallel (on multiple runners)
+# Splitting into separate jobs to make stuff build in parallel (on multiple runners)
 jobs:
     # Note: job names should be unique across all workflows (e.g. to reference them as pull request checks)!
 
@@ -26,7 +26,7 @@ jobs:
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-bookworm-base build-bookworm-ci build-bookworm-dev
+                  docker compose push build-bookworm-base build-bookworm-ci build-bookworm-dev build-bookworm-run
 
     docker-fpsdk-noetic:
         runs-on: ubuntu-latest
@@ -46,7 +46,7 @@ jobs:
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-noetic-base build-noetic-ci build-noetic-dev
+                  docker compose push build-noetic-base build-noetic-ci build-noetic-dev build-noetic-run
 
     docker-fpsdk-humble:
         runs-on: ubuntu-latest
@@ -66,7 +66,7 @@ jobs:
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-humble-base build-humble-ci build-humble-dev
+                  docker compose push build-humble-base build-humble-ci build-humble-dev build-humble-run
 
     docker-fpsdk-jazzy:
         runs-on: ubuntu-latest
@@ -86,7 +86,7 @@ jobs:
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-jazzy-base build-jazzy-ci build-jazzy-dev
+                  docker compose push build-jazzy-base build-jazzy-ci build-jazzy-dev build-jazzy-run
 
     docker-fpsdk-cleanup:
         runs-on: ubuntu-latest

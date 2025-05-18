@@ -30,7 +30,7 @@ namespace apps {
     Several apps ("tools", "utilities") are provided. They are useful as-is but are also meant to demonstrate the
     use of the @ref FPSDK_COMMON_DOC and serve as a basis for users to build their own tools.
 
-    See @ref FPSDK_BUILD_DOC on how to build and run the apps.
+    See @ref FPSDK_BUILD_DOC on how to build and run the apps, or @ref FPSDK_RUN_DOC on how to run the apps.
 
     @section FPSDK_APPS_APPS Apps
 
