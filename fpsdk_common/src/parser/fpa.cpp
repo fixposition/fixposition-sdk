@@ -27,6 +27,7 @@
 /* PACKAGE */
 #include "fpsdk_common/parser/fpa.hpp"
 #include "fpsdk_common/parser/nmea.hpp"
+#include "fpsdk_common/string.hpp"
 #include "fpsdk_common/types.hpp"
 
 namespace fpsdk {
@@ -208,8 +209,9 @@ static bool GetParts(FpaParts& parts, const char* msg_type, const uint8_t* msg, 
         std::string payload((const char*)&msg[parts.meta_.payload_ix0_],
             (const char*)&msg[parts.meta_.payload_ix0_] + (parts.meta_.payload_ix1_ - parts.meta_.payload_ix0_ + 1));
 
-        FPA_TRACE("GetParts(...) msg_type=%s msg_version=%d payload=%s ix0=%d ix1=%d size=%d", parts.meta_.msg_type_,
-            parts.meta_.msg_version_, payload.c_str(), parts.meta_.payload_ix0_, parts.meta_.payload_ix1_, msg_size);
+        FPA_TRACE("GetParts(...) msg_type=%s msg_version=%d payload=%s ix0=%d ix1=%d size=%" PRIuMAX,
+            parts.meta_.msg_type_, parts.meta_.msg_version_, payload.c_str(), parts.meta_.payload_ix0_,
+            parts.meta_.payload_ix1_, msg_size);
 
         std::size_t pos = 0;
         while ((pos = payload.find(",")) != std::string::npos) {
@@ -220,8 +222,7 @@ static bool GetParts(FpaParts& parts, const char* msg_type, const uint8_t* msg, 
         parts.fields_.push_back(payload);
     }
 
-    FPA_TRACE(
-        "GetParts(..., \"%s\", ..., ...)=%s #fields=%d", msg_type, ok ? "true" : "false", (int)parts.fields_.size());
+    FPA_TRACE("GetParts(..., \"%s\", ..., ...)=%s #fields=%d", msg_type, string::ToStr(ok), (int)parts.fields_.size());
     return ok;
 }
 
@@ -241,7 +242,7 @@ static bool GetInitStatus(FpaInitStatus& status, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetInitStatus(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    FPA_TRACE("GetInitStatus(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -261,8 +262,7 @@ static bool GetFusionStatusLegacy(FpaFusionStatusLegacy& status, const std::stri
     } else {
         ok = true;
     }
-    FPA_TRACE(
-        "GetFusionStatusLegacy(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    FPA_TRACE("GetFusionStatusLegacy(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -280,7 +280,7 @@ static bool GetMeasStatus(FpaMeasStatus& status, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetMeasStatus(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    FPA_TRACE("GetMeasStatus(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -299,7 +299,7 @@ static bool GetImuStatus(FpaImuStatus& status, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetImuStatus(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    FPA_TRACE("GetImuStatus(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -316,8 +316,7 @@ static bool GetImuStatusLegacy(FpaImuStatusLegacy& status, const std::string& fi
     } else {
         ok = true;
     }
-    FPA_TRACE(
-        "GetImuStatusLegacy(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    FPA_TRACE("GetImuStatusLegacy(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -339,7 +338,7 @@ static bool GetImuNoise(FpaImuNoise& noise, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetImuNoise(\"%s\")=%s noise=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(noise));
+    FPA_TRACE("GetImuNoise(\"%s\")=%s noise=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(noise));
     return ok;
 }
 
@@ -362,7 +361,7 @@ static bool GetImuConv(FpaImuConv& conv, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetImuConv(\"%s\")=%s conv=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(conv));
+    FPA_TRACE("GetImuConv(\"%s\")=%s conv=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(conv));
     return ok;
 }
 
@@ -387,7 +386,7 @@ static bool GetGnssStatus(FpaGnssStatus& status, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetGnssStatus(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    FPA_TRACE("GetGnssStatus(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -412,7 +411,7 @@ static bool GetCorrStatus(FpaCorrStatus& status, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetCorrStatus(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    FPA_TRACE("GetCorrStatus(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -431,7 +430,7 @@ static bool GetBaselineStatus(FpaBaselineStatus& status, const std::string& fiel
     } else {
         ok = true;
     }
-    FPA_TRACE("GetBaselineStatus(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    FPA_TRACE("GetBaselineStatus(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -452,7 +451,7 @@ static bool GetCamStatus(FpaCamStatus& status, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetCamStatus(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    FPA_TRACE("GetCamStatus(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -472,7 +471,7 @@ static bool GetWsStatus(FpaWsStatus& status, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetWsStatus(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    FPA_TRACE("GetWsStatus(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -490,7 +489,7 @@ static bool GetWsStatusLegacy(FpaWsStatusLegacy& status, const std::string& fiel
     } else {
         ok = true;
     }
-    FPA_TRACE("GetWsStatusLegacy(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    FPA_TRACE("GetWsStatusLegacy(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -512,7 +511,7 @@ static bool GetWsConv(FpaWsConv& conv, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetWsConv(\"%s\")=%s conv=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(conv));
+    FPA_TRACE("GetWsConv(\"%s\")=%s conv=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(conv));
     return ok;
 }
 
@@ -531,7 +530,7 @@ static bool GetMarkersStatus(FpaMarkersStatus& status, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetMarkersStatus(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    FPA_TRACE("GetMarkersStatus(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -551,7 +550,7 @@ static bool GetMarkersConv(FpaMarkersConv& conv, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetMarkersConv(\"%s\")=%s conv=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(conv));
+    FPA_TRACE("GetMarkersConv(\"%s\")=%s conv=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(conv));
     return ok;
 }
 
@@ -575,7 +574,7 @@ static bool GetGnssFix(FpaGnssFix& fix, const std::string& field)
     } else {
         ok = true;
     }
-    FPA_TRACE("GetGnssFix(\"%s\")=%s conv=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(fix));
+    FPA_TRACE("GetGnssFix(\"%s\")=%s conv=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(fix));
     return ok;
 }
 
@@ -591,7 +590,7 @@ static bool GetEpoch(FpaEpoch& epoch, const std::string& field)
     } else {
         ok = false;
     }
-    FPA_TRACE("GetEpoch(\"%s\")=%s epoch=%d", field.c_str(), ok ? "true" : "false", types::EnumToVal(epoch));
+    FPA_TRACE("GetEpoch(\"%s\")=%s epoch=%d", field.c_str(), string::ToStr(ok), types::EnumToVal(epoch));
     return ok;
 }
 
@@ -602,7 +601,7 @@ static bool GetAntState(FpaAntState& state, const std::string& field)
     else if (field == "open")  { state = FpaAntState::OPEN;  }
     else if (field == "short") { state = FpaAntState::SHORT; }
     else                       { state = FpaAntState::UNSPECIFIED; ok = field.empty(); }  // clang-format on
-    FPA_TRACE("GetAntState(\"%s\")=%s state=%d", field.c_str(), ok ? "true" : "false", types::EnumToVal(state));
+    FPA_TRACE("GetAntState(\"%s\")=%s state=%d", field.c_str(), string::ToStr(ok), types::EnumToVal(state));
     return ok;
 }
 
@@ -612,7 +611,7 @@ static bool GetAntPower(FpaAntPower& power, const std::string& field)
     if      (field == "on")  { power = FpaAntPower::ON;  }
     else if (field == "off") { power = FpaAntPower::OFF; }
     else                     { power = FpaAntPower::UNSPECIFIED; ok = field.empty(); }  // clang-format on
-    FPA_TRACE("GetAntPower(\"%s\")=%s power=%d", field.c_str(), ok ? "true" : "false", types::EnumToVal(power));
+    FPA_TRACE("GetAntPower(\"%s\")=%s power=%d", field.c_str(), string::ToStr(ok), types::EnumToVal(power));
     return ok;
 }
 
@@ -624,7 +623,7 @@ static bool GetTextLevel(FpaTextLevel& level, const std::string& field)
     else if (field == "INFO")    { level = FpaTextLevel::INFO; }
     else if (field == "DEBUG")   { level = FpaTextLevel::DEBUG; }
     else                         { level = FpaTextLevel::UNSPECIFIED; ok = field.empty(); }  // clang-format on
-    FPA_TRACE("GetTextLevel(\"%s\")=%s level=%d", field.c_str(), ok ? "true" : "false", types::EnumToVal(level));
+    FPA_TRACE("GetTextLevel(\"%s\")=%s level=%d", field.c_str(), string::ToStr(ok), types::EnumToVal(level));
     return ok;
 }
 
@@ -636,7 +635,7 @@ static bool GetTimebase(FpaTimebase& base, const std::string& field)
     else if (field == "UTC")  { base = FpaTimebase::UTC;  }
     else if (field == "NONE") { base = FpaTimebase::NONE; }
     else                      { base = FpaTimebase::UNSPECIFIED; ok = false; }  // clang-format on
-    FPA_TRACE("GetTimebase(\"%s\")=%s base=%d", field.c_str(), ok ? "true" : "false", types::EnumToVal(base));
+    FPA_TRACE("GetTimebase(\"%s\")=%s base=%d", field.c_str(), string::ToStr(ok), types::EnumToVal(base));
     return ok;
 }
 
@@ -658,7 +657,7 @@ static bool GetTimeref(FpaTimeref& ref, const std::string& field)
     else if (field == "NVC")   { ref = FpaTimeref::GNSS_NVC; }
     else if (field == "OTHER") { ref = FpaTimeref::OTHER;    }
     else                       { ref = FpaTimeref::UNSPECIFIED; }  // clang-format on
-    FPA_TRACE("GetTimeref(\"%s\")=%s ref=%d", field.c_str(), ok ? "true" : "false", types::EnumToVal(ref));
+    FPA_TRACE("GetTimeref(\"%s\")=%s ref=%d", field.c_str(), string::ToStr(ok), types::EnumToVal(ref));
     return ok;
 }
 
@@ -695,8 +694,8 @@ static bool GetInt(
         }
     }
 
-    FPA_TRACE("GetInt(\"%s\", %s, %d, %d)=%s value=%d/%s", field.c_str(), required ? "true" : "false", min, max,
-        ok ? "true" : "false", fpaint.value, fpaint.valid ? "true" : "false");
+    FPA_TRACE("GetInt(\"%s\", %s, %d, %d)=%s value=%d/%s", field.c_str(), string::ToStr(required), min, max,
+        string::ToStr(ok), fpaint.value, string::ToStr(fpaint.valid));
     return ok;
 }
 
@@ -731,8 +730,8 @@ static bool GetFloat(
         }
     }
 
-    FPA_TRACE("GetFloat(\"%s\", %s, %g, %g)=%s value=%g/%s", field.c_str(), required ? "true" : "false", min, max,
-        ok ? "true" : "false", fpafloat.value, fpafloat.valid ? "true" : "false");
+    FPA_TRACE("GetFloat(\"%s\", %s, %g, %g)=%s value=%g/%s", field.c_str(), string::ToStr(required), min, max,
+        string::ToStr(ok), fpafloat.value, string::ToStr(fpafloat.valid));
     return ok;
 }
 
@@ -750,12 +749,12 @@ static bool GetFloatArr(T& fpafloatx, const std::vector<std::string>& fields, co
         fpafloatx.values[ix] = f.value;
     }
     fpafloatx.valid = valid;
-    FPA_TRACE("GetFloatArr<%d>(..., %s, %g, %g)=%s values=.../%s", (int)N, required ? "true" : "false", min, max,
-        ok ? "true" : "false", fpafloatx.valid ? "true" : "false");
+    FPA_TRACE("GetFloatArr<%d>(..., %s, %g, %g)=%s values=.../%s", (int)N, string::ToStr(required), min, max,
+        string::ToStr(ok), string::ToStr(fpafloatx.valid));
 
     //  fields[offs].c_str(),
     //     fields[offs + 1].c_str(), fields[offs + 2].c_str(), , fpafloat3.values[0], fpafloat3.values[1],
-    //     fpafloat3.values[2], fpafloat3.valid ? "true" : "false");
+    //     fpafloat3.values[2], string::ToStr(fpafloat3.valid));
     return ok;
 }
 
@@ -773,8 +772,8 @@ static bool GetFloat3llh(
     fpafloat3.values[1] = lon.value;
     fpafloat3.values[2] = height.value;
     FPA_TRACE("GetFloat3llh(\"%s\", \"%s\", \"%s\", %s)=%s values=%g/%g/%g/%s", fields[offs].c_str(),
-        fields[offs + 1].c_str(), fields[offs + 2].c_str(), required ? "true" : "false", ok ? "true" : "false",
-        fpafloat3.values[0], fpafloat3.values[1], fpafloat3.values[2], fpafloat3.valid ? "true" : "false");
+        fields[offs + 1].c_str(), fields[offs + 2].c_str(), string::ToStr(required), string::ToStr(ok),
+        fpafloat3.values[0], fpafloat3.values[1], fpafloat3.values[2], string::ToStr(fpafloat3.valid));
     return ok;
 }
 
@@ -786,8 +785,8 @@ static bool GetGpsTime(
         GetInt(gps_time.week, fields[offs], required, 0, 9999) &&
         GetFloat(gps_time.tow, fields[offs + 1], required, 0.0, 604800.0 - std::numeric_limits<double>::epsilon());
     FPA_TRACE("GetGpsTime(\"%s\", \"%s\")=%s week=%d/%s tow=%.6f/%s", fields[offs].c_str(), fields[offs + 1].c_str(),
-        ok ? "true" : "false", gps_time.week.value, gps_time.week.valid ? "true" : "false", gps_time.tow.value,
-        gps_time.tow.valid ? "true" : "false");
+        string::ToStr(ok), gps_time.week.value, string::ToStr(gps_time.week.valid), gps_time.tow.value,
+        string::ToStr(gps_time.tow.valid));
     return ok;
 }
 
@@ -840,8 +839,8 @@ static bool GetText(char* str, const std::size_t size, const std::string& field,
     } else {
         std::memcpy(str, field.data(), field.size() + 1);
     }
-    FPA_TRACE("GetText(..., %" PRIuMAX ", \"%s\", %s)=%s str=%s", size, field.c_str(), required ? "true" : "false",
-        ok ? "true" : "false", str);
+    FPA_TRACE("GetText(..., %" PRIuMAX ", \"%s\", %s)=%s str=%s", size, field.c_str(), string::ToStr(required),
+        string::ToStr(ok), str);
     return ok;
 }
 
@@ -856,7 +855,7 @@ bool FpaEoePayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     if (GetParts(m, "EOE", msg, msg_size) && (m.meta_.msg_version_ == 1) && (m.fields_.size() == 3)) {
         ok = (GetGpsTime(gps_time, m.fields_, 0, false) && GetEpoch(epoch, m.fields_[2]));
     }
-    FPA_TRACE("FpaEoePayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaEoePayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -875,7 +874,7 @@ bool FpaGnssantPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
               GetAntState(gnss2_state, m.fields_[5]) && GetAntPower(gnss2_power, m.fields_[6]) &&
               GetInt(gnss2_age, m.fields_[7], false, 0));
     }
-    FPA_TRACE("FpaGnssantPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaGnssantPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -898,7 +897,7 @@ bool FpaGnsscorrPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_si
               GetFloat(corr_msg_rate, m.fields_[11], false, 0.0) && GetInt(sta_id, m.fields_[12], false, 0, 4095) &&
               GetFloat3llh(sta_llh, m.fields_, 13, false) && GetInt(sta_dist, m.fields_[16], false, 0));
     }
-    FPA_TRACE("FpaGnsscorrPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaGnsscorrPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -918,7 +917,7 @@ bool FpaRawimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size
     if (ok) {
         which = Which::RAWIMU;
     }
-    FPA_TRACE("FpaRawimuPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaRawimuPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -938,7 +937,7 @@ bool FpaCorrimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
     if (ok) {
         which = Which::CORRIMU;
     }
-    FPA_TRACE("FpaCorrimuPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaCorrimuPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -960,7 +959,7 @@ bool FpaImubiasPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
               GetFloatArr(bias_gyr, m.fields_, 9, false) && GetFloatArr(bias_cov_acc, m.fields_, 12, false) &&
               GetFloatArr(bias_cov_gyr, m.fields_, 15, false));
     }
-    FPA_TRACE("FpaImubiasPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaImubiasPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -979,7 +978,7 @@ bool FpaLlhPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
         ok = (GetGpsTime(gps_time, m.fields_, 0, false) && GetFloat3llh(llh, m.fields_, 2, false) &&
               GetFloatArr(cov_enu, m.fields_, 5, false));
     }
-    FPA_TRACE("FpaLlhPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaLlhPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -1003,7 +1002,7 @@ bool FpaOdometryPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_si
     if (ok) {
         which = Which::ODOMETRY;
     }
-    FPA_TRACE("FpaOdometryPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaOdometryPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -1027,7 +1026,7 @@ bool FpaOdomenuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
     if (ok) {
         which = Which::ODOMENU;
     }
-    FPA_TRACE("FpaOdomenuPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaOdomenuPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -1051,7 +1050,7 @@ bool FpaOdomshPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size
     if (ok) {
         which = Which::ODOMSH;
     }
-    FPA_TRACE("FpaOdomshPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaOdomshPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -1080,7 +1079,7 @@ bool FpaOdomstatusPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_
               GetWsConv(ws_conv, m.fields_[25]) && GetMarkersStatus(markers_status, m.fields_[26]) &&
               GetMarkersConv(markers_conv, m.fields_[27]));
     }
-    FPA_TRACE("FpaOdomstatusPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaOdomstatusPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -1098,7 +1097,7 @@ bool FpaTextPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     if (GetParts(m, "TEXT", msg, msg_size) && (m.meta_.msg_version_ == 1) && (m.fields_.size() == 2)) {
         ok = (GetTextLevel(level, m.fields_[0]) && GetText(text, sizeof(text), m.fields_[1], false));
     }
-    FPA_TRACE("FpaTextPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaTextPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -1118,7 +1117,7 @@ bool FpaTfPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               GetText(frame_b, sizeof(frame_b), m.fields_[3], true) && GetFloatArr(translation, m.fields_, 4, true) &&
               GetFloatArr(orientation, m.fields_, 7, true));
     }
-    FPA_TRACE("FpaTfPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaTfPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -1142,7 +1141,7 @@ bool FpaTpPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               GetInt(gps_leaps, m.fields_[5], false, 0) &&
               ((m.meta_.msg_version_ == 1) || GetInt(tp_week, m.fields_[6], false, 0, 9999)));
     }
-    FPA_TRACE("FpaTpPayload %s", ok ? "true" : "false");
+    FPA_TRACE("FpaTpPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }

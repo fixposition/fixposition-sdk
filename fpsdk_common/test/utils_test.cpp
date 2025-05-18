@@ -21,10 +21,12 @@
 /* PACKAGE */
 #include <fpsdk_common/logging.hpp>
 #include <fpsdk_common/utils.hpp>
+#include <fpsdk_common/string.hpp>
 
 namespace {
 /* ****************************************************************************************************************** */
 using namespace fpsdk::common::utils;
+using namespace fpsdk::common::string;
 
 TEST(UtilsTest, GetVersionString)
 {
@@ -59,7 +61,7 @@ TEST(UtilsTest, GetLicenseString)
 #if 0  // Must also make "private:" stuff "public:" in CircularBuffer for this to work...
 #  define HD_CB(label)                                                                                     \
       DEBUG_HEXDUMP(cb.buf_.data(), cb.buf_.size(), "", label " read=%d write=%d full=%s Used=%d Free=%d", \
-          (int)cb.read_, (int)cb.write_, cb.full_ ? "true" : "false", (int)cb.Used(), (int)cb.Avail())
+          (int)cb.read_, (int)cb.write_, ToStr(cb.full_), (int)cb.Used(), (int)cb.Avail())
 #else
 #  define HD_CB(...) /* nothing */
 #endif

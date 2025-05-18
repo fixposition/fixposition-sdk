@@ -24,6 +24,7 @@
 /* Fixposition SDK */
 #include <fpsdk_common/app.hpp>
 #include <fpsdk_common/logging.hpp>
+#include <fpsdk_common/string.hpp>
 
 /* PACKAGE */
 
@@ -235,7 +236,7 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
             DEBUG("inputs_[%" PRIuMAX "]    = '%s'", ix, inputs_[ix].c_str());
         }
         DEBUG("output        = '%s'", output_.c_str());
-        DEBUG("overwrite     = %s", overwrite_ ? "true" : "false");
+        DEBUG("overwrite     = %s", fpsdk::common::string::ToStr(overwrite_));
         DEBUG("extra         = %d", extra_);
         DEBUG("progress      = %d", progress_);
         DEBUG("compress      = %d", compress_);
