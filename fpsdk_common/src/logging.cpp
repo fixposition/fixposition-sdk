@@ -12,13 +12,13 @@
  */
 
 /* LIBC/STL */
+#include <algorithm>
 #include <cctype>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <mutex>
-#include <algorithm>
 
 /* EXTERNAL */
 #include <unistd.h>
@@ -224,8 +224,8 @@ LoggingParams::LoggingParams(
             // Copy string and lower-case it
             char words[1000];
             std::snprintf(words, sizeof(words), "%s,", env_logging);
-            std::transform(words, &words[std::strlen(words)], words, [](const char c){ return std::tolower(c); } );
-            for (char *word = std::strtok(words, ","); word != nullptr; word = std::strtok(nullptr, ",")) {
+            std::transform(words, &words[std::strlen(words)], words, [](const char c) { return std::tolower(c); });
+            for (char* word = std::strtok(words, ","); word != nullptr; word = std::strtok(nullptr, ",")) {
                 // clang-format off
                 if      (std::strcmp(word, "trace")    == 0) { level_      = LoggingLevel::TRACE;         }
                 else if (std::strcmp(word, "debug")    == 0) { level_      = LoggingLevel::DEBUG;         }
