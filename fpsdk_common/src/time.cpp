@@ -1059,7 +1059,7 @@ bool Time::SetPosix(const std::time_t posix)
     sec_ = sec;
     nsec_ = 0;
     TIME_TRACE("SetPosix %" PRIiMAX " lsinfo %d %s -> %" PRIu32 " %" PRIu32, posix, lsinfo.leapsec_value_,
-        lsinfo.at_leapsec_ ? "true" : "false", sec_, nsec_);
+        string::ToStr(lsinfo.at_leapsec_), sec_, nsec_);
     return true;
 }
 
@@ -1106,7 +1106,7 @@ bool Time::SetRosTime(const RosTime& rostime)
     sec_ = sec;
     nsec_ = rostime.nsec_;
     TIME_TRACE("SetRosTime %" PRIu32 " %" PRIu32 " lsinfo %d %s -> %" PRIu32 " %" PRIu32, rostime.sec_, rostime.nsec_,
-        lsinfo.leapsec_value_, lsinfo.at_leapsec_ ? "true" : "false", sec_, nsec_);
+        lsinfo.leapsec_value_, string::ToStr(lsinfo.at_leapsec_), sec_, nsec_);
     return true;
 }
 
@@ -1159,7 +1159,7 @@ bool Time::SetGloTime(const GloTime& glotime)
     }
 
     TIME_TRACE("SetGloTime %d %d %.9f lsinfo %d %s -> %" PRIi64 " %" PRIu32, glotime.N4_, glotime.Nt_, glotime.TOD_,
-        lsinfo.leapsec_value_, lsinfo.at_leapsec_ ? "true" : "false", sec, nsec);
+        lsinfo.leapsec_value_, string::ToStr(lsinfo.at_leapsec_), sec, nsec);
 
     return (sec >= 0) && (sec <= std::numeric_limits<uint32_t>::max()) && SetSecNSec(static_cast<uint32_t>(sec), nsec);
 }
@@ -1199,7 +1199,7 @@ bool Time::SetUtcTime(const UtcTime& utctime)
     TIME_TRACE(/* clang-format off */
         "SetUtcTime %04d-%02d-%02d %02d:%02d:%012.9f -> %d %d -> %d %s -> %" PRIu32 " %" PRIu32,
         utctime.year_, utctime.month_, utctime.day_, utctime.hour_, utctime.min_, utctime.sec_,
-        days, tod, lsinfo.leapsec_value_, lsinfo.at_leapsec_ ? "true" : "false", sec_, nsec_);  // clang-format on
+        days, tod, lsinfo.leapsec_value_, string::ToStr(lsinfo.at_leapsec_), sec_, nsec_);  // clang-format on
 
     return true;
 }
@@ -1264,7 +1264,7 @@ std::time_t Time::GetPosix() const
         posix += 1;
     }
     TIME_TRACE("GetPosix %" PRIu32 " lsinfo %d %s -> %" PRIiMAX, sec_, lsinfo.leapsec_value_,
-        lsinfo.at_leapsec_ ? "true" : "false", posix);
+        string::ToStr(lsinfo.at_leapsec_), posix);
     return posix;
 }
 
@@ -1289,7 +1289,7 @@ RosTime Time::GetRosTime() const
     }
     RosTime rostime(posix, nsec_);
     TIME_TRACE("GetRosTime %" PRIu32 " %" PRIu32 " lsinfo %d %s -> %" PRIu32 " %" PRIu32, sec_, nsec_,
-        lsinfo.leapsec_value_, lsinfo.at_leapsec_ ? "true" : "false", rostime.sec_, rostime.nsec_);
+        lsinfo.leapsec_value_, string::ToStr(lsinfo.at_leapsec_), rostime.sec_, rostime.nsec_);
     return rostime;
 }
 
@@ -1344,7 +1344,7 @@ GloTime Time::GetGloTime(const int prec) const
     const double TOD = math::RoundToFracDigits(
         static_cast<double>(sec % SEC_IN_DAY_I) + static_cast<double>(nsec_ * 1e-9), std::clamp(prec, 0, 9));
     TIME_TRACE("GetGloTime %" PRIu32 " %" PRIu32 " lsinfo %d %s -> %" PRIi64 " %d -> %d %d %.9f", sec_, nsec_,
-        lsinfo.leapsec_value_, lsinfo.at_leapsec_ ? "true" : "false", sec, glo_days, N4, Nt, TOD);
+        lsinfo.leapsec_value_, string::ToStr(lsinfo.at_leapsec_), sec, glo_days, N4, Nt, TOD);
     return GloTime(N4, Nt, TOD);
 }
 
@@ -1388,7 +1388,7 @@ UtcTime Time::GetUtcTime(const int prec) const
 
     TIME_TRACE(/* clang-format off */
         "GetUtcTime %" PRIu32 " %" PRIu32 " %d %s -> %" PRIu32 " %" PRIu32 " %" PRIu32 " -> %04d-%02d-%02d %02d:%02d:%0*.*f",
-        sec_, nsec_, lsinfo.leapsec_value_, lsinfo.at_leapsec_ ? "true" : "false",  posix_secs, posix_days, rem_secs,
+        sec_, nsec_, lsinfo.leapsec_value_, string::ToStr(lsinfo.at_leapsec_),  posix_secs, posix_days, rem_secs,
         utctime.year_, utctime.month_, utctime.day_, utctime.hour_, utctime.min_,
             n_frac > 0 ? (n_frac + 3) : (n_frac + 2), n_frac, utctime.sec_);  // clang-format on
 
@@ -1413,7 +1413,7 @@ double Time::GetDayOfYear(const int prec) const
     const double doyfr = math::RoundToFracDigits(doyf, std::clamp(prec, 0, 12));
 
     TIME_TRACE("GetDayOfYear %d %d %d %d %d %.9f %s -> %d %.12f %.12f", utc.year_, utc.month_, utc.day_, utc.hour_,
-        utc.min_, utc.sec_, leap_year ? "true" : "false", doyi, doyf, doyfr);
+        utc.min_, utc.sec_, string::ToStr(leap_year), doyi, doyf, doyfr);
 
     return (double)doyi + doyfr;
 }

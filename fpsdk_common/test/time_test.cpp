@@ -92,6 +92,7 @@ void PrintTo(const Time& time, ::std::ostream* os) { *os << time; }
 namespace {
 /* ****************************************************************************************************************** */
 using namespace fpsdk::common::time;
+using namespace fpsdk::common::string;
 
 TEST(TimeTest, RosTime)
 {
@@ -1104,7 +1105,7 @@ TEST(TimeTest, Time_Clock)
     if (adjtimex(&tx) == TIME_OK) {
         tx_tai = tx.tai;
     } else {
-        WARNING("adjtimex() fail: %s", fpsdk::common::string::StrError(errno).c_str());
+        WARNING("adjtimex() fail: %s", StrError(errno).c_str());
     }
     DEBUG("tx_tai=%d", tx_tai);
 
@@ -1417,7 +1418,7 @@ TEST(TimeTest, Diff)
         {
             Duration d;
             const bool d_ok = t1.Diff(t2, d);
-            DEBUG("t1=%.9f t2=%.9f d_ok=%s d=%.9f", t1.GetSec(), t2.GetSec(), d_ok ? "true" : "false", d.GetSec());
+            DEBUG("t1=%.9f t2=%.9f d_ok=%s d=%.9f", t1.GetSec(), t2.GetSec(), ToStr(d_ok), d.GetSec());
             EXPECT_EQ(d_ok, test.d_ok);
             EXPECT_EQ(d.sec_, test.d_sec);
             EXPECT_EQ(d.nsec_, test.d_nsec);
