@@ -158,7 +158,7 @@ class YamlToShellOptions : public ProgramOptions
         DEBUG("input     = %s", input_.c_str());
         DEBUG("prefix    = %s", prefix_.c_str());
         DEBUG("output    = %s", output_.c_str());
-        DEBUG("upper     = %s", upper_ ? "true" : "false");
+        DEBUG("upper     = %s", ToStr(upper_));
         DEBUG("max_num_  = %" PRIu32, max_num_);
         DEBUG("max_size  = %" PRIu32, max_size_);
         DEBUG("filter    = %s", filter_.c_str());
@@ -266,9 +266,8 @@ class YamlToShell
     bool Dump(const YAML::Node& node, const std::string& prefix, const int depth = 0)
     {
         TRACE("%*sDump(%s, %d) defined=%s null=%s scalar=%s map=%s sequence=%s tag=%s", 4 * depth, "", prefix.c_str(),
-            depth, node.IsDefined() ? "true" : "false", node.IsNull() ? "true" : "false",
-            node.IsScalar() ? "true" : "false", node.IsMap() ? "true" : "false", node.IsSequence() ? "true" : "false",
-            node.Tag().c_str());
+            depth, ToStr(node.IsDefined()), ToStr(node.IsNull()), ToStr(node.IsScalar()), ToStr(node.IsMap()),
+            ToStr(node.IsSequence()), node.Tag().c_str());
         if (depth > MAX_DEPTH) {
             WARNING("max depth exceeded");
             return false;

@@ -27,6 +27,7 @@
 /* PACKAGE */
 #include "fpsdk_common/math.hpp"
 #include "fpsdk_common/parser/nmea.hpp"
+#include "fpsdk_common/string.hpp"
 #include "fpsdk_common/types.hpp"
 
 namespace fpsdk {
@@ -281,7 +282,7 @@ static bool GetParts(NmeaParts& parts, const char* formatter, const uint8_t* msg
     }
 
     NMEA_TRACE(
-        "GetParts(..., \"%s\", ..., ...)=%s #fields=%d", formatter, ok ? "true" : "false", (int)parts.fields_.size());
+        "GetParts(..., \"%s\", ..., ...)=%s #fields=%d", formatter, string::ToStr(ok), (int)parts.fields_.size());
     return ok;
 }
 
@@ -306,7 +307,7 @@ bool GetTalker(NmeaTalkerId& talker, const char* talkerstr)
     } else {
         ok = false;
     }
-    NMEA_TRACE("GetTalker(\"%s\")=%s talker=%c", talkerstr, ok ? "true" : "false", types::EnumToVal(talker));
+    NMEA_TRACE("GetTalker(\"%s\")=%s talker=%c", talkerstr, string::ToStr(ok), types::EnumToVal(talker));
     return ok;
 }
 
@@ -370,8 +371,8 @@ static bool GetLlh(NmeaLlh& llh, const std::vector<std::string>& fields, const i
     NMEA_TRACE("GetLlh(%d=\"%s\", %d=\"%s\", %d=\"%s\", %d=\"%s\", %s)=%s ll=%.12g/%.12g/%s h=%g/%s", lat_ix,
         lat_ix >= 0 ? fields[lat_ix].c_str() : "", lon_ix, lon_ix >= 0 ? fields[lon_ix].c_str() : "", alt_ix,
         alt_ix >= 0 ? fields[alt_ix].c_str() : "", sep_ix, sep_ix >= 0 ? fields[sep_ix].c_str() : "",
-        required ? "true" : "false", ok ? "true" : "false", llh.lat, llh.lon, llh.latlon_valid ? "true" : "false",
-        llh.height, llh.height_valid ? "true" : "false");
+        string::ToStr(required), string::ToStr(ok), llh.lat, llh.lon, string::ToStr(llh.latlon_valid), llh.height,
+        string::ToStr(llh.height_valid));
     return ok;
 }
 
@@ -393,8 +394,8 @@ static bool GetTime(NmeaTime& time, const std::string& field)
             ok = false;
         }
     }
-    NMEA_TRACE("GetTime(\"%s\")=%s time=%d/%d/%g/%s", field.c_str(), ok ? "true" : "false", time.hours, time.mins,
-        time.secs, time.valid ? "true" : "false");
+    NMEA_TRACE("GetTime(\"%s\")=%s time=%d/%d/%g/%s", field.c_str(), string::ToStr(ok), time.hours, time.mins,
+        time.secs, string::ToStr(time.valid));
     return ok;
 }
 
@@ -414,8 +415,8 @@ static bool GetDateDdMmYy(NmeaDate& date, const std::string& field)
             ok = false;
         }
     }
-    NMEA_TRACE("GetDateDdMmYy(\"%s\")=%s date=%d/%d/%d/%s", field.c_str(), ok ? "true" : "false", date.years,
-        date.months, date.days, date.valid ? "true" : "false");
+    NMEA_TRACE("GetDateDdMmYy(\"%s\")=%s date=%d/%d/%d/%s", field.c_str(), string::ToStr(ok), date.years, date.months,
+        date.days, string::ToStr(date.valid));
     return ok;
 }
 
@@ -435,8 +436,8 @@ static bool GetDateYyyyMmDd(NmeaDate& date, const std::string& field) {
             ok = false;
         }
     }
-    NMEA_TRACE("GetDateYyyyMmDd(\"%s\")=%s date=%d/%d/%d/%s", field.c_str(), ok ? "true" : "false", date.years,
-               date.months, date.days, date.valid ? "true" : "false");
+    NMEA_TRACE("GetDateYyyyMmDd(\"%s\")=%s date=%d/%d/%d/%s", field.c_str(), string::ToStr(ok), date.years,
+               date.months, date.days, string::ToStr(date.valid));
     return ok;
 }
 #endif
@@ -458,8 +459,8 @@ static bool GetSat(NmeaSat& sat, const std::string& field, const NmeaSystemId sy
             ok = false;
         }
     }
-    NMEA_TRACE("GetSat(\"%s\")=%s svid=%d/%c/%s", field.c_str(), ok ? "true" : "false", sat.svid,
-        types::EnumToVal(sat.system), sat.valid ? "true" : "false");
+    NMEA_TRACE("GetSat(\"%s\")=%s svid=%d/%c/%s", field.c_str(), string::ToStr(ok), sat.svid,
+        types::EnumToVal(sat.system), string::ToStr(sat.valid));
     return ok;
 }
 
@@ -483,7 +484,7 @@ static bool GetQualityGga(NmeaQualityGga& quality, const std::string& field)
     } else {
         ok = false;
     }
-    NMEA_TRACE("GetQualityGga(\"%s\")=%s quality=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(quality));
+    NMEA_TRACE("GetQualityGga(\"%s\")=%s quality=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(quality));
     return ok;
 }
 
@@ -500,7 +501,7 @@ static bool GetStatusGllRmc(NmeaStatusGllRmc& status, const std::string& field)
     } else {
         ok = false;
     }
-    NMEA_TRACE("GetStatusGllRmc(\"%s\")=%s status=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(status));
+    NMEA_TRACE("GetStatusGllRmc(\"%s\")=%s status=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(status));
     return ok;
 }
 
@@ -521,7 +522,7 @@ static bool GetModeGllVtg(NmeaModeGllVtg& mode, const std::string& field)
     } else {
         ok = false;
     }
-    NMEA_TRACE("GetModeGllVtg(\"%s\")=%s mode=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(mode));
+    NMEA_TRACE("GetModeGllVtg(\"%s\")=%s mode=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(mode));
     return ok;
 }
 
@@ -545,7 +546,7 @@ static bool GetModeRmcGns(NmeaModeRmcGns& mode, const std::string& field)
     } else {
         ok = false;
     }
-    NMEA_TRACE("GetModeRmcGns(\"%s\")=%s mode=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(mode));
+    NMEA_TRACE("GetModeRmcGns(\"%s\")=%s mode=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(mode));
     return ok;
 }
 
@@ -565,7 +566,7 @@ static bool GetNavStatusRmc(NmeaNavStatusRmc& navstatus, const std::string& fiel
         ok = false;
     }
     NMEA_TRACE(
-        "GetNavStatusRmc(\"%s\")=%s navstatus=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(navstatus));
+        "GetNavStatusRmc(\"%s\")=%s navstatus=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(navstatus));
     return ok;
 }
 
@@ -582,7 +583,7 @@ static bool GetOpModeGsa(NmeaOpModeGsa& opmode, const std::string& field)
     } else {
         ok = false;
     }
-    NMEA_TRACE("GetOpModeGsa(\"%s\")=%s opmode=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(opmode));
+    NMEA_TRACE("GetOpModeGsa(\"%s\")=%s opmode=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(opmode));
     return ok;
 }
 
@@ -600,7 +601,7 @@ static bool GetNavModeGsa(NmeaNavModeGsa& navmode, const std::string& field)
     } else {
         ok = false;
     }
-    NMEA_TRACE("GetNavModeGsa(\"%s\")=%s navmode=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(navmode));
+    NMEA_TRACE("GetNavModeGsa(\"%s\")=%s navmode=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(navmode));
     return ok;
 }
 
@@ -621,7 +622,7 @@ static bool GetSystemId(NmeaSystemId& system, const std::string& field)
     } else {
         ok = false;
     }
-    NMEA_TRACE("GetSystemId(\"%s\")=%s system=%c", field.c_str(), ok ? "true" : "false", types::EnumToVal(system));
+    NMEA_TRACE("GetSystemId(\"%s\")=%s system=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(system));
     return ok;
 }
 
@@ -684,8 +685,8 @@ static bool GetSignalId(NmeaSignalId& signalid, const std::string& field, const 
     } else {
         ok = false;
     }
-    NMEA_TRACE("GetSignalId(\"%s\", '%c')=%s signalid=%c", field.c_str(), types::EnumToVal(system),
-        ok ? "true" : "false", types::EnumToVal(signalid));
+    NMEA_TRACE("GetSignalId(\"%s\", '%c')=%s signalid=%c", field.c_str(), types::EnumToVal(system), string::ToStr(ok),
+        types::EnumToVal(signalid));
     return ok;
 }
 
@@ -741,8 +742,8 @@ static bool GetInt(
         }
     }
 
-    NMEA_TRACE("GetInt(\"%s\", %s, %d, %d)=%s value=%d/%s", field.c_str(), required ? "true" : "false", min, max,
-        ok ? "true" : "false", nmeaint.value, nmeaint.valid ? "true" : "false");
+    NMEA_TRACE("GetInt(\"%s\", %s, %d, %d)=%s value=%d/%s", field.c_str(), string::ToStr(required), min, max,
+        string::ToStr(ok), nmeaint.value, string::ToStr(nmeaint.valid));
     return ok;
 }
 
@@ -777,8 +778,8 @@ static bool GetFloat(
         }
     }
 
-    NMEA_TRACE("GetFloat(\"%s\", %s, %g, %g)=%s value=%g/%s", field.c_str(), required ? "true" : "false", min, max,
-        ok ? "true" : "false", nmeafloat.value, nmeafloat.valid ? "true" : "false");
+    NMEA_TRACE("GetFloat(\"%s\", %s, %g, %g)=%s value=%g/%s", field.c_str(), string::ToStr(required), min, max,
+        string::ToStr(ok), nmeafloat.value, string::ToStr(nmeafloat.valid));
     return ok;
 }
 
@@ -801,7 +802,7 @@ bool NmeaGgaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               ((m.fields_.size() == 12) ||
                   (GetFloat(diff_age, m.fields_[12], false, 0, 1023) && GetInt(diff_sta, m.fields_[13], false, 0.0))));
     }
-    NMEA_TRACE("NmeaGgaPayload %s", ok ? "true" : "false");
+    NMEA_TRACE("NmeaGgaPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -819,7 +820,7 @@ bool NmeaGllPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               GetModeGllVtg(mode, m.fields_[6]) &&
               GetLlh(ll, m.fields_, 0, 2, -1, -1, mode != NmeaModeGllVtg::INVALID));
     }
-    NMEA_TRACE("NmeaGllPayload %s", ok ? "true" : "false");
+    NMEA_TRACE("NmeaGllPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -843,7 +844,7 @@ bool NmeaRmcPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               GetLlh(llh, m.fields_, 2, 4, -1, -1, mode != NmeaModeRmcGns::INVALID) &&
               ((m.fields_.size() == 12) || GetNavStatusRmc(navstatus, m.fields_[12])));
     }
-    NMEA_TRACE("NmeaRmcPayload %s", ok ? "true" : "false");
+    NMEA_TRACE("NmeaRmcPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -862,7 +863,7 @@ bool NmeaVtgPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               (m.fields_[5] == "N") && GetFloat(sogn, m.fields_[4], false) && (m.fields_[7] == "K") &&
               GetFloat(sogk, m.fields_[6], false) && GetModeGllVtg(mode, m.fields_[8]));
     }
-    NMEA_TRACE("NmeaVtgPayload %s", ok ? "true" : "false");
+    NMEA_TRACE("NmeaVtgPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -882,7 +883,7 @@ bool NmeaGstPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
               GetFloat(std_lat, m.fields_[5], false) && GetFloat(std_lon, m.fields_[6], false) &&
               GetFloat(std_alt, m.fields_[7], false));
     }
-    NMEA_TRACE("NmeaGstPayload %s", ok ? "true" : "false");
+    NMEA_TRACE("NmeaGstPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -899,7 +900,7 @@ bool NmeaHdtPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
         // Ignore true_ind fields_[1]
         ok = (GetTalker(talker, m.meta_.talker_) && GetFloat(heading, m.fields_[0], false, 0.0, 360.0));
     }
-    NMEA_TRACE("NmeaHdtPayload %s", ok ? "true" : "false");
+    NMEA_TRACE("NmeaHdtPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -925,7 +926,7 @@ bool NmeaZdaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
         date.months = month.value;
         date.days = day.value;
     }
-    NMEA_TRACE("NmeaZdaPayload %s", ok ? "true" : "false");
+    NMEA_TRACE("NmeaZdaPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -963,7 +964,7 @@ bool NmeaGsaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
                   ((navmode == NmeaNavModeGsa::NOFIX) || GetFloat(vdop, m.fields_[16], true, 0.0)));
         }
     }
-    NMEA_TRACE("NmeaGsaPayload %s", ok ? "true" : "false");
+    NMEA_TRACE("NmeaGsaPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -1052,7 +1053,7 @@ bool NmeaGsvPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
             }
         }
     }
-    NMEA_TRACE("NmeaGsvPayload %s", ok ? "true" : "false");
+    NMEA_TRACE("NmeaGsvPayload %s", string::ToStr(ok));
     valid_ = ok;
     return ok;
 }
@@ -1072,7 +1073,7 @@ bool NmeaCollectGsaGsv::AddGsaAndGsv(const std::vector<NmeaGsaPayload>& gsas, co
             ok = false;
         }
     }
-    NMEA_TRACE("AddGsaAndGsv(%d, %d)=%s", (int)gsas.size(), (int)gsvs.size(), ok ? "true" : "false");
+    NMEA_TRACE("AddGsaAndGsv(%d, %d)=%s", (int)gsas.size(), (int)gsvs.size(), string::ToStr(ok));
     if (ok) {
         Complete();
     }
@@ -1141,7 +1142,7 @@ bool NmeaCollectGsaGsv::AddGsv(const NmeaGsvPayload& gsv)
     }
 
     NMEA_TRACE("AddGsv(%d/%s, %d/%s, %c, %c, %d, %d) sats_=%d sigs_=%d", gsv.msg_num.value,
-        gsv.msg_num.valid ? "true" : "false", gsv.num_msgs.value, gsv.num_msgs.valid ? "true" : "false",
+        string::ToStr(gsv.msg_num.valid), gsv.num_msgs.value, string::ToStr(gsv.num_msgs.valid),
         types::EnumToVal(gsv.system), types::EnumToVal(gsv.signal), gsv.num_azels, gsv.num_cnos, (int)sats_.size(),
         (int)sigs_.size());
 

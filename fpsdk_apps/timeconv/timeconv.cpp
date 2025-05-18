@@ -154,7 +154,7 @@ class TimeConvOptions : public ProgramOptions
     {
         bool ok = true;
         input_ = args;
-        DEBUG("ignore_bad = %s", ignore_bad_ ? "true" : "false");
+        DEBUG("ignore_bad = %s", ToStr(ignore_bad_));
         DEBUG("num_frac   = %d", prec_);
         DEBUG("input_     = [ %s ]",
             StrJoin(StrMap(input_, [](const std::string& s) { return "\"" + s + "\""; }), ", ").c_str());
