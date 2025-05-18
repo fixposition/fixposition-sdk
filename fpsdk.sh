@@ -50,9 +50,9 @@ function main
                 echo
                 echo "Examples:"
                 echo
-                echo "    Run some fpltool command:"
+                echo "    Show version information:"
                 echo
-                echo "        $0 fpltool -h"
+                echo "        $0 fpltool -V"
                 echo
                 echo "    Extract .fpl to ROS1 .bag file in current directory:"
                 echo
@@ -113,7 +113,7 @@ function main
 
     # The image (see docker/docker-compose.yaml, which we're not using to let this script to run stand-alone)
     image="ghcr.io/fixposition/fixposition-sdk:${image}-run"
-    if ! docker image inspect ${image} >/dev/null; then
+    if ! docker image inspect ${image} >/dev/null 2>&1; then
         update=1
     fi
 

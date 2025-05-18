@@ -72,7 +72,7 @@ jobs:
 
     ci-images:
         runs-on: ubuntu-latest
-        needs:
+        needs: # we build the images only if these are successful
             - ci-fpsdk-bookworm
             - ci-fpsdk-noetic
             - ci-fpsdk-humble
@@ -86,22 +86,32 @@ jobs:
                   registry: ghcr.io
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
+            - name: Pull
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=4 docker compose pull bookworm-base noetic-base humble-base jazzy-base
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose pull bookworm-base noetic-base humble-base jazzy-base
                   COMPOSE_PARALLEL_LIMIT=1 docker compose build build-bookworm-run build-noetic-run build-humble-run build-jazzy-run
             - name: Push
               if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/115/merge' }}
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
                   docker compose push build-bookworm-run build-noetic-run build-humble-run build-jazzy-run
+            - name: Expire old images
+              uses: actions/delete-package-versions@v5
+              with:
+                  package-name:                  ${{ github.event.repository.name }}
+                  package-type:                  container
+                  min-versions-to-keep:          0
+                  delete-only-untagged-versions: true
 
     ci-pages:
         runs-on: ubuntu-latest
         container:
             image: ghcr.io/fixposition/fixposition-sdk:noetic-ci
-        needs:
+        needs: # we build the documentation only if these are successful
             - ci-fpsdk-bookworm
             - ci-fpsdk-noetic
             - ci-fpsdk-humble

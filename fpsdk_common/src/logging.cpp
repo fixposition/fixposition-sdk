@@ -213,8 +213,6 @@ LoggingParams::LoggingParams(
     timestamps_   { timestamps },
     fn_           { LoggingDefaultWriteFn }  // clang-format on
 {
-    printf("init! %s %s %s\n", LoggingLevelStr(level_), LoggingColourStr(colour_), LoggingTimestampsStr(timestamps_));
-
     // Change defaults from environment variables when g_params ctor is called, before any user calls to
     // LoggingParams()/LoggingSetParams()
     static bool s_defaults_init = false;
