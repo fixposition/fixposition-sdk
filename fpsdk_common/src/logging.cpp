@@ -239,13 +239,12 @@ LoggingParams::LoggingParams(
                 else if (std::strcmp(word, "none")     == 0) { timestamps_ = LoggingTimestamps::NONE;     }
                 else if (std::strcmp(word, "relative") == 0) { timestamps_ = LoggingTimestamps::RELATIVE; }
                 else if (std::strcmp(word, "absolute") == 0) { timestamps_ = LoggingTimestamps::ABSOLUTE; }
-                // clang-format off
+                // clang-format on
             }
         }
 
         s_defaults_init = true;
     }
-
 
     // User wants us to decide...
     if (colour_ == LoggingColour::AUTO) {
