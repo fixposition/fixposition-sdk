@@ -214,7 +214,7 @@ LoggingParams::LoggingParams(
     fn_           { LoggingDefaultWriteFn }  // clang-format on
 {
     // Change defaults from environment variables when g_params ctor is called, before any user calls to
-    // LoggingParams()/LoggingSetParams()
+    // LoggingParams()/LoggingSetParams(). Do this once only.
     static bool s_defaults_init = false;
     if (!s_defaults_init) {
         const char* env_logging = std::getenv("FP_LOGGING");
@@ -242,7 +242,6 @@ LoggingParams::LoggingParams(
                 // clang-format on
             }
         }
-
         s_defaults_init = true;
     }
 
