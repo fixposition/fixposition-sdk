@@ -214,7 +214,7 @@ LoggingParams::LoggingParams(
     fn_           { LoggingDefaultWriteFn }  // clang-format on
 {
     // Change defaults from environment variables when g_params ctor is called, before any user calls to
-    // LoggingParams()/LoggingSetParams()
+    // LoggingParams()/LoggingSetParams(). Do this once only.
     static bool s_defaults_init = false;
     if (!s_defaults_init) {
         const char* env_logging = std::getenv("FP_LOGGING");
@@ -239,13 +239,11 @@ LoggingParams::LoggingParams(
                 else if (std::strcmp(word, "none")     == 0) { timestamps_ = LoggingTimestamps::NONE;     }
                 else if (std::strcmp(word, "relative") == 0) { timestamps_ = LoggingTimestamps::RELATIVE; }
                 else if (std::strcmp(word, "absolute") == 0) { timestamps_ = LoggingTimestamps::ABSOLUTE; }
-                // clang-format off
+                // clang-format on
             }
         }
-
         s_defaults_init = true;
     }
-
 
     // User wants us to decide...
     if (colour_ == LoggingColour::AUTO) {

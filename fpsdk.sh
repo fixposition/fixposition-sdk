@@ -127,7 +127,7 @@ function main
     fi
 
     if [ ${have_command} -eq 0 -a ${update} -eq 0 ]; then
-        exit_fail "Need command"
+        exit_fail "Need a command"
     fi
 
     # Docker run command
