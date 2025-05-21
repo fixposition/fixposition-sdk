@@ -45,14 +45,14 @@ namespace time {
  */
 
 // clang-format off
-static constexpr int    SEC_IN_MIN_I   = 60;                                  //!< Number of seconds in a minute (integer)
-static constexpr int    SEC_IN_HOUR_I  = 60 * SEC_IN_MIN_I;                   //!< Number of seconds in an hour (integer)
-static constexpr int    SEC_IN_DAY_I   = 24 * SEC_IN_HOUR_I;                  //!< Number of seconds in a day (integer)
-static constexpr int    SEC_IN_WEEK_I  =  7 * SEC_IN_DAY_I;                   //!< Number of seconds in a week (integer)
-static constexpr double SEC_IN_MIN_D   = static_cast<double>(SEC_IN_MIN_I);   //!< Number of seconds in a minute (double)
-static constexpr double SEC_IN_HOUR_D  = static_cast<double>(SEC_IN_HOUR_I);  //!< Number of seconds in an hour (double)
-static constexpr double SEC_IN_DAY_D   = static_cast<double>(SEC_IN_DAY_I);   //!< Number of seconds in a day (double)
-static constexpr double SEC_IN_WEEK_D  = static_cast<double>(SEC_IN_WEEK_I);  //!< Number of seconds in a week (double)
+static constexpr int    SEC_IN_MIN_I   = 60;                                  //!< Number of seconds in a minute (integer) = 60
+static constexpr int    SEC_IN_HOUR_I  = 60 * SEC_IN_MIN_I;                   //!< Number of seconds in an hour (integer)  = 3600
+static constexpr int    SEC_IN_DAY_I   = 24 * SEC_IN_HOUR_I;                  //!< Number of seconds in a day (integer)    = 86400
+static constexpr int    SEC_IN_WEEK_I  =  7 * SEC_IN_DAY_I;                   //!< Number of seconds in a week (integer)   = 604800
+static constexpr double SEC_IN_MIN_D   = static_cast<double>(SEC_IN_MIN_I);   //!< Number of seconds in a minute (double)  = 60.0
+static constexpr double SEC_IN_HOUR_D  = static_cast<double>(SEC_IN_HOUR_I);  //!< Number of seconds in an hour (double)   = 3600.0
+static constexpr double SEC_IN_DAY_D   = static_cast<double>(SEC_IN_DAY_I);   //!< Number of seconds in a day (double)     = 86400.0
+static constexpr double SEC_IN_WEEK_D  = static_cast<double>(SEC_IN_WEEK_I);  //!< Number of seconds in a week (double)    = 604800.0
 //clang-format on
 
 ///@}
@@ -454,15 +454,23 @@ struct WnoTow {
     /**
      * @brief Constructor
      *
-     * @param[in]  wno  Week number [-] (>= 0)
-     * @param[in]  tow  Time of week [s] (0.0-603'799.999..)
+     * @note Input values are not normalised nor range checked here. See comments in Time::GetWnoTow() and
+     *       Time::SetWnoTow()
+     *
+     * @param[in]  wno  Week number [-] (>= SANE_WNO_MIN)
+     * @param[in]  tow  Time of week [s] (SANE_TOW_MIN - SANE_TOW_MAX)
      * @param[in]  sys  GNSS
      */
     WnoTow(const int wno, const double tow, const Sys sys = Sys::GPS);
 
     // clang-format off
-    int    wno_ = 0;    //!< Week number [-] (>= 0)
-    double tow_ = 0.0;  //!< Time of week [s] (0.0-603'799.999..)
+    static constexpr int    SANE_WNO_MIN = 0;    //!< Minimum sane wno_ value
+    static constexpr int    SANE_WNO_MAX = 9999; //!< Maximum sane wno_ value, good enough for the next centuries
+    static constexpr double SANE_TOW_MIN = 0.0;  //!< Minimum sane tow_ value
+    static constexpr double SANE_TOW_MAX = SEC_IN_WEEK_D - std::numeric_limits<double>::epsilon();  //!< Maximum sane tow_ value
+
+    int    wno_ = 0;    //!< Week number [-] (>= SANE_WNO_MIN, if normalised)
+    double tow_ = 0.0;  //!< Time of week [s] (SANE_TOW_MIN - SANE_TOW_MAX, if normalised)
     Sys    sys_;        //!< Time system
     // clang-format on
 
@@ -483,16 +491,27 @@ struct GloTime
 
     /**
      * @brief Constructor
-     * @param[in]  N4   Four-year interval, 1=1996..1999, 2=2000..2003, ..., valid range: 1-...
-     * @param[in]  Nt   Day in four-year interval, valid range: 1-1461
-     * @param[in]  TOD  Time of day (in Москва time zone) [s]
+     *
+     * @note Input values are not normalised nor range checked here. See comments in Time::GetGloTime() and
+     *       Time::SetGloTime()
+     *
+     * @param[in]  N4   Four-year interval, 1=1996..1999, 2=2000..2003, ... (SANE_N4_MIN - SANE_N4_MAX)
+     * @param[in]  Nt   Day in four-year interval (SANE_NT_MIN - SANE_NT_MAX)
+     * @param[in]  TOD  Time of day (in Москва time zone) [s] (SANE_TOD_MIN - SANE_TOD_MAX)
      */
     GloTime(const int N4, const int Nt, const double TOD);
 
     // clang-format off
-    int    N4_  = 0;    //!< Four-year interval, 1=1996..1999, 2=2000..2003, ..., valid range: 1-...
-    int    Nt_  = 0;    //!< Day in four-year interval, valid range: 1-1461
-    double TOD_ = 0.0;  //!< Time of day (in Москва time zone) [s]
+    static constexpr int    SANE_N4_MIN  = 1;     //!< Minimum sane N4_ value
+    static constexpr int    SANE_N4_MAX  = 99;    //!< Maximum sane N4_ value, good enough for the next centuries
+    static constexpr int    SANE_NT_MIN  = 1;     //!< Minimum sane Nt_ value
+    static constexpr int    SANE_NT_MAX  = 1461;  //!< Maximum sane Nt_ value
+    static constexpr double SANE_TOD_MIN = 0.0;   //!< Minimum sane TOD_ value
+    static constexpr double SANE_TOD_MAX = SEC_IN_DAY_D - std::numeric_limits<double>::epsilon();  //!< Maximum sane TOD_ value
+
+    int    N4_  = 0;    //!< Four-year interval, 1=1996..1999, 2=2000..2003, ... (SANE_N4_MIN - SANE_N4_MAX)
+    int    Nt_  = 0;    //!< Day in four-year interval (SANE_NT_MIN - SANE_NT_MAX)
+    double TOD_ = 0.0;  //!< Time of day (in Москва time zone) [s] (SANE_TOD_MIN - SANE_TOD_MAX)
     // clang-format on
 };
 
@@ -802,6 +821,9 @@ class Time
     /**
      * @brief Set time from GNSS (GPS, Galileo, BeiDou) time (atomic)
      *
+     * @note Input values are normalised, so tow < SANE_TOW_MIN, tow > SANE_TOW_MAX, and wno < SANE_WNO_MIN are
+     *       acceptable. Compare GetWnoTow().
+     *
      * @param[in]  wnotow  GNSS time
      *
      * @returns true if successful, false otherwise (bad time)
@@ -810,6 +832,9 @@ class Time
 
     /**
      * @brief Set time from GLONASS time (UTC + 3h)
+     *
+     * @note Input values will be normalised, so e.g. Nt_ < SANE_NT_MIN or N4_ > SANE_N4_MAX, ... are acceptable.
+     *       Compare GetGloTime().
      *
      * @param[in]  glotime  GLONASS time
      *
@@ -919,7 +944,9 @@ class Time
     /**
      * @brief Get time as GNSS (GPS, Galileo, BeiDou) time (atomic)
      *
-     * @note For times before the respective GNSS epoch the result is not usable (e.g. negative week numbers).
+     * @note For times before the respective GNSS epoch the result is not usable (e.g. wno_ may be < SANE_WNO_MIN).
+     *       Output tow_ is guaranteed to be within sane range (i.e. SANE_TOW_MIN <= tow_ < SANE_TOW_MAX). Compare
+     *       SetWnoTow()
      *
      * @param[in]  sys   GNSS
      * @param[in]  prec  Round the seconds to this many fractional digits (0-9)
@@ -930,6 +957,10 @@ class Time
 
     /**
      * @brief Get time as GLONASS time (UTC + 3h)
+     *
+     * @note For times before the respective GLONASS epoch the result is not usable (e.g. N4_ may be < SANE_N4_MIN).
+     *       Output Nt_ and tod_ are guaranteed to be within sane range (e.g. SANE_NT_MIN <= Nt_ < SANE_NT_MAX). Compare
+     *       SetGloTime()
      *
      * @param[in]  prec  Round the seconds to this many fractional digits (0-9)
      *

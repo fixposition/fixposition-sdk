@@ -28,6 +28,7 @@
 #include "fpsdk_common/parser/fpa.hpp"
 #include "fpsdk_common/parser/nmea.hpp"
 #include "fpsdk_common/string.hpp"
+#include "fpsdk_common/time.hpp"
 #include "fpsdk_common/types.hpp"
 
 namespace fpsdk {
@@ -782,8 +783,8 @@ static bool GetGpsTime(
     FpaGpsTime& gps_time, const std::vector<std::string>& fields, const int offs, const bool required = false)
 {
     bool ok =
-        GetInt(gps_time.week, fields[offs], required, 0, 9999) &&
-        GetFloat(gps_time.tow, fields[offs + 1], required, 0.0, 604800.0 - std::numeric_limits<double>::epsilon());
+        GetInt(gps_time.week, fields[offs], required, time::WnoTow::SANE_WNO_MIN, time::WnoTow::SANE_WNO_MAX) &&
+        GetFloat(gps_time.tow, fields[offs + 1], required, time::WnoTow::SANE_TOW_MIN, time::WnoTow::SANE_TOW_MAX);
     FPA_TRACE("GetGpsTime(\"%s\", \"%s\")=%s week=%d/%s tow=%.6f/%s", fields[offs].c_str(), fields[offs + 1].c_str(),
         string::ToStr(ok), gps_time.week.value, string::ToStr(gps_time.week.valid), gps_time.tow.value,
         string::ToStr(gps_time.tow.valid));
