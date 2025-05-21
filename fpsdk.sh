@@ -25,13 +25,14 @@ function main
     local image=bookworm
     local update=0
     local volume_args=
-    while getopts ":hdui:v:" opt; do
+    local docker_args=
+    while getopts ":hduti:v:" opt; do
         case $opt in
             h)
                 echo
                 echo "Run Fixposition SDK apps"
                 echo
-                echo "This uses Docker images which contain pre-build binaries of the Fixposition SDK apps."
+                echo "This uses Docker images with pre-build binaries of the Fixposition SDK apps."
                 echo
                 echo "Usage: $0 [-d] [-u] [-i <image>] [-v <volume> ...] <command> ..."
                 echo
@@ -39,6 +40,7 @@ function main
                 echo
                 echo "    -d          Enable debug output (of this script)"
                 echo "    -u          Update (pull) the necessary Docker <image>"
+                echo "    -t          Executes <command> with docker run -it"
                 echo "    -i <image>  Specifies which Docker image to use (default: bookworm). Available images are:"
                 echo "                bookworm  -- Debian Bookworm (no ROS, some functionality not available)"
                 echo "                noetic    -- ROS1 Noetic (additional ROS1 functionality available)"
@@ -68,6 +70,10 @@ function main
                 echo "        $0 fpltool extract some.fpl"
                 echo "        $0 parsertool -f NMEA,FP_A -c some_userio.raw > some_userio.txt"
                 echo
+                echo "    Run an interactive shell:"
+                echo
+                echo "        $0 -t -i noetic bash"
+                echo
                 exit 0
                 ;;
             d)
@@ -75,6 +81,9 @@ function main
                 ;;
             u)
                 update=1
+                ;;
+            t)
+                docker_args="--interactive --tty"
                 ;;
             i)
                 image=${OPTARG}
@@ -95,7 +104,7 @@ function main
         have_command=1
     fi
 
-    debug "SCRIPTDIR=${SCRIPTDIR} image=${image} volume_args=${volume_args} command=$@"
+    debug "SCRIPTDIR=${SCRIPTDIR} image=${image} docker_args=${docker_args} volume_args=${volume_args} command=$@"
 
     # Check that script is run as user and docker is setup properly
     if ! which docker >/dev/null; then
@@ -131,9 +140,9 @@ function main
     fi
 
     # Docker run command
-    local args=
-    # - interactive with tty, single-use container, no funny network
-    args="${args} --interactive --tty --rm --network host"
+    local args="${docker_args}"
+    # - single-use container, no funny network
+    args="${args} --rm --network host"
     # - Mount current directory as /data and run command inside docker from there
     args="${args} --volume ${PWD}:/data --workdir /data"
     # - Additional mounts
