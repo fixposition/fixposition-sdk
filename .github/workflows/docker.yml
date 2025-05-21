@@ -22,7 +22,7 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-bookworm-base build-bookworm-ci build-bookworm-dev
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-bookworm-base build-bookworm-ci build-bookworm-dev build-bookworm-run
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
@@ -42,7 +42,7 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-noetic-base build-noetic-ci build-noetic-dev
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-noetic-base build-noetic-ci build-noetic-dev build-noetic-run
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
@@ -66,7 +66,7 @@ jobs:
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-humble-base build-humble-ci build-humble-dev build-humble-run
+                  docker compose push build-humble-base build-humble-ci build-humble-dev build-humble-run build-humble-dev
 
     docker-fpsdk-jazzy:
         runs-on: ubuntu-latest
@@ -82,7 +82,7 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-jazzy-base build-jazzy-ci build-jazzy-dev
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-jazzy-base build-jazzy-ci build-jazzy-dev build-jazzy-run
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
