@@ -62,11 +62,11 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-humble-base build-humble-ci build-humble-dev
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-humble-base build-humble-ci build-humble-dev build-humble-run
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-humble-base build-humble-ci build-humble-dev build-humble-run build-humble-dev
+                  docker compose push build-humble-base build-humble-ci build-humble-dev build-humble-run
 
     docker-fpsdk-jazzy:
         runs-on: ubuntu-latest
