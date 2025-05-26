@@ -40,7 +40,7 @@ function main
                 echo
                 echo "    -d          Enable debug output (of this script)"
                 echo "    -u          Update (pull) the necessary Docker <image>"
-                echo "    -t          Executes <command> with docker run -it"
+                echo "    -t          Executes <command> with docker run --tty"
                 echo "    -i <image>  Specifies which Docker image to use (default: bookworm). Available images are:"
                 echo "                bookworm  -- Debian Bookworm (no ROS, some functionality not available)"
                 echo "                noetic    -- ROS1 Noetic (additional ROS1 functionality available)"
@@ -83,7 +83,7 @@ function main
                 update=1
                 ;;
             t)
-                docker_args="--interactive --tty"
+                docker_args="--tty"
                 ;;
             i)
                 image=${OPTARG}
@@ -143,6 +143,8 @@ function main
     local args="${docker_args}"
     # - single-use container, no funny network
     args="${args} --rm --network host"
+    # - connect stdin
+    args="${args} --interactive"
     # - Mount current directory as /data and run command inside docker from there
     args="${args} --volume ${PWD}:/data --workdir /data"
     # - Additional mounts
