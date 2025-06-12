@@ -626,7 +626,7 @@ struct FpaGnsscorrPayload : public FpaPayload
 };
 
 /**
- * @brief FP_A-...IMU (version 1) messages payload
+ * @brief FP_A-...IMU (versions 1 and 2) messages payload
  */
 struct FpaImuPayload : public FpaPayload
 {
@@ -639,9 +639,11 @@ struct FpaImuPayload : public FpaPayload
     };
     Which which = Which::UNSPECIFIED;  //!< Indicates from which message the data is
     // clang-format off
-    FpaGpsTime gps_time;  //!< Time
-    FpaFloat3  acc;       //!< Raw acceleration in output frame, X/Y/Z components
-    FpaFloat3  rot;       //!< Raw angular velocity in output frame, X/Y/Z components
+    FpaGpsTime   gps_time;          //!< Time
+    FpaFloat3    acc;               //!< Raw acceleration in output frame, X/Y/Z components
+    FpaFloat3    rot;               //!< Raw angular velocity in output frame, X/Y/Z components
+    bool         bias_comp = false; //!< Signal is bias compensated (true) or not (false), always false for RAWIMU, may be true for CORRIMU
+    FpaImuStatus imu_status = FpaImuStatus::UNSPECIFIED;  //!< IMU bias status (only available for version 2 messages)
     // clang-format on
 
     /**
@@ -683,7 +685,7 @@ struct FpaImubiasPayload : public FpaPayload
 {  // clang-format off
     FpaGpsTime     gps_time;      //!< Time
     FpaMeasStatus  fusion_imu;    //!< Fusion measurement status: IMU
-    FpaImuStatus   imu_status;    //!<  IMU bias status
+    FpaImuStatus   imu_status;    //!< IMU bias status
     FpaImuNoise    imu_noise;     //!< IMU variance status
     FpaImuConv     imu_conv;      //!< IMU convergence status
     FpaFloat3      bias_acc;      //!< Accelerometer bias, X/Y/Z components

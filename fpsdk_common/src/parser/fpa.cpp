@@ -907,13 +907,25 @@ bool FpaGnsscorrPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_si
 
 bool FpaRawimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
 {
+    // v1
     // $FP,RAWIMU,1,2197,126191.777855,-0.199914,0.472851,9.917973,0.023436,0.007723,0.002131*34
-    //            0      1             2         3        4        5        6        7
+    //              0    1             2         3        4        5        6        7
+    // v2
+    // $FP,RAWIMU,2,2368,228734.073983,-0.118514,-0.082600,9.894035,0.014381,0.004794,-0.003196,0,1,*1C
+    //               0    1             2         3         4        5        6        7        8 9 10
     bool ok = false;
     FpaParts m;
-    if (GetParts(m, "RAWIMU", msg, msg_size) && (m.meta_.msg_version_ == 1) && (m.fields_.size() == 8)) {
-        ok = (GetGpsTime(gps_time, m.fields_, 0, false) && GetFloatArr(acc, m.fields_, 2, false) &&
-              GetFloatArr(rot, m.fields_, 5, false));
+    if (GetParts(m, "RAWIMU", msg, msg_size)) {
+        if ((m.meta_.msg_version_ == 1) && (m.fields_.size() == 8)) {
+            ok = (GetGpsTime(gps_time, m.fields_, 0, false) && GetFloatArr(acc, m.fields_, 2, false) &&
+                  GetFloatArr(rot, m.fields_, 5, false));
+        } else if ((m.meta_.msg_version_ == 2) && (m.fields_.size() == 11)) {
+            FpaInt bias;
+            ok = (GetGpsTime(gps_time, m.fields_, 0, false) && GetFloatArr(acc, m.fields_, 2, false) &&
+                  GetFloatArr(rot, m.fields_, 5, false) && GetInt(bias, m.fields_[8], true, 0, 1) && bias.valid &&
+                  GetImuStatus(imu_status, m.fields_[9]));
+            bias_comp = (bias.value == 1);
+        }
     }
     if (ok) {
         which = Which::RAWIMU;
@@ -927,13 +939,25 @@ bool FpaRawimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size
 
 bool FpaCorrimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
 {
+    // v1
     // $FP,CORRIMU,1,2197,126191.777855,-0.195224,0.393969,9.869998,0.013342,-0.004620,-0.000728*7D
-    //             0      1             2         3        4        5        6        7
+    //             0      1             2         3        4        5        6         7
+    // v2
+    // $FP,CORRIMU,2,2368,228734.073983,-0.102908,-0.096532,9.732782,0.002208,0.001499,-0.001206,1,1,*54
+    //             0      1             2         3        4        5        6         7         8 9 10
     bool ok = false;
     FpaParts m;
-    if (GetParts(m, "CORRIMU", msg, msg_size) && (m.meta_.msg_version_ == 1) && (m.fields_.size() == 8)) {
-        ok = (GetGpsTime(gps_time, m.fields_, 0, false) && GetFloatArr(acc, m.fields_, 2, false) &&
-              GetFloatArr(rot, m.fields_, 5, false));
+    if (GetParts(m, "CORRIMU", msg, msg_size)) {
+        if ((m.meta_.msg_version_ == 1) && (m.fields_.size() == 8)) {
+            ok = (GetGpsTime(gps_time, m.fields_, 0, false) && GetFloatArr(acc, m.fields_, 2, false) &&
+                  GetFloatArr(rot, m.fields_, 5, false));
+        } else if ((m.meta_.msg_version_ == 2) && (m.fields_.size() == 11)) {
+            FpaInt bias;
+            ok = (GetGpsTime(gps_time, m.fields_, 0, false) && GetFloatArr(acc, m.fields_, 2, false) &&
+                  GetFloatArr(rot, m.fields_, 5, false) && GetInt(bias, m.fields_[8], true, 0, 1) && bias.valid &&
+                  GetImuStatus(imu_status, m.fields_[9]));
+            bias_comp = (bias.value == 1);
+        }
     }
     if (ok) {
         which = Which::CORRIMU;
