@@ -346,6 +346,7 @@ TEST(ParserFpaTest, FpaGnsscorrPayload)
 
 TEST(ParserFpaTest, FpaRawimuPayload)
 {
+    // v1
     {
         FpaRawimuPayload payload;
         const char* msg =  // clang-format off
@@ -365,6 +366,8 @@ TEST(ParserFpaTest, FpaRawimuPayload)
         EXPECT_NEAR(payload.rot.values[0], 0.023436, 1e-9);
         EXPECT_NEAR(payload.rot.values[1], 0.007723, 1e-9);
         EXPECT_NEAR(payload.rot.values[2], 0.002131, 1e-9);
+        EXPECT_FALSE(payload.bias_comp);
+        EXPECT_EQ(payload.imu_status, FpaImuStatus::UNSPECIFIED);
     }
     {
         FpaRawimuPayload payload;
@@ -385,6 +388,31 @@ TEST(ParserFpaTest, FpaRawimuPayload)
         EXPECT_EQ(payload.rot.values[0], 0.0);
         EXPECT_EQ(payload.rot.values[1], 0.0);
         EXPECT_EQ(payload.rot.values[2], 0.0);
+        EXPECT_FALSE(payload.bias_comp);
+        EXPECT_EQ(payload.imu_status, FpaImuStatus::UNSPECIFIED);
+    }
+    // v2
+    {
+        FpaRawimuPayload payload;
+        const char* msg =  // clang-format off
+            "$FP,RAWIMU,2,2368,228734.073983,-0.118514,-0.082600,9.894035,0.014381,0.004794,-0.003196,0,1,*1C\r\n";  // clang-format on
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.which, FpaImuPayload::Which::RAWIMU);
+        EXPECT_TRUE(payload.gps_time.week.valid);
+        EXPECT_EQ(payload.gps_time.week.value, 2368);
+        EXPECT_TRUE(payload.gps_time.tow.valid);
+        EXPECT_NEAR(payload.gps_time.tow.value, 228734.073983, 1e-9);
+        EXPECT_TRUE(payload.acc.valid);
+        EXPECT_NEAR(payload.acc.values[0], -0.118514, 1e-9);
+        EXPECT_NEAR(payload.acc.values[1], -0.082600, 1e-9);
+        EXPECT_NEAR(payload.acc.values[2], 9.894035, 1e-9);
+        EXPECT_TRUE(payload.rot.valid);
+        EXPECT_NEAR(payload.rot.values[0], 0.014381, 1e-9);
+        EXPECT_NEAR(payload.rot.values[1], 0.004794, 1e-9);
+        EXPECT_NEAR(payload.rot.values[2], -0.003196, 1e-9);
+        EXPECT_FALSE(payload.bias_comp);
+        EXPECT_EQ(payload.imu_status, FpaImuStatus::WARMSTARTED);
     }
 }
 
@@ -392,6 +420,7 @@ TEST(ParserFpaTest, FpaRawimuPayload)
 
 TEST(ParserFpaTest, FpaCorrimuPayload)
 {
+    // v1
     {
         FpaCorrimuPayload payload;
         const char* msg =  // clang-format off
@@ -431,6 +460,29 @@ TEST(ParserFpaTest, FpaCorrimuPayload)
         EXPECT_EQ(payload.rot.values[0], 0.0);
         EXPECT_EQ(payload.rot.values[1], 0.0);
         EXPECT_EQ(payload.rot.values[2], 0.0);
+    }
+    // v2
+    {
+        FpaCorrimuPayload payload;
+        const char* msg =  // clang-format off
+            "$FP,CORRIMU,2,2368,228734.073983,-0.102908,-0.096532,9.732782,0.002208,0.001499,-0.001206,1,1,*54\r\n";  // clang-format on
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.which, FpaImuPayload::Which::CORRIMU);
+        EXPECT_TRUE(payload.gps_time.week.valid);
+        EXPECT_EQ(payload.gps_time.week.value, 2368);
+        EXPECT_TRUE(payload.gps_time.tow.valid);
+        EXPECT_NEAR(payload.gps_time.tow.value, 228734.073983, 1e-9);
+        EXPECT_TRUE(payload.acc.valid);
+        EXPECT_NEAR(payload.acc.values[0], -0.102908, 1e-9);
+        EXPECT_NEAR(payload.acc.values[1], -0.096532, 1e-9);
+        EXPECT_NEAR(payload.acc.values[2], 9.732782, 1e-9);
+        EXPECT_TRUE(payload.rot.valid);
+        EXPECT_NEAR(payload.rot.values[0], 0.002208, 1e-9);
+        EXPECT_NEAR(payload.rot.values[1], 0.001499, 1e-9);
+        EXPECT_NEAR(payload.rot.values[2], -0.001206, 1e-9);
+        EXPECT_TRUE(payload.bias_comp);
+        EXPECT_EQ(payload.imu_status, FpaImuStatus::WARMSTARTED);
     }
 }
 
