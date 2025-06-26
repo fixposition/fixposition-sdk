@@ -175,7 +175,7 @@ ifneq ($(MAKECMDGOALS),distclean)
 ifneq ($(MAKECMDGOALS),doc)
 builddiruid=$(shell $(CAT) $(BUILD_DIR)/.make-uid 2>/dev/null || echo "none")
 ifneq ($(builddiruid),$(configuid))
-    $(shell $(RM) -f $(BUILD_DIR)/.make-uid)
+    dummy=$(shell $(RM) -f $(BUILD_DIR)/.make-uid)
 endif
 endif
 endif

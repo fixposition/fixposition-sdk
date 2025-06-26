@@ -106,16 +106,22 @@ function main
 
     debug "SCRIPTDIR=${SCRIPTDIR} image=${image} docker_args=${docker_args} volume_args=${volume_args} have_command=${have_command} command=$@"
 
-    # Check that script is run as user and docker is setup properly
-    if ! which docker >/dev/null; then
-        exit_fail "Docker does not seem to be installed here"
-    fi
-    if [ $(id -u) -eq 0 ]; then
-        exit_fail "This script should not be run as root"
+    # Check if we're running inside a container
+    # PID 2 will be kthreadd on host Linux, and no kthreadd will be visible in a container
+    if ! grep -q kthreadd /proc/2/status 2>/dev/null; then
+        error "You cannot run this in a container"
         exit 1
     fi
+
+    # Check for common issues
+    if ! command -v docker >/dev/null ]; then
+        warning "Docker does not seem to be installed, this probably doesn't work"
+    fi
+    if [ $(id -u) -eq 0 ]; then
+        warning "You probably should not run this as root"
+    fi
     if ! id -nG | grep -qw docker; then
-        exit_fail "User $USER is not in the docker group"
+        echo "You're not in the docker group, this may not work"
     fi
 
     local res=0

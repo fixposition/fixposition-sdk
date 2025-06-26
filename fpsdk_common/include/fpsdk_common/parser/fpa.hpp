@@ -167,6 +167,15 @@ enum class FpaInitStatus : int
 };  // clang-format on
 
 /**
+ * @brief Stringify initialisation status
+ *
+ * @param[in]  status  The initialisation status
+ *
+ * @returns the stringification of the initialisation status
+ */
+const char* FpaInitStatusStr(const FpaInitStatus status);
+
+/**
  * @brief FP_A legacy fusion status
  */
 enum class FpaFusionStatusLegacy : int
@@ -180,6 +189,15 @@ enum class FpaFusionStatusLegacy : int
 };  // clang-format on
 
 /**
+ * @brief Stringify legacy fusion status
+ *
+ * @param[in]  status  The legacy fusion status
+ *
+ * @returns the stringification of the legacy fusion status
+ */
+const char* FpaFusionStatusLegacyStr(const FpaFusionStatusLegacy status);
+
+/**
  * @brief FP_A fusion measurement status
  */
 enum class FpaMeasStatus : int
@@ -189,6 +207,15 @@ enum class FpaMeasStatus : int
     USED                     = '1',  //!< Used
     DEGRADED                 = '2',  //!< Degraded
 };  // clang-format on
+
+/**
+ * @brief Stringify fusion measurement status
+ *
+ * @param[in]  status  The fusion measurement status
+ *
+ * @returns the stringification of the fusion measurement status
+ */
+const char* FpaMeasStatusStr(const FpaMeasStatus status);
 
 /**
  * @brief FP_A IMU bias status
@@ -203,7 +230,16 @@ enum class FpaImuStatus : int
 };  // clang-format on
 
 /**
- * @brief FP_A Legacy IMU bias status
+ * @brief Stringify IMU bias status
+ *
+ * @param[in]  status  The IMU bias status
+ *
+ * @returns the stringification of the IMU bias status
+ */
+const char* FpaImuStatusStr(const FpaImuStatus status);
+
+/**
+ * @brief FP_A legacy IMU bias status
  */
 enum class FpaImuStatusLegacy : int
 {  // clang-format off
@@ -211,6 +247,15 @@ enum class FpaImuStatusLegacy : int
     NOT_CONVERGED            = '0',  //!< Not converged
     CONVERGED                = '1',  //!< Converged
 };  // clang-format on
+
+/**
+ * @brief Stringify legacy IMU bias status
+ *
+ * @param[in]  status  The legacy IMU bias status
+ *
+ * @returns the stringification of the legacy IMU bias status
+ */
+const char* FpaImuStatusLegacyStr(const FpaImuStatusLegacy status);
 
 /**
  * @brief FP_A IMU variance
@@ -228,6 +273,15 @@ enum class FpaImuNoise : int
 };  // clang-format on
 
 /**
+ * @brief Stringify IMU variance
+ *
+ * @param[in]  noise  The IMU variance
+ *
+ * @returns the stringification of the IMU variance
+ */
+const char* FpaImuNoiseStr(const FpaImuNoise noise);
+
+/**
  * @brief FP_A IMU accelerometer and gyroscope convergence
  */
 enum class FpaImuConv : int
@@ -242,6 +296,15 @@ enum class FpaImuConv : int
     RESERVED6                = '6',  //!< Reserved
     IDLE                     = '7',  //!< Idle
 };  // clang-format on
+
+/**
+ * @brief Stringify IMU accelerometer and gyroscope convergence
+ *
+ * @param[in]  conv  The IMU accelerometer and gyroscope convergence
+ *
+ * @returns the stringification of the IMU accelerometer and gyroscope convergence
+ */
+const char* FpaImuConvStr(const FpaImuConv conv);
 
 /**
  * @brief FP_A GNSS fix status
@@ -262,6 +325,15 @@ enum class FpaGnssStatus : int
 };  // clang-format on
 
 /**
+ * @brief Stringify GNSS fix status
+ *
+ * @param[in]  status  TheGNSS fix status
+ *
+ * @returns the stringification of the GNSS fix status
+ */
+const char* FpaGnssStatusStr(const FpaGnssStatus status);
+
+/**
  * @brief FP_A GNSS correction status
  */
 enum class FpaCorrStatus : int
@@ -280,6 +352,15 @@ enum class FpaCorrStatus : int
 };  // clang-format on
 
 /**
+ * @brief Stringify GNSS correction status
+ *
+ * @param[in]  status  The GNSS correction status
+ *
+ * @returns the stringification of the GNSS correction status
+ */
+const char* FpaCorrStatusStr(const FpaCorrStatus status);
+
+/**
  * @brief FP_A baseline status
  */
 enum class FpaBaselineStatus : int
@@ -290,6 +371,15 @@ enum class FpaBaselineStatus : int
     FAILING                  = '2',  //!< Failing
     PASSING                  = '3',  //!< Passing
 };  // clang-format on
+
+/**
+ * @brief Stringify baseline status
+ *
+ * @param[in]  status  The baseline status
+ *
+ * @returns the stringification of the baseline status
+ */
+const char* FpaBaselineStatusStr(const FpaBaselineStatus status);
 
 /**
  * @brief FP_A camera status
@@ -306,6 +396,15 @@ enum class FpaCamStatus : int
 };  // clang-format on
 
 /**
+ * @brief Stringify camera status
+ *
+ * @param[in]  status  The camera status
+ *
+ * @returns the stringification of the camera status
+ */
+const char* FpaCamStatusStr(const FpaCamStatus status);
+
+/**
  * @brief FP_A wheelspeed status
  */
 enum class FpaWsStatus : int
@@ -319,7 +418,16 @@ enum class FpaWsStatus : int
 };  // clang-format on
 
 /**
- * @brief FP_A Legacy wheelspeed status
+ * @brief Stringify wheelspeed status
+ *
+ * @param[in]  status  The wheelspeed status
+ *
+ * @returns the stringification of the wheelspeed status
+ */
+const char* FpaWsStatusStr(const FpaWsStatus status);
+
+/**
+ * @brief FP_A legacy wheelspeed status
  */
 enum class FpaWsStatusLegacy : int
 {  // clang-format off
@@ -328,6 +436,15 @@ enum class FpaWsStatusLegacy : int
     NONE_CONVERGED           = '0', //!< None converged
     ONE_OR_MORE_CONVERGED    = '1', //!< At least one converged
 };  // clang-format on
+
+/**
+ * @brief Stringify legacy wheelspeed status
+ *
+ * @param[in]  status  The legacy wheelspeed status
+ *
+ * @returns the stringification of the legacy wheelspeed status
+ */
+const char* FpaWsStatusLegacyStr(const FpaWsStatusLegacy status);
 
 /**
  * @brief FP_A wheelspeed convergence status
@@ -345,6 +462,15 @@ enum class FpaWsConv : int
 };  // clang-format on
 
 /**
+ * @brief Stringify wheelspeed convergence status
+ *
+ * @param[in]  status  The wheelspeed convergence status
+ *
+ * @returns the stringification of the wheelspeed convergence status
+ */
+const char* FpaWsConvStr(const FpaWsConv status);
+
+/**
  * @brief FP_A markers status
  */
 enum class FpaMarkersStatus : int
@@ -355,6 +481,15 @@ enum class FpaMarkersStatus : int
     ONE_CONVERGED            = '2',  //!< Markers available and used
     ALL_CONVERGED            = '3',  //!< All markers available and used
 };  // clang-format on
+
+/**
+ * @brief Stringify markers status
+ *
+ * @param[in]  status  The markers status
+ *
+ * @returns the stringification of the markers status
+ */
+const char* FpaMarkersStatusStr(const FpaMarkersStatus status);
 
 /**
  * @brief FP_A markers convergence status
@@ -368,6 +503,15 @@ enum class FpaMarkersConv : int
     CONVERGING               = '3',  //!< Converging
     IDLE                     = '4',  //!< Idle
 };  // clang-format on
+
+/**
+ * @brief Stringify markers convergence status
+ *
+ * @param[in]  conv  The markers convergence status
+ *
+ * @returns the stringification of the markers convergence status
+ */
+const char* FpaMarkersConvStr(const FpaMarkersConv conv);
 
 /**
  * @brief FP_A GNSS fix type
@@ -385,6 +529,15 @@ enum class FpaGnssFix : int
     RTK_FLOAT                = '7',  //!< RTK float fix
     RTK_FIXED                = '8',  //!< RTK fixed fix
 };  // clang-format on
+
+/**
+ * @brief Stringify fix type
+ *
+ * @param[in] fix  The fix type
+ *
+ * @returns the stringification of the fix type ("S3D", "RTK_FLOAT", etc.)
+ */
+const char* FpaGnssFixStr(const FpaGnssFix fix);
 
 /**
  * @brief FP_A epoch type
@@ -419,6 +572,15 @@ enum class FpaAntState : int
 };
 
 /**
+ * @brief Stringify antenna state
+ *
+ * @param[in]  state  The antenna state
+ *
+ * @returns the stringification of the antenna state ("OPEN", "OK", etc.)
+ */
+const char* FpaAntStateStr(const FpaAntState state);
+
+/**
  * @brief FP_A GNSS antenna power
  */
 enum class FpaAntPower : int
@@ -427,6 +589,15 @@ enum class FpaAntPower : int
     ON,               //!< Antenna power supply is on
     OFF,              //!< Antenna power supply is off
 };
+
+/**
+ * @brief Stringify antenna power
+ *
+ * @param[in]  power  The antenna power
+ *
+ * @returns the stringification of the antenna power ("ON", "OFF", etc.)
+ */
+const char* FpaAntPowerStr(const FpaAntPower power);
 
 /**
  * @brief FP_A text levels
@@ -439,6 +610,16 @@ enum class FpaTextLevel : int
     INFO         = types::EnumToVal(logging::LoggingLevel::INFO),     //!< Info
     DEBUG        = types::EnumToVal(logging::LoggingLevel::DEBUG),    //!< Debug
 };  // clang-format on
+
+/**
+ * @brief Stringify text level
+ *
+ * @param[in]  level  The text level
+ *
+ * @returns the stringification of the text level ("ERROR", "INFO", etc.)
+ */
+const char* FpaTextLevelStr(const FpaTextLevel level);
+
 /**
  * @brief FP_A time base
  */
@@ -449,6 +630,15 @@ enum class FpaTimebase : int
     GNSS,             //!< GNSS
     UTC,              //!< UTC
 };  // clang-format on
+
+/**
+ * @brief Stringify time base
+ *
+ * @param[in]  base  The time base
+ *
+ * @returns the stringification of the time base ("GNSS", "UTC", etc.)
+ */
+const char* FpaTimebaseStr(const FpaTimebase base);
 
 /**
  * @brief FP_A time reference
@@ -471,6 +661,15 @@ enum class FpaTimeref : int
     GNSS_NVC,         //!< GNSS: NavIC
     OTHER,            //!< other/unknown GNSS/UTC
 };  // clang-format on
+
+/**
+ * @brief Stringify time reference
+ *
+ * @param[in]  ref  The time reference
+ *
+ * @returns the stringification of the time reference ("UTC_NONE", "GNSS_GPS", etc.)
+ */
+const char* FpaTimerefStr(const FpaTimeref ref);
 
 /**
  * @brief FP_A integer value
@@ -653,14 +852,6 @@ struct FpaGnsscorrPayload : public FpaPayload
  */
 struct FpaImuPayload : public FpaPayload
 {
-    //! Data from which FP_A-...IMU is stored
-    enum class Which
-    {
-        UNSPECIFIED,  //!< Unspecified
-        RAWIMU,       //!< Data is from FP_A-RAWIMU
-        CORRIMU,      //!< Data is from FP_A-CORRIMU
-    };
-    Which which = Which::UNSPECIFIED;  //!< Indicates from which message the data is
     // clang-format off
     FpaGpsTime   gps_time;          //!< Time
     FpaFloat3    acc;               //!< Raw acceleration in output frame, X/Y/Z components
@@ -731,16 +922,7 @@ struct FpaLlhPayload : public FpaPayload
  */
 struct FpaOdomPayload : public FpaPayload
 {
-    //! Data from which FP_A-...IMU is stored
-    enum class Which
-    {
-        UNSPECIFIED,  //!< Unspecified
-        ODOMETRY,     //!< Data is from FP_A-ODOMETRY
-        ODOMENU,      //!< Data is from FP_A-ODOMENU
-        ODOMSH,       //!< Data is from FP_A-ODOMSH
-    };
     // clang-format off
-    Which which = Which::UNSPECIFIED;            //!< Indicates from which message the data is
     FpaGpsTime             gps_time;             //!< Time
     FpaFloat3              pos;                  //!< Position, X/Y/Z components
     FpaFloat4              orientation;          //!< Quaternion, W/X/Y/Z components

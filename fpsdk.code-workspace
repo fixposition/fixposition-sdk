@@ -221,7 +221,15 @@
             "filesystem": "cpp"
         },
         "workbench.remoteIndicator.showExtensionRecommendations": true,
-        "yaml.extension.recommendations": false
+        "yaml.extension.recommendations": false,
+        "workbench.colorCustomizations": {
+            "commandCenter.border": "#15202b99",
+            "titleBar.activeBackground": "#f9e64f",
+            "titleBar.activeForeground": "#15202b",
+            "titleBar.inactiveBackground": "#f9e64f99",
+            "titleBar.inactiveForeground": "#15202b99"
+        },
+        "peacock.remoteColor": "#f9e64f"
     },
     "extensions": {
         "recommendations": [
@@ -295,8 +303,14 @@
                 "stopAtEntry": true,
                 "preLaunchTask" : "Fixposition SDK: build",
                 "program": "${workspaceFolder}/build/Debug/fpsdk_apps/fpltool",
-                "args": [ "-v", "-v" ],
-                "cwd": "${workspaceFolder}"
+                "args": [ "-v", "extract", "filedumpworking.fpl", "-f" ],
+                "cwd": "${workspaceFolder}",
+                "setupCommands": [
+                    { "text": "set auto-load safe-path ${workspaceFolder}", "description": "", "ignoreFailures": true },
+                    { "text": "-enable-pretty-printing", "description": "enable pretty printing", "ignoreFailures": true },
+                    { "text": "handle SIGPIPE nostop noprint pass", "description": "ignore SIGPIPE", "ignoreFailures": true },
+                    { "text": "source ${workspaceFolder}/.devcontainer/.gdb/gdbinit", "description": "load local gdbinit", "ignoreFailures": false }
+                ]
             },
             {
                 "name": "Fixposition SDK: debug trafo_test",
@@ -305,36 +319,6 @@
                 "preLaunchTask" : "Fixposition SDK: build",
                 "program": "${workspaceFolder}/build/Debug/fpsdk_common/fpsdk_common_trafo_test",
                 "args": [ "-v", "-v", "-v", "-v" ],
-                "cwd": "${workspaceFolder}",
-                "setupCommands": [
-                    { "text": "set auto-load safe-path ${workspaceFolder}", "description": "", "ignoreFailures": true },
-                    { "text": "-enable-pretty-printing", "description": "enable pretty printing", "ignoreFailures": true },
-                    { "text": "handle SIGPIPE nostop noprint pass", "description": "ignore SIGPIPE", "ignoreFailures": true },
-                    { "text": "source ${workspaceFolder}/.devcontainer/.gdb/gdbinit", "description": "load local gdbinit", "ignoreFailures": false }
-                ]
-            },
-            {
-                "name": "Fixposition SDK: debug streamtool",
-                "type": "cppdbg", "request": "launch", "MIMode": "gdb", "miDebuggerPath" : "gdb",
-                "stopAtEntry": true,
-                "preLaunchTask" : "Fixposition SDK: build",
-                "program": "${workspaceFolder}/build/Debug/fpsdk_apps/streamtool",
-                "args": [ "-v", "-v", "-v", "tcpsvr://:12345" ],
-                "cwd": "${workspaceFolder}",
-                "setupCommands": [
-                    { "text": "set auto-load safe-path ${workspaceFolder}", "description": "", "ignoreFailures": true },
-                    { "text": "-enable-pretty-printing", "description": "enable pretty printing", "ignoreFailures": true },
-                    { "text": "handle SIGPIPE nostop noprint pass", "description": "ignore SIGPIPE", "ignoreFailures": true },
-                    { "text": "source ${workspaceFolder}/.devcontainer/.gdb/gdbinit", "description": "load local gdbinit", "ignoreFailures": false }
-                ]
-            },
-            {
-                "name": "Fixposition SDK: debug streammux",
-                "type": "cppdbg", "request": "launch", "MIMode": "gdb", "miDebuggerPath" : "gdb",
-                "stopAtEntry": false,
-                "preLaunchTask" : "Fixposition SDK: build",
-                "program": "${workspaceFolder}/build/Debug/fpsdk_apps/streammux",
-                "args": [ "-v", "-v", "-v", "-s", "tcpsvr://:10001", "-s", "tcpsvr://:10002", "-m", "1=2", "-a", ":20000/meier" ],
                 "cwd": "${workspaceFolder}",
                 "setupCommands": [
                     { "text": "set auto-load safe-path ${workspaceFolder}", "description": "", "ignoreFailures": true },

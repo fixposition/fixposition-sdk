@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: .fpl logfile helpers
+ * @brief Fixposition SDK: .fpl utilities
  */
 
 /* LIBC/STL */

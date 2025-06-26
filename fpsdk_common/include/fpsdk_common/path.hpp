@@ -28,6 +28,7 @@
 /* EXTERNAL */
 
 /* PACKAGE */
+#include "types.hpp"
 
 namespace fpsdk {
 namespace common {
@@ -110,9 +111,27 @@ bool PathIsExecutable(const std::string& path);
 std::size_t FileSize(const std::string& path);
 
 /**
+ * @brief Get directory size
+ *
+ * @param[in]  path  Path to directory
+ *
+ * @returns the size of all the files in the directory in bytes, 0 is only valid if file is readable
+ */
+std::size_t DirSize(const std::string& path);
+
+/**
+ * @brief Remove, recursively
+ *
+ * Removes the path, including all its subdirectories, recursively.
+ *
+ * @param[in]  path  The path to remove
+ */
+void RemoveAll(const std::string& path);
+
+/**
  * @brief Output file handle
  */
-class OutputFile
+class OutputFile : private types::NoCopyNoMove
 {
    public:
     OutputFile();
@@ -150,6 +169,15 @@ class OutputFile
      * @returns true on success, false otherwise
      */
     bool Write(const uint8_t* data, const std::size_t size);
+
+    /**
+     * @brief Write data to file
+     *
+     * @param[in]  data  The data to be written
+     *
+     * @returns true on success, false otherwise
+     */
+    bool Write(const std::string& data);
 
     /**
      * @brief Get file path

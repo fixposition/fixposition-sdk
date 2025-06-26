@@ -86,7 +86,7 @@ class BinarySemaphore
      * longer than one period in order to achieve the minimal wait duration and still timeout on the start of a period.
      *
      * Note that this works on the actual system clock. In ROS replay scenario this may not behave as expected as the
-     * fake ROS system clock may be faster or slower than the actual system clock.
+     * simulated ROS system clock may be faster or slower than the actual system clock.
      *
      * @param[in]  period     Period duration [ms], must be > 0
      * @param[in]  min_sleep  Minimal sleep duration [ms], must be < period

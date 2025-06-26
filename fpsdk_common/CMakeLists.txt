@@ -1,7 +1,9 @@
 # GENERAL ==============================================================================================================
+message(STATUS "fpsdk: ----- ${CMAKE_CURRENT_SOURCE_DIR} -----")
 
 cmake_minimum_required(VERSION 3.16)
 include(cmake/setup.cmake)
+include(cmake/ros.cmake)
 
 project(fpsdk_common
     LANGUAGES CXX
@@ -25,7 +27,7 @@ endif()
 if(NOT CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_compile_definitions(NDEBUG)
 endif()
-if (NOT CMAKE_BUILD_TYPE STREQUAL "Release")
+if(NOT CMAKE_BUILD_TYPE STREQUAL "Release")
     add_compile_definitions(BOOST_STACKTRACE_USE_BACKTRACE)
     add_compile_definitions(BOOST_STACKTRACE_USE_ADDR2LINE)
     set(FPSDK_BOOST_STACKTRACE 1)
@@ -35,14 +37,14 @@ endif()
 # DEPENDENCIES =========================================================================================================
 
 if(FPSDK_BOOST_STACKTRACE)
-    if (FPSDK_LEGACY_BOOST_CMAKE) # e.g. Buildroot 2022.08
+    if(FPSDK_LEGACY_BOOST_CMAKE) # e.g. Buildroot 2022.08
         find_package(Boost REQUIRED COMPONENTS stacktrace_basic stacktrace_backtrace stacktrace_addr2line)
     else()
         find_package(Boost CONFIG REQUIRED COMPONENTS stacktrace_basic stacktrace_backtrace stacktrace_addr2line)
     endif()
     set(Boost_TARGETS "Boost::headers;Boost::stacktrace_basic;Boost::stacktrace_backtrace;Boost::stacktrace_addr2line")
 else()
-    if (FPSDK_LEGACY_BOOST_CMAKE)
+    if(FPSDK_LEGACY_BOOST_CMAKE)
         find_package(Boost REQUIRED)
     else()
         find_package(Boost CONFIG REQUIRED)
@@ -58,14 +60,14 @@ find_package(PkgConfig REQUIRED)
 pkg_search_module(OpenSSL REQUIRED IMPORTED_TARGET openssl)
 
 # PROJ is optional, unless explicitly requested with -DFPSDK_USE_PROJ=ON
-if (FPSDK_USE_PROJ STREQUAL "ON")
+if(FPSDK_USE_PROJ STREQUAL "ON")
     find_package(PROJ 9.4 REQUIRED CONFIG)
     message(STATUS "fpsdk: Using PROJ (${PROJ_VERSION})")
 elseif(FPSDK_USE_PROJ STREQUAL "OFF")
     message(STATUS "fpsdk: Not using PROJ")
 else()
     find_package(PROJ 9.4 CONFIG QUIET)
-    if (${PROJ_FOUND})
+    if(${PROJ_FOUND})
         message(STATUS "fpsdk: Using PROJ (${PROJ_VERSION})")
         set(FP_FPSDK_USE_PROJ ON)
     else()
@@ -74,16 +76,33 @@ else()
     endif()
 endif()
 
+if(FPSDK_USE_ROS1)
+    fpsdk_cmake_find_ros1_package(std_msgs)
+    fpsdk_cmake_find_ros1_package(sensor_msgs)
+    fpsdk_cmake_find_ros1_package(geometry_msgs)
+    fpsdk_cmake_find_ros1_package(tf2_msgs)
+    fpsdk_cmake_find_ros1_package(nav_msgs)
+    add_compile_definitions(FPSDK_USE_ROS1)
+else()
+    if(FPSDK_USE_ROS2)
+        add_compile_definitions(FPSDK_USE_ROS2)
+    endif()
+    fpsdk_cmake_local_ros1_package(std_msgs)
+    fpsdk_cmake_local_ros1_package(sensor_msgs)
+    fpsdk_cmake_local_ros1_package(geometry_msgs)
+    fpsdk_cmake_local_ros1_package(tf2_msgs)
+    fpsdk_cmake_local_ros1_package(nav_msgs)
+endif()
+
 fpsdk_save_versions(FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_versions.txt
     PACKAGES CMAKE Boost yaml-cpp ZLIB Eigen3 nlohmann_json OpenSSL PROJ)
-
 
 # SHARED LIBRARY =======================================================================================================
 
 file(GLOB CPP_FILES src/*.cpp src/parser/*.cpp src/stream/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${CPP_FILES})
 
-if (FPSDK_USE_PROJ)
+if(FPSDK_USE_PROJ)
     target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_PROJ=1)
 else()
     target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_PROJ=0)
@@ -95,6 +114,14 @@ target_include_directories(${PROJECT_NAME}
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
 
+if(NOT FPSDK_USE_ROS1)
+    target_include_directories(${PROJECT_NAME}
+        PUBLIC
+            $<INSTALL_INTERFACE:include/${PROJECT_NAME}/rosnoros>
+            $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/rosnoros>
+    )
+endif()
+
 set(FPSDK_COMMON_TRANS_DEPS "Eigen3;yaml-cpp")
 
 target_link_libraries(${PROJECT_NAME}
@@ -102,6 +129,11 @@ target_link_libraries(${PROJECT_NAME}
         Eigen3::Eigen
         yaml-cpp
     PRIVATE
+        $<TARGET_NAME_IF_EXISTS:ros1::std_msgs>
+        $<TARGET_NAME_IF_EXISTS:ros1::geometry_msgs>
+        $<TARGET_NAME_IF_EXISTS:ros1::sensor_msgs>
+        $<TARGET_NAME_IF_EXISTS:ros1::tf2_msgs>
+        $<TARGET_NAME_IF_EXISTS:ros1::nav_msgs>
         ${Boost_TARGETS}
         ${CMAKE_DL_LIBS}
         ZLIB::ZLIB
@@ -127,6 +159,10 @@ set(PROJECT_DATA_DIR    ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME})
 
 # Headers
 install(DIRECTORY include/${PROJECT_NAME}/
+    DESTINATION ${PROJECT_INCLUDE_DIR}
+)
+
+install(DIRECTORY rosnoros
     DESTINATION ${PROJECT_INCLUDE_DIR}
 )
 
@@ -205,6 +241,7 @@ add_gtest(TARGET parser_types_test    SOURCES test/parser_types_test.cpp    LINK
 add_gtest(TARGET parser_ubx_test      SOURCES test/parser_ubx_test.cpp      LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET parser_unib_test     SOURCES test/parser_unib_test.cpp     LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET path_test            SOURCES test/path_test.cpp            LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET ros1_test            SOURCES test/ros1_test.cpp            LINK_LIBS ${PROJECT_NAME} ros1::sensor_msgs ros1::tf2_msgs)
 add_gtest(TARGET string_test          SOURCES test/string_test.cpp          LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET time_test            SOURCES test/time_test.cpp            LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET thread_test          SOURCES test/thread_test.cpp          LINK_LIBS ${PROJECT_NAME})

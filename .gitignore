@@ -31,6 +31,15 @@ foo*
 bar*
 baz*
 /tmp
+/*.raw
+/*.fpl
+/*.jsonl
+/*.raw.gz
+/*.fpl.gz
+/*.jsonl.gz
+/*.yaml
+/*.gz
+/*.json
 
 # We must not commit such files ever. See section FPSDK_BUILD_ROS in fpsdk_doc/fpsdk_build.hpp
 CATKIN_IGNORE

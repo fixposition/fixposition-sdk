@@ -53,14 +53,7 @@ bool DoTrim(const FplToolOptions& opts)
     }
 
     // Determine output file name
-    std::string output_fpl;
-    if (opts.output_.empty()) {
-        output_fpl = input_fpl;
-        StrReplace(output_fpl, ".fpl", "");
-        output_fpl += "_S" + std::to_string(opts.skip_) + "-D" + std::to_string(opts.duration_) + ".fpl";
-    } else {
-        output_fpl = opts.output_;
-    }
+    std::string output_fpl = opts.GetOutputPrefix(input_fpl) + ".fpl" + (opts.compress_ ? ".gz" : "");
 
     // Open input log
     FplFileReader reader;
@@ -99,8 +92,8 @@ bool DoTrim(const FplToolOptions& opts)
         // Report progress
         if (opts.progress_ > 0) {
             if (reader.GetProgress(progress, rate)) {
-                INFO("Processing... %.1f%% (%.0f MiB/s) -- %" PRIu64 " msgs\r", progress, rate, n_used);
-                n_used = 0;
+                INFO("Processing... %.1f%% (%.0f MiB/s) -- time into log %" PRIu32 ", used %" PRIu64 " msgs\r",
+                    progress, rate, time_into_log, n_used);
             }
         }
 

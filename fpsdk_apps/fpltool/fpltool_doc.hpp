@@ -24,20 +24,21 @@ namespace fpltool {
 /* ****************************************************************************************************************** */
 
 /*!
-    @page FPSDK_APPS_FPLTOOL .fpl logfile tool
+    @page FPSDK_APPS_FPLTOOL .fpl tool
 
     @section FPSDK_APPS_FPLTOOL_OVERVIEW Overview
 
-    Tool to process .fpl logfiles (recordings). This demonstrates the use of the @ref FPSDK_COMMON_FPL
+    Tool to process .fpl files. This demonstrates the use of the @ref FPSDK_COMMON_FPL
 
     See @ref FPSDK_BUILD_DOC on how to build and run this app, or @ref FPSDK_RUN_DOC on how to run it using pre-built
     Docker images.
+
 
     @section FPSDK_APPS_FPLTOOL_HELP Command line help
 
     @include fpltool_helpscreen.txt
 
-    */
+*/
 
 /* ****************************************************************************************************************** */
 // clang-format on

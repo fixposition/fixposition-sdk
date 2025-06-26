@@ -223,6 +223,41 @@ enum class NmeaTalkerId : int
 };  // clang-format on
 
 /**
+ * @brief Stringify NMEA talker ID
+ *
+ * @param[in]  talker  The NMEA talker ID
+ *
+ * @returns the stringification of the NMEA talker ID
+ */
+const char* NmeaTalkerIdStr(const NmeaTalkerId talker);
+
+/**
+ * @brief NMEA formatter
+ */
+enum class NmeaFormatter
+{
+    UNSPECIFIED,  //!< Unspecified
+    GGA,          //!< Formatter GGA (NmeaGgaPayload)
+    GLL,          //!< Formatter GLL (NmeaGllPayload)
+    RMC,          //!< Formatter RMC (NmeaRmcPayload)
+    VTG,          //!< Formatter VTG (NmeaVtgPayload)
+    GST,          //!< Formatter GST (NmeaGstPayload)
+    HDT,          //!< Formatter HDT (NmeaHdtPayload)
+    ZDA,          //!< Formatter ZDA (NmeaZdaPayload)
+    GSA,          //!< Formatter GSA (NmeaGsaPayload)
+    GSV,          //!< Formatter GSV (NmeaGsvPayload)
+};
+
+/**
+ * @brief Stringify NMEA formatter
+ *
+ * @param[in]  formatter  The NMEA formatter
+ *
+ * @returns the stringification of the NMEA formatter
+ */
+const char* NmeaFormatterStr(const NmeaFormatter formatter);
+
+/**
  * @brief NMEA-Gx-GGA quality indicator
  */
 enum class NmeaQualityGga : int
@@ -240,7 +275,16 @@ enum class NmeaQualityGga : int
 };  // clang-format on
 
 /**
- * @brief  NMEA-Gx-GLL and NMEA-Gx-RMC status
+ * @brief Stringify NMEA-Gx-GGA quality indicator
+ *
+ * @param[in]  qual  The NMEA-Gx-GGA quality indicator
+ *
+ * @returns the stringification of the NMEA-Gx-GGA quality indicator
+ */
+const char* NmeaQualityGgaStr(const NmeaQualityGga qual);
+
+/**
+ * @brief NMEA-Gx-GLL and NMEA-Gx-RMC status
  *
  * @note Do not use <, >, >=, <= operators on this!
  */
@@ -251,6 +295,15 @@ enum class NmeaStatusGllRmc : int
     VALID        = 'A',  //!< Data valid
  // DIFFERENTIAL = 'D',  // @todo another possible value?
 };  // clang-format on
+
+/**
+ * @brief Stringify NMEA-Gx-GLL and NMEA-Gx-RMC status
+ *
+ * @param[in]  status  The NMEA-Gx-GLL and NMEA-Gx-RMC status
+ *
+ * @returns the stringification of the NMEA-Gx-GLL and NMEA-Gx-RMC status
+ */
+const char* NmeaStatusGllRmcStr(const NmeaStatusGllRmc status);
 
 /**
  * @brief NMEA-Gx-GLL and NMEA-Gx-VTG pos mode
@@ -269,7 +322,16 @@ enum class NmeaModeGllVtg : int
 };  // clang-format on
 
 /**
- * @brief  NMEA-Gx-RMC and NMEA-Gx-GNS pos mode
+ * @brief Stringify NMEA-Gx-GLL and NMEA-Gx-VTG pos mode
+ *
+ * @param[in]  mode  The NMEA-Gx-GLL and NMEA-Gx-VTG pos mode
+ *
+ * @returns the stringification of the NMEA-Gx-GLL and NMEA-Gx-VTG pos mode
+ */
+const char* NmeaModeGllVtgStr(const NmeaModeGllVtg mode);
+
+/**
+ * @brief NMEA-Gx-RMC and NMEA-Gx-GNS pos mode
  *
  * @note Do not use <, >, >=, <= operators on this!
  */
@@ -288,6 +350,15 @@ enum class NmeaModeRmcGns : int
 };  // clang-format on
 
 /**
+ * @brief Stringify NMEA-Gx-RMC and NMEA-Gx-GNS pos mode
+ *
+ * @param[in]  mode  The NMEA-Gx-RMC and NMEA-Gx-GNS pos mode
+ *
+ * @returns the stringification of the NMEA-Gx-RMC and NMEA-Gx-GNS pos mode
+ */
+const char* NmeaModeRmcGnsStr(const NmeaModeRmcGns mode);
+
+/**
  * @brief NMEA-Gx-RMC navigational status
  *
  * @note Do not use <, >, >=, <= operators on this!
@@ -302,6 +373,15 @@ enum class NmeaNavStatusRmc : int
 };  // clang-format on
 
 /**
+ * @brief Stringify NMEA-Gx-RMC navigational status
+ *
+ * @param[in]  navstatus  The NMEA-Gx-RMC navigational status
+ *
+ * @returns the stringification of the NMEA-Gx-RMC navigational status
+ */
+const char* NmeaNavStatusRmcStr(const NmeaNavStatusRmc navstatus);
+
+/**
  * @brief NMEA-Gx-GNS operation mode
  *
  * @note Do not use <, >, >=, <= operators on this!
@@ -314,6 +394,15 @@ enum class NmeaOpModeGsa : int
 };  // clang-format on
 
 /**
+ * @brief Stringify NMEA-Gx-GNS operation mode
+ *
+ * @param[in]  opmode  The NMEA-Gx-GNS operation mode
+ *
+ * @returns the stringification of the NMEA-Gx-GNS operation mode
+ */
+const char* NmeaOpModeGsaStr(const NmeaOpModeGsa opmode);
+
+/**
  * @brief NMEA-Gx-GNS nav mode
  */
 enum class NmeaNavModeGsa : int
@@ -323,6 +412,15 @@ enum class NmeaNavModeGsa : int
     FIX2D       = '2',  //!< 2D fix
     FIX3D       = '3',  //!< 3D fix
 };  // clang-format on
+
+/**
+ * @brief Stringify NMEA-Gx-GNS nav mode
+ *
+ * @param[in]  navmode  The NMEA-Gx-GNS nav mode
+ *
+ * @returns the stringification of the NMEA-Gx-GNS nav mode
+ */
+const char* NmeaNavModeGsaStr(const NmeaNavModeGsa navmode);
 
 /**
  * @brief NMEA system IDs
@@ -341,6 +439,15 @@ enum class NmeaSystemId : int
 };  // clang-format on
 
 /**
+ * @brief Stringify NMEA system ID
+ *
+ * @param[in]  system  The NMEA system ID
+ *
+ * @returns the stringification of the NMEA system ID
+ */
+const char* NmeaSystemIdStr(const NmeaSystemId system);
+
+/**
  * @brief NMEA signal IDs
  *
  * @note Do not use <, >, >=, <= operators on this!
@@ -349,31 +456,46 @@ enum class NmeaSignalId : int
 {  // clang-format off
     UNSPECIFIED = 0x000 + '!',  //!< Unspecified
     NONE        = 0x000 + '0',  //!< None
+    // GPS (SBAS)
     GPS_L1CA    = 0x100 + '1',  //!< GPS L1 C/A or SBAS L1 C/A
     GPS_L2CL    = 0x100 + '6',  //!< GPS L2 CL
     GPS_L2CM    = 0x100 + '5',  //!< GPS L2 CM
     GPS_L5I     = 0x100 + '7',  //!< GPS L5 I
     GPS_L5Q     = 0x100 + '8',  //!< GPS L5 Q
-    GLO_L1OF    = 0x200 + '1',  //!< GLONASS L1 OF
-    GLO_L2OF    = 0x200 + '3',  //!< GLONASS L2 OF
+    // GAL
     GAL_E1      = 0x300 + '7',  //!< Galileo E1
     GAL_E5A     = 0x300 + '1',  //!< Galileo E5 A
     GAL_E5B     = 0x300 + '2',  //!< Galileo E5 B
     GAL_E6BC    = 0x300 + '3',  //!< Galileo E6 B/C
     GAL_E6A     = 0x300 + '4',  //!< Galileo E6 A
+    // BDS
     BDS_B1ID    = 0x400 + '1',  //!< BeiDou B1I D
     BDS_B2ID    = 0x400 + 'B',  //!< BeiDou B2I D
     BDS_B1C     = 0x400 + '3',  //!< BeiDou B1 C
     BDS_B2A     = 0x400 + '5',  //!< BeiDou B2 a
     BDS_B2B     = 0x400 + '6',  //!< BeiDou B2 b
+    // QZSS
     QZSS_L1CA   = 0x500 + '1',  //!< QZSS L1 C/A
     QZSS_L1S    = 0x500 + '4',  //!< QZSS L1S
     QZSS_L2CM   = 0x500 + '5',  //!< QZSS L2 CM
     QZSS_L2CL   = 0x500 + '6',  //!< QZSS L2 CL
     QZSS_L5I    = 0x500 + '7',  //!< QZSS L5 I
     QZSS_L5Q    = 0x500 + '8',  //!< QZSS L5 Q
+    // GLO
+    GLO_L1OF    = 0x200 + '1',  //!< GLONASS L1 OF
+    GLO_L2OF    = 0x200 + '3',  //!< GLONASS L2 OF
+    // NAVIC
     NAVIC_L5A   = 0x600 + '5',  //!< NavIC L5 A
 };  // clang-format on
+
+/**
+ * @brief Stringify NMEA signal IDs
+ *
+ * @param[in]  signal  The NMEA signal IDs
+ *
+ * @returns the stringification of the NMEA signal IDs
+ */
+const char* NmeaSignalIdStr(const NmeaSignalId signal);
 
 /**
  * @brief NMEA time (hour, minutes, seconds)
@@ -489,23 +611,6 @@ struct NmeaFloat
 {
     bool valid = false;  //!< Data is valid
     double value = 0;    //!< Value
-};
-
-/**
- * @brief NMEA formatter
- */
-enum class NmeaFormatter
-{
-    UNSPECIFIED,  //!< Unspecified
-    GGA,          //!< Formatter GGA (NmeaGgaPayload)
-    GLL,          //!< Formatter GLL (NmeaGllPayload)
-    RMC,          //!< Formatter RMC (NmeaRmcPayload)
-    VTG,          //!< Formatter VTG (NmeaVtgPayload)
-    GST,          //!< Formatter GST (NmeaGstPayload)
-    HDT,          //!< Formatter HDT (NmeaHdtPayload)
-    ZDA,          //!< Formatter ZDA (NmeaZdaPayload)
-    GSA,          //!< Formatter GSA (NmeaGsaPayload)
-    GSV,          //!< Formatter GSV (NmeaGsvPayload)
 };
 
 /**

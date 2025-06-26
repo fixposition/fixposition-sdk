@@ -219,7 +219,8 @@ std::vector<std::string> HexDump(const uint8_t* data, const std::size_t size)
             str[pos2] = isprint((int)c) ? c : '.';
         }
         char buf[1024];
-        std::snprintf(buf, sizeof(buf), "0x%04" PRIx64 " %05" PRIu64 "  %s", ix, ix, str);
+        std::snprintf(buf, sizeof(buf),
+            size > 0xffff ? "0x%06" PRIx64 " %08" PRIu64 "  %s" : "0x%04" PRIx64 " %05" PRIu64 "  %s", ix, ix, str);
         hexdump.push_back(buf);
         ix += 16;
     }

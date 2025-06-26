@@ -474,12 +474,11 @@ function build_projs_release_ros2
     cmake --build build/${buildname}/fpsdk_common ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname}/fpsdk_common || return 1
 
-    # TODO: not working yet
-    # cmake -B build/${buildname}/fpsdk_ros2 -S fpsdk_ros2 \
-    #     -DCMAKE_INSTALL_PREFIX=install/${buildname} \
-    #     -DCMAKE_BUILD_TYPE=Release || return 1
-    # cmake --build build/${buildname}/fpsdk_ros2 ${CMAKE_BUILD_ARGS} || return 1
-    # cmake --install build/${buildname}/fpsdk_ros2 || return 1
+    cmake -B build/${buildname}/fpsdk_ros2 -S fpsdk_ros2 \
+        -DCMAKE_INSTALL_PREFIX=install/${buildname} \
+        -DCMAKE_BUILD_TYPE=Release || return 1
+    cmake --build build/${buildname}/fpsdk_ros2 ${CMAKE_BUILD_ARGS} || return 1
+    cmake --install build/${buildname}/fpsdk_ros2 || return 1
 
     cmake -B build/${buildname}/fpsdk_apps -S fpsdk_apps \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \

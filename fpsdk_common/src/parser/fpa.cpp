@@ -124,6 +124,271 @@ bool FpaGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const char* FpaInitStatusStr(const FpaInitStatus status)
+{
+    switch (status) {  // clang-format off
+        case FpaInitStatus::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaInitStatus::NOT_INIT:    return "NOT_INIT";
+        case FpaInitStatus::LOCAL_INIT:  return "LOCAL_INIT";
+        case FpaInitStatus::GLOBAL_INIT: return "GLOBAL_INIT";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaFusionStatusLegacyStr(const FpaFusionStatusLegacy status)
+{
+    switch (status) {  // clang-format off
+        case FpaFusionStatusLegacy::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaFusionStatusLegacy::NONE:        return "NONE";
+        case FpaFusionStatusLegacy::VISION:      return "VISION";
+        case FpaFusionStatusLegacy::VIO:         return "VIO";
+        case FpaFusionStatusLegacy::IMU_GNSS:    return "IMU_GNSS";
+        case FpaFusionStatusLegacy::VIO_GNSS:    return "VIO_GNSS";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaMeasStatusStr(const FpaMeasStatus status)
+{
+    switch (status) {  // clang-format off
+        case FpaMeasStatus::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaMeasStatus::NOT_USED:    return "NOT_USED";
+        case FpaMeasStatus::USED:        return "USED";
+        case FpaMeasStatus::DEGRADED:    return "DEGRADED";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaImuStatusStr(const FpaImuStatus status)
+{
+    switch (status) {  // clang-format off
+        case FpaImuStatus::UNSPECIFIED:     return "UNSPECIFIED";
+        case FpaImuStatus::NOT_CONVERGED:   return "NOT_CONVERGED";
+        case FpaImuStatus::WARMSTARTED:     return "WARMSTARTED";
+        case FpaImuStatus::ROUGH_CONVERGED: return "ROUGH_CONVERGED";
+        case FpaImuStatus::FINE_CONVERGED:  return "FINE_CONVERGED";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaImuStatusLegacyStr(const FpaImuStatusLegacy status)
+{
+    switch (status) {  // clang-format off
+        case FpaImuStatusLegacy::UNSPECIFIED:   return "UNSPECIFIED";
+        case FpaImuStatusLegacy::NOT_CONVERGED: return "NOT_CONVERGED";
+        case FpaImuStatusLegacy::CONVERGED:     return "CONVERGED";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaImuNoiseStr(const FpaImuNoise noise)
+{
+    switch (noise) {  // clang-format off
+        case FpaImuNoise::UNSPECIFIED:  return "UNSPECIFIED";
+        case FpaImuNoise::LOW_NOISE:    return "LOW_NOISE";
+        case FpaImuNoise::MEDIUM_NOISE: return "MEDIUM_NOISE";
+        case FpaImuNoise::HIGH_NOISE:   return "HIGH_NOISE";
+        case FpaImuNoise::RESERVED4:    return "RESERVED4";
+        case FpaImuNoise::RESERVED5:    return "RESERVED5";
+        case FpaImuNoise::RESERVED6:    return "RESERVED6";
+        case FpaImuNoise::RESERVED7:    return "RESERVED7";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaImuConvStr(const FpaImuConv conv)
+{
+    switch (conv) {  // clang-format off
+        case FpaImuConv::UNSPECIFIED:      return "UNSPECIFIED";
+        case FpaImuConv::RESERVED0:        return "RESERVED0";
+        case FpaImuConv::WAIT_IMU_MEAS:    return "WAIT_IMU_MEAS";
+        case FpaImuConv::WAIT_GLOBAL_MEAS: return "WAIT_GLOBAL_MEAS";
+        case FpaImuConv::WAIT_MOTION:      return "WAIT_MOTION";
+        case FpaImuConv::CONVERGING:       return "CONVERGING";
+        case FpaImuConv::RESERVED5:        return "RESERVED5";
+        case FpaImuConv::RESERVED6:        return "RESERVED6";
+        case FpaImuConv::IDLE:             return "IDLE";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaGnssStatusStr(const FpaGnssStatus status)
+{
+    switch (status) {  // clang-format off
+        case FpaGnssStatus::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaGnssStatus::NO_FIX:      return "NO_FIX";
+        case FpaGnssStatus::SPP:         return "SPP";
+        case FpaGnssStatus::RTK_MB:      return "RTK_MB";
+        case FpaGnssStatus::RESERVED3:   return "RESERVED3";
+        case FpaGnssStatus::RESERVED4:   return "RESERVED4";
+        case FpaGnssStatus::RTK_FLOAT:   return "RTK_FLOAT";
+        case FpaGnssStatus::RESERVED6:   return "RESERVED6";
+        case FpaGnssStatus::RESERVED7:   return "RESERVED7";
+        case FpaGnssStatus::RTK_FIXED:   return "RTK_FIXED";
+        case FpaGnssStatus::RESERVED9:   return "RESERVED9";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaCorrStatusStr(const FpaCorrStatus status)
+{
+    switch (status) {  // clang-format off
+        case FpaCorrStatus::UNSPECIFIED:    return "UNSPECIFIED";
+        case FpaCorrStatus::WAITING_FUSION: return "WAITING_FUSION";
+        case FpaCorrStatus::NO_GNSS:        return "NO_GNSS";
+        case FpaCorrStatus::NO_CORR:        return "NO_CORR";
+        case FpaCorrStatus::LIMITED_CORR:   return "LIMITED_CORR";
+        case FpaCorrStatus::OLD_CORR:       return "OLD_CORR";
+        case FpaCorrStatus::GOOD_CORR:      return "GOOD_CORR";
+        case FpaCorrStatus::RESERVED6:      return "RESERVED6";
+        case FpaCorrStatus::RESERVED7:      return "RESERVED7";
+        case FpaCorrStatus::RESERVED8:      return "RESERVED8";
+        case FpaCorrStatus::RESERVED9:      return "RESERVED9";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaBaselineStatusStr(const FpaBaselineStatus status)
+{
+    switch (status) {  // clang-format off
+        case FpaBaselineStatus::UNSPECIFIED:    return "UNSPECIFIED";
+        case FpaBaselineStatus::WAITING_FUSION: return "WAITING_FUSION";
+        case FpaBaselineStatus::NO_FIX:         return "NO_FIX";
+        case FpaBaselineStatus::FAILING:        return "FAILING";
+        case FpaBaselineStatus::PASSING:        return "PASSING";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaCamStatusStr(const FpaCamStatus status)
+{
+    switch (status) {  // clang-format off
+        case FpaCamStatus::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaCamStatus::CAM_UNAVL:   return "CAM_UNAVL";
+        case FpaCamStatus::BAD_FEAT:    return "BAD_FEAT";
+        case FpaCamStatus::RESERVED2:   return "RESERVED2";
+        case FpaCamStatus::RESERVED3:   return "RESERVED3";
+        case FpaCamStatus::RESERVED4:   return "RESERVED4";
+        case FpaCamStatus::GOOD:        return "GOOD";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaWsStatusStr(const FpaWsStatus status)
+{
+    switch (status) {  // clang-format off
+        case FpaWsStatus::UNSPECIFIED:    return "UNSPECIFIED";
+        case FpaWsStatus::NOT_ENABLED:    return "NOT_ENABLED";
+        case FpaWsStatus::MISS_MEAS:      return "MISS_MEAS";
+        case FpaWsStatus::NONE_CONVERGED: return "NONE_CONVERGED";
+        case FpaWsStatus::ONE_CONVERGED:  return "ONE_CONVERGED";
+        case FpaWsStatus::ALL_CONVERGED:  return "ALL_CONVERGED";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaWsStatusLegacyStr(const FpaWsStatusLegacy status)
+{
+    switch (status) {  // clang-format off
+        case FpaWsStatusLegacy::UNSPECIFIED:           return "UNSPECIFIED";
+        case FpaWsStatusLegacy::NOT_ENABLED:           return "NOT_ENABLED";
+        case FpaWsStatusLegacy::NONE_CONVERGED:        return "NONE_CONVERGED";
+        case FpaWsStatusLegacy::ONE_OR_MORE_CONVERGED: return "ONE_OR_MORE_CONVERGED";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaWsConvStr(const FpaWsConv status)
+{
+    switch (status) {  // clang-format off
+        case FpaWsConv::UNSPECIFIED:      return "UNSPECIFIED";
+        case FpaWsConv::WAIT_FUSION:      return "WAIT_FUSION";
+        case FpaWsConv::WAIT_WS_MEAS:     return "WAIT_WS_MEAS";
+        case FpaWsConv::WAIT_GLOBAL_MEAS: return "WAIT_GLOBAL_MEAS";
+        case FpaWsConv::WAIT_MOTION:      return "WAIT_MOTION";
+        case FpaWsConv::WAIT_IMU_BIAS:    return "WAIT_IMU_BIAS";
+        case FpaWsConv::CONVERGING:       return "CONVERGING";
+        case FpaWsConv::IDLE:             return "IDLE";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaMarkersStatusStr(const FpaMarkersStatus status)
+{
+    switch (status) {  // clang-format off
+        case FpaMarkersStatus::UNSPECIFIED:    return "UNSPECIFIED";
+        case FpaMarkersStatus::NOT_ENABLED:    return "NOT_ENABLED";
+        case FpaMarkersStatus::NONE_CONVERGED: return "NONE_CONVERGED";
+        case FpaMarkersStatus::ONE_CONVERGED:  return "ONE_CONVERGED";
+        case FpaMarkersStatus::ALL_CONVERGED:  return "ALL_CONVERGED";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaMarkersConvStr(const FpaMarkersConv conv)
+{
+    switch (conv) {  // clang-format off
+        case FpaMarkersConv::UNSPECIFIED:      return "UNSPECIFIED";
+        case FpaMarkersConv::WAIT_FUSION:      return "WAIT_FUSION";
+        case FpaMarkersConv::WAIT_MARKER_MEAS: return "WAIT_MARKER_MEAS";
+        case FpaMarkersConv::WAIT_GLOBAL_MEAS: return "WAIT_GLOBAL_MEAS";
+        case FpaMarkersConv::CONVERGING:       return "CONVERGING";
+        case FpaMarkersConv::IDLE:             return "IDLE";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaGnssFixStr(const FpaGnssFix fix)
+{
+    switch (fix) {  // clang-format off
+        case FpaGnssFix::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaGnssFix::UNKNOWN:     return "UNKNOWN";
+        case FpaGnssFix::NOFIX:       return "NOFIX";
+        case FpaGnssFix::DRONLY:      return "DRONLY";
+        case FpaGnssFix::TIME:        return "TIME";
+        case FpaGnssFix::S2D:         return "S2D";
+        case FpaGnssFix::S3D:         return "S3D";
+        case FpaGnssFix::S3D_DR:      return "S3D_DR";
+        case FpaGnssFix::RTK_FLOAT:   return "RTK_FLOAT";
+        case FpaGnssFix::RTK_FIXED:   return "RTK_FIXED";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 const char* FpaEpochStr(const FpaEpoch epoch)
 {
     switch (epoch) {  // clang-format off
@@ -132,6 +397,82 @@ const char* FpaEpochStr(const FpaEpoch epoch)
         case FpaEpoch::GNSS2:       return "GNSS2";
         case FpaEpoch::GNSS:        return "GNSS";
         case FpaEpoch::FUSION:      return "FUSION";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaAntStateStr(const FpaAntState state)
+{
+    switch (state) {  // clang-format off
+        case FpaAntState::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaAntState::OPEN:        return "OPEN";
+        case FpaAntState::OK:          return "OK";
+        case FpaAntState::SHORT:       return "SHORT";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaAntPowerStr(const FpaAntPower power)
+{
+    switch (power) {  // clang-format off
+        case FpaAntPower::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaAntPower::ON:          return "ON";
+        case FpaAntPower::OFF:         return "OFF";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaTextLevelStr(const FpaTextLevel level)
+{
+    switch (level) {  // clang-format off
+        case FpaTextLevel::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaTextLevel::ERROR:       return "ERROR";
+        case FpaTextLevel::WARNING:     return "WARNING";
+        case FpaTextLevel::INFO:        return "INFO";
+        case FpaTextLevel::DEBUG:       return "DEBUG";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaTimebaseStr(const FpaTimebase base)
+{
+    switch (base) {  // clang-format off
+        case FpaTimebase::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaTimebase::NONE:        return "NONE";
+        case FpaTimebase::GNSS:        return "GNSS";
+        case FpaTimebase::UTC:         return "UTC";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaTimerefStr(const FpaTimeref ref)
+{
+    switch (ref) {  // clang-format off
+        case FpaTimeref::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaTimeref::UTC_NONE:    return "UTC_NONE";
+        case FpaTimeref::UTC_CRL:     return "UTC_CRL";
+        case FpaTimeref::UTC_NIST:    return "UTC_NIST";
+        case FpaTimeref::UTC_USNO:    return "UTC_USNO";
+        case FpaTimeref::UTC_BIPM:    return "UTC_BIPM";
+        case FpaTimeref::UTC_EU:      return "UTC_EU";
+        case FpaTimeref::UTC_SU:      return "UTC_SU";
+        case FpaTimeref::UTC_NTSC:    return "UTC_NTSC";
+        case FpaTimeref::GNSS_GPS:    return "GNSS_GPS";
+        case FpaTimeref::GNSS_GAL:    return "GNSS_GAL";
+        case FpaTimeref::GNSS_BDS:    return "GNSS_BDS";
+        case FpaTimeref::GNSS_GLO:    return "GNSS_GLO";
+        case FpaTimeref::GNSS_NVC:    return "GNSS_NVC";
+        case FpaTimeref::OTHER:       return "OTHER";
     }  // clang-format on
     return "?";
 }
@@ -932,9 +1273,6 @@ bool FpaRawimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size
             bias_comp = (bias.value == 1);
         }
     }
-    if (ok) {
-        which = Which::RAWIMU;
-    }
     FPA_TRACE("FpaRawimuPayload %s", string::ToStr(ok));
     valid_ = ok;
     msg_type_ = FpaMessageType::RAWIMU;
@@ -964,9 +1302,6 @@ bool FpaCorrimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
                   GetImuStatus(imu_status, m.fields_[9]));
             bias_comp = (bias.value == 1);
         }
-    }
-    if (ok) {
-        which = Which::CORRIMU;
     }
     FPA_TRACE("FpaCorrimuPayload %s", string::ToStr(ok));
     valid_ = ok;
@@ -1033,9 +1368,6 @@ bool FpaOdometryPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_si
               GetFloatArr(pos_cov, m.fields_, 23, false) && GetFloatArr(orientation_cov, m.fields_, 29, false) &&
               GetFloatArr(vel_cov, m.fields_, 35, false) && GetText(version, sizeof(version), m.fields_[41]));
     }
-    if (ok) {
-        which = Which::ODOMETRY;
-    }
     FPA_TRACE("FpaOdometryPayload %s", string::ToStr(ok));
     valid_ = ok;
     msg_type_ = FpaMessageType::ODOMETRY;
@@ -1058,9 +1390,6 @@ bool FpaOdomenuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
               GetFloatArr(pos_cov, m.fields_, 23, false) && GetFloatArr(orientation_cov, m.fields_, 29, false) &&
               GetFloatArr(vel_cov, m.fields_, 35, false));
     }
-    if (ok) {
-        which = Which::ODOMENU;
-    }
     FPA_TRACE("FpaOdomenuPayload %s", string::ToStr(ok));
     valid_ = ok;
     msg_type_ = FpaMessageType::ODOMENU;
@@ -1082,9 +1411,6 @@ bool FpaOdomshPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size
               GetGnssFix(gnss2_fix, m.fields_[21]) && GetWsStatusLegacy(wheelspeed_status, m.fields_[22]) &&
               GetFloatArr(pos_cov, m.fields_, 23, false) && GetFloatArr(orientation_cov, m.fields_, 29, false) &&
               GetFloatArr(vel_cov, m.fields_, 35, false));
-    }
-    if (ok) {
-        which = Which::ODOMSH;
     }
     FPA_TRACE("FpaOdomshPayload %s", string::ToStr(ok));
     valid_ = ok;

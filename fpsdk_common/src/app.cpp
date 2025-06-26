@@ -301,11 +301,18 @@ bool ProgramOptions::CheckOptions(const std::vector<std::string>& /*args*/)
 
 void ProgramOptions::PrintVersion()
 {
-    std::fprintf(stdout, "%s (%s, %s)\n%s\n%s\n", app_name_.c_str(),
+    std::fprintf(stdout, "%s (%s, %s, %s)\n%s\n%s\n", app_name_.c_str(),
 #ifdef NDEBUG
         "release",
 #else
         "debug",
+#endif
+#if defined(FPSDK_USE_ROS1)
+        "ROS1",
+#elif defined(FPSDK_USE_ROS2)
+        "ROS2",
+#else
+        "no ROS",
 #endif
         utils::GetVersionString(), utils::GetCopyrightString(), utils::GetLicenseString());
 }

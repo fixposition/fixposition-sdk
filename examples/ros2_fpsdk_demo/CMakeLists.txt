@@ -1,4 +1,5 @@
 # GENERAL ==============================================================================================================
+message(STATUS "fpsdk: ----- ${CMAKE_CURRENT_SOURCE_DIR} -----")
 
 cmake_minimum_required(VERSION 3.16)
 
@@ -32,8 +33,9 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(fpsdk_common REQUIRED)
 find_package(fpsdk_ros2 REQUIRED)
+find_package(rosbag2_cpp REQUIRED)
 
-include_directories(include ${rclcpp_INCLUDE_DIRS} ${rmw_INCLUDE_DIRS} ${fpsdk_common_INCLUDE_DIRS} ${fpsdk_ros2_INCLUDE_DIRS})
+# include_directories(include ${rclcpp_INCLUDE_DIRS} ${rmw_INCLUDE_DIRS} ${fpsdk_common_INCLUDE_DIRS})
 
 
 # SHARED LIBRARY =======================================================================================================
@@ -52,8 +54,13 @@ add_executable(${PROJECT_NAME}_node
     src/node_main.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_lib fpsdk_common fpsdk_ros2)
+target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_lib fpsdk_common fpsdk_ros2 ${rosbag2_cpp_TARGETS})
 ament_target_dependencies(${PROJECT_NAME}_node rclcpp fpsdk_common fpsdk_ros2)
+
+target_include_directories(${PROJECT_NAME}_lib
+    PUBLIC
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+)
 
 install(TARGETS
     ${PROJECT_NAME}_lib ${PROJECT_NAME}_node

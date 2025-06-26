@@ -1,4 +1,5 @@
 # GENERAL ==============================================================================================================
+message(STATUS "fpsdk: ----- ${CMAKE_CURRENT_SOURCE_DIR} -----")
 
 cmake_minimum_required(VERSION 3.16)
 
@@ -42,8 +43,6 @@ catkin_package(
     std_msgs
 )
 
-include_directories(include ${catkin_INCLUDE_DIRS} ${fpsdk_common_INCLUDE_DIRS} ${fpsdk_ros1_INCLUDE_DIRS})
-
 
 # SHARED LIBRARY =======================================================================================================
 
@@ -52,6 +51,12 @@ add_library(${PROJECT_NAME}_lib SHARED
 )
 
 target_link_libraries(${PROJECT_NAME}_lib ${catkin_LIBRARIES} fpsdk_common fpsdk_ros1)
+
+target_include_directories(${PROJECT_NAME}_lib
+    PUBLIC
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
+        ${catkin_INCLUDE_DIRS}
+)
 
 
 # EXECUTABLES ==========================================================================================================

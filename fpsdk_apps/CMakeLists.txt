@@ -1,7 +1,9 @@
 # GENERAL ==============================================================================================================
+message(STATUS "fpsdk: ----- ${CMAKE_CURRENT_SOURCE_DIR} -----")
 
 cmake_minimum_required(VERSION 3.16)
 include(../fpsdk_common/cmake/setup.cmake)
+include(../fpsdk_common/cmake/ros.cmake)
 
 project(fpsdk_apps
     LANGUAGES CXX
@@ -37,18 +39,18 @@ endif()
 if(FPSDK_USE_ROS1)
     if(NOT TARGET fpsdk_ros1)
         find_package(fpsdk_ros1 REQUIRED)
-        message(STATUS "fpsdk_apps: fpsdk_ros1_INCLUDE_DIRS=${fpsdk_ros1_INCLUDE_DIRS}")
-        message(STATUS "fpsdk_apps: fpsdk_ros1_LIBRARIES=${fpsdk_ros1_LIBRARIES}")
     endif()
+    fpsdk_cmake_find_ros1_package(rosbag)
     add_compile_definitions(FPSDK_USE_ROS1)
 elseif(FPSDK_USE_ROS2)
     add_compile_definitions(FPSDK_USE_ROS2)
+    find_package(rosbag2_cpp REQUIRED)
+    if(NOT TARGET fpsdk_ros2)
+        find_package(fpsdk_ros2 REQUIRED)
+    endif()
 else()
     message(STATUS "fpsdk_apps: No ROS available")
 endif()
-
-include_directories(include ${fpsdk_ros1_INCLUDE_DIRS})
-
 
 # SHARED LIBRARY =======================================================================================================
 
@@ -56,7 +58,7 @@ include_directories(include ${fpsdk_ros1_INCLUDE_DIRS})
 list(APPEND CMAKE_INSTALL_RPATH $ORIGIN)
 list(APPEND CMAKE_INSTALL_RPATH $ORIGIN/../lib)
 if(FPSDK_USE_ROS1)
-    list(APPEND CMAKE_INSTALL_RPATH ${fpsdk_ros1_ROS_LIBRARIES_DIRS})
+    #list(APPEND CMAKE_INSTALL_RPATH ${fpsdk_ros1_ROS_LIBRARIES_DIRS})
     # Note that user still has to load the ROS environment (setup.bash) as the RUNPATH (mistakenly called RPATH by
     # cmake) a) does not work for indirect loading (app -> libfpsdk_ros1 -> someroslib) and b) ROS does funny things
     # run-time (such as loading more libs)
@@ -73,6 +75,9 @@ target_link_libraries(fpltool
     PRIVATE
         fpsdk_common
         $<$<BOOL:${FPSDK_USE_ROS1}>:fpsdk_ros1>
+        $<$<BOOL:${FPSDK_USE_ROS2}>:fpsdk_ros2>
+        $<TARGET_NAME_IF_EXISTS:ros1::rosbag>
+        ${rosbag2_cpp_TARGETS}
 )
 
 file(GLOB PARSERTOOL_CPP_FILES parsertool/*.cpp)
