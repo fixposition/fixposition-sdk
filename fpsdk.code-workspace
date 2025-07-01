@@ -217,7 +217,8 @@
             "stacktrace": "cpp",
             "syncstream": "cpp",
             "*.conf": "bitbake",
-            "*.inc": "bitbake"
+            "*.inc": "bitbake",
+            "filesystem": "cpp"
         },
         "workbench.remoteIndicator.showExtensionRecommendations": true,
         "yaml.extension.recommendations": false
