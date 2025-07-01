@@ -691,7 +691,7 @@ class Time
     static Time FromPosixSec(const double posix_sec);
 
     /**
-     * @brief From POSIX time (POSIX, nanoseconds)
+     * @brief From POSIX nanoseconds (POSIX)
      *
      * @note See comments in the class description regarding POSIX time!
      *
@@ -745,6 +745,24 @@ class Time
      * @returns true if successful, false otherwise (bad time)
      */
     static Time FromTai(const std::time_t tai);
+
+    /**
+     * @brief From TAI seconds (CLOCK_TAI)
+     *
+     * @param[in]  tai_sec  Time value seconds (> 0.0)
+     *
+     * @returns the Time object
+     */
+    static Time FromTaiSec(const double tai_sec);
+
+    /**
+     * @brief From TAI nanoseconds (CLOCK_TAI)
+     *
+     * @param[in]  tai_ns  Time value nanoseconds (> 0)
+     *
+     * @returns the Time object
+     */
+    static Time FromTaiNs(const uint64_t tai_ns);
 
     /**
      * @brief From system clock current (now) system time (CLOCK_REALTIME)
@@ -825,7 +843,7 @@ class Time
     bool SetPosixSec(const double posix_sec);
 
     /**
-     * @brief Set time from POSIX time (POSIX, nanoseconds)
+     * @brief Set time from POSIX nanoseconds (POSIX)
      *
      * @note See comments in the class description regarding POSIX time!
      *
@@ -887,6 +905,24 @@ class Time
      * @returns true if successful, false otherwise (bad time)
      */
     bool SetTai(const std::time_t tai);
+
+    /**
+     * @brief Set time from TAI seconds (CLOCK_TAI)
+     *
+     * @param[in]  tai_sec  Time value seconds (> 0.0)
+     *
+     * @returns true if successful, false otherwise (bad time)
+     */
+    bool SetTaiSec(const double tai_sec);
+
+    /**
+     * @brief Set time from TAI nanoseconds (CLOCK_TAI)
+     *
+     * @param[in]  tai_ns  Time value nanoseconds (> 0)
+     *
+     * @returns true if successful, false otherwise (bad time)
+     */
+    bool SetTaiNs(const uint64_t tai_ns);
 
     /**
      * @brief Set time from system clock current (now) system time (CLOCK_REALTIME)
@@ -952,11 +988,11 @@ class Time
     double GetPosixSec(const int prec = 9) const;
 
     /**
-     * @brief Get time as POSIX time (POSIX, nanoseconds)
+     * @brief Get time as POSIX nanoseconds (POSIX)
      *
      * @note See comments in the class description regarding POSIX time!
      *
-     * @returns the POSIX time, truncated (rounded down, sub-seconds ignored)
+     * @returns the POSIX time in nanoseconds
      */
     uint64_t GetPosixNs() const;
 
@@ -1020,6 +1056,22 @@ class Time
      * @returns the TAI time, truncated (rounded down, sub-seconds ignored)
      */
     std::time_t GetTai() const;
+
+    /**
+     * @brief Get time as TAI seconds (CLOCK_TAI)
+     *
+     * @param[in]  prec  Round the seconds to this many fractional digits (0-9)
+     *
+     * @returns the TAI time in seconds
+     */
+    double GetTaiSec(const int prec = 9) const;
+
+    /**
+     * @brief Get time as TAI nanoseconds (CLOCK_TAI)
+     *
+     * @returns the TAI time in nanoseconds
+     */
+    uint64_t GetTaiNs() const;
 
     /**
      * @brief Get time as std::chrono::duration (milliseconds since epoch) (POSIX)

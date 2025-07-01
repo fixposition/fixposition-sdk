@@ -994,6 +994,24 @@ Time::Time() : sec_{ 0 }, nsec_{ 0 }
     return time;
 }
 
+/*static*/ Time FromTaiSec(const double tai_sec)
+{
+    Time time;
+    if (!time.SetTaiSec(tai_sec)) {
+        throw std::runtime_error(TIME_THROW_MSG);
+    }
+    return time;
+}
+
+/*static*/ Time Time::FromTaiNs(const uint64_t tai_ns)
+{
+    Time time;
+    if (!time.SetTaiNs(tai_ns)) {
+        throw std::runtime_error(TIME_THROW_MSG);
+    }
+    return time;
+}
+
 /*static*/ Time Time::FromClockRealtime()
 {
     Time time;
@@ -1215,6 +1233,28 @@ bool Time::SetTai(const std::time_t tai)
     return true;
 }
 
+bool Time::SetTaiSec(const double tai_sec)
+{
+    uint32_t isec = 0;
+    uint32_t nsec = 0;
+    if (!timeSecToIsecNsec(tai_sec, isec, nsec) || !SetTai(static_cast<std::time_t>(isec))) {
+        return false;
+    }
+    nsec_ = nsec;
+    return true;
+}
+
+bool Time::SetTaiNs(const uint64_t tai_ns)
+{
+    uint64_t sec64 = 0;
+    uint64_t nsec64 = tai_ns;
+    if (!timeNormalizeSecNSec(sec64, nsec64) || !SetTai(static_cast<std::time_t>(sec64))) {
+        return false;
+    }
+    nsec_ = nsec64;
+    return true;
+}
+
 bool Time::SetClockRealtime()
 {
     timespec tsnow;
@@ -1423,6 +1463,17 @@ std::time_t Time::GetTai() const
     std::time_t tai = static_cast<std::time_t>(sec_) + TAI_OFFS;
     TIME_TRACE("GetTai %" PRIu32 " -> %" PRIiMAX, sec_, tai);
     return tai;
+}
+
+double Time::GetTaiSec(const int prec) const
+{
+    return math::RoundToFracDigits(
+        static_cast<double>(GetTai()) + (1e-9 * static_cast<double>(nsec_)), std::clamp(prec, 0, 9));
+}
+
+uint64_t Time::GetTaiNs() const
+{
+    return (static_cast<uint64_t>(GetTai()) * (uint64_t)1000000000) + static_cast<uint64_t>(nsec_);
 }
 
 std::chrono::milliseconds Time::GetChronoMilli() const

@@ -16,6 +16,7 @@
 #include <cstdio>
 #include <cstring>
 #include <string>
+#include <unordered_map>
 
 /* EXTERNAL */
 #include <unistd.h>
@@ -75,32 +76,33 @@ class TimeConvOptions : public ProgramOptions
             "\n"
             "    <out> <in> <fields...>\n"
             "\n"
-            "The <out> and <in> are the output resp. the input format. Depending on the input format a\n"
+            "The <out> and <in> are the output resp. the input format. They can be specified using\n"
+            "the numeric value or a mnemonic (in brackes) given below. Depending on the input format a\n"
             "a different number of <fields> must be provided. The <input> is then converted to a output\n"
             "line with <in> and <out> reversed and the <fields> replaced with the corresponding output\n"
             "format fields. The supported formats are (<...> are the required fields):\n"
             "\n"
-            "    11   current system time from CLOCK_REALTIME (input only)\n"
-            "    12   current system time from CLOCK_TAI (input only)\n"
+            "    11 (clock_rt)  current system time from CLOCK_REALTIME (input only)\n"
+            "    12 (clock_tai) current system time from CLOCK_TAI (input only)\n"
             "\n"
-            "    21   integer <seconds> and <nanoseconds> (atomic)\n"
-            "    22   integer <nanoseconds> (atomic)\n"
-            "    23   float <seconds> (atomic)\n"
-            "    24   integer (truncated) <seconds> (atomic)\n"
+            "    21             integer <seconds> and <nanoseconds> (atomic)\n"
+            "    22             integer <nanoseconds> (atomic)\n"
+            "    23 (atomic)    float <seconds> (atomic)\n"
+            "    24             integer (truncated) <seconds> (atomic)\n"
             "\n"
-            "    31   float <seconds> (POSIX)\n"
-            "    32   integer (truncated) <seconds> (POSIX)\n"
-            "    33   integer <seconds> and <nanoseconds> (POSIX)\n"
-            "    34   float <seconds> (TAI)\n"
-            "    35   integer (truncated) <seconds> (TAI)\n"
+            "    31 (posix)     float <seconds> (POSIX)\n"
+            "    32             integer (truncated) <seconds> (POSIX)\n"
+            "    33             integer <seconds> and <nanoseconds> (POSIX)\n"
+            "    34 (tai)       float <seconds> (TAI)\n"
+            "    35             integer (truncated) <seconds> (TAI)\n"
             "\n"
-            "    41   GPS integer <week> and float <tow>\n"
-            "    42   Galileo integer <week> and float <tow>\n"
-            "    43   BeiDou integer <week> and float <tow>\n"
-            "    44   GLONASS integer <N4>, integer <Nt> and float <TOD>\n"
+            "    41 (gps)       GPS integer <week> and float <tow>\n"
+            "    42 (galileo)   Galileo integer <week> and float <tow>\n"
+            "    43 (beidou)    BeiDou integer <week> and float <tow>\n"
+            "    44 (glonass)   GLONASS integer <N4>, integer <Nt> and float <TOD>\n"
             "\n"
-            "    51   integer <year>, <month>, <day>, <hour>, <minute> and float <second> (UTC)\n"
-            "    52   float <day_of_year> (output only)\n"
+            "    51 (utc)       integer <year>, <month>, <day>, <hour>, <minute> and float <second> (UTC)\n"
+            "    52 (doy)       float <day_of_year> (output only)\n"
             "\n"
             "     0   Ignore, don't generate output\n"
             "\n"
@@ -225,10 +227,25 @@ class TimeConv
             return false;
         }
 
+        const std::unordered_map<std::string, int> FMTS = { { "clock_rt", 11 }, { "clock_tai", 12 }, { "atomic", 23 },
+            { "posix", 31 }, { "tai", 34 }, { "gps", 41 }, { "galileo", 42 }, { "beidou", 43 }, { "glonass", 44 },
+            { "utc", 51 }, { "doy", 52 } };
+        const auto in_str = StrToLower(input[1]);
+        const auto out_str = StrToLower(input[0]);
         int in = 0;
         int out = 0;
-        StrToValue(input[1], in);
-        StrToValue(input[0], out);
+        auto in_fmt = FMTS.find(in_str);
+        if (in_fmt != FMTS.end()) {
+            in = in_fmt->second;
+        } else {
+            StrToValue(in_str, in);
+        }
+        auto out_fmt = FMTS.find(out_str);
+        if (out_fmt != FMTS.end()) {
+            out = out_fmt->second;
+        } else {
+            StrToValue(out_str, out);
+        }
 
         bool ok = true;
         Time t;
@@ -265,12 +282,7 @@ class TimeConv
             }
             case 31: {
                 double sec = 0.0;
-                ok = ((input.size() == 3) && StrToValue(input[2], sec));
-                if (ok) {
-                    const double frac = std::modf(sec, &sec);
-                    ok = t.SetPosix(sec);
-                    t.nsec_ = std::round(frac * 1e9);
-                }
+                ok = ((input.size() == 3) && StrToValue(input[2], sec)) && t.SetPosixSec(sec);
                 break;
             }
             case 32: {
@@ -286,12 +298,7 @@ class TimeConv
             }
             case 34: {
                 double sec = 0.0;
-                ok = ((input.size() == 3) && StrToValue(input[2], sec));
-                if (ok) {
-                    const double frac = std::modf(sec, &sec);
-                    ok = t.SetTai(sec);
-                    t.nsec_ = std::round(frac * 1e9);
-                }
+                ok = ((input.size() == 3) && StrToValue(input[2], sec)) && t.SetTaiSec(sec);
                 break;
             }
             case 35: {
@@ -323,7 +330,7 @@ class TimeConv
                       StrToValue(input[3], glotime.TOD_) && t.SetGloTime(glotime));
                 break;
             }
-            case 46: {
+            case 51: {
                 UtcTime utctime;
                 ok = ((input.size() == 8) && StrToValue(input[2], utctime.year_) &&
                       StrToValue(input[3], utctime.month_) && StrToValue(input[4], utctime.day_) &&
@@ -331,7 +338,7 @@ class TimeConv
                       StrToValue(input[7], utctime.sec_) && t.SetUtcTime(utctime));
                 break;
             }
-            // case 47: {
+            // case 52: {
             //     double doy = 0.0;
             //     ok = ((input.size() == 3) && StrToValue(input[2], doy) && t.SetDayOfYear(doy));
             // }
@@ -340,74 +347,71 @@ class TimeConv
                 break;
         }
         if (!ok) {
-            error = "bad <in>";
+            error = Sprintf("bad <in> %s (%d)", in_str.c_str(), in);
             return false;
         }
 
         const int pp = (opts_.prec_ > 0 ? 1 : 0) + opts_.prec_;
         switch (out) {
             case 21:
-                std::printf("%2d %2d %11" PRIu32 " %9" PRIu32 "\n", in, out, t.sec_, t.nsec_);
+                std::printf("%2d %2d %11" PRIu32 " %9" PRIu32, in, out, t.sec_, t.nsec_);
                 break;
             case 22:
-                std::printf("%2d %2d %20" PRIu64 "\n", in, out, t.GetNSec());
+                std::printf("%2d %2d %20" PRIu64, in, out, t.GetNSec());
                 break;
             case 23:
-                std::printf("%2d %2d %*.*f\n", in, out, 11 + pp, opts_.prec_, t.GetSec(opts_.prec_));
+                std::printf("%2d %2d %*.*f", in, out, 11 + pp, opts_.prec_, t.GetSec(opts_.prec_));
                 break;
             case 24:
-                std::printf("%2d %2d %11" PRIu32 "\n", in, out, t.sec_);
+                std::printf("%2d %2d %11" PRIu32, in, out, t.sec_);
                 break;
             case 31: {
-                const auto rostime = t.GetRosTime();
-                std::printf("%2d %2d %*.*f\n", in, out, 11 + pp, opts_.prec_,
-                    (double)rostime.sec_ + ((double)rostime.nsec_ * 1e-9));
+                std::printf("%2d %2d %*.*f", in, out, 11 + pp, opts_.prec_, t.GetPosixSec());
                 break;
             }
             case 32:
-                std::printf("%2d %2d %11" PRIi64 "\n", in, out, t.GetPosix());
+                std::printf("%2d %2d %11" PRIi64, in, out, t.GetPosix());
                 break;
             case 33: {
                 const auto rostime = t.GetRosTime();
-                std::printf("%2d %2d %11" PRIu32 " %9" PRIu32 "\n", in, out, rostime.sec_, rostime.nsec_);
+                std::printf("%2d %2d %11" PRIu32 " %9" PRIu32, in, out, rostime.sec_, rostime.nsec_);
                 break;
             }
             case 34:
-                std::printf("%2d %2d %*.*f\n", in, out, 11 + pp, opts_.prec_,
-                    (double)t.GetTai() + ((double)(t.GetNSec() % (uint64_t)1000000000) * 1e-9));
+                std::printf("%2d %2d %*.*f", in, out, 11 + pp, opts_.prec_, t.GetTaiSec());
                 break;
             case 35:
-                std::printf("%2d %2d %11" PRIi64 "\n", in, out, t.GetTai());
+                std::printf("%2d %2d %11" PRIi64, in, out, t.GetTai());
                 break;
             case 41: {
                 const auto wnotow = t.GetWnoTow(WnoTow::Sys::GPS, opts_.prec_);
-                std::printf("%2d %2d %4d %*.*f\n", in, out, wnotow.wno_, 6 + pp, opts_.prec_, wnotow.tow_);
+                std::printf("%2d %2d %4d %*.*f", in, out, wnotow.wno_, 6 + pp, opts_.prec_, wnotow.tow_);
                 break;
             }
             case 42: {
                 const auto wnotow = t.GetWnoTow(WnoTow::Sys::GAL, opts_.prec_);
-                std::printf("%2d %2d %4d %*.*f\n", in, out, wnotow.wno_, 6 + pp, opts_.prec_, wnotow.tow_);
+                std::printf("%2d %2d %4d %*.*f", in, out, wnotow.wno_, 6 + pp, opts_.prec_, wnotow.tow_);
                 break;
             }
             case 43: {
                 const auto wnotow = t.GetWnoTow(WnoTow::Sys::BDS, opts_.prec_);
-                std::printf("%2d %2d %4d %*.*f\n", in, out, wnotow.wno_, 6 + pp, opts_.prec_, wnotow.tow_);
+                std::printf("%2d %2d %4d %*.*f", in, out, wnotow.wno_, 6 + pp, opts_.prec_, wnotow.tow_);
                 break;
             }
             case 44: {
                 const auto glotime = t.GetGloTime(opts_.prec_);
                 std::printf(
-                    "%2d %2d %2d %4d %*.*f\n", in, out, glotime.N4_, glotime.Nt_, 5 + pp, opts_.prec_, glotime.TOD_);
+                    "%2d %2d %2d %4d %*.*f", in, out, glotime.N4_, glotime.Nt_, 5 + pp, opts_.prec_, glotime.TOD_);
                 break;
             }
             case 51: {
                 const auto utc = t.GetUtcTime(opts_.prec_);
-                std::printf("%2d %2d %4d %2d %2d %2d %2d %*.*f\n", in, out, utc.year_, utc.month_, utc.day_, utc.hour_,
+                std::printf("%2d %2d %4d %2d %2d %2d %2d %*.*f", in, out, utc.year_, utc.month_, utc.day_, utc.hour_,
                     utc.min_, 2 + pp, opts_.prec_, utc.sec_);
                 break;
             }
             case 52:
-                std::printf("%2d %2d %*.*f\n", in, out, 3 + pp, opts_.prec_, t.GetDayOfYear(opts_.prec_));
+                std::printf("%2d %2d %*.*f", in, out, 3 + pp, opts_.prec_, t.GetDayOfYear(opts_.prec_));
                 break;
             case 0:
                 break;
@@ -415,8 +419,10 @@ class TimeConv
                 ok = false;
                 break;
         }
-        if (!ok) {
-            error = "bad <out>";
+        if (ok) {
+            std::printf("  # input: %s\n", StrJoin(input, " ").c_str());
+        } else {
+            error = Sprintf("bad <out> %s (%d)", out_str.c_str(), out);
             return false;
         }
 
