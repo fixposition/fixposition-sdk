@@ -53,7 +53,33 @@ static constexpr double SEC_IN_MIN_D   = static_cast<double>(SEC_IN_MIN_I);   //
 static constexpr double SEC_IN_HOUR_D  = static_cast<double>(SEC_IN_HOUR_I);  //!< Number of seconds in an hour (double)   = 3600.0
 static constexpr double SEC_IN_DAY_D   = static_cast<double>(SEC_IN_DAY_I);   //!< Number of seconds in a day (double)     = 86400.0
 static constexpr double SEC_IN_WEEK_D  = static_cast<double>(SEC_IN_WEEK_I);  //!< Number of seconds in a week (double)    = 604800.0
-//clang-format on
+// clang-format on
+
+/**
+ * @brief Convert seconds to nanoseconds
+ *
+ * @note Depending on the \c ns value this can be lossy.
+ *
+ * @param[in]  ns  Nanoseconds alue
+ *
+ * @returns the seconds value
+ */
+static constexpr double NsecToSec(const uint64_t ns)
+{
+    return (double)ns * 1e-9;  // (double)(ns % (uint64_t)1000000000) + ((double)(ns / (uint64_t)1000000000) * 1e-9);
+}
+
+/**
+ * @brief Convert nanoseconds to seconds
+ *
+ * @param[in]  sec  Seconds value
+ *
+ * @returns the nanoseconds value
+ */
+static constexpr uint64_t SecToNsec(const double sec)
+{
+    return sec * 1e9;
+}
 
 ///@}
 
@@ -75,7 +101,7 @@ double GetSecs();
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-class Duration; // forward declaration
+class Duration;  // forward declaration
 
 /**
  * @brief Helper to measure wallclock time
@@ -434,11 +460,13 @@ class Duration
 /**
  * @brief GNSS atomic time representation: week number (wno) and time of week (tow) used by GPS, Galileo and BeiDou
  */
-struct WnoTow {
+struct WnoTow
+{
     /**
      * @brief GNSS time system
      */
-    enum class Sys {
+    enum class Sys
+    {
         GPS,  //!< GPS (also: SBAS, QZSS)
         GAL,  //!< Galileo system time (GST)
         BDS,  //!< BeiDou time
@@ -1212,6 +1240,11 @@ class Time
      * @returns the leapseconds for the time
      */
     int GetLeapseconds() const;
+
+    /**
+     * @brief Offset between GPS leapseconds and TAI-UTC leapseconds
+     */
+    static constexpr int GPS_LEAPSECONDS_OFFS = 19;
 
     ///@}
     // -----------------------------------------------------------------------------------------------------------------
