@@ -1595,8 +1595,8 @@ TEST(TimeTest, TaiSec)
     const auto t1 = Time::FromSecNSec(800000000, 123456789);
     EXPECT_NEAR(t1.GetTaiSec(), 800000010.123456789, 1e-9);
 
-    const auto t2 = Time::FromPosixSec(800000000.123456789);
-    EXPECT_NEAR(t2.GetSec(), 800000010.123456789, 1e-9);
+    const auto t2 = Time::FromTaiSec(800000010.123456789);
+    EXPECT_NEAR(t2.GetSec(), 800000000.123456789, 1e-9);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

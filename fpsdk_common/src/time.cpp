@@ -994,7 +994,7 @@ Time::Time() : sec_{ 0 }, nsec_{ 0 }
     return time;
 }
 
-/*static*/ Time FromTaiSec(const double tai_sec)
+/*static*/ Time Time::FromTaiSec(const double tai_sec)
 {
     Time time;
     if (!time.SetTaiSec(tai_sec)) {
