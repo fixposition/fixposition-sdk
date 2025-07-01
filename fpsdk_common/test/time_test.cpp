@@ -1588,6 +1588,22 @@ TEST(TimeTest, PosixSec)
     EXPECT_EQ(t1.GetRosTime().ToSec(), t1.GetPosixSec());
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(TimeTest, SecNsec)
+{
+    const double s1 = 0.123454321;
+    const uint64_t n1 = 123454321;
+    EXPECT_EQ(SecToNsec(s1), n1);
+    EXPECT_NEAR(NsecToSec(n1), s1, 1e-9);
+
+    const double s2 = 1751348822.123454321;
+    const uint64_t n2 = 1751348822123454321;
+    const int64_t d2 = SecToNsec(s2) - n2;
+    EXPECT_LE(d2 < 0 ? -d2 : d2, 200);
+    EXPECT_NEAR(NsecToSec(n2), s2, 1e-9);
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace
 

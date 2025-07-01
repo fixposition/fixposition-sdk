@@ -175,7 +175,7 @@ enum class FpaFusionStatusLegacy : int
     VIO                      = '2',  //!< Visual-inertial fusion
     IMU_GNSS                 = '3',  //!< Inertial-GNSS fusion
     VIO_GNSS                 = '4'   //!< Visual-inertial-GNSS fusion
-}; //clang-format on
+};  // clang-format on
 
 /**
  * @brief FP_A fusion measurement status
