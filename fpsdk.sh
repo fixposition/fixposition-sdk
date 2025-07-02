@@ -104,7 +104,7 @@ function main
         have_command=1
     fi
 
-    debug "SCRIPTDIR=${SCRIPTDIR} image=${image} docker_args=${docker_args} volume_args=${volume_args} command=$@"
+    debug "SCRIPTDIR=${SCRIPTDIR} image=${image} docker_args=${docker_args} volume_args=${volume_args} have_command=${have_command} command=$@"
 
     # Check that script is run as user and docker is setup properly
     if ! which docker >/dev/null; then
@@ -133,9 +133,13 @@ function main
             error "Failed to pull ${image} :-("
             exit 1
         fi
+        info "Image is updated"
+        if [ ${have_command} -eq 0 ]; then
+            exit 0
+        fi
     fi
 
-    if [ ${have_command} -eq 0 -a ${update} -eq 0 ]; then
+    if [ ${have_command} -eq 0 ]; then
         exit_fail "Need a command"
     fi
 
