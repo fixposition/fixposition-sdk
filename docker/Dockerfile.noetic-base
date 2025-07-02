@@ -19,6 +19,9 @@ ENV ROS_DISTRO=noetic
 # Remove automatic use of /ros_entrypoint.sh, we'll deal with this ourselves
 ENTRYPOINT []
 
+# ROS mirror is fckd :-/
+RUN echo "deb [trusted=yes] http://packages.ros.org/ros/ubuntu focal main" > /etc/apt/sources.list.d/ros1-latest.list
+
 # Install stuff
 COPY docker/scripts/install_apt_base.sh /tmp
 RUN /tmp/install_apt_base.sh && rm -f /tmp/install_apt_base.sh
