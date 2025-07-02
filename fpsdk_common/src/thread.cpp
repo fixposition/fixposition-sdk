@@ -199,17 +199,18 @@ BinarySemaphore::BinarySemaphore()
 
 void BinarySemaphore::Notify()
 {
+    std::unique_lock<std::mutex> lock(mutex_);
     pend_ = true;
     cond_.notify_all();
 }
 
 WaitRes BinarySemaphore::WaitFor(const uint32_t millis)
 {
+    std::unique_lock<std::mutex> lock(mutex_);
     if (pend_) {
         pend_ = false;
         return WaitRes::WOKEN;
     }
-    std::unique_lock<std::mutex> lock(mutex_);
     if (cond_.wait_for(lock, std::chrono::milliseconds(millis)) == std::cv_status::timeout) {
         return WaitRes::TIMEOUT;
     } else {

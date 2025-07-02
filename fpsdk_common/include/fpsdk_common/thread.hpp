@@ -96,9 +96,9 @@ class BinarySemaphore
     WaitRes WaitUntil(const uint32_t period, const uint32_t min_sleep = 0);
 
    private:
-    std::mutex mutex_;                //!< Mutex
-    std::condition_variable cond_;    //!< Condition
-    std::atomic<bool> pend_ = false;  //!< Pending
+    std::mutex mutex_;              //!< Mutex
+    std::condition_variable cond_;  //!< Condition
+    bool pend_ = false;             //!< Pending
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
