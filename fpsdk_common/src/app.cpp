@@ -196,12 +196,13 @@ bool ProgramOptions::LoadFromArgv(int argc, char** argv)
     // Build arguments for getopt_long()
     std::vector<struct option> long_opts = {
         // clang-format off
-        { "version", no_argument, NULL, 'V' },
-        { "help",    no_argument, NULL, 'h' },
-        { "verbose", no_argument, NULL, 'v' },
-        { "quiet",   no_argument, NULL, 'q' },
+        { "version",  no_argument, NULL, 'V' },
+        { "help",     no_argument, NULL, 'h' },
+        { "verbose",  no_argument, NULL, 'v' },
+        { "quiet",    no_argument, NULL, 'q' },
+        { "journal",  no_argument, NULL, 'J' },
     };  // clang-format on
-    std::string short_opts = ":hVvq";
+    std::string short_opts = ":hVvqJ";
     for (const auto& option : options_) {
         long_opts.push_back({ "dummy", option.has_argument ? required_argument : no_argument, NULL, option.flag });
         short_opts += string::Sprintf("%c%s", option.flag, option.has_argument ? ":" : "");
@@ -233,6 +234,9 @@ bool ProgramOptions::LoadFromArgv(int argc, char** argv)
             case 'q':
                 logging_level_--;
                 break;
+            case 'J':
+                logging_colour_ = logging::LoggingColour::JOURNAL;
+                break;
             // Special getopt_long() cases
             case '?':
                 WARNING("Invalid option '-%c'", optopt);
@@ -260,8 +264,9 @@ bool ProgramOptions::LoadFromArgv(int argc, char** argv)
     if (logging_level_ >= LoggingLevel::DEBUG) {
         logging_timestamps_ = LoggingTimestamps::RELATIVE;
     }
-    LoggingSetParams({ logging_level_, LoggingColour::AUTO, logging_timestamps_ });
-    DEBUG("logging = %s %s", LoggingLevelStr(logging_level_), LoggingTimestampsStr(logging_timestamps_));
+    LoggingSetParams({ logging_level_, logging_colour_, logging_timestamps_ });
+    DEBUG("logging = %s %s %s", LoggingLevelStr(logging_level_), LoggingColourStr(logging_colour_),
+        LoggingTimestampsStr(logging_timestamps_));
 
     // Non-flag arguments
     std::vector<std::string> args;

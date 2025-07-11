@@ -155,11 +155,15 @@ class ProgramOptions
    public:
     /**
      * @brief A program option
+     *
+     * Reserved options are: 'h' / "help", 'V' / "version", 'v' / "verbose", 'q' / "quiet", 'J' / "journal",  '?', '*',
+     * and ':'.
      */
     struct Option
     {
-        char flag;          //!< The flag (reserved: 'h', 'V', 'v', 'q', '?', '*', ':')
-        bool has_argument;  //!< True if flag requires an an argument, false if not
+        char flag;                   //!< The flag (some are reserved, see above)
+        bool has_argument;           //!< True if flag requires an an argument, false if not
+        const char* name = nullptr;  //!< Long option name (or nullptr, some are reserved, see above)
     };
 
     /**
@@ -211,13 +215,16 @@ class ProgramOptions
 
     //! Help screen for common options  @hideinitializer
     static constexpr const char* COMMON_FLAGS_HELP = /* clang-format off */
-        "    -h       -- Print program help screen, and exit\n"
-        "    -V       -- Print program, version and license information, and exit\n"
-        "    -v / -q  -- Increase / decrease logging verbosity, multiple flags accumulate\n";  // clang-format on
+        "    -h, --help     -- Print program help screen, and exit\n"
+        "    -V, --version  -- Print program, version and license information, and exit\n"
+        "    -v, --verbose / -q, --quiet\n"
+        "                   -- Increase / decrease logging verbosity, multiple flags accumulate\n"
+        "    -J, --journal  -- Use systemd journal logging markers instead of colours\n";  // clang-format on
 
     std::string app_name_;                                                              //!< App name
     logging::LoggingLevel logging_level_ = logging::LoggingLevel::INFO;                 //!< Logging verbosity level
     logging::LoggingTimestamps logging_timestamps_ = logging::LoggingTimestamps::NONE;  //!< Logging timestamps
+    logging::LoggingColour logging_colour_ = logging::LoggingColour::AUTO;              //!< Logging colour
     std::vector<std::string> argv_;                                                     //!< argv[] of program
 
    private:
