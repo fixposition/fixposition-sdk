@@ -204,7 +204,8 @@ bool ProgramOptions::LoadFromArgv(int argc, char** argv)
     };  // clang-format on
     std::string short_opts = ":hVvqJ";
     for (const auto& option : options_) {
-        long_opts.push_back({ "dummy", option.has_argument ? required_argument : no_argument, NULL, option.flag });
+        long_opts.push_back({ option.name != nullptr ? option.name : "dummy",
+            option.has_argument ? required_argument : no_argument, NULL, option.flag });
         short_opts += string::Sprintf("%c%s", option.flag, option.has_argument ? ":" : "");
     }
     long_opts.push_back({ NULL, 0, NULL, 0 });
