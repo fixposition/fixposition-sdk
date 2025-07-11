@@ -164,6 +164,11 @@ static void LoggingDefaultWriteFn(const LoggingParams& params, const LoggingLeve
     static char output[0x1fff];
     std::size_t len = 0;
 
+    // Journal marker must always come first.
+    if ((params.colour_ == LoggingColour::JOURNAL) && (prefix != NULL)) {
+        len += std::snprintf(&output[len], sizeof(output) - len, "%s", prefix);
+    }
+
     // Timestamps. Note: deliberately *not* using fpsdk::common::time
     if (params.timestamps_ != LoggingTimestamps::NONE) {
         if (g_time0.tv_sec == 0) {
@@ -188,7 +193,7 @@ static void LoggingDefaultWriteFn(const LoggingParams& params, const LoggingLeve
         }
     }
 
-    if (prefix != NULL) {
+    if ((params.colour_ != LoggingColour::JOURNAL) && (prefix != NULL)) {
         len += std::snprintf(&output[len], sizeof(output) - len, "%s", prefix);
     }
     len += std::snprintf(&output[len], sizeof(output) - len, "%s", str);
