@@ -45,7 +45,7 @@ class TimeConvOptions : public ProgramOptions
 {
    public:
     TimeConvOptions()  // clang-format off
-        : ProgramOptions("timeconv", { { 'i', false }, { 'p', true } }) {};  // clang-format on
+        : ProgramOptions("timeconv", { { 'i', false, "ignore" }, { 'p', true, "prec" } }) {};  // clang-format on
 
     // clang-format off
     bool ignore_bad_ = false;
@@ -68,8 +68,8 @@ class TimeConvOptions : public ProgramOptions
             "\n" ,stdout);
         std::fputs(COMMON_FLAGS_HELP, stdout);
         std::fputs(
-            "    -i       -- Ignore errors in input (only from stdin, not for input on command line)\n"
-            "    -p <n>   -- Precision (number of fractional digits) for float outputs (default: 3)\n"
+            "    -i, --ignore        -- Ignore errors in input (only from stdin, not for input on command line)\n"
+            "    -p <n>, --prec <n>  -- Precision (number of fractional digits) for float outputs (default: 3)\n"
             "\n"
             "A single <input> is either provided on the command line or on stdin, one <input> per line.\n"
             "The program converts the input to the desired output. One <input> has the following format:\n"

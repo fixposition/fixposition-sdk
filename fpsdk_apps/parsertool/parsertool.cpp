@@ -49,7 +49,9 @@ class ParserToolOptions : public ProgramOptions
 {
    public:
     ParserToolOptions()  // clang-format off
-        : ProgramOptions("parsertool", { { 'x', false }, { 's', false }, { 'f', true }, { 'c', false } }) {};  // clang-format on
+        : ProgramOptions("parsertool", {
+            { 'x', false, "hexdump" }, { 's', false, "save" }, { 'f', true, "filter" }, { 'c', false, "stdout" }
+        }) {};  // clang-format on
 
     // clang-format off
     bool                      hexdump_ = false;  //!< Do hexdump of messages
@@ -75,12 +77,13 @@ class ParserToolOptions : public ProgramOptions
             "\n" ,stdout);
         std::fputs(COMMON_FLAGS_HELP, stdout);
         std::fputs(
-            "    -x       -- Print hexdump of each message, not with -c\n"
-            "    -s       -- Save each (!) message into a separate (!) file in the current directory, not with -c\n"
-            "    -f <filter> -- Filter input, where <filter> is a comma-separated list of full or partial message.\n"
-            "                names. Multiple -f can be given.\n"
-            "    -c       -- Write messages to stdout instead of printing info, useful with -f\n"
-            "    <input>  -- File or device to read data from (instead of stdin)\n"
+            "    -x, --hexdump  -- Print hexdump of each message, not with -c\n"
+            "    -s, --save     -- Save each (!) message into a separate (!) file in the current directory, not with -c\n"
+            "    -f <filter>, --filter <filter>\n"
+            "                   -- Filter input, where <filter> is a comma-separated list of full or partial message.\n"
+            "                      names. Multiple -f can be given.\n"
+            "    -c, --stdout   -- Write messages to stdout instead of printing info, useful with -f\n"
+            "    <input>        -- File or device to read data from (instead of stdin)\n"
             "\n"
             "Examples:\n"
             "\n"
