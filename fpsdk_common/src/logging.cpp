@@ -144,7 +144,7 @@ static void LoggingDefaultWriteFn(const LoggingParams& params, const LoggingLeve
             tscol = "\033[0;34m";
             break;
         case LoggingColour::JOURNAL:
-            switch (params.level_) {  // clang-format off
+            switch (level) {  // clang-format off
                 case LoggingLevel::TRACE:   prefix = "<7>"; suffix = "\n"; break;
                 case LoggingLevel::DEBUG:   prefix = "<7>"; suffix = "\n"; break;
                 case LoggingLevel::INFO:    prefix = "<6>"; suffix = "\n"; break;
