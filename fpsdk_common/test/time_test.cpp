@@ -889,7 +889,7 @@ TEST(TimeTest, Time_StrIsoTime)
     const Time t6 = Time::FromUtcTime({ 2024, 1, 31, 23, 59, 59.99 });
     EXPECT_EQ(t6.StrIsoTime(1), std::string("2024-02-01T00:00:00.0Z"));
     const Time t7 = Time::FromUtcTime({ 2024, 12, 31, 23, 59, 59.99 });
-    EXPECT_EQ(t7.StrIsoTime(1), std::string("2025-01-01T00:00.00.0Z"));
+    EXPECT_EQ(t7.StrIsoTime(1), std::string("2025-01-01T00:00:00.0Z"));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
