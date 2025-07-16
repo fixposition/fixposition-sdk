@@ -1249,7 +1249,7 @@ class Time
      *
      * @param[in]  prec  Number of fractional digits for the seconds (0-9)
      *
-     * @returns a string with formatted UTC time ("yyyyddmmThhmmssZ")
+     * @returns a string with formatted UTC time ("yyyy-dd-mmThh:mm:ssZ")
      */
     std::string StrIsoTime(const int prec = 0) const;
 

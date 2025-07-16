@@ -862,34 +862,34 @@ TEST(TimeTest, Time_StrUtcTime)
 TEST(TimeTest, Time_StrIsoTime)
 {
     const Time t1 = Time::FromUtcTime({ 2024, 1, 2, 3, 4, 5.123456789 });
-    EXPECT_EQ(t1.StrIsoTime(9), std::string("20240102T030405.123456789Z"));
-    EXPECT_EQ(t1.StrIsoTime(8), std::string("20240102T030405.12345679Z"));  // round
-    EXPECT_EQ(t1.StrIsoTime(7), std::string("20240102T030405.1234568Z"));   // round
-    EXPECT_EQ(t1.StrIsoTime(6), std::string("20240102T030405.123457Z"));    // round
-    EXPECT_EQ(t1.StrIsoTime(5), std::string("20240102T030405.12346Z"));     // round
-    EXPECT_EQ(t1.StrIsoTime(4), std::string("20240102T030405.1235Z"));      // round
-    EXPECT_EQ(t1.StrIsoTime(3), std::string("20240102T030405.123Z"));
-    EXPECT_EQ(t1.StrIsoTime(2), std::string("20240102T030405.12Z"));
-    EXPECT_EQ(t1.StrIsoTime(1), std::string("20240102T030405.1Z"));
-    EXPECT_EQ(t1.StrIsoTime(0), std::string("20240102T030405Z"));
+    EXPECT_EQ(t1.StrIsoTime(9), std::string("2024-01-02T03:04:05.123456789Z"));
+    EXPECT_EQ(t1.StrIsoTime(8), std::string("2024-01-02T03:04:05.12345679Z"));  // round
+    EXPECT_EQ(t1.StrIsoTime(7), std::string("2024-01-02T03:04:05.1234568Z"));   // round
+    EXPECT_EQ(t1.StrIsoTime(6), std::string("2024-01-02T03:04:05.123457Z"));    // round
+    EXPECT_EQ(t1.StrIsoTime(5), std::string("2024-01-02T03:04:05.12346Z"));     // round
+    EXPECT_EQ(t1.StrIsoTime(4), std::string("2024-01-02T03:04:05.1235Z"));      // round
+    EXPECT_EQ(t1.StrIsoTime(3), std::string("2024-01-02T03:04:05.123Z"));
+    EXPECT_EQ(t1.StrIsoTime(2), std::string("2024-01-02T03:04:05.12Z"));
+    EXPECT_EQ(t1.StrIsoTime(1), std::string("2024-01-02T03:04:05.1Z"));
+    EXPECT_EQ(t1.StrIsoTime(0), std::string("2024-01-02T03:04:05Z"));
     // Default precision is 0
-    EXPECT_EQ(t1.StrIsoTime(), std::string("20240102T030405Z"));
+    EXPECT_EQ(t1.StrIsoTime(), std::string("2024-01-02T03:04:05Z"));
 
     const Time t2 = Time::FromUtcTime({ 2024, 1, 2, 3, 4, 5.1234567899 });
     EXPECT_EQ(t2.nsec_, 123456790);  // 0.1234567899 rounded in FromUtcTime()
-    EXPECT_EQ(t2.StrIsoTime(9), std::string("20240102T030405.123456790Z"));
+    EXPECT_EQ(t2.StrIsoTime(9), std::string("2024-01-02T03:04:05.123456790Z"));
 
     // Rollover sec -> min, min -> hour, hour -> day, day -> month, month -> year
     const Time t3 = Time::FromUtcTime({ 2024, 1, 2, 3, 4, 59.99 });
-    EXPECT_EQ(t3.StrIsoTime(1), std::string("20240102T030500.0Z"));
+    EXPECT_EQ(t3.StrIsoTime(1), std::string("2024-01-02T03:05:00.0Z"));
     const Time t4 = Time::FromUtcTime({ 2024, 1, 2, 3, 59, 59.99 });
-    EXPECT_EQ(t4.StrIsoTime(1), std::string("20240102T040000.0Z"));
+    EXPECT_EQ(t4.StrIsoTime(1), std::string("2024-01-02T04:00:00.0Z"));
     const Time t5 = Time::FromUtcTime({ 2024, 1, 2, 23, 59, 59.99 });
-    EXPECT_EQ(t5.StrIsoTime(1), std::string("20240103T000000.0Z"));
+    EXPECT_EQ(t5.StrIsoTime(1), std::string("2024-01-03T00:00:00.0Z"));
     const Time t6 = Time::FromUtcTime({ 2024, 1, 31, 23, 59, 59.99 });
-    EXPECT_EQ(t6.StrIsoTime(1), std::string("20240201T000000.0Z"));
+    EXPECT_EQ(t6.StrIsoTime(1), std::string("2024-02-01T00:00:00.0Z"));
     const Time t7 = Time::FromUtcTime({ 2024, 12, 31, 23, 59, 59.99 });
-    EXPECT_EQ(t7.StrIsoTime(1), std::string("20250101T000000.0Z"));
+    EXPECT_EQ(t7.StrIsoTime(1), std::string("2025-01-01T00:00:00.0Z"));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
