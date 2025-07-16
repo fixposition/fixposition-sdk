@@ -22,7 +22,7 @@ ln -s ../../fpsdk_common .
 ln -s ../../fpsdk_ros2 .
 ln -s ../../examples/ros2_fpsdk_demo .
 cd ..
-colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug
+colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Debug
 ```
 
 To run the node:
