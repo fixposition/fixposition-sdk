@@ -1760,8 +1760,8 @@ std::string Time::StrIsoTime(const int prec) const
 {
     const int n_frac = std::clamp(prec, 0, 9);
     const auto utctime = GetUtcTime(n_frac);
-    return string::Sprintf("%04d%02d%02dT%02d%02d%0*.*fZ", utctime.year_, utctime.month_, utctime.day_, utctime.hour_,
-        utctime.min_, n_frac > 0 ? (n_frac + 3) : (n_frac + 2), n_frac, utctime.sec_);
+    return string::Sprintf("%04d-%02d-%02dT%02d:%02d:%0*.*fZ", utctime.year_, utctime.month_, utctime.day_,
+        utctime.hour_, utctime.min_, n_frac > 0 ? (n_frac + 3) : (n_frac + 2), n_frac, utctime.sec_);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
