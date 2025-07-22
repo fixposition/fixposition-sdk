@@ -741,12 +741,11 @@ struct LeapSecInfo
 // TAI (CLOCK_TAI) has TAI_OFFS leap seconds.
 static constexpr int TAI_OFFS = 10;  // offset of CLOCK_TAI to our atomic time
 
-// See IERS "Bulletin C" #69 January 2025 (https://hpiers.obspm.fr/iers/bul/bulc/bulletinc.dat)
+// See IERS "Bulletin C" #70 July 2025 (https://hpiers.obspm.fr/iers/bul/bulc/bulletinc.dat)
 // See also https://data.iana.org/time-zones/data/leap-seconds.list
 // See also /usr/share/zoneinfo/{leapseconds,leap-seconds.list}
-// 2025-12-31 12:00:00 (The earliest time there can be a change is at midnight this day)
-// TZ=UTC date --date "2024-12-31 12:00:00" +%s
-static constexpr uint32_t max_ts = 1767182437;
+// The earliest time there can be a change is approximately:
+static constexpr uint32_t max_ts = 1782820800;  // TZ=UTC date --date "2026-06-30 12:00:00" +%s
 static constexpr uint32_t NUM_LEAPS = 27;
 static constexpr std::array<std::array<uint32_t, 2>, NUM_LEAPS> LEAPSECONDS = { {
     // clang-format off
