@@ -86,7 +86,7 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-        yaml-cpp::yaml-cpp
+        yaml-cpp
         Eigen3::Eigen
     PRIVATE
         ${Boost_TARGETS}
