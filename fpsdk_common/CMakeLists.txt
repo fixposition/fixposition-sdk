@@ -37,15 +37,17 @@ endif()
 find_package(yaml-cpp REQUIRED)
 if(FP_BOOST_STACKTRACE)
     find_package(Boost CONFIG REQUIRED COMPONENTS stacktrace_basic stacktrace_backtrace stacktrace_addr2line)
+    set(Boost_TARGETS "Boost::headers;Boost::stacktrace_basic;Boost::stacktrace_backtrace;Boost::stacktrace_addr2line")
 else()
     find_package(Boost CONFIG REQUIRED)
+    set(Boost_TARGETS "Boost::headers")
 endif()
 find_package(ZLIB REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(Threads REQUIRED)
 find_package(PkgConfig REQUIRED)
-pkg_search_module(OPENSSL REQUIRED openssl)
+pkg_search_module(OpenSSL REQUIRED IMPORTED_TARGET openssl)
 
 # PROJ is optional, unless explicitly requested with -DFPSDK_USE_PROJ=ON
 if (FPSDK_USE_PROJ STREQUAL "ON")
@@ -63,14 +65,6 @@ else()
         set(FP_FPSDK_USE_PROJ OFF)
     endif()
 endif()
-
-include_directories(include
-    ${YAML_CPP_INCLUDE_DIR}
-    ${Boost_INCLUDE_DIRS}
-    ${ZLIB_INCLUDE_DIRS}
-    ${EIGEN3_INCLUDE_DIR}
-    ${OPENSSL_INCLUDE_DIRS}
-)
 
 
 # SHARED LIBRARY =======================================================================================================
@@ -92,12 +86,13 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-        ${YAML_CPP_LIBRARIES}
-        ${EIGEN3_LIBRARIES}
+        yaml-cpp::yaml-cpp
+        Eigen3::Eigen
     PRIVATE
-        ${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
-        ${ZLIB_LIBRARIES}
-        ${OPENSSL_LIBRARIES}
+        ${Boost_TARGETS}
+        ${CMAKE_DL_LIBS}
+        ZLIB::ZLIB
+        PkgConfig::OpenSSL
         Threads::Threads
         nlohmann_json::nlohmann_json
         $<$<BOOL:${FPSDK_USE_PROJ}>:PROJ::proj>
