@@ -15,7 +15,7 @@
 #include <exception>
 
 /* EXTERNAL */
-#if FP_USE_PROJ
+#if FPSDK_USE_PROJ
 #  include <proj.h>
 #endif
 
@@ -236,7 +236,7 @@ Eigen::Vector3d LlhRadToDeg(const Eigen::Vector3d& llh_rad)
 }
 
 /* ****************************************************************************************************************** */
-#if FP_USE_PROJ
+#if FPSDK_USE_PROJ
 
 Transformer::Transformer(const std::string& name) /* clang-format off */ :
     name_      { name },
@@ -344,7 +344,7 @@ bool Transformer::Transform(const Eigen::Vector3d& in, Eigen::Vector3d& out, con
     return false;
 }
 
-#endif  // FP_USE_PROJ
+#endif  // FPSDK_USE_PROJ
 
 /* ****************************************************************************************************************** */
 }  // namespace trafo

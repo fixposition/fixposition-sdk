@@ -53,7 +53,7 @@ class TimeConvOptions : public ProgramOptions
     std::vector<std::string> input_;
     // clang-format on
 
-    void PrintHelp() final
+    void PrintHelp() override final
     {
         // clang-format off
         std::fputs(
@@ -65,7 +65,7 @@ class TimeConvOptions : public ProgramOptions
             "    timeconv [flags] [<input>]\n"
             "\n"
             "Where:\n"
-            "\n" ,stdout);
+            "\n", stdout);
         std::fputs(COMMON_FLAGS_HELP, stdout);
         std::fputs(
             "    -i, --ignore        -- Ignore errors in input (only from stdin, not for input on command line)\n"

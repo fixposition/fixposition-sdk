@@ -73,7 +73,7 @@ if(BUILD_TESTING)
         gtest_add_tests(
             TARGET ${GTEST_PREFIX}_${ADD_GTEST_TARGET}
             SOURCES ${ADD_GTEST_SOURCES}
-            WORKING_DIRECTORY ${ADD_GTEST_WORKING_DIRECTORY}
+            # WORKING_DIRECTORY ${ADD_GTEST_WORKING_DIRECTORY}
         )
 
         endmacro()

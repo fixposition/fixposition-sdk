@@ -14,6 +14,7 @@
 /* LIBC/STL */
 #include <csignal>
 #include <iostream>
+#include <unistd.h>
 
 /* EXTERNAL */
 #include <boost/stacktrace.hpp>
@@ -22,6 +23,7 @@
 /* PACKAGE */
 #include "fpsdk_common/app.hpp"
 #include "fpsdk_common/logging.hpp"
+#include "fpsdk_common/path.hpp"
 #include "fpsdk_common/string.hpp"
 #include "fpsdk_common/thread.hpp"
 #include "fpsdk_common/utils.hpp"
@@ -173,8 +175,9 @@ void PrintStacktrace()
 /* ****************************************************************************************************************** */
 
 ProgramOptions::ProgramOptions(const std::string& app_name, const std::vector<Option>& options) /* clang-format off */ :
-    app_name_   { app_name },
-    options_    { options }  // clang-format on
+    app_name_        { app_name },
+    logging_params_  { logging::LoggingGetParams() },
+    options_         { options }  // clang-format on
 {
 }
 
@@ -230,13 +233,13 @@ bool ProgramOptions::LoadFromArgv(int argc, char** argv)
                 exit(EXIT_SUCCESS);
                 break;
             case 'v':
-                logging_level_++;
+                logging_params_.level_++;
                 break;
             case 'q':
-                logging_level_--;
+                logging_params_.level_--;
                 break;
             case 'J':
-                logging_colour_ = logging::LoggingColour::JOURNAL;
+                logging_params_.colour_ = logging::LoggingColour::JOURNAL;
                 break;
             // Special getopt_long() cases
             case '?':
@@ -262,12 +265,12 @@ bool ProgramOptions::LoadFromArgv(int argc, char** argv)
     }
 
     // Setup debugging
-    if (logging_level_ >= LoggingLevel::DEBUG) {
-        logging_timestamps_ = LoggingTimestamps::RELATIVE;
+    if (logging_params_.level_ >= LoggingLevel::DEBUG) {
+        logging_params_.timestamps_ = LoggingTimestamps::RELATIVE;
     }
-    LoggingSetParams({ logging_level_, logging_colour_, logging_timestamps_ });
-    DEBUG("logging = %s %s %s", LoggingLevelStr(logging_level_), LoggingColourStr(logging_colour_),
-        LoggingTimestampsStr(logging_timestamps_));
+    LoggingSetParams(logging_params_);
+    DEBUG("logging = %s %s %s", LoggingLevelStr(logging_params_.level_), LoggingColourStr(logging_params_.colour_),
+        LoggingTimestampsStr(logging_params_.timestamps_));
 
     // Non-flag arguments
     std::vector<std::string> args;
@@ -289,6 +292,13 @@ bool ProgramOptions::LoadFromArgv(int argc, char** argv)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool ProgramOptions::CheckOptions(const std::vector<std::string>& /*args*/)
+{
+    return true;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void ProgramOptions::PrintVersion()
 {
     std::fprintf(stdout, "%s (%s, %s)\n%s\n%s\n", app_name_.c_str(),
@@ -298,6 +308,75 @@ void ProgramOptions::PrintVersion()
         "debug",
 #endif
         utils::GetVersionString(), utils::GetCopyrightString(), utils::GetLicenseString());
+}
+
+/* ****************************************************************************************************************** */
+
+static inline uint64_t GetClockNs(const clockid_t id)
+{
+    struct timespec t;
+    return (clock_gettime(id, &t) == 0) ? ((uint64_t)t.tv_sec * (uint64_t)1000000000) + (uint64_t)t.tv_nsec : 0;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+PerfStats::PerfStats()
+{
+    start_.SetClockRealtime();
+    start_m_ = GetClockNs(CLOCK_MONOTONIC);
+    start_c_ = GetClockNs(CLOCK_PROCESS_CPUTIME_ID);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void PerfStats::Update()
+{
+    // Get current times
+    const uint64_t time_m = GetClockNs(CLOCK_MONOTONIC);
+    const uint64_t time_c = GetClockNs(CLOCK_PROCESS_CPUTIME_ID);
+
+    // Update PID (it could have changed!)
+    pid_ = getpid();
+
+    // Memory
+    std::vector<uint8_t> data;
+    std::size_t resident = 0;
+    if (path::FileSlurp("/proc/self/statm", data) &&
+        (std::sscanf((const char*)data.data(), "%*s %" SCNuMAX, &resident) == 1) && (resident > 0)) {
+        const double page_size = (double)sysconf(_SC_PAGESIZE) * (1.0f / 1024.0f / 1024.0f);
+        mem_curr_ = (double)resident * page_size;
+        if (mem_curr_ > mem_peak_) {
+            mem_peak_ = mem_curr_;
+        }
+    } else {
+        mem_curr_ = 0.0;
+    }
+
+    // CPU
+    if (time_m > start_m_) {
+        cpu_avg_ = (double)(time_c - start_c_) / (double)(time_m - start_m_) * 1e2;
+    }
+    if (time_m > last_m_) {
+        cpu_curr_ = (double)(time_c - last_c_) / (double)(time_m - last_m_) * 1e2;
+        if (cpu_curr_ > cpu_peak_) {
+            cpu_peak_ = cpu_curr_;
+        }
+    }
+    last_c_ = time_c;
+    last_m_ = time_m;
+
+    // Uptime
+    time::Time now;
+    if (now.SetClockRealtime()) {
+        now.Diff(start_, uptime_);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void PerfStats::Reset()
+{
+    *this = PerfStats();
 }
 
 /* ****************************************************************************************************************** */

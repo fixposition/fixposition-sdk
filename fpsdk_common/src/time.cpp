@@ -44,16 +44,20 @@ uint64_t GetMillis()
 {
     struct timespec tp;
     clock_gettime(CLOCK_MONOTONIC, &tp);
-    return (tp.tv_sec * 1000) + (tp.tv_nsec / 1000000);
+    static uint64_t t0 = 0;
+    uint64_t t = (tp.tv_sec * 1000) + (tp.tv_nsec / 1000000);
+    if (t0 == 0) {
+        t0 = t;
+        return 0;
+    }
+    return t - t0;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 double GetSecs()
 {
-    struct timespec tp;
-    clock_gettime(CLOCK_MONOTONIC, &tp);
-    return (double)tp.tv_sec + ((double)tp.tv_nsec * 1e-9);
+    return (double)GetMillis() * 1e-3;
 }
 
 /* ****************************************************************************************************************** */

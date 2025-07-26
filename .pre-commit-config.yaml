@@ -5,11 +5,14 @@ repos:
     hooks:
       #- id: check-json
       - id: end-of-file-fixer
+        verbose: true
       - id: trailing-whitespace
+        verbose: true
   - repo: https://github.com/pocc/pre-commit-hooks
     rev: v1.3.5
     hooks:
       - id: clang-format
+        verbose: true
         args:
           - "-i"
 exclude: '(.*\.svg|.*/test/data/.*|\.devcontainer/.*|\.vscode/.*)'

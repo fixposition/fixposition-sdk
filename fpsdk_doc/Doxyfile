@@ -2389,7 +2389,7 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = _DOXYGEN_ \
                          NDEBUG \
-                         FP_USE_PROJ=1
+                         FPSDK_USE_PROJ=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
@@ -2698,7 +2698,7 @@ DIR_GRAPH_MAX_DEPTH    = 1
 # The default value is: png.
 # This tag requires that the tag HAVE_DOT is set to YES.
 
-DOT_IMAGE_FORMAT       = png
+DOT_IMAGE_FORMAT       = svg
 
 # If DOT_IMAGE_FORMAT is set to svg, then this option can be set to YES to
 # enable generation of interactive SVG images that allow zooming and panning.

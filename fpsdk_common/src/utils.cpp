@@ -27,7 +27,7 @@ namespace utils {
 
 const char* GetVersionString()
 {
-    return FP_VERSION_STRING;  // "0.0.0", "0.0.0-heads/feature/bla-g123456-dirty"
+    return FPSDK_VERSION_STRING;  // "0.0.0", "0.0.0-heads/feature/bla-g123456-dirty"
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -66,7 +66,6 @@ void CircularBuffer::Reset()
     read_ = 0;
     write_ = 0;
     full_ = false;
-    std::memset(&buf_[0], 0, buf_.size());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

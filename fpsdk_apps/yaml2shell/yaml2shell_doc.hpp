@@ -30,7 +30,8 @@ namespace streammux {
 
     Tool to convert a yaml document to shell variables.
 
-    See @ref FPSDK_BUILD_DOC on how to build and run the apps, or @ref FPSDK_RUN_DOC on how to run the apps.
+    See @ref FPSDK_BUILD_DOC on how to build and run this app, or @ref FPSDK_RUN_DOC on how to run it using pre-built
+    Docker images.
 
     @section FPSDK_APPS_YAML2SHELL_HELP Command line help
 

@@ -413,7 +413,16 @@ constexpr const char* ToStr(const bool value)
  *
  * @returns a buffer with the string's data
  */
-std::vector<uint8_t> StrToVec(const std::string& str);
+std::vector<uint8_t> StrToBuf(const std::string& str);
+
+/**
+ * @brief Convert buffer to string
+ *
+ * @param[in]  buf  The buffer
+ *
+ * @returns a string with the buffer's data
+ */
+std::string BufToStr(const std::vector<uint8_t>& buf);
 
 /* ****************************************************************************************************************** */
 }  // namespace string
