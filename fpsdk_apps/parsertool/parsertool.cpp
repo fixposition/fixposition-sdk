@@ -61,7 +61,7 @@ class ParserToolOptions : public ProgramOptions
     bool                      stdout_  = false;  //!< Write message to stdout instead of info about it
     // clang-format on
 
-    void PrintHelp() final
+    void PrintHelp() override final
     {
         // clang-format off
         std::fputs(
@@ -74,7 +74,7 @@ class ParserToolOptions : public ProgramOptions
             "    parsertool [flags] [<input> ...]\n"
             "\n"
             "Where:\n"
-            "\n" ,stdout);
+            "\n", stdout);
         std::fputs(COMMON_FLAGS_HELP, stdout);
         std::fputs(
             "    -x, --hexdump  -- Print hexdump of each message, not with -c\n"

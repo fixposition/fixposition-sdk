@@ -32,7 +32,7 @@ function main
                 echo
                 echo "Run Fixposition SDK apps"
                 echo
-                echo "This uses Docker images with pre-build binaries of the Fixposition SDK apps."
+                echo "This uses Docker images with pre-built binaries of the Fixposition SDK apps."
                 echo
                 echo "Usage: $0 [-d] [-u] [-i <image>] [-v <volume> ...] <command> ..."
                 echo

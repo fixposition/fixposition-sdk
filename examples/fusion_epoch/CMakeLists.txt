@@ -8,8 +8,8 @@ project(fusion_epoch
     DESCRIPTION "Fixposition SDK example: collecting fusion epoch data from FP_A messages"
 )
 
-set(BUILD_TESTING OFF)
-set(USE_PROJ ON)
+set(FPSDK_BUILD_TESTING OFF)
+set(FPSDK_USE_PROJ ON)
 
 
 # COMPILER SETUP =======================================================================================================

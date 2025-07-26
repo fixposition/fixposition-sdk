@@ -53,21 +53,21 @@ endif()
 # always, write/update some.hpp that can be included and properly dependency-managed. There are things like
 # https://github.com/andrew-hardin/cmake-git-version-tracking/tree/master, but they're quite involved, too.
 
-if (NOT FP_VERSION_IS_SET) # Do this only once. E.g. when running the top-level CMakeLists.txt
+if (NOT FPSDK_VERSION_IS_SET) # Do this only once. E.g. when running the top-level CMakeLists.txt
     # - Version supplied on cmake command line (-DVERSION_STRING=x.x.x, -DVERSION_STRING=x.x.x-gggggg)
-    if (VERSION_STRING)
-        string(REGEX MATCH "^([0-9]+\.[0-9]+\.[0-9]+).*$" _ ${VERSION_STRING})
+    if (FPSDK_VERSION_STRING)
+        string(REGEX MATCH "^([0-9]+\.[0-9]+\.[0-9]+).*$" _ ${FPSDK_VERSION_STRING})
         if ("${CMAKE_MATCH_1}" STREQUAL "")
-            message(FATAL_ERROR "fpsdk: bad VERSION_STRING=${VERSION_STRING}, must be x.x.x or x.x.x-ggggggg")
+            message(FATAL_ERROR "fpsdk: bad FPSDK_VERSION_STRING=${FPSDK_VERSION_STRING}, must be x.x.x or x.x.x-ggggggg")
         endif()
-        set(FP_VERSION_NUMBER "${CMAKE_MATCH_1}")
-        set(FP_VERSION_STRING "${VERSION_STRING}")
+        set(FPSDK_VERSION_NUMBER "${CMAKE_MATCH_1}")
+        set(FPSDK_VERSION_STRING "${FPSDK_VERSION_STRING}")
     # - Version supplied from VERSION file (release tarballs), but ignore file if fpsdk is a git repo
-    elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../FP_VERSION_NUMBER AND NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../.git)
-        file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/../../FP_VERSION_NUMBER FP_VERSION_NUMBER LIMIT_COUNT 1)
-        set(FP_VERSION_NUMBER "${FP_VERSION_NUMBER}")
-        file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/../../FP_VERSION_STRING FP_VERSION_STRING LIMIT_COUNT 1)
-        set(FP_VERSION_STRING "${FP_VERSION_STRING}")
+    elseif(EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../FPSDK_VERSION_NUMBER AND NOT EXISTS ${CMAKE_CURRENT_LIST_DIR}/../../.git)
+        file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/../../FPSDK_VERSION_NUMBER FPSDK_VERSION_NUMBER LIMIT_COUNT 1)
+        set(FPSDK_VERSION_NUMBER "${FPSDK_VERSION_NUMBER}")
+        file(STRINGS ${CMAKE_CURRENT_LIST_DIR}/../../FPSDK_VERSION_STRING FPSDK_VERSION_STRING LIMIT_COUNT 1)
+        set(FPSDK_VERSION_STRING "${FPSDK_VERSION_STRING}")
     # - Version from git
     else()
         execute_process(
@@ -82,31 +82,31 @@ if (NOT FP_VERSION_IS_SET) # Do this only once. E.g. when running the top-level 
 
         # Anything dirty: version number 0.0.0 and string "0.0.0-dirty"
         if("${CMD_OUTPUT}" MATCHES "-dirty")
-            set(FP_VERSION_NUMBER 0.0.0)
-            set(FP_VERSION_STRING "${FP_VERSION_NUMBER}-${CMD_OUTPUT}")
+            set(FPSDK_VERSION_NUMBER 0.0.0)
+            set(FPSDK_VERSION_STRING "${FPSDK_VERSION_NUMBER}-${CMD_OUTPUT}")
         # Tags that look like a version: version number x.y.z and string "x.y.z"
         elseif("${CMD_OUTPUT}" MATCHES "^tags/([a-z0-9]+_|v|)(0|[1-9][0-9]*).(0|[1-9][0-9]*).(0|[1-9][0-9]*)")
-            set(FP_VERSION_NUMBER "${CMAKE_MATCH_2}.${CMAKE_MATCH_3}.${CMAKE_MATCH_4}")
-            set(FP_VERSION_STRING "${FP_VERSION_NUMBER}")
+            set(FPSDK_VERSION_NUMBER "${CMAKE_MATCH_2}.${CMAKE_MATCH_3}.${CMAKE_MATCH_4}")
+            set(FPSDK_VERSION_STRING "${FPSDK_VERSION_NUMBER}")
         # Anything else: version number 0.0.0 and string "0.0.0-whatevergitsaid"
         elseif(NOT "${CMD_OUTPUT}" STREQUAL "")
-            set(FP_VERSION_NUMBER 0.0.0)
-            set(FP_VERSION_STRING "${FP_VERSION_NUMBER}-${CMD_OUTPUT}")
+            set(FPSDK_VERSION_NUMBER 0.0.0)
+            set(FPSDK_VERSION_STRING "${FPSDK_VERSION_NUMBER}-${CMD_OUTPUT}")
         # Git failed: version number 0.0.0 and string "0.0.0-dev"
         else()
-            set(FP_VERSION_NUMBER 0.0.0)
-            set(FP_VERSION_STRING "${FP_VERSION_NUMBER}-dev")
+            set(FPSDK_VERSION_NUMBER 0.0.0)
+            set(FPSDK_VERSION_STRING "${FPSDK_VERSION_NUMBER}-dev")
         endif()
     endif()
 
-    #add_compile_definitions(FP_VERSION_NUMBER="${FP_VERSION_NUMBER}")
-    add_compile_definitions(FP_VERSION_STRING="${FP_VERSION_STRING}")
+    #add_compile_definitions(FPSDK_VERSION_NUMBER="${FPSDK_VERSION_NUMBER}")
+    add_compile_definitions(FPSDK_VERSION_STRING="${FPSDK_VERSION_STRING}")
 
     # write version info to file
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/FP_VERSION_NUMBER "${FP_VERSION_NUMBER}")
-    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/FP_VERSION_STRING "${FP_VERSION_STRING}")
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/FPSDK_VERSION_NUMBER "${FPSDK_VERSION_NUMBER}")
+    file(WRITE ${CMAKE_CURRENT_BINARY_DIR}/FPSDK_VERSION_STRING "${FPSDK_VERSION_STRING}")
 
-    set(FP_VERSION_IS_SET ON)
+    set(FPSDK_VERSION_IS_SET ON)
 endif()
 
 
@@ -115,8 +115,8 @@ endif()
 message(STATUS "fpsdk: CMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}")
 message(STATUS "fpsdk: CMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}")
 message(STATUS "fpsdk: CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-message(STATUS "fpsdk: FP_VERSION_NUMBER=${FP_VERSION_NUMBER}")
-message(STATUS "fpsdk: FP_VERSION_STRING=${FP_VERSION_STRING}")
+message(STATUS "fpsdk: FPSDK_VERSION_NUMBER=${FPSDK_VERSION_NUMBER}")
+message(STATUS "fpsdk: FPSDK_VERSION_STRING=${FPSDK_VERSION_STRING}")
 
 
 ########################################################################################################################

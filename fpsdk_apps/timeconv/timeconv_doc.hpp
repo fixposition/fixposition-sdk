@@ -30,7 +30,8 @@ namespace timeconv {
 
     Tool to convert time. This demonstrates the use of the @ref FPSDK_COMMON_TIME
 
-    See @ref FPSDK_BUILD_DOC on how to build and run the apps, or @ref FPSDK_RUN_DOC on how to run the apps.
+    See @ref FPSDK_BUILD_DOC on how to build and run this app, or @ref FPSDK_RUN_DOC on how to run it using pre-built
+    Docker images.
 
     @section FPSDK_APPS_TIMECONV_HELP Command line help
 

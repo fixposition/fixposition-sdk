@@ -469,10 +469,10 @@ bool StrToValue(const std::string& str, double& value)
 bool StrToValue(const std::string& str, bool& value)
 {
     const auto lc = StrToLower(str);
-    if ((lc == "1") || (lc == "true") || (lc == "yes")) {
+    if ((lc == "1") || (lc == "true") || (lc == "yes") || (lc == "on")) {
         value = true;
         return true;
-    } else if ((lc == "0") || (lc == "false") || (lc == "no")) {
+    } else if ((lc == "0") || (lc == "false") || (lc == "no") || (lc == "off")) {
         value = false;
         return true;
     }
@@ -511,9 +511,14 @@ std::string StrError(const int errnum)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-std::vector<uint8_t> StrToVec(const std::string& str)
+std::vector<uint8_t> StrToBuf(const std::string& str)
 {
     return { (const uint8_t*)str.data(), (const uint8_t*)str.data() + str.size() };
+}
+
+std::string BufToStr(const std::vector<uint8_t>& buf)
+{
+    return { (const char*)buf.data(), buf.size() };
 }
 
 /* ****************************************************************************************************************** */

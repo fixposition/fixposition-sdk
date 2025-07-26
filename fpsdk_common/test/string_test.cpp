@@ -640,6 +640,7 @@ TEST(StringTest, StrToValue_bool)
         { "Yes",    true,  true },
         { "TrUe",   true,  true },
         { "YeS",    true,  true },
+        { "on",     true,  true },
 
         { "0",      false, true },
         { "false",  false, true },
@@ -649,11 +650,15 @@ TEST(StringTest, StrToValue_bool)
         { "FaLsE",  false, true },
         { "nO",     false, true },
         { "false",  false, true },
+        { "off",    false, true },
 
         { "nope",   egal,  false },
         { "yes!",   egal,  false },
         { "00",     egal,  false },
         { "11",     egal,  false },
+        { "offf",   egal,  false },
+        { "tru",    egal,  false },
+
     };  // clang-format on
 
     for (auto& test : tests) {
@@ -715,12 +720,22 @@ TEST(StringTest, ToStr)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(StringTest, StrToVec)
+TEST(StringTest, StrToBuf)
 {
     const std::string str = "gugus";
-    const std::vector<uint8_t> vec = { 0x67, 0x75, 0x67, 0x75, 0x73 };
-    EXPECT_EQ(StrToVec(str), vec);
-    EXPECT_EQ(str.length(), vec.size());
+    const std::vector<uint8_t> buf = { 0x67, 0x75, 0x67, 0x75, 0x73 };
+    EXPECT_EQ(StrToBuf(str), buf);
+    EXPECT_EQ(str.size(), buf.size());
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(StringTest, BufToStr)
+{
+    const std::vector<uint8_t> buf = { 0x67, 0x75, 0x67, 0x75, 0x73 };
+    const std::string str = "gugus";
+    EXPECT_EQ(BufToStr(buf), str);
+    EXPECT_EQ(buf.size(), str.size());
 }
 
 /* ****************************************************************************************************************** */

@@ -71,7 +71,7 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
     uint32_t                  duration_  = 0;                     //!< Duration [sec]
     // clang-format on
 
-    void PrintHelp() final
+    void PrintHelp() override final
     {
         // clang-format off
         std::fputs(
@@ -87,7 +87,7 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
             "    fpltool [<flags>] <command> [...]\n"
             "\n"
             "Where (availability of flags depends on <command>, see below):\n"
-            "\n" ,stdout);
+            "\n", stdout);
         std::fputs(COMMON_FLAGS_HELP, stdout);
         std::fputs(
             "    -p / -P  -- Show / don't show progress (default: automatic)\n"

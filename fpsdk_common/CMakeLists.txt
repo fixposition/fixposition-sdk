@@ -5,7 +5,7 @@ include(cmake/setup.cmake)
 
 project(fpsdk_common
     LANGUAGES CXX
-    VERSION ${FP_VERSION_NUMBER}
+    VERSION ${FPSDK_VERSION_NUMBER}
     DESCRIPTION "Fixposition SDK: Common Library"
 )
 
@@ -36,9 +36,9 @@ endif()
 
 find_package(yaml-cpp REQUIRED)
 if(FP_BOOST_STACKTRACE)
-    find_package(Boost REQUIRED COMPONENTS REQUIRED stacktrace_basic stacktrace_backtrace stacktrace_addr2line)
+    find_package(Boost CONFIG REQUIRED COMPONENTS stacktrace_basic stacktrace_backtrace stacktrace_addr2line)
 else()
-    find_package(Boost REQUIRED)
+    find_package(Boost CONFIG REQUIRED)
 endif()
 find_package(ZLIB REQUIRED)
 find_package(Eigen3 REQUIRED)
@@ -47,19 +47,21 @@ find_package(Threads REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(OPENSSL REQUIRED openssl)
 
-# PROJ is optional, unless explicitly requested with -DUSE_PROJ=ON
-if (USE_PROJ STREQUAL "ON")
+# PROJ is optional, unless explicitly requested with -DFPSDK_USE_PROJ=ON
+if (FPSDK_USE_PROJ STREQUAL "ON")
     find_package(PROJ 9.4 REQUIRED CONFIG)
-elseif(USE_PROJ STREQUAL "OFF")
+    message(STATUS "fpsdk: Using PROJ (${PROJ_VERSION})")
+elseif(FPSDK_USE_PROJ STREQUAL "OFF")
+    message(STATUS "fpsdk: Not using PROJ")
 else()
     find_package(PROJ 9.4 CONFIG QUIET)
-endif()
-if (${PROJ_FOUND})
-    message(STATUS "fpsdk: Using PROJ (${PROJ_VERSION})")
-    set(FP_USE_PROJ ON)
-else()
-    message(STATUS "fpsdk: No PROJ found")
-    set(FP_USE_PROJ OFF)
+    if (${PROJ_FOUND})
+        message(STATUS "fpsdk: Using PROJ (${PROJ_VERSION})")
+        set(FP_FPSDK_USE_PROJ ON)
+    else()
+        message(STATUS "fpsdk: No PROJ found")
+        set(FP_FPSDK_USE_PROJ OFF)
+    endif()
 endif()
 
 include_directories(include
@@ -76,10 +78,10 @@ include_directories(include
 file(GLOB CPP_FILES src/*.cpp src/parser/*.cpp src/stream/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${CPP_FILES})
 
-if (FP_USE_PROJ)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC FP_USE_PROJ=1)
+if (FPSDK_USE_PROJ)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_PROJ=1)
 else()
-    target_compile_definitions(${PROJECT_NAME} PUBLIC FP_USE_PROJ=0)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_PROJ=0)
 endif()
 
 target_include_directories(${PROJECT_NAME}
@@ -92,13 +94,13 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         ${YAML_CPP_LIBRARIES}
         ${EIGEN3_LIBRARIES}
-        PRIVATE
+    PRIVATE
         ${Boost_LIBRARIES} ${CMAKE_DL_LIBS}
         ${ZLIB_LIBRARIES}
         ${OPENSSL_LIBRARIES}
         Threads::Threads
         nlohmann_json::nlohmann_json
-        $<$<BOOL:${FP_USE_PROJ}>:PROJ::proj>
+        $<$<BOOL:${FPSDK_USE_PROJ}>:PROJ::proj>
 )
 
 set_target_properties(${PROJECT_NAME}

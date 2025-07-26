@@ -280,6 +280,15 @@ struct LoggingParams;  // forward declaration
 using LoggingWriteFunc = void (*)(const LoggingParams& params, const LoggingLevel level, const char* str);
 
 /**
+ * @brief Default logging write function
+ *
+ * @param[in]  params  Logging parameters
+ * @param[in]  level   Logging level for the message
+ * @param[in]  str     The message
+ */
+void LoggingDefaultWriteFn(const LoggingParams& params, const LoggingLevel level, const char* str);
+
+/**
  * @brief Logging parameters
  */
 struct LoggingParams
@@ -297,6 +306,7 @@ struct LoggingParams
     LoggingColour colour_;          //!< Level colours
     LoggingTimestamps timestamps_;  //!< Timestamps
     LoggingWriteFunc fn_;           //!< Custom logging write function
+    void* user_ = nullptr;          //!< User data, ignored by fpsdk::logging
 };
 
 /**

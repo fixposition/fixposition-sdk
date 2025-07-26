@@ -30,7 +30,8 @@ namespace parsertool {
 
     This demonstrates the use of the @ref FPSDK_COMMON_PARSER
 
-    See @ref FPSDK_BUILD_DOC on how to build and run the apps, or @ref FPSDK_RUN_DOC on how to run the apps.
+    See @ref FPSDK_BUILD_DOC on how to build and run this app, or @ref FPSDK_RUN_DOC on how to run it using pre-built
+    Docker images.
 
     @section FPSDK_APPS_PARSERTOOL_HELP Command line help
 

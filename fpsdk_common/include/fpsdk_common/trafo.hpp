@@ -209,7 +209,7 @@ Eigen::Vector3d LlhDegToRad(const Eigen::Vector3d& llh_deg);
  */
 Eigen::Vector3d LlhRadToDeg(const Eigen::Vector3d& llh_rad);
 
-#if FP_USE_PROJ
+#if FPSDK_USE_PROJ
 /**
  * @brief "Universal" coordinate transformer, backed by PROJ
  */
@@ -278,7 +278,7 @@ class Transformer : private types::NoCopyNoMove
     void* pj_ctx_;            //!< Proj context
     void* pj_tf_;             //!< Proj transformation object
 };
-#endif  // FP_USE_PROJ
+#endif  // FPSDK_USE_PROJ
 
 /* ****************************************************************************************************************** */
 }  // namespace trafo

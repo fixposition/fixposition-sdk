@@ -44,6 +44,7 @@ namespace fpsdk {
     - zlib1g           (≥ 1.2.11, tested with 1.2.11, 1.2.13, 1.3)
     - OpenSSL (libssl) (≥ 1.1.x,  tested with 1.1.1, 3.0.2, 3.0.13, 3.0.15)
     - nlohmann-json3   (≥ 3.7.3,  tested with 3.7.3, 3.11.3)
+    - Various Linux tools, including Bash, CMake, make, xxd, sed, awk, ...
     - PROJ         (*) (≥ 9.4.x,  tested with 9.4.0, 9.4.1)
     - ROS1         (*) (Noetic), or
     - ROS2         (*) (Humble or Jazzy)
@@ -128,7 +129,7 @@ namespace fpsdk {
         wide or otherwise tell CMake where to find them.
 
         @code{sh}
-        sudo apt install libyaml-cpp-dev libboost-all-dev zlib1g-dev libeigen3-dev linux-libc-dev       # For building
+        sudo apt install libyaml-cpp-dev libboost-all-dev zlib1g-dev libeigen3-dev linux-libc-dev xxd   # For building
         sudo apt install libgtest-dev clang-format doxygen pre-commit                                   # For development
         source /opt/ros/noetic/setup.bash                                                               # If you have ROS1
         @endcode
@@ -139,7 +140,7 @@ namespace fpsdk {
         cmake -B build -DCMAKE_INSTALL_PREFIX=~/fpsdk
         @endcode
 
-        Additional parameters include (see CMakeList.txt files of the projects for details):
+        Additional parameters include (see CMakeList.txt files of the projects for details and more parameters):
 
         - Build type: `-DCMAKE_BUILD_TYPE=Debug` or `-DCMAKE_BUILD_TYPE=Release` (default)
         - Force ROS1 package path: `-DROS_PACKAGE_PATH=/path/to/ros` (default: auto-detect)
@@ -147,7 +148,7 @@ namespace fpsdk {
           The default is to automatically enable testing if a suitable GTest library is found.
           Note that the instead of the standard BUILD_TESTING variable the variable `FPSDK_BUILD_TESTING=...`
           can be used.
-        - Explicitly enable or disable use of the PROJ library: `-DUSE_PROJ=ON` or `-DUSE_PROJ=OFF`.
+        - Explicitly enable or disable use of the PROJ library: `-DFPSDK_USE_PROJ=ON` or `-DFPSDK_USE_PROJ=OFF`.
           The default is to automatically use the PROJ library if a suitable version is found
 
     4. Build

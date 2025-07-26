@@ -63,7 +63,7 @@ class YamlToShellOptions : public ProgramOptions
     uint32_t max_size_ = 1024 * 1024;
     std::string filter_;
 
-    void PrintHelp() final
+    void PrintHelp() override final
     {
         // clang-format off
         std::fputs(
@@ -76,7 +76,7 @@ class YamlToShellOptions : public ProgramOptions
             "    yaml2shell [flags] [<some.yaml]>\n"
             "\n"
             "Where:\n"
-            "\n" ,stdout);
+            "\n", stdout);
         std::fputs(COMMON_FLAGS_HELP, stdout);
         std::fputs(
             "    -p <str>  -- Prefix for variable names (default: none)\n"

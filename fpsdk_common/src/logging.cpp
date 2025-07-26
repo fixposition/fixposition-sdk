@@ -124,7 +124,7 @@ const char* LoggingTimestampsStr(const LoggingTimestamps timestamps)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-static void LoggingDefaultWriteFn(const LoggingParams& params, const LoggingLevel level, const char* str)
+void LoggingDefaultWriteFn(const LoggingParams& params, const LoggingLevel level, const char* str)
 {
     const char* prefix = NULL;
     const char* suffix = NULL;
@@ -222,7 +222,7 @@ LoggingParams::LoggingParams(
     // LoggingParams()/LoggingSetParams(). Do this once only.
     static bool s_defaults_init = false;
     if (!s_defaults_init) {
-        const char* env_logging = std::getenv("FP_LOGGING");
+        const char* env_logging = std::getenv("FPSDK_LOGGING");
         if ((env_logging != nullptr) && (env_logging[0] != '\0')) {
             // Copy string and lower-case it
             char words[1000];

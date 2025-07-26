@@ -26,13 +26,13 @@ else ifeq ($(ROS_VERSION),2)
 endif
 
 # A unique ID for this exact config we're using
-configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING) ${VERSION_STRING}" | md5sum | cut -d " " -f1)
+configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING) ${FPSDK_VERSION_STRING} $$(uname -a)" | md5sum | cut -d " " -f1)
 
 .PHONY: help
 help:
 	@echo "Usage:"
 	@echo
-	@echo "    make <target> [INSTALL_PREFIX=...] [BUILD_TYPE=Debug|Release] [BUILD_TESTING=|ON|OFF] [VERSION_STRING=x.x.x-gggggggg] [VERBOSE=1]"
+	@echo "    make <target> [INSTALL_PREFIX=...] [BUILD_TYPE=Debug|Release] [BUILD_TESTING=|ON|OFF] [FPSDK_VERSION_STRING=x.x.x-gggggggg] [VERBOSE=1]"
 	@echo
 	@echo "Where possible <target>s are:"
 	@echo
@@ -42,6 +42,7 @@ help:
 	@echo "    test                Run tests"
 	@echo "    install             Install packages (into INSTALL_PREFIX path)"
 	@echo "    doc                 Generate documentation (into build directory)"
+	@echo "    doc-dev             Generate documentation and start webserver to view it"
 	@echo
 	@echo "Typically you want to do something like this:"
 	@echo
@@ -67,6 +68,7 @@ NICE       := nice
 CAT        := cat
 PYTHON     := python
 SED        := sed
+LN         := ln
 
 ifeq ($(VERBOSE),1)
 V =
@@ -110,6 +112,7 @@ endif
 ########################################################################################################################
 
 CMAKE_ARGS_BUILD :=
+CMAKE_ARGS_INSTALL :=
 CTEST_ARGS := --output-on-failure
 CMAKE_ARGS := -DCMAKE_INSTALL_PREFIX=$(INSTALL_PREFIX)
 CMAKE_ARGS += -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
@@ -119,8 +122,12 @@ endif
 ifneq ($(BUILD_TESTING),)
   CMAKE_ARGS += -DBUILD_TESTING=$(BUILD_TESTING)
 endif
-ifneq ($(VERSION_STRING),)
-  CMAKE_ARGS += -DVERSION_STRING=$(VERSION_STRING)
+ifneq ($(FPSDK_VERSION_STRING),)
+  CMAKE_ARGS += -DVERSION_STRING=$(FPSDK_VERSION_STRING)
+endif
+
+ifeq ($(BUILD_TYPE),Release)
+CMAKE_ARGS_INSTALL += --strip
 endif
 
 MAKEFLAGS = --no-print-directory
@@ -178,7 +185,7 @@ $(BUILD_DIR)/.make-uid: | $(BUILD_DIR)
 .PHONY: cmake
 cmake: $(BUILD_DIR)/.make-cmake
 
-deps = $(sort $(wildcard CMakeList.txt Makefile fpsdk.sh fpsdk_doc/* \
+deps = $(sort $(wildcard CMakeLists.txt Makefile fpsdk.sh fpsdk_doc/* \
     fpsdk_common/* fpsdk_common/*/* fpsdk_common/*/*/* fpsdk_common/*/*/*/* \
     fpsdk_ros1/* fpsdk_ros1/*/* fpsdk_ros1/*/*/* fpsdk_ros1/*/*/*/* \
     fpsdk_ros2/* fpsdk_ros2/*/* fpsdk_ros2/*/*/* fpsdk_ros2/*/*/*/* \
@@ -196,7 +203,7 @@ build: $(BUILD_DIR)/.make-build
 
 $(BUILD_DIR)/.make-build: $(BUILD_DIR)/.make-cmake $(BUILD_DIR)/.make-uid
 	@echo "$(HLW)***** Build ($(BUILD_TYPE)) *****$(HLO)"
-	$(V)$(NICE_BUILD) $(CMAKE) --build $(BUILD_DIR)  $(CMAKE_ARGS_BUILD)
+	$(V)$(NICE_BUILD) $(CMAKE) --build $(BUILD_DIR) $(CMAKE_ARGS_BUILD) -- -k
 	$(V)$(TOUCH) $@
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -206,7 +213,7 @@ install: $(BUILD_DIR)/.make-install
 
 $(BUILD_DIR)/.make-install: $(BUILD_DIR)/.make-build
 	@echo "$(HLW)***** Install ($(BUILD_TYPE)) *****$(HLO)"
-	$(V)$(CMAKE) --install $(BUILD_DIR)
+	$(V)$(CMAKE) --install $(BUILD_DIR) $(CMAKE_ARGS_INSTALL)
 	$(V)$(TOUCH) $@
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -235,10 +242,12 @@ $(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-build fpsdk_doc/Doxyfile
 	$(V)$(BUILD_DIR)/fpsdk_apps/parsertool -h > $(BUILD_DIR)/helpscreens/parsertool_helpscreen.txt
 	$(V)$(BUILD_DIR)/fpsdk_apps/timeconv   -h > $(BUILD_DIR)/helpscreens/timeconv_helpscreen.txt
 	$(V)$(BUILD_DIR)/fpsdk_apps/yaml2shell -h > $(BUILD_DIR)/helpscreens/yaml2shell_helpscreen.txt
+	$(V)$(BUILD_DIR)/fpsdk_apps/streamtool -h > $(BUILD_DIR)/helpscreens/streamtool_helpscreen.txt
+	$(V)$(BUILD_DIR)/fpsdk_apps/streammux  -h > $(BUILD_DIR)/helpscreens/streammux_helpscreen.txt
 	$(V)./fpsdk.sh -h                         > $(BUILD_DIR)/helpscreens/fpsdk_helpscreen.txt
 	$(V)( \
             cat fpsdk_doc/Doxyfile; \
-            echo "PROJECT_NUMBER = $$(cat $(BUILD_DIR)/FP_VERSION_STRING || echo 'unknown revision')"; \
+            echo "PROJECT_NUMBER = $$(cat $(BUILD_DIR)/FPSDK_VERSION_STRING || echo 'unknown revision')"; \
             echo "OUTPUT_DIRECTORY = $(BUILD_DIR)"; \
 			echo "EXAMPLE_PATH += $(BUILD_DIR)/helpscreens"; \
         ) | $(DOXYGEN) -
@@ -293,13 +302,13 @@ else
 	@false
 endif
 
-
-
 # ----------------------------------------------------------------------------------------------------------------------
 
 .PHONY: pre-commit
-pre-commit:
+pre-commit: | $(BUILD_DIR)
 	@echo "$(HLW)***** pre-commit checks *****$(HLO)"
-	$(V)pre-commit run --all-files --hook-stage manual || return 1
+	$(V)$(MKDIR) -p $(BUILD_DIR)/.bin
+	$(V)$(LN) -sf /usr/bin/clang-format-17 $(BUILD_DIR)/.bin/clang-format
+	$(V)export PATH=$(BUILD_DIR)/.bin:$$PATH; pre-commit run --all-files --hook-stage manual || return 1
 
 ########################################################################################################################

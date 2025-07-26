@@ -25,6 +25,7 @@
 
 /* PACKAGE */
 #include "logging.hpp"
+#include "time.hpp"
 
 namespace fpsdk {
 namespace common {
@@ -39,6 +40,12 @@ namespace app {
  *
  * On construction this installs a handler for SIGINT. On destruction it sets the handler back to its previous state.
  * Note that signal handlers are global and therefore you can only use one SigIntHelper in a app.
+ *
+ * When the signal is received it (optionally) prints a message and ShouldAbort() and WaitAbort() react accordingly.
+ * Also, the signal handler is reset to the previous state (typically, but not necessarily, the default handler) and any
+ * further SIGINT triggers the previously set handler. This allows for apps to handle the the first SIGINT
+ * nicely and allows the user to "SIGINT again" and trigger the previous handler (typically the default one,
+ * i.e. "hard abort").
  *
  * Example:
  *
@@ -59,7 +66,7 @@ class SigIntHelper
     /**
      * @brief Constructor
      *
-     * @param[in]  warn  Print a WARNING() (true, default) or a DEBUG() (false)
+     * @param[in]  warn  Print a WARNING() (true, default) or a DEBUG() (false) on signal
      */
     SigIntHelper(const bool warn = true);
 
@@ -191,10 +198,15 @@ class ProgramOptions
     virtual void PrintHelp() = 0;
 
     /**
+     * @brief Print version information
+     */
+    virtual void PrintVersion();
+
+    /**
      * @brief Handle a command-line flag argument
      *
      * @param[in]  option    The option
-     * @param[in]  argument  Optional argument
+     * @param[in]  argument  Option argument (if the option requires one)
      *
      * @returns true if option was accepted, false otherwise
      */
@@ -207,12 +219,9 @@ class ProgramOptions
      *
      * @returns true if options are good, false otherwise
      */
-    virtual bool CheckOptions(const std::vector<std::string>& args)
-    {
-        (void)args;
-        return true;
-    }
+    virtual bool CheckOptions(const std::vector<std::string>& args);
 
+   protected:
     //! Help screen for common options  @hideinitializer
     static constexpr const char* COMMON_FLAGS_HELP = /* clang-format off */
         "    -h, --help     -- Print program help screen, and exit\n"
@@ -221,15 +230,38 @@ class ProgramOptions
         "                   -- Increase / decrease logging verbosity, multiple flags accumulate\n"
         "    -J, --journal  -- Use systemd journal logging markers instead of colours\n";  // clang-format on
 
-    std::string app_name_;                                                              //!< App name
-    logging::LoggingLevel logging_level_ = logging::LoggingLevel::INFO;                 //!< Logging verbosity level
-    logging::LoggingTimestamps logging_timestamps_ = logging::LoggingTimestamps::NONE;  //!< Logging timestamps
-    logging::LoggingColour logging_colour_ = logging::LoggingColour::AUTO;              //!< Logging colour
-    std::vector<std::string> argv_;                                                     //!< argv[] of program
+    std::string app_name_;                   //!< App name
+    logging::LoggingParams logging_params_;  //!< Logging params
+    std::vector<std::string> argv_;          //!< argv[] of program
 
    private:
     std::vector<Option> options_;  //!< Program options
-    void PrintVersion();
+};
+
+/**
+ * @brief App performance stats
+ */
+struct PerfStats
+{
+    PerfStats();    //!< Constructor
+    void Reset();   //!< Reset stats
+    void Update();  //!< Update stats
+
+    // Data, becomes valid after first call to Update()
+    double mem_curr_ = 0.0;  //!< Current memory usage [MiB]
+    double mem_peak_ = 0.0;  //!< Peak memory usage [MiB]
+    double cpu_curr_ = 0.0;  //!< Current (= average since last call to Update()) CPU usage [%]
+    double cpu_avg_ = 0.0;   //!< Average (since start) CPU usage [%]
+    double cpu_peak_ = 0.0;  //!< Peak CPU usage [%]
+    time::Duration uptime_;  //!< Time since start
+    uint64_t pid_ = 0;       //!< Process ID
+
+   private:
+    time::Time start_;      //!< Start time
+    uint64_t start_m_ = 0;  //!< CPU usage
+    uint64_t start_c_ = 0;  //!< CPU usage
+    uint64_t last_m_ = 0;   //!< CPU usage
+    uint64_t last_c_ = 0;   //!< CPU usage
 };
 
 /* ****************************************************************************************************************** */
