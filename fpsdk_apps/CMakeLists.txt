@@ -34,6 +34,9 @@ if(NOT TARGET fpsdk_common)
     find_package(fpsdk_common REQUIRED)
 endif()
 
+find_package(yaml-cpp REQUIRED)
+find_package(Eigen3 REQUIRED)
+
 if(FP_USE_ROS1)
     if(NOT TARGET fpsdk_ros1)
         find_package(fpsdk_ros1 REQUIRED)

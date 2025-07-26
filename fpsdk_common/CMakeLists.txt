@@ -86,8 +86,8 @@ target_include_directories(${PROJECT_NAME}
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
-        yaml-cpp::yaml-cpp
         Eigen3::Eigen
+        yaml-cpp
     PRIVATE
         ${Boost_TARGETS}
         ${CMAKE_DL_LIBS}

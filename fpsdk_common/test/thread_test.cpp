@@ -31,11 +31,11 @@ TEST(ThreadTest, HappyThread)
 {
     auto s = fpsdk::common::time::Duration::FromSec(0.2);
 
-    Thread thread(std::string("worker"), [](Thread* t, void*) -> bool {
+    Thread thread(std::string("worker"), [](Thread& t, void*) -> bool {
         DEBUG("thread begin");
-        while (!t->ShouldAbort()) {
+        while (!t.ShouldAbort()) {
             DEBUG("thread...");
-            t->Sleep(50);
+            t.Sleep(50);
         }
         DEBUG("thread end");
         return true;
@@ -56,7 +56,7 @@ TEST(ThreadTest, ShortThread)
 {
     auto s = fpsdk::common::time::Duration::FromSec(0.2);
 
-    Thread thread(std::string("worker"), [](Thread*, void*) -> bool {
+    Thread thread(std::string("worker"), [](Thread&, void*) -> bool {
         DEBUG("thread begin");
         DEBUG("thread end");
         return true;
@@ -76,12 +76,12 @@ TEST(ThreadTest, SadThread)
 {
     auto s = fpsdk::common::time::Duration::FromSec(0.25);
 
-    Thread thread(std::string("worker"), [](Thread* t, void*) -> bool {
+    Thread thread(std::string("worker"), [](Thread& t, void*) -> bool {
         DEBUG("thread begin");
         int n = 0;
-        while (!t->ShouldAbort()) {
+        while (!t.ShouldAbort()) {
             DEBUG("thread...");
-            t->Sleep(50);
+            t.Sleep(50);
             if (n >= 2) {
                 DEBUG("thread return false");
                 return false;
@@ -107,12 +107,12 @@ TEST(ThreadTest, CrashedThread)
 {
     auto s = fpsdk::common::time::Duration::FromSec(0.25);
 
-    Thread thread(std::string("worker"), [](Thread* t, void*) -> bool {
+    Thread thread(std::string("worker"), [](Thread& t, void*) -> bool {
         DEBUG("thread begin");
         int n = 0;
-        while (!t->ShouldAbort()) {
+        while (!t.ShouldAbort()) {
             DEBUG("thread...");
-            t->Sleep(50);
+            t.Sleep(50);
             if (n >= 2) {
                 throw std::runtime_error("deliberate crash");
                 return false;
