@@ -35,7 +35,7 @@ if [ -n "${GITHUB_WORKSPACE:-}" ]; then
 # For running it locally via docker.sh...
 else
     FPSDK_SRC_DIR=${SCRIPTDIR}/..
-    CMAKE_BUILD_ARGS="--parallel $(shell nproc --ignore=2)"
+    CMAKE_BUILD_ARGS="--parallel $(nproc --ignore=2)"
 fi
 echo "FPSDK_SRC_DIR=${FPSDK_SRC_DIR}"
 
