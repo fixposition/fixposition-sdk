@@ -13,6 +13,7 @@
 
 /* LIBC/STL */
 #include <algorithm>
+#include <cmath>
 
 /* EXTERNAL */
 
@@ -23,6 +24,20 @@ namespace fpsdk {
 namespace common {
 namespace math {
 /* ****************************************************************************************************************** */
+
+DegMinSec::DegMinSec(const double deg)
+{
+    double tmp = deg;
+    deg_ = std::floor(tmp);
+    tmp -= deg_;
+    tmp *= 60.0;
+    min_ = std::floor(tmp);
+    tmp -= min_;
+    tmp *= 60.0;
+    sec_ = tmp;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 double RoundToFracDigits(const double value, const int digits)
 {

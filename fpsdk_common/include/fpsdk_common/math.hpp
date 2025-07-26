@@ -65,6 +65,22 @@ constexpr inline T RadToDeg(T radians)
 }
 
 /**
+ * @brief Integer degrees and minutes with fractional seconds
+ */
+struct DegMinSec
+{
+    /**
+     * @brief Set from fractional degrees
+     *
+     * @param[in]  deg  Fractional degrees
+     */
+    DegMinSec(const double deg);
+    int deg_ = 0;       //!< Integer degrees
+    int min_ = 0;       //!< Integer minutes
+    double sec_ = 0.0;  //!< Fractional seconds
+};
+
+/**
  * @brief Round to desired number of fractional digits (of precision)
  *
  * @param[in]  value   The value
