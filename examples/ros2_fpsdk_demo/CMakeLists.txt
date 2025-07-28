@@ -31,8 +31,6 @@ find_package(ament_cmake REQUIRED) # https://docs.ros.org/en/humble/How-To-Guide
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(fpsdk_common REQUIRED)
-find_package(yaml-cpp REQUIRED)
-find_package(Eigen3 REQUIRED)
 find_package(fpsdk_ros2 REQUIRED)
 
 include_directories(include ${rclcpp_INCLUDE_DIRS} ${rmw_INCLUDE_DIRS} ${fpsdk_common_INCLUDE_DIRS} ${fpsdk_ros2_INCLUDE_DIRS})

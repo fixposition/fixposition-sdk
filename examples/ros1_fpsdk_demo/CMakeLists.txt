@@ -27,8 +27,6 @@ endif()
 # DEPENDENCIES =========================================================================================================
 
 find_package(fpsdk_common REQUIRED)
-find_package(yaml-cpp REQUIRED)
-find_package(Eigen3 REQUIRED)
 find_package(fpsdk_ros1 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
     roscpp

@@ -34,7 +34,6 @@ endif()
 
 # DEPENDENCIES =========================================================================================================
 
-find_package(yaml-cpp REQUIRED)
 if(FP_BOOST_STACKTRACE)
     find_package(Boost CONFIG REQUIRED COMPONENTS stacktrace_basic stacktrace_backtrace stacktrace_addr2line)
     set(Boost_TARGETS "Boost::headers;Boost::stacktrace_basic;Boost::stacktrace_backtrace;Boost::stacktrace_addr2line")
@@ -42,6 +41,7 @@ else()
     find_package(Boost CONFIG REQUIRED)
     set(Boost_TARGETS "Boost::headers")
 endif()
+find_package(yaml-cpp REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(nlohmann_json REQUIRED)
@@ -83,6 +83,8 @@ target_include_directories(${PROJECT_NAME}
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 )
+
+set(FPSDK_COMMON_TRANS_DEPS "Eigen3;yaml-cpp")
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC

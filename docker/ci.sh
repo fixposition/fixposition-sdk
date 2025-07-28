@@ -160,7 +160,7 @@ function build_projs_release_noros
     rm -rf build/${buildname}
 
     cmake -B build/${buildname}/fpsdk_common -S fpsdk_common \
-        -DCMAKE_INSTALL_PREFIX=install/${buildname} \
+        -DCMAKE_INSTALL_PREFIX=install/${buildname} -DBUILD_TESTING=OFF \
         -DCMAKE_BUILD_TYPE=Release || return 1
     cmake --build build/${buildname}/fpsdk_common ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname}/fpsdk_common || return 1

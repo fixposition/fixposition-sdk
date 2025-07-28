@@ -34,9 +34,6 @@ if(NOT TARGET fpsdk_common)
     find_package(fpsdk_common REQUIRED)
 endif()
 
-find_package(yaml-cpp REQUIRED)
-find_package(Eigen3 REQUIRED)
-
 set(FP_ROS1_INCLUDE_DIRS "")
 set(FP_ROS1_LIBRARIES "")
 
