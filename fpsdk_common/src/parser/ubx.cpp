@@ -26,6 +26,7 @@
 
 /* PACKAGE */
 #include "fpsdk_common/gnss.hpp"
+#include "fpsdk_common/logging.hpp"
 #include "fpsdk_common/math.hpp"
 #include "fpsdk_common/parser/crc.hpp"
 #include "fpsdk_common/parser/types.hpp"
@@ -257,6 +258,21 @@ const UbxMessagesInfo& UbxGetMessagesInfo()
 {
     return MSG_INFO;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool UbxMessageInfo(const std::string& name, UbxMsgInfo& info)
+{
+    auto entry =
+        std::find_if(MSG_INFO.begin(), MSG_INFO.end(), [name](const auto& cand) { return cand.name_ == name; });
+    if (entry != MSG_INFO.end()) {
+        info = *entry;
+        return true;
+    }
+    return false;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 static bool UbxMessageName(char* name, const std::size_t size, const uint8_t cls_id, const uint8_t msg_id)
 {

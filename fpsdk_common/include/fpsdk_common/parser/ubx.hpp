@@ -33,6 +33,7 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <string>
 #include <vector>
 
 /* EXTERNAL */
@@ -49,7 +50,7 @@ namespace ubx {
 /* ****************************************************************************************************************** */
 
 // Doxygen is easily confused.. :-/
-//! Message truct that must be packed
+//! Message struct that must be packed
 #ifndef _DOXYGEN_
 #  define UBX_PACKED __attribute__((packed))
 #else
@@ -133,8 +134,6 @@ bool UbxGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
  * @param[in]   msg_id        Message ID
  * @param[in]   payload       The message payload (up to MAX_UBX_SIZE - UBX_FRAME_SIZE bytes, can be empty)
  *
- * @returns true if the message was created successfully
- *
  * @returns true if the message was successfully constructed (\c msg now contains the message),
  *          false if failed contructing the message (payload too large)
  */
@@ -174,8 +173,8 @@ std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* m
  *
  * @param[out]  str       String to format
  * @param[in]   size      Maximum size of string (incl. nul termination)
- * @param[in]   msg       The UBX-RXM-SFRBX message
- * @param[in]   msg_size  Size of the UBX-RXM-SFRBX message
+ * @param[in]   msg       The UBX-MON-VER message
+ * @param[in]   msg_size  Size of the UBX-MON-VER message
  *
  * @returns the length of the string generated (excl. nul termination)
  */
@@ -601,9 +600,9 @@ static constexpr const char* UBX_RTCM3_TYPE4072_1_STRID     = "UBX-RTCM3-TYPE407
  */
 struct UbxMsgInfo
 {
-    uint8_t cls_id_;    //!< UBX class ID
-    uint8_t msg_id_;    //!< UBX message ID
-    const char* name_;  //!< UBX name
+    uint8_t cls_id_ = 0;          //!< UBX class ID
+    uint8_t msg_id_ = 0;          //!< UBX message ID
+    const char* name_ = nullptr;  //!< UBX name
 };
 
 // @fp_codegen_begin{FPSDK_COMMON_PARSER_UBX_MSGINFO_HPP}
@@ -625,7 +624,16 @@ const UbxClassesInfo& UbxGetClassesInfo();
  */
 const UbxMessagesInfo& UbxGetMessagesInfo();
 
-// clang-format on
+/**
+ * @brief Get UBX message info
+ *
+ * @param[in]   name  The name of the message, e.g. "UBX-NAV-SOL"
+ * @param[out]  info  The message info, if name is a known message
+ *
+ * @returns true if the message name was found and info is valid, false otherwise
+ */
+bool UbxMessageInfo(const std::string& name, UbxMsgInfo& info);
+
 ///@}
 
 // ---------------------------------------------------------------------------------------------------------------------
