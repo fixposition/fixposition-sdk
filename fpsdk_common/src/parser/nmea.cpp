@@ -27,6 +27,7 @@
 /* PACKAGE */
 #include "fpsdk_common/math.hpp"
 #include "fpsdk_common/parser/nmea.hpp"
+#include "fpsdk_common/parser/types.hpp"
 #include "fpsdk_common/string.hpp"
 #include "fpsdk_common/types.hpp"
 
@@ -154,6 +155,50 @@ bool NmeaGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, 
     }
     return (len > 0) && (len < size);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool NmeaMakeMessage(std::vector<uint8_t>& msg, const std::string& payload)
+{
+    const std::size_t msg_size = NMEA_FRAME_SIZE + payload.size();
+    if (msg_size > MAX_NMEA_SIZE) {
+        return false;
+    }
+    msg.resize(msg_size);
+    std::size_t ix = 0;
+    msg[ix++] = '$';
+    uint8_t ck = 0;
+    for (const char c : payload) {  // clang-format off
+        if ((c < 0x20) || (c > 0x7e) ||                               // invalid range,
+            (c == '$') || (c == '\\') || (c == '!') || (c == '~') ||  // reserved...
+            (c == '^') || (c == '*'))                                 // ...or sepecial (but do allow ',')
+        {
+            msg[ix] = '_';
+        } else {
+            msg[ix] = c;
+        }
+        ck ^= msg[ix];
+        ix++;
+    }
+    msg[ix++] = '*';
+    msg[ix++] = '0' + ((ck >> 4) & 0x0f);
+    msg[ix++] = '0' + (ck & 0x0f);
+    msg[ix++] = '\r';
+    msg[ix++] = '\n';
+    return true;
+}
+
+bool NmeaMakeMessage(std::string& msg, const std::string& payload)
+{
+    std::vector<uint8_t> buf;
+    if (NmeaMakeMessage(buf, payload)) {
+        msg = string::BufToStr(buf);
+        return true;
+    } else {
+        return false;
+    }
+}
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 

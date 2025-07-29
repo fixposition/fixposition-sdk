@@ -153,6 +153,19 @@ TEST(ParserUbxTest, UbxMakeMessage)
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ParserUbxTest, UbxMessageInfo)
+{
+    UbxMsgInfo info;
+    EXPECT_FALSE(UbxMessageInfo("NOT_A_UBX_MESSAGE_NAME", info));
+    const std::string name = "UBX-NAV-PVT";
+    EXPECT_TRUE(UbxMessageInfo(name, info));
+    EXPECT_EQ(info.cls_id_, UBX_NAV_CLSID);
+    EXPECT_EQ(info.msg_id_, UBX_NAV_PVT_MSGID);
+    EXPECT_EQ(std::string(info.name_), name);
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace
 

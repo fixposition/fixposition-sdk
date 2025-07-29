@@ -156,6 +156,36 @@ bool NmeaGetMessageName(char* name, const std::size_t size, const uint8_t* msg, 
 bool NmeaGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size);
 
 /**
+ * @brief Make a NMEA message
+ *
+ * @param[out]  msg           The message frame
+ * @param[in]   payload       The message payload, including the talker ID and formatter
+ *                            (up to MAX_NMEA_SIZE - NMEA_FRAME_SIZE bytes, can be empty)
+ *
+ * @note Illegal (< 0x20 or > 0x7e) or reserved/special ('$', '\', '!', '~', '^' and '*') characters are replaced
+ *       by a '_'.
+ *
+ * @returns true if the message was successfully constructed (\c msg now contains the message),
+ *          false if failed contructing the message (payload too large)
+ */
+bool NmeaMakeMessage(std::vector<uint8_t>& msg, const std::string& payload);
+
+/**
+ * @brief Make a NMEA message
+ *
+ * @param[out]  msg           The message frame
+ * @param[in]   payload       The message payload, including the talker ID and formatter
+ *                            (up to MAX_NMEA_SIZE - NMEA_FRAME_SIZE bytes, can be empty)
+ *
+ * @note Illegal (< 0x20 or > 0x7e) or reserved/special ('$', '\', '!', '~', '^' and '*') characters are replaced
+ *       by a '_'.
+ *
+ * @returns true if the message was successfully constructed (\c msg now contains the message),
+ *          false if failed contructing the message (payload too large)
+ */
+bool NmeaMakeMessage(std::string& msg, const std::string& payload);
+
+/**
  * @brief NMEA coordinates (integer degrees, float minutes and a sign for N/S resp. E/W)
  */
 struct NmeaCoordinates

@@ -20,10 +20,12 @@
 /* PACKAGE */
 #include <fpsdk_common/logging.hpp>
 #include <fpsdk_common/parser/nmea.hpp>
+#include <fpsdk_common/string.hpp>
 
 namespace {
 /* ****************************************************************************************************************** */
 using namespace fpsdk::common::parser::nmea;
+using namespace fpsdk::common::string;
 
 TEST(ParserNmeaTest, NmeaGetMessageMeta)
 {
@@ -1301,6 +1303,18 @@ TEST(ParserNmeaTest, NmeaCollectGsaGsv)
         EXPECT_EQ(coll.sigs_[42].cno_, 37);
         EXPECT_FALSE(coll.sigs_[42].used_);  // not used
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ParserNmeaTest, NmeaMakeMessage)
+{
+    std::vector<uint8_t> msg;
+    EXPECT_TRUE(NmeaMakeMessage(msg, "GNGGA,235943.812,,,,,0,00,99.99,,M,,M,,"));
+    EXPECT_EQ(BufToStr(msg), std::string("$GNGGA,235943.812,,,,,0,00,99.99,,M,,M,,*49\r\n"));
+
+    EXPECT_TRUE(NmeaMakeMessage(msg, "Bad$h!7^*\t\\"));
+    EXPECT_EQ(BufToStr(msg), std::string("$Bad_h_7____*18\r\n"));
 }
 
 /* ****************************************************************************************************************** */
