@@ -415,7 +415,7 @@ static const char* UbxSigStr(const uint8_t gnssId, const uint8_t sigId)
 
 std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
-    if ((UBX_RXM_SFRBX_VERSION_GET(msg) != UBX_RXM_SFRBX_V2_VERSION) || (msg_size < UBX_RXM_SFRBX_V2_MIN_SIZE)) {
+    if ((UBX_RXM_SFRBX_VERSION(msg) != UBX_RXM_SFRBX_V2_VERSION) || (msg_size < UBX_RXM_SFRBX_V2_MIN_SIZE)) {
         return 0;
     }
 
@@ -628,7 +628,7 @@ static std::size_t StrUbxNavPvt(char* info, const std::size_t size, const uint8_
         sec -= 1;
         msec = 1000 + msec;
     }
-    const std::size_t carrSoln = UBX_NAV_PVT_V1_FLAGS_CARRSOLN_GET(pvt.flags);
+    const std::size_t carrSoln = UBX_NAV_PVT_V1_FLAGS_CARRSOLN(pvt.flags);
     constexpr std::array<const char*, 6> fixTypes = { { "nofix", "dr", "2D", "3D", "3D+DR", "time" } };
     const std::size_t n = std::snprintf(info, size,
         "%010.3f"
@@ -670,8 +670,7 @@ static std::size_t StrUbxNavPosecef(char* info, const std::size_t size, const ui
 static std::size_t StrUbxNavHpposecef(
     char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
-    if ((msg_size != UBX_NAV_HPPOSECEF_V0_SIZE) ||
-        (UBX_NAV_HPPOSECEF_VERSION_GET(msg) != UBX_NAV_HPPOSECEF_V0_VERSION)) {
+    if ((msg_size != UBX_NAV_HPPOSECEF_V0_SIZE) || (UBX_NAV_HPPOSECEF_VERSION(msg) != UBX_NAV_HPPOSECEF_V0_VERSION)) {
         return 0;
     }
     UBX_NAV_HPPOSECEF_V0_GROUP0 pos;
@@ -693,13 +692,12 @@ static std::size_t StrUbxNavHpposecef(
 static std::size_t StrUbxNavRelposned(
     char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
-    if ((msg_size != UBX_NAV_RELPOSNED_V1_SIZE) ||
-        (UBX_NAV_RELPOSNED_VERSION_GET(msg) != UBX_NAV_RELPOSNED_V1_VERSION)) {
+    if ((msg_size != UBX_NAV_RELPOSNED_V1_SIZE) || (UBX_NAV_RELPOSNED_VERSION(msg) != UBX_NAV_RELPOSNED_V1_VERSION)) {
         return 0;
     }
     UBX_NAV_RELPOSNED_V1_GROUP0 rel;
     std::memcpy(&rel, &msg[UBX_HEAD_SIZE], sizeof(rel));
-    const std::size_t carrSoln = UBX_NAV_RELPOSNED_V1_FLAGS_CARRSOLN_GET(rel.flags);
+    const std::size_t carrSoln = UBX_NAV_RELPOSNED_V1_FLAGS_CARRSOLN(rel.flags);
     return std::snprintf(info, size,
         "%010.3f N %.3f E %.3f D %.3f L %.3f (%.3f) H %.1f (%.1f) %s %s %s pos:%c head:%c moving:%c posMiss:%c "
         "obsMiss:%c norm:%c",
@@ -803,7 +801,7 @@ static std::size_t StrUbxNavTimeutc(char* info, const std::size_t size, const ui
     }
     UBX_NAV_TIMEUTC_V0_GROUP0 utc;
     std::memcpy(&utc, &msg[UBX_HEAD_SIZE], sizeof(utc));
-    const uint8_t utcStandard = UBX_NAV_TIMEUTC_V0_VALID_UTCSTANDARD_GET(utc.valid);
+    const uint8_t utcStandard = UBX_NAV_TIMEUTC_V0_VALID_UTCSTANDARD(utc.valid);
     constexpr std::array<const char*, 9> utcStandardStr = { { "NA", "CRL", "NIST", "USNO", "BIPM", "EU", "SU", "NTSC",
         "NPLI" } };
     return std::snprintf(info, size, "%010.3f %c %04u-%02u-%02u %c %02u:%02u:%02u.%03u %c %s",
@@ -816,7 +814,7 @@ static std::size_t StrUbxNavTimeutc(char* info, const std::size_t size, const ui
 
 static std::size_t StrUbxNavSig(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
-    if ((msg_size < UBX_NAV_SIG_V0_MIN_SIZE) || (UBX_NAV_SIG_VERSION_GET(msg) != UBX_NAV_SIG_V0_VERSION)) {
+    if ((msg_size < UBX_NAV_SIG_V0_MIN_SIZE) || (UBX_NAV_SIG_VERSION(msg) != UBX_NAV_SIG_V0_VERSION)) {
         return 0;
     }
     UBX_NAV_SIG_V0_GROUP0 head;
@@ -826,7 +824,7 @@ static std::size_t StrUbxNavSig(char* info, const std::size_t size, const uint8_
 
 static std::size_t StrUbxNavSat(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
-    if ((msg_size < UBX_NAV_SAT_V1_MIN_SIZE) || (UBX_NAV_SAT_VERSION_GET(msg) != UBX_NAV_SAT_V1_VERSION)) {
+    if ((msg_size < UBX_NAV_SAT_V1_MIN_SIZE) || (UBX_NAV_SAT_VERSION(msg) != UBX_NAV_SAT_V1_VERSION)) {
         return 0;
     }
     UBX_NAV_SAT_V1_GROUP0 head;
@@ -859,7 +857,7 @@ static std::size_t StrUbxMonVer(char* info, const std::size_t size, const uint8_
 
 static std::size_t StrUbxMonTemp(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
-    if ((UBX_MON_TEMP_VERSION_GET(msg) != UBX_MON_TEMP_V0_VERSION) || (msg_size != UBX_MON_TEMP_V0_SIZE)) {
+    if ((UBX_MON_TEMP_VERSION(msg) != UBX_MON_TEMP_V0_VERSION) || (msg_size != UBX_MON_TEMP_V0_SIZE)) {
         return 0;
     }
     UBX_MON_TEMP_V0_GROUP0 temp;
@@ -869,7 +867,7 @@ static std::size_t StrUbxMonTemp(char* info, const std::size_t size, const uint8
 
 static std::size_t StrUbxRxmSfrbx(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
-    if ((UBX_RXM_SFRBX_VERSION_GET(msg) != UBX_RXM_SFRBX_V2_VERSION) || (msg_size < UBX_RXM_SFRBX_V2_MIN_SIZE)) {
+    if ((UBX_RXM_SFRBX_VERSION(msg) != UBX_RXM_SFRBX_V2_VERSION) || (msg_size < UBX_RXM_SFRBX_V2_MIN_SIZE)) {
         return 0;
     }
 
@@ -991,7 +989,7 @@ static std::size_t StrUbxTimTm2(char* info, const std::size_t size, const uint8_
     UBX_TIM_TM2_V0_GROUP0 tm;
     std::memcpy(&tm, &msg[UBX_HEAD_SIZE], sizeof(tm));
 
-    const uint8_t timeBase = UBX_TIM_TM2_V0_FLAGS_TIMEBASE_GET(tm.flags);
+    const uint8_t timeBase = UBX_TIM_TM2_V0_FLAGS_TIMEBASE(tm.flags);
     constexpr std::array<const char*, 3> timeBaseStr = { { "RX", "GNSS", "UTC" } };
     const double towR =
         ((double)tm.towMsR * UBX_TIM_TM2_V0_TOW_SCALE) + ((double)tm.towSubMsR * UBX_TIM_TM2_V0_SUBMS_SCALE);
@@ -1001,8 +999,8 @@ static std::size_t StrUbxTimTm2(char* info, const std::size_t size, const uint8_
     return std::snprintf(info, size, "%04u:%013.6f %04u:%013.6f INT%u %c %c %s %s %s %s %s %u %.6g", tm.wnR, towR,
         tm.wnF, towF, tm.ch, UBX_TIM_TM2_V0_FLAGS_NEWRISINGEDGE(tm.flags) ? 'R' : '-',
         UBX_TIM_TM2_V0_FLAGS_NEWFALLINGEDGE(tm.flags) ? 'F' : '-',
-        UBX_TIM_TM2_V0_FLAGS_MODE_GET(tm.flags) == UBX_TIM_TM2_V0_FLAGS_MODE_SINGLE ? "single" : "running",
-        UBX_TIM_TM2_V0_FLAGS_RUN_GET(tm.flags) == UBX_TIM_TM2_V0_FLAGS_RUN_ARMED ? "armed" : "stopped",
+        UBX_TIM_TM2_V0_FLAGS_MODE(tm.flags) == UBX_TIM_TM2_V0_FLAGS_MODE_SINGLE ? "single" : "running",
+        UBX_TIM_TM2_V0_FLAGS_RUN(tm.flags) == UBX_TIM_TM2_V0_FLAGS_RUN_ARMED ? "armed" : "stopped",
         timeBase < timeBaseStr.size() ? timeBaseStr[timeBase] : "?",
         UBX_TIM_TM2_V0_FLAGS_UTCACAVAIL(tm.flags) ? "UTC" : "n/a",
         UBX_TIM_TM2_V0_FLAGS_TIMEVALID(tm.flags) ? "valid" : "invalid", tm.count,
@@ -1028,12 +1026,12 @@ static std::size_t StrUbxTimTp(char* info, const std::size_t size, const uint8_t
     UBX_TIM_TP_V0_GROUP0 tp;
     std::memcpy(&tp, &msg[UBX_HEAD_SIZE], sizeof(tp));
 
-    const uint8_t timeBase = UBX_TIM_TP_V0_FLAGS_TIMEBASE_GET(tp.flags);
+    const uint8_t timeBase = UBX_TIM_TP_V0_FLAGS_TIMEBASE(tp.flags);
     const double tow =
         ((double)tp.towMs * UBX_TIM_TP_V0_TOWMS_SCALE) + ((double)tp.towSubMs * UBX_TIM_TP_V0_TOWSUBMS_SCALE);
-    const uint8_t timeRefGnss = UBX_TIM_TP_V0_REFINFO_TIMEREFGNSS_GET(tp.refInfo);
+    const uint8_t timeRefGnss = UBX_TIM_TP_V0_REFINFO_TIMEREFGNSS(tp.refInfo);
     constexpr std::array<const char*, 5> timeRefGnssStr = { { "GPS", "GLO", "BDS", "GAL", "NAVIC" } };
-    const uint8_t utcStandard = UBX_TIM_TP_V0_REFINFO_UTCSTANDARD_GET(tp.refInfo);
+    const uint8_t utcStandard = UBX_TIM_TP_V0_REFINFO_UTCSTANDARD(tp.refInfo);
     constexpr std::array<const char*, 9> utcStandardStr = { { "NA", "CRL", "NIST", "USNO", "BIPM", "EU", "SU", "NTSC",
         "NPLI" } };
 
@@ -1064,7 +1062,7 @@ static std::size_t StrUbxTimTp(char* info, const std::size_t size, const uint8_t
 
 static std::size_t StrUbxRxmRawx(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
-    if ((UBX_RXM_RAWX_VERSION_GET(msg) != UBX_RXM_RAWX_V1_VERSION) || (msg_size != UBX_RXM_RAWX_V1_SIZE(msg))) {
+    if ((UBX_RXM_RAWX_VERSION(msg) != UBX_RXM_RAWX_V1_VERSION) || (msg_size != UBX_RXM_RAWX_V1_SIZE(msg))) {
         return 0;
     }
 

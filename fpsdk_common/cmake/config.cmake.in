@@ -17,3 +17,10 @@ set(@PROJECT_NAME@_LIBRARY_DIRS "${_INSTALL_PREFIX}/@CMAKE_INSTALL_LIBDIR@")
 
 # Libraries
 set(@PROJECT_NAME@_LIBRARIES "@TARGET1@")
+
+# Handle transitive deps
+include(CMakeFindDependencyMacro)
+set(FPSDK_COMMON_TRANS_DEPS "@FPSDK_COMMON_TRANS_DEPS@")
+foreach(_dep ${FPSDK_COMMON_TRANS_DEPS})
+    find_dependency(${_dep})
+endforeach()

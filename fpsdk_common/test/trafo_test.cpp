@@ -12,6 +12,7 @@
  */
 
 /* LIBC/STL */
+#include <cmath>
 
 /* EXTERNAL */
 #include <gtest/gtest.h>

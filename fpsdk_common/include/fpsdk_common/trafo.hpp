@@ -146,7 +146,7 @@ Eigen::Vector3d TfEcefNed(const Eigen::Vector3d& ned, const Eigen::Vector3d& wgs
 /**
  * @brief Convert geodetic coordinates (latitude, longitude, height) to ECEF (x, y, z).
  *
- * @param[in]  wgs84llh  Geodetic coordinates (Lat[rad], Lon[rad], Height[m])
+ * @param[in]  wgs84llh  Geodetic coordinates (lat [rad], lon [rad], height [m])
  *
  * @returns the ECEF coordinates [m]
  */

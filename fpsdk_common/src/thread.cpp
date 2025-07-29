@@ -151,7 +151,7 @@ void Thread::_Thread(const bool try_catch)
     // Run user thread function
     if (try_catch) {
         try {
-            if (func_(this, arg_)) {
+            if (func_(*this, arg_)) {
                 status_ = Status::STOPPED;
             } else {
                 status_ = Status::FAILED;
@@ -161,7 +161,7 @@ void Thread::_Thread(const bool try_catch)
             status_ = Status::FAILED;
         }
     } else {
-        if (func_(this, arg_)) {
+        if (func_(*this, arg_)) {
             status_ = Status::STOPPED;
         } else {
             status_ = Status::FAILED;

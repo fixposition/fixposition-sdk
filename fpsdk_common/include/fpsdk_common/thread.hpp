@@ -113,7 +113,8 @@ class BinarySemaphore
  *    public:
  *
  *        Example() :
- *            thread_ { "worker", std::bind(&Example::Worker, this) }
+ *            // We're only interested in the first ThreadFunc argument
+ *            thread_ { "worker", std::bind(&Example::Worker, this, std::placeholders::_1) }
  *        { }
  *
  *    void Run() {
@@ -140,9 +141,10 @@ class BinarySemaphore
  *
  *    private:
  *
- *     bool Worker(void *) {
- *          while (!thread_.ShouldAbort()) {
- *              if (thread_.Sleep(123) == WaitRes::WOKEN) {   // = BinarySemaphore::SleepFor(1000)
+ *     // Note that the first argument is a reference to the thread itself.
+ *     bool Worker(Thread& thread) {
+ *          while (!thread.ShouldAbort()) {
+ *              if (thread.Sleep(123) == WaitRes::WOKEN) {   // = BinarySemaphore::SleepFor(1000)
  *                  // We have been woken up
  *              } else {
  *                  // Timeout expired
@@ -158,7 +160,7 @@ class BinarySemaphore
 class Thread
 {
    public:
-    using ThreadFunc = std::function<bool(Thread*, void*)>;  //!< Thread main function
+    using ThreadFunc = std::function<bool(Thread&, void*)>;  //!< Thread main function
     using PrepFunc = std::function<void(void*)>;             //!< Thread prepare function
     using CleanFunc = std::function<void(void*)>;            //!< Thread cleanup function
 
