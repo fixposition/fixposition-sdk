@@ -264,6 +264,25 @@ struct PerfStats
     uint64_t last_c_ = 0;   //!< CPU usage
 };
 
+/**
+ * @brief Memory usage
+ */
+struct MemUsage
+{
+    double size_ = 0.0;      // Total size [MiB]
+    double resident_ = 0.0;  // Resident set size [MiB]
+    double shared_ = 0.0;    // Resident shared [MiB]
+    double text_ = 0.0;      // Text (code) [MiB]
+    double data_ = 0.0;      // Data + stack [MiB]
+};
+
+/**
+ * @brief Get memory usage
+ *
+ * @returns the current memory usage
+ */
+MemUsage GetMemUsage();
+
 /* ****************************************************************************************************************** */
 }  // namespace app
 }  // namespace common

@@ -341,7 +341,7 @@ void PerfStats::Update()
     // Memory
     std::vector<uint8_t> data;
     std::size_t resident = 0;
-    if (path::FileSlurp("/proc/self/statm", data) &&
+    if (path::FileSlurp("/proc/self/statm", data) && !data.empty() &&
         (std::sscanf((const char*)data.data(), "%*s %" SCNuMAX, &resident) == 1) && (resident > 0)) {
         const double page_size = (double)sysconf(_SC_PAGESIZE) * (1.0f / 1024.0f / 1024.0f);
         mem_curr_ = (double)resident * page_size;
@@ -377,6 +377,28 @@ void PerfStats::Update()
 void PerfStats::Reset()
 {
     *this = PerfStats();
+}
+
+/* ****************************************************************************************************************** */
+
+MemUsage GetMemUsage()
+{
+    MemUsage mem_usage;
+    std::vector<uint8_t> statm;
+    std::size_t size = 0, resident = 0, shared = 0, text = 0, data = 0;
+    if (path::FileSlurp("/proc/self/statm", statm) && !statm.empty() &&
+        (std::sscanf((const char*)statm.data(), "%" SCNuMAX " %" SCNuMAX " %" SCNuMAX " %" SCNuMAX " %*s %" SCNuMAX,
+             &size, &resident, &shared, &text, &data) == 5)) {
+        const double page_size = (float)sysconf(_SC_PAGESIZE) * (1.0f / 1024.0f / 1024.0f);
+        // clang-format off
+            mem_usage.size_     = (double)size     * page_size;
+            mem_usage.resident_ = (double)resident * page_size;
+            mem_usage.shared_   = (double)shared   * page_size;
+            mem_usage.text_     = (double)text     * page_size;
+            mem_usage.data_     = (double)data     * page_size;
+        // clang-format on
+    }
+    return mem_usage;
 }
 
 /* ****************************************************************************************************************** */
