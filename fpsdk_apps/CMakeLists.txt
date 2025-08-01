@@ -34,20 +34,20 @@ if(NOT TARGET fpsdk_common)
     find_package(fpsdk_common REQUIRED)
 endif()
 
-if(FP_USE_ROS1)
+if(FPSDK_USE_ROS1)
     if(NOT TARGET fpsdk_ros1)
         find_package(fpsdk_ros1 REQUIRED)
         message(STATUS "fpsdk_apps: fpsdk_ros1_INCLUDE_DIRS=${fpsdk_ros1_INCLUDE_DIRS}")
         message(STATUS "fpsdk_apps: fpsdk_ros1_LIBRARIES=${fpsdk_ros1_LIBRARIES}")
     endif()
-    add_compile_definitions(FP_USE_ROS1)
-elseif(FP_USE_ROS2)
-    add_compile_definitions(FP_USE_ROS2)
+    add_compile_definitions(FPSDK_USE_ROS1)
+elseif(FPSDK_USE_ROS2)
+    add_compile_definitions(FPSDK_USE_ROS2)
 else()
     message(STATUS "fpsdk_apps: No ROS available")
 endif()
 
-include_directories(include ${fpsdk_common_INCLUDE_DIRS} ${YAML_CPP_INCLUDE_DIR} ${fpsdk_ros1_INCLUDE_DIRS})
+include_directories(include ${fpsdk_ros1_INCLUDE_DIRS})
 
 
 # SHARED LIBRARY =======================================================================================================
@@ -55,7 +55,7 @@ include_directories(include ${fpsdk_common_INCLUDE_DIRS} ${YAML_CPP_INCLUDE_DIR}
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#recommendations
 list(APPEND CMAKE_INSTALL_RPATH $ORIGIN)
 list(APPEND CMAKE_INSTALL_RPATH $ORIGIN/../lib)
-if(FP_USE_ROS1)
+if(FPSDK_USE_ROS1)
     list(APPEND CMAKE_INSTALL_RPATH ${fpsdk_ros1_ROS_LIBRARIES_DIRS})
     # Note that user still has to load the ROS environment (setup.bash) as the RUNPATH (mistakenly called RPATH by
     # cmake) a) does not work for indirect loading (app -> libfpsdk_ros1 -> someroslib) and b) ROS does funny things
@@ -70,26 +70,30 @@ file(GLOB COMMON_CPP_FILES common/*.cpp)
 file(GLOB FPLTOOL_CPP_FILES fpltool/*.cpp)
 add_executable(fpltool ${FPLTOOL_CPP_FILES})
 target_link_libraries(fpltool
-    fpsdk_common
-    $<$<BOOL:${FP_USE_ROS1}>:fpsdk_ros1>
+    PRIVATE
+        fpsdk_common
+        $<$<BOOL:${FPSDK_USE_ROS1}>:fpsdk_ros1>
 )
 
 file(GLOB PARSERTOOL_CPP_FILES parsertool/*.cpp)
 add_executable(parsertool ${PARSERTOOL_CPP_FILES} ${COMMON_CPP_FILES})
 target_link_libraries(parsertool
-    fpsdk_common
+    PRIVATE
+        fpsdk_common
 )
 
 file(GLOB TIMECONV_CPP_FILES timeconv/*.cpp)
 add_executable(timeconv ${TIMECONV_CPP_FILES} ${COMMON_CPP_FILES})
 target_link_libraries(timeconv
-    fpsdk_common
+    PRIVATE
+        fpsdk_common
 )
 
 file(GLOB YAML2SHELL_CPP_FILES yaml2shell/*.cpp)
 add_executable(yaml2shell ${YAML2SHELL_CPP_FILES} ${COMMON_CPP_FILES})
 target_link_libraries(yaml2shell
-    fpsdk_common
+    PRIVATE
+        fpsdk_common
 )
 
 

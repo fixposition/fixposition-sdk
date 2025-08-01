@@ -60,7 +60,7 @@
         "C_Cpp.default.includePath":           [
             "${workspaceFolder}/fpsdk_common/**", "${workspaceFolder}/fpsdk_ros1/**", "${workspaceFolder}/fpsdk_ros2/**", "${workspaceFolder}/fpsdk_apps/**",
             "/opt/ros/noetic/include", "/opt/ros/humble/include", "/opt/ros/jazzy/include" ],
-        "C_Cpp.default.defines":               [ "FP_USE_ROS1" ],
+        "C_Cpp.default.defines":               [ "FPSDK_USE_ROS1" ],
         //"C_Cpp.default.compileCommands":       "",
         //"C_Cpp.default.forcedIncludes":      [ ],
         "C_Cpp.default.intelliSenseMode":        "gcc-x64",

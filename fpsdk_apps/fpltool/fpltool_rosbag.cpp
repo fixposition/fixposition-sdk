@@ -22,7 +22,7 @@
 #include <fpsdk_common/logging.hpp>
 #include <fpsdk_common/path.hpp>
 #include <fpsdk_common/string.hpp>
-#ifdef FP_USE_ROS1
+#ifdef FPSDK_USE_ROS1
 #  include <fpsdk_ros1/bagwriter.hpp>
 #  include <fpsdk_ros1/msgs.hpp>
 #endif
@@ -34,7 +34,7 @@ namespace fpsdk {
 namespace apps {
 namespace fpltool {
 /* ****************************************************************************************************************** */
-#ifdef FP_USE_ROS1
+#ifdef FPSDK_USE_ROS1
 
 using namespace fpsdk::common::app;
 using namespace fpsdk::common::fpl;
@@ -199,14 +199,14 @@ bool DoRosbag(const FplToolOptions& opts)
 }
 
 /* ****************************************************************************************************************** */
-#else   // FP_USE_ROS1
+#else   // FPSDK_USE_ROS1
 
 bool DoRosbag(const FplToolOptions& opts)
 {
     WARNING("Command %s unavailable, ROS functionality is not compiled in", opts.command_str_.c_str());
     return false;
 }
-#endif  // FP_USE_ROS1
+#endif  // FPSDK_USE_ROS1
 
 /* ****************************************************************************************************************** */
 }  // namespace fpltool

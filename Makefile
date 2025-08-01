@@ -15,12 +15,12 @@ VERBOSE        = 0
 -include config.mk
 
 # Check if we have ROS
-FP_USE_ROS1=
-FP_USE_ROS2=
+FPSDK_USE_ROS1=
+FPSDK_USE_ROS2=
 ifneq ($(ROS_PACKAGE_PATH),)
-	FP_USE_ROS1=yes
+	FPSDK_USE_ROS1=yes
 else ifeq ($(ROS_VERSION),2)
-	FP_USE_ROS2=yes
+	FPSDK_USE_ROS2=yes
 # else
 # 	$(info No ROS_PACKAGE_PATH (ROS1) and no ROS_VERSION (ROS2) found)
 endif
@@ -222,10 +222,10 @@ $(BUILD_DIR)/.make-install: $(BUILD_DIR)/.make-build
 test: $(BUILD_DIR)/.make-build
 	@echo "$(HLW)***** Test ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)(cd $(BUILD_DIR)/fpsdk_common && ctest $(CTEST_ARGS))
-ifneq ($(FP_USE_ROS1),)
+ifneq ($(FPSDK_USE_ROS1),)
 	$(V)(cd $(BUILD_DIR)/fpsdk_ros1 && ctest $(CTEST_ARGS))
 endif
-ifneq ($(FP_USE_ROS2),)
+ifneq ($(FPSDK_USE_ROS2),)
 	$(V)(cd $(BUILD_DIR)/fpsdk_ros2 && ctest $(CTEST_ARGS))
 endif
 
