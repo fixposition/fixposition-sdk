@@ -105,7 +105,7 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
             "Print the meta data from a .fpl logfile (as YAML)\n"
             "\n"
             "    fpltool [-vqpP] meta <fpl-file>\n"
-#ifdef FP_USE_ROS1
+#ifdef FPSDK_USE_ROS1
             "\n"
             "Generate a ROS bag from a .fpl logfile\n"
             "\n"
@@ -123,7 +123,7 @@ class FplToolOptions : public fpsdk::common::app::ProgramOptions
             "    fpltool [-vqpP] extract <fpl-file>\n"
             "\n"
             "Examples:\n"
-#ifdef FP_USE_ROS1
+#ifdef FPSDK_USE_ROS1
             "\n"
             "    Create a some.bag from a some.fpl logfile:\n"
             "\n"
