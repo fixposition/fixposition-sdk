@@ -185,23 +185,25 @@ $(BUILD_DIR)/.make-uid: | $(BUILD_DIR)
 .PHONY: cmake
 cmake: $(BUILD_DIR)/.make-cmake
 
-deps = $(sort $(wildcard CMakeLists.txt Makefile fpsdk.sh fpsdk_doc/* \
-    fpsdk_common/* fpsdk_common/*/* fpsdk_common/*/*/* fpsdk_common/*/*/*/* \
-    fpsdk_ros1/* fpsdk_ros1/*/* fpsdk_ros1/*/*/* fpsdk_ros1/*/*/*/* \
-    fpsdk_ros2/* fpsdk_ros2/*/* fpsdk_ros2/*/*/* fpsdk_ros2/*/*/*/* \
-    fpsdk_apps/* fpsdk_apps/*/* fpsdk_apps/*/*/* fpsdk_apps/*/*/*/*))
+deps_cmake := Makefile $(sort $(wildcard CMakeLists.txt */CMakeLists.txt */cmake/*))
 
-$(BUILD_DIR)/.make-cmake: $(deps) $(BUILD_DIR)/.make-uid
+$(BUILD_DIR)/.make-cmake: $(deps_cmake) $(BUILD_DIR)/.make-uid
 	@echo "$(HLW)***** Configure ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)$(CMAKE) -B $(BUILD_DIR) $(CMAKE_ARGS)
 	$(V)$(TOUCH) $@
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+deps_build = $(sort $(wildcard fpsdk.sh fpsdk_doc/* \
+    fpsdk_common/* fpsdk_common/*/* fpsdk_common/*/*/* fpsdk_common/*/*/*/* \
+    fpsdk_ros1/* fpsdk_ros1/*/* fpsdk_ros1/*/*/* fpsdk_ros1/*/*/*/* \
+    fpsdk_ros2/* fpsdk_ros2/*/* fpsdk_ros2/*/*/* fpsdk_ros2/*/*/*/* \
+    fpsdk_apps/* fpsdk_apps/*/* fpsdk_apps/*/*/* fpsdk_apps/*/*/*/*))
+
 .PHONY: build
 build: $(BUILD_DIR)/.make-build
 
-$(BUILD_DIR)/.make-build: $(BUILD_DIR)/.make-cmake $(BUILD_DIR)/.make-uid
+$(BUILD_DIR)/.make-build: $(deps_build) $(BUILD_DIR)/.make-cmake $(BUILD_DIR)/.make-uid
 	@echo "$(HLW)***** Build ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)$(NICE_BUILD) $(CMAKE) --build $(BUILD_DIR) $(CMAKE_ARGS_BUILD) -- -k
 	$(V)$(TOUCH) $@
