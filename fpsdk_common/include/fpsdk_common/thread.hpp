@@ -160,9 +160,30 @@ class BinarySemaphore
 class Thread
 {
    public:
-    using ThreadFunc = std::function<bool(Thread&, void*)>;  //!< Thread main function
-    using PrepFunc = std::function<void(void*)>;             //!< Thread prepare function
-    using CleanFunc = std::function<void(void*)>;            //!< Thread cleanup function
+    /**
+     * @brief Thread main function
+     *
+     * @param[in]  thread  Reference to the thread handle
+     * @param[in]  arg     User argument passed in Thread contstructor
+     *
+     * @returns true if the thread happily ended (Thread::GetStatus() will return STOPPED) or false if the thread
+     *          sadly ended (Thread::GetStatus() will return FAILED)
+     */
+    using ThreadFunc = std::function<bool(Thread& thread, void* arg)>;
+
+    /**
+     * @brief Thread pepare function
+     *
+     * @param[in]  arg User argument passed in Thread contstructor
+     */
+    using PrepFunc = std::function<void(void* arg)>;
+
+    /**
+     * @brief Thread cleanup function
+     *
+     * @param[in]  arg User argument passed in Thread contstructor
+     */
+    using CleanFunc = std::function<void(void* arg)>;
 
     /**
      * @brief Constructor
