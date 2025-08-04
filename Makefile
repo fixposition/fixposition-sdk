@@ -194,7 +194,7 @@ $(BUILD_DIR)/.make-cmake: $(deps_cmake) $(BUILD_DIR)/.make-uid
 
 # ----------------------------------------------------------------------------------------------------------------------
 
-deps_build = $(sort $(wildcard Makefile fpsdk.sh fpsdk_doc/* \
+deps_build = $(sort $(wildcard fpsdk.sh fpsdk_doc/* \
     fpsdk_common/* fpsdk_common/*/* fpsdk_common/*/*/* fpsdk_common/*/*/*/* \
     fpsdk_ros1/* fpsdk_ros1/*/* fpsdk_ros1/*/*/* fpsdk_ros1/*/*/*/* \
     fpsdk_ros2/* fpsdk_ros2/*/* fpsdk_ros2/*/*/* fpsdk_ros2/*/*/*/* \
