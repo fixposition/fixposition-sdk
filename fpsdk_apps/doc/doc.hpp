@@ -37,6 +37,7 @@ namespace apps {
     - @subpage FPSDK_APPS_FPLTOOL
     - @subpage FPSDK_APPS_PARSERTOOL
     - @subpage FPSDK_APPS_TIMECONV
+    - @subpage FPSDK_APPS_TIMETOOL
     - @subpage FPSDK_APPS_YAML2SHELL
 
     @section FPSDK_APPS_LICENSE License

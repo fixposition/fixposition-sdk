@@ -89,6 +89,13 @@ target_link_libraries(timeconv
         fpsdk_common
 )
 
+file(GLOB TIMECONV_CPP_FILES timetool/*.cpp)
+add_executable(timetool ${TIMECONV_CPP_FILES} ${COMMON_CPP_FILES})
+target_link_libraries(timetool
+    PRIVATE
+        fpsdk_common
+)
+
 file(GLOB YAML2SHELL_CPP_FILES yaml2shell/*.cpp)
 add_executable(yaml2shell ${YAML2SHELL_CPP_FILES} ${COMMON_CPP_FILES})
 target_link_libraries(yaml2shell
