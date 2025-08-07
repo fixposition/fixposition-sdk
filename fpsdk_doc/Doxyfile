@@ -950,6 +950,7 @@ INPUT                  = fpsdk_doc \
                          fpsdk_apps/fpltool/fpltool_doc.hpp \
                          fpsdk_apps/parsertool/parsertool_doc.hpp \
                          fpsdk_apps/timeconv/timeconv_doc.hpp \
+                         fpsdk_apps/timetool/timetool_doc.hpp \
                          fpsdk_apps/yaml2shell/yaml2shell_doc.hpp
 
 # This tag can be used to specify the character encoding of the source files
