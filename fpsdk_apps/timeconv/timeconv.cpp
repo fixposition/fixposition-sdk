@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: parsertool main
+ * @brief Fixposition SDK: timeconv main
  */
 
 /* LIBC/STL */
