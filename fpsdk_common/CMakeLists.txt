@@ -35,7 +35,7 @@ endif()
 # DEPENDENCIES =========================================================================================================
 
 if(FPSDK_BOOST_STACKTRACE)
-    if (FPSDK_LEGACY_BOOST_CMAKE)
+    if (FPSDK_LEGACY_BOOST_CMAKE) # e.g. Buildroot 2022.08
         find_package(Boost REQUIRED COMPONENTS stacktrace_basic stacktrace_backtrace stacktrace_addr2line)
     else()
         find_package(Boost CONFIG REQUIRED COMPONENTS stacktrace_basic stacktrace_backtrace stacktrace_addr2line)
