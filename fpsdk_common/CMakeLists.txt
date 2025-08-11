@@ -35,10 +35,10 @@ endif()
 # DEPENDENCIES =========================================================================================================
 
 if(FP_BOOST_STACKTRACE)
-    find_package(Boost CONFIG REQUIRED COMPONENTS stacktrace_basic stacktrace_backtrace stacktrace_addr2line)
+    find_package(Boost REQUIRED COMPONENTS stacktrace_basic stacktrace_backtrace stacktrace_addr2line)
     set(Boost_TARGETS "Boost::headers;Boost::stacktrace_basic;Boost::stacktrace_backtrace;Boost::stacktrace_addr2line")
 else()
-    find_package(Boost CONFIG REQUIRED)
+    find_package(Boost REQUIRED)
     set(Boost_TARGETS "Boost::headers")
 endif()
 find_package(yaml-cpp REQUIRED)
