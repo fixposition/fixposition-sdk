@@ -266,17 +266,17 @@ struct LogMeta
      * @param[in]  log_msg  .fpl log message
      */
     LogMeta(const FplMessage& log_msg);
-    bool valid_;                      //!< Data valid, successfully extracted from message
-    std::string info_;                //!< Stringification of (some of the) data, for debugging
-    std::string hw_uid_;              //!< Hardware UID
-    std::string hw_product_;          //!< Product
-    std::string sw_version_;          //!< Software version
-    uint32_t log_start_time_posix_;   //!< Start time of logging
-    std::string log_start_time_iso_;  //!< Start time of logging
-    std::string log_profile_;         //!< Logging configuration profile name
-    std::string log_target_;          //!< Loging target name
-    std::string log_filename_;        //!< Logfile name
-    std::string yaml_;                //!< Raw meta data YAML
+    bool valid_ = false;                 //!< Data valid, successfully extracted from message
+    std::string info_;                   //!< Stringification of (some of the) data, for debugging
+    std::string hw_uid_;                 //!< Hardware UID
+    std::string product_model_;          //!< Product model
+    std::string sw_version_;             //!< Software version
+    uint32_t log_start_time_posix_ = 0;  //!< Start time of logging
+    std::string log_start_time_iso_;     //!< Start time of logging
+    std::string log_profile_;            //!< Logging configuration profile name
+    std::string log_target_;             //!< Loging target name
+    std::string log_filename_;           //!< Logfile name
+    std::string yaml_;                   //!< Raw meta data YAML
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -295,24 +295,27 @@ struct LogStatus
     bool valid_;  //!< Data valid, successfully extracted from message
 
     // Version 1 and later
-    std::string info_;       //!< Stringification of (some of the) data, for debugging
-    std::string state_;      //!< Logging state: "stopped", "logging", "stopping"
-    uint32_t queue_size_;    //!< Queue size
-    uint32_t queue_peak_;    //!< Queue peak size
-    uint32_t queue_skip_;    //!< Number of skipped messages (queue full)
-    uint32_t log_count_;     //!< Number of logged messages
-    uint32_t log_errors_;    //!< Number of messages failed to log (failed to write/send)
-    uint64_t log_size_;      //!< Total size of logged messages [bytes]
-    uint32_t log_duration_;  //!< Duration of logging [s]
+    std::string info_;          //!< Stringification of (some of the) data, for debugging
+    std::string state_;         //!< Logging state: "stopped", "logging", "stopping"
+    uint32_t queue_size_ = 0;   //!< Queue size
+    uint32_t queue_peak_ = 0;   //!< Queue peak size
+    uint32_t queue_skip_ = 0;   //!< Number of skipped messages (queue full)
+    uint32_t queue_bsize_ = 0;  //!< Output queue size [bytes]
+    uint32_t queue_bpeak_ = 0;  //!< Output queue peak size [bytes]
+
+    uint32_t log_count_ = 0;     //!< Number of logged messages
+    uint32_t log_errors_ = 0;    //!< Number of messages failed to log (failed to write/send)
+    uint64_t log_size_ = 0;      //!< Total size of logged messages [bytes]
+    uint32_t log_duration_ = 0;  //!< Duration of logging [s]
 
     // Version 2 and later
-    uint32_t log_time_posix_;   //!< Approximate time
-    std::string log_time_iso_;  //!< Approximate time
-    int8_t pos_source_;         //!< Approximate sensor position source (see POS_SOURCE_... below)
-    int8_t pos_fix_type_;       //!< Approximate sensor position fix type (see fpsdk::common::gnss::GnssFixType)
-    double pos_lat_;            //!< Approximate sensor position latitude [deg]
-    double pos_lon_;            //!< Approximate sensor position longitude [deg]
-    double pos_height_;         //!< Approximate sensor position height [m]
+    uint32_t log_time_posix_ = 0;  //!< Approximate time
+    std::string log_time_iso_;     //!< Approximate time
+    int8_t pos_source_ = 0;        //!< Approximate sensor position source (see POS_SOURCE_... below)
+    int8_t pos_fix_type_ = 0;      //!< Approximate sensor position fix type (see fpsdk::common::gnss::GnssFixType)
+    double pos_lat_ = 0.0;         //!< Approximate sensor position latitude [deg]
+    double pos_lon_ = 0.0;         //!< Approximate sensor position longitude [deg]
+    double pos_height_ = 0.0;      //!< Approximate sensor position height [m]
 
     static constexpr int8_t POS_SOURCE_UNKNOWN = 0;  //!< Position source unknown resp. not available
     static constexpr int8_t POS_SOURCE_GNSS = 1;     //!< Position source is GNSS

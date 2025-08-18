@@ -181,7 +181,7 @@ bool DoDump(const FplToolOptions& opts)
     // Print log meta data
     if (first_logmeta) {
         std::printf("meta    hw_uid              %s\n", first_logmeta->hw_uid_.c_str());
-        std::printf("meta    hw_product          %s\n", first_logmeta->hw_product_.c_str());
+        std::printf("meta    product_model       %s\n", first_logmeta->product_model_.c_str());
         std::printf("meta    sw_version          %s\n", first_logmeta->sw_version_.c_str());
         std::printf("meta    log_start_time_iso  %s\n", first_logmeta->log_start_time_iso_.c_str());
         std::printf("meta    log_profile         %s\n", first_logmeta->log_profile_.c_str());
@@ -198,6 +198,8 @@ bool DoDump(const FplToolOptions& opts)
         std::printf("status  queue_size          %" PRIu32 "\n", last_logstatus->queue_size_);
         std::printf("status  queue_peak          %" PRIu32 "\n", last_logstatus->queue_peak_);
         std::printf("status  queue_skip          %" PRIu32 "\n", last_logstatus->queue_skip_);
+        std::printf("status  queue_bsize         %" PRIu32 "\n", last_logstatus->queue_bsize_);
+        std::printf("status  queue_bpeak         %" PRIu32 "\n", last_logstatus->queue_bpeak_);
         std::printf("status  log_count           %" PRIu32 "\n", last_logstatus->log_count_);
         std::printf("status  log_errors          %" PRIu32 "\n", last_logstatus->log_errors_);
         std::printf("status  log_size            %" PRIu64 "\n", last_logstatus->log_size_);
