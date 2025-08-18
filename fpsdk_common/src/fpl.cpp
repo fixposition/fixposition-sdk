@@ -391,7 +391,6 @@ LogMeta::LogMeta(const FplMessage& log_msg)
                 if (meta_ver >= 1) {
                     // clang-format off
                     hw_uid_               = meta["hw_uid"].as<std::string>();
-                    hw_product_           = meta["hw_product"].as<std::string>();
                     sw_version_           = meta["sw_version"].as<std::string>();
                     log_start_time_posix_ = meta["log_start_time_posix"].as<uint32_t>();
                     log_start_time_iso_   = meta["log_start_time_iso"].as<std::string>();
@@ -399,9 +398,14 @@ LogMeta::LogMeta(const FplMessage& log_msg)
                     log_target_           = meta["log_target"].as<std::string>();
                     log_filename_         = meta["log_filename"].as<std::string>();
                     yaml_ += "\n";
+                    if (meta_ver == 1) {
+                        product_model_ = meta["hw_product"].as<std::string>();  // Previously this was "hw_product"
+                    } else {
+                        product_model_ = meta["product_model"].as<std::string>();
+                    }
                     info_ =
                          "hw_uid="         + hw_uid_ +
-                        " hw_product="     + hw_product_ +
+                        " product_model="  + product_model_ +
                         " sw_version="     + sw_version_ +
                         " log_profile="    + log_profile_ +
                         " log_target="     + log_target_ +
@@ -480,7 +484,10 @@ LogStatus::LogStatus(const FplMessage& log_msg)
                                  fpsdk::common::gnss::GnssFixTypeStr((GnssFixType)pos_fix_type_),
                                  pos_avail ? pos_lat_ : NAN, pos_avail ? pos_lon_ : NAN, pos_avail ? pos_height_ : NAN);
                 }
-
+                if (status_ver >= 3) {
+                    queue_bsize_ = status["queue_bsize"].as<uint32_t>();
+                    queue_bpeak_ = status["queue_bpeak"].as<uint32_t>();
+                }
             } catch (std::exception& ex) {
                 WARNING("LogStatus: bad status data: %s", ex.what());
             }
