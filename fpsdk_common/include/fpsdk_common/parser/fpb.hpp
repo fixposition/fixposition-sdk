@@ -417,7 +417,8 @@ static_assert(sizeof(FpbMeasurementsMeas) == FP_B_MEASUREMENTS_MEAS_SIZE, "");
  * |  4 |   72    | `hw_name`         | uint8_t[32]    | -    | Hardware name string (nul-terminated string)         |
  * |  5 |  104    | `hw_ver`          | uint8_t[32]    | -    | Hardware version (nul-terminated string)             |
  * |  6 |  136    | `hw_uid`          | uint8_t[32]    | -    | Hardware UID (nul-terminated string)                 |
-*  |  7 |  168    | `reserved1`       | uint8_t[64]    | -    | Reserved for future use. Set to 0.                   |
+ * |  7 |  172    | `product_model`   | uint8_t[32]    | -    | Product model (nul-terminated string)                |
+ * |  8 |  200    | `reserved1`       | uint8_t[32]    | -    | Reserved for future use. Set to 0.                   |
  * @fp_msgspec_end
  *
  * @{
@@ -431,12 +432,13 @@ static constexpr uint8_t FP_B_VERSION_V1 = 0x01;
 struct FpbVersionPayload
 {  // clang-format off
     uint8_t  version = FP_B_VERSION_V1;  //!< Message version (= FP_B_VERSION_V1 for this version of the message)
-    uint8_t  reserved0[7]   = { 0 };     //!< Reserved for future use. Set to 0.
-    uint8_t  sw_version[64] = { 0 };     //!< Software version (nul-terminated string)
-    uint8_t  hw_name[32]    = { 0 };     //!< Hardware name string (nul-terminated string)
-    uint8_t  hw_ver[32]     = { 0 };     //!< Hardware version (nul-terminated string)
-    uint8_t  hw_uid[32]     = { 0 };     //!< Hardware UID (nul-terminated string)
-    uint8_t  reserved1[64]  = { 0 };     //!< Reserved for future use. Set to 0.
+    uint8_t  reserved0[7]      = { 0 };  //!< Reserved for future use. Set to 0.
+    uint8_t  sw_version[64]    = { 0 };  //!< Software version (nul-terminated string)
+    uint8_t  hw_name[32]       = { 0 };  //!< Hardware name string (nul-terminated string)
+    uint8_t  hw_ver[32]        = { 0 };  //!< Hardware version (nul-terminated string)
+    uint8_t  hw_uid[32]        = { 0 };  //!< Hardware UID (nul-terminated string)
+    uint8_t  product_model[32] = { 0 };  //!< Product model (nul-terminated string)
+    uint8_t  reserved1[32]     = { 0 };  //!< Reserved for future use. Set to 0.
 };  // clang-format on
 
 //! Size of FpbVersionPayload

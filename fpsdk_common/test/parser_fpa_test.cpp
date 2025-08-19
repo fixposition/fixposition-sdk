@@ -903,6 +903,23 @@ TEST(ParserFpaTest, FpaTimestamps)
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ParserFpaTest, FpaVersionPayload)
+{
+    {
+        FpaVersionPayload payload;
+        const char* msg_v1 = "$FP,VERSION,1,fp_vrtk2-release-vr2_2.123.0-456,NAV_VR2,v1.3b,fp-5d6f64,VRTK2_STK,*3F\r\n";
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg_v1, strlen(msg_v1)));
+        EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(std::string(payload.sw_version), "fp_vrtk2-release-vr2_2.123.0-456");
+        EXPECT_EQ(std::string(payload.hw_name), "NAV_VR2");
+        EXPECT_EQ(std::string(payload.hw_ver), "v1.3b");
+        EXPECT_EQ(std::string(payload.hw_uid), "fp-5d6f64");
+        EXPECT_EQ(std::string(payload.product_model), "VRTK2_STK");
+    }
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace
 
