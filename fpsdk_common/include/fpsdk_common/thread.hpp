@@ -262,7 +262,7 @@ class Thread
      *
      * @returns a stringification of the status
      */
-    static const char *StatusStr(const Status status);
+    static const char* StatusStr(const Status status);
 
     /**
      * @brief Check thread status
