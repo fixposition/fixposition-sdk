@@ -39,6 +39,7 @@ help:
 	@echo "    clean               Clean build directory"
 	@echo "    cmake               Configure packages"
 	@echo "    build               Build packages"
+	@echo "    pre-commit          Run pre-commit"
 	@echo "    test                Run tests"
 	@echo "    install             Install packages (into INSTALL_PREFIX path)"
 	@echo "    doc                 Generate documentation (into build directory)"
@@ -52,7 +53,8 @@ help:
 	@echo "Notes:"
 	@echo
 	@echo "- ROS_PACKAGE_PATH can be provided through catkin/ros env (recommended) or on the command line"
-	@echo "- Command line variables can be stored into a config.mk file, which is automatically loaded"
+	@echo "- All <target>s but 'clean' and 'pre-commit' require that the same command-line variables are passed"
+	@echo "- Command-line variables can be stored into a config.mk file, which is automatically loaded"
 	@echo "- 'make ci' runs the CI (more or less) like on Github. INSTALL_PREFIX and BUILD_TYPE have no effect here."
 	@echo
 
@@ -127,7 +129,7 @@ ifneq ($(FPSDK_VERSION_STRING),)
 endif
 
 ifeq ($(BUILD_TYPE),Release)
-CMAKE_ARGS_INSTALL += --strip
+  CMAKE_ARGS_INSTALL += --strip
 endif
 
 MAKEFLAGS = --no-print-directory
@@ -185,7 +187,7 @@ $(BUILD_DIR)/.make-uid: | $(BUILD_DIR)
 .PHONY: cmake
 cmake: $(BUILD_DIR)/.make-cmake
 
-deps_cmake := Makefile $(sort $(wildcard CMakeLists.txt */CMakeLists.txt */cmake/*))
+deps_cmake := Makefile $(wildcard config.mk) $(wildcard $(sort $(wildcard CMakeLists.txt */CMakeLists.txt */cmake/*)))
 
 $(BUILD_DIR)/.make-cmake: $(deps_cmake) $(BUILD_DIR)/.make-uid
 	@echo "$(HLW)***** Configure ($(BUILD_TYPE)) *****$(HLO)"
