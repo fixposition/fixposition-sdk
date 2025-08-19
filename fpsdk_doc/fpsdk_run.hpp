@@ -36,7 +36,7 @@ namespace fpsdk {
         curl -o fpsdk.sh https://raw.githubusercontent.com/fixposition/fixposition-sdk/refs/heads/main/fpsdk.sh
         chmod +x fpsdk.sh
 
-    To run the apps the script automatically pulls thee Docker image with the pre-built binaries on first run from the
+    To run the apps the script automatically pulls the Docker image with the pre-built binaries on first run from the
     package registry. The `-u` flag can be used to pull the image again in order to update it. Images for for ROS1, ROS2
     and "no ROS" are provided. Note that downloading the image may take some time.
 

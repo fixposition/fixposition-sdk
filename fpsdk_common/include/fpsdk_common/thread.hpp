@@ -155,6 +155,7 @@ class BinarySemaphore
  *
  *    Thread thread_;
  * };
+ *
  * @endcode
  */
 class Thread
@@ -223,6 +224,9 @@ class Thread
     /**
      * @brief Start the thread
      *
+     * @note In case a thread is re-Start()ed, it must have been Stop()ed previously, even if it ended by itself. Apps
+     *       that repeatedly Start() and Stop() a thread must keep track of this themselves.
+     *
      * @param[in]  try_catch  Run user-supplied thread function in a try ... catch block
      *
      * @returns true if the thread was started, false otherwise
@@ -250,6 +254,15 @@ class Thread
         RUNNING,  //!< Running (Start(ed) and happily running)
         FAILED,   //!< Failed (was Start()ed, but crashed due to an exception)
     };
+
+    /**
+     * @brief Stringify status
+     *
+     * @param[in]  status  The status
+     *
+     * @returns a stringification of the status
+     */
+    static const char* StatusStr(const Status status);
 
     /**
      * @brief Check thread status

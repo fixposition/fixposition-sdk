@@ -103,6 +103,18 @@ Thread::Status Thread::GetStatus() const
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+/*static*/ const char* Thread::StatusStr(const Status status)
+{
+    switch (status) {  // clang-format off
+        case STOPPED: return "STOPPED";
+        case RUNNING: return "RUNNING";
+        case FAILED:  return "FAILED";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 void Thread::Wakeup()
 {
     sem_.Notify();

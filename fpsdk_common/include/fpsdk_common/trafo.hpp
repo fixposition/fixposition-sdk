@@ -44,14 +44,14 @@ namespace trafo {
  *
  * @{
  */
-static constexpr double WGS84_A = 6378137.0;                  //!< WGS-84 Earth radius major axis [m]
-static constexpr double WGS84_B = 6356752.314245;             //!< WGS-84 Earth radius minor axis [m]
-static constexpr double WGS84_C = 40075016.6855785;           //!< Circumference at equator (= 2π * WGS84_A) [m]
-static constexpr double WGS84_1F = 298.257223563;             //!< WGS-84 1/f inverse of flattening parameter
-static constexpr double WGS84_E2 = 6.69437999014e-3;          //!< WGS-84 first eccentricity squared
-static constexpr double WGS84_A2 = WGS84_A * WGS84_A;         //!< WGS-84 a^2
-static constexpr double WGS84_B2 = WGS84_B * WGS84_B;         //!< WGS-84 b^2
-static constexpr double WGS84_EE2 = WGS84_A2 / WGS84_B2 - 1;  //!< WGS-84 e'^2 second eccentricity squared
+static constexpr double WGS84_A = 6378137.0;                      //!< WGS-84 Earth radius major axis [m]
+static constexpr double WGS84_B = 6356752.314245;                 //!< WGS-84 Earth radius minor axis [m]
+static constexpr double WGS84_C = 40075016.6855785;               //!< Circumference at equator (= 2π * WGS84_A) [m]
+static constexpr double WGS84_1F = 298.257223563;                 //!< WGS-84 1/f inverse of flattening parameter
+static constexpr double WGS84_E2 = 6.69437999014e-3;              //!< WGS-84 first eccentricity squared
+static constexpr double WGS84_A2 = WGS84_A * WGS84_A;             //!< WGS-84 a^2
+static constexpr double WGS84_B2 = WGS84_B * WGS84_B;             //!< WGS-84 b^2
+static constexpr double WGS84_EE2 = (WGS84_A2 / WGS84_B2) - 1.0;  //!< WGS-84 e'^2 second eccentricity squared
 ///@}
 
 /**
