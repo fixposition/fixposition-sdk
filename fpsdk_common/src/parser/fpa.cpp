@@ -1171,6 +1171,25 @@ bool FpaTpPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     return ok;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool FpaVersionPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
+{
+    // clang-format off
+    // $FP,VERSION,1,fp_vrtk2-release-vr2_2.123.0-456,NAV_VR2,v1.3b,fp-5d6f64,VRTK2_STK,*3F\r\n
+    //               0                                1       2     3         4         5
+    // clang-format on
+    bool ok = false;
+    FpaParts m;
+    if (GetParts(m, "VERSION", msg, msg_size) && (m.meta_.msg_version_ == 1) && (m.fields_.size() == 6)) {
+        ok = GetText(sw_version, sizeof(sw_version), m.fields_[0]) && GetText(hw_name, sizeof(hw_name), m.fields_[1]) &&
+             GetText(hw_ver, sizeof(hw_ver), m.fields_[2]) && GetText(hw_uid, sizeof(hw_uid), m.fields_[3]) &&
+             GetText(product_model, sizeof(product_model), m.fields_[4]);
+    }
+    FPA_TRACE("FpaVersionPayload %s", string::ToStr(ok));
+    valid_ = ok;
+    return ok;
+}
 /* ****************************************************************************************************************** */
 }  // namespace fpa
 }  // namespace parser

@@ -761,7 +761,7 @@ struct FpaOdomPayload : public FpaPayload
     FpaFloat6              pos_cov;              //!< Position covariance, XX/YY/ZZ/XY/YZ/XZ components
     FpaFloat6              orientation_cov;      //!< Orientation covariance, XX/YY/ZZ/XY/YZ/XZ components
     FpaFloat6              vel_cov;              //!< Velocity covariance, XX/YY/ZZ/XY/YZ/XZ components
-    char                   version[100] = { 0 };  //!< Version
+    char                   version[100] = { 0 }; //!< Software version string
     // clang-format on
 
     /**
@@ -925,6 +925,31 @@ struct FpaTpPayload : public FpaPayload
     static constexpr const char* MSG_NAME = "FP_A-TP";  //!< Message name
 };
 
+/**
+ * @brief FP_A-VERSION (version 1) message payload
+ */
+struct FpaVersionPayload : public FpaPayload
+{  // clang-format off
+    char sw_version[100]    = { 0 }; //!< Software version string
+    char hw_name[100]       = { 0 }; //!< Hardware name
+    char hw_ver[100]        = { 0 }; //!< Hardware version string
+    char hw_uid[100]        = { 0 }; //!< Hardware UID
+    char product_model[100] = { 0 }; //!< Product model
+    // clang-format on
+
+    /**
+     * @brief Set data from message
+     *
+     * @param[in]   msg       Pointer to the FP_A message
+     * @param[in]   msg_size  Size of the FP_A message (>= 11)
+     *
+     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    static constexpr const char* MSG_NAME = "FP_A-VERSION";  //!< Message name
+};
 /* ****************************************************************************************************************** */
 }  // namespace fpa
 }  // namespace parser
