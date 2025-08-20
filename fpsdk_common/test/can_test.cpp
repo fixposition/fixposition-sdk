@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: tests for fpsdk::common::stream
+ * @brief Fixposition SDK: tests for fpsdk::common::can
  */
 
 /* LIBC/STL */
@@ -18,14 +18,14 @@
 #include <gtest/gtest.h>
 
 /* PACKAGE */
+#include <fpsdk_common/can.hpp>
 #include <fpsdk_common/logging.hpp>
-#include <fpsdk_common/stream.hpp>
 
 namespace {
 /* ****************************************************************************************************************** */
-using namespace fpsdk::common::stream;
+using namespace fpsdk::common::can;
 
-TEST(StreamTest, Dummy)
+TEST(CanTest, Dummy)
 {
     EXPECT_TRUE(true);
 }
