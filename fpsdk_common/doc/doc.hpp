@@ -32,13 +32,13 @@ namespace common {
     @section FPSDK_COMMON_MODULES Modules
 
     - @subpage FPSDK_COMMON_APPS
+    - @subpage FPSDK_COMMON_CAN
     - @subpage FPSDK_COMMON_FPL
     - @subpage FPSDK_COMMON_GNSS
     - @subpage FPSDK_COMMON_LOGGING
     - @subpage FPSDK_COMMON_MATH
     - @subpage FPSDK_COMMON_PARSER
     - @subpage FPSDK_COMMON_PATH
-    - @subpage FPSDK_COMMON_STREAM
     - @subpage FPSDK_COMMON_STRING
     - @subpage FPSDK_COMMON_TIME
     - @subpage FPSDK_COMMON_THREAD
