@@ -37,15 +37,15 @@ namespace fpsdk {
     For building the libraries and apps:
 
     - **Linux**, GCC (C++-17), glibc, cmake, bash, etc. (tested with Ubuntu 20.04/22.04/24.04 and Debian Trixie)
-    - boost            (≥ 1.71.0, tested with 1.71.0, 1.74.1, 1.83.0)
-    - curl             (≥ 7.68.0, tested with 7.68.0, 7.88.1, 8.5.0)
-    - Eigen3           (≥ 3.3.7,  tested with 3.3.7, 3.4.0)
-    - yaml-cpp         (≥ 0.6.2,  tested with 0.6.2, 0.7.0, 0.8.0)
-    - zlib1g           (≥ 1.2.11, tested with 1.2.11, 1.2.13, 1.3)
-    - OpenSSL (libssl) (≥ 1.1.x,  tested with 1.1.1, 3.0.2, 3.0.13, 3.0.15)
-    - nlohmann-json3   (≥ 3.7.3,  tested with 3.7.3, 3.11.3)
+    - boost            (≥ 1.71.0)
+    - curl             (≥ 7.68.0)
+    - Eigen3           (≥ 3.3.7)
+    - yaml-cpp         (≥ 0.6.2)
+    - zlib1g           (≥ 1.2.11)
+    - OpenSSL (libssl) (≥ 1.1.x)
+    - nlohmann-json3   (≥ 3.7.3)
     - Various Linux tools, including Bash, CMake, make, xxd, sed, awk, ...
-    - PROJ         (*) (≥ 9.4.x,  tested with 9.4.1, 9.6.0)
+    - PROJ         (*) (≥ 9.4.x)
     - ROS1         (*) (Noetic), or
     - ROS2         (*) (Humble or Jazzy)
 
@@ -54,8 +54,11 @@ namespace fpsdk {
     For development additionally:
 
     - clang-format (≥ 19, tested with 19)
-    - Doxygen      (≥ 1.11.0, tested with 1.11.0)
-    - GTest        (≥ 1.12.0, tested with 1.12.1 and 1.13.0)
+    - Doxygen      (≥ 1.11.0, tested with 1.14.0)
+    - GTest        (≥ 1.12.0)
+
+    Note that the list above may be incomplete or wrong. See @ref FPSDK_BUILD_CIVERSIONS for the versions used in the CI
+    builds.
 
     <!-- trick doxygen -->
 
@@ -228,7 +231,27 @@ namespace fpsdk {
     and the CI script (`docker/ci.sh`) for details on how things are done.
 
 
+    @section FPSDK_BUILD_CIVERSIONS Dependency versions
 
+
+    The builds using Debian 13 "Trixie" currently use:
+
+    @include fpsdk_common_versions_trixie/fpsdk_common/fpsdk_common_versions.txt
+
+
+    The builds using ROS Noetic (Ubuntu 20.04.6 LTS "Focal") currently use:
+
+    @include fpsdk_common_versions_noetic/fpsdk_common/fpsdk_common_versions.txt
+
+
+    The builds using ROS Humble (Ubuntu 22.04 LTS "Jammy") currently use:
+
+    @include fpsdk_common_versions_humble/fpsdk_common/fpsdk_common_versions.txt
+
+
+    The builds using ROS Jazzy (Ubuntu 24.04 LTS "Noble") currently use:
+
+    @include fpsdk_common_versions_jazzy/fpsdk_common/fpsdk_common_versions.txt
 */
 
 // clang-format on

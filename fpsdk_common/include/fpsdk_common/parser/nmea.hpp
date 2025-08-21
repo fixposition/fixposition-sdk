@@ -81,6 +81,7 @@
 /* LIBC/STL */
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -358,6 +359,8 @@ enum class NmeaSignalId : int
     GAL_E1      = 0x300 + '7',  //!< Galileo E1
     GAL_E5A     = 0x300 + '1',  //!< Galileo E5 A
     GAL_E5B     = 0x300 + '2',  //!< Galileo E5 B
+    GAL_E6BC    = 0x300 + '3',  //!< Galileo E6 B/C
+    GAL_E6A     = 0x300 + '4',  //!< Galileo E6 A
     BDS_B1ID    = 0x400 + '1',  //!< BeiDou B1I D
     BDS_B2ID    = 0x400 + 'B',  //!< BeiDou B2I D
     BDS_B1C     = 0x400 + '3',  //!< BeiDou B1 C
@@ -438,6 +441,8 @@ struct NmeaVersion
     const int svid_max_glo = -1;            //!< Max GLONASS satellite ID
     const int svid_min_qzss = -1;           //!< Min QZSS satellite ID, -1 if not available
     const int svid_max_qzss = -1;           //!< Max QZSS satellite ID, -1 if not available
+    const int svid_min_navic = -1;          //!< Min NavIC satellite ID, -1 if not available
+    const int svid_max_navic = -1;          //!< Max NavIC satellite ID, -1 if not available
     static const NmeaVersion V410;          //!< Value for NMEA v4.10
     static const NmeaVersion V410_UBX_EXT;  //!< Value for NMEA v4.10 extended (u-blox flavour)
     static const NmeaVersion V411;          //!< Value for NMEA v4.11
@@ -486,13 +491,55 @@ struct NmeaFloat
 };
 
 /**
+ * @brief NMEA formatter
+ */
+enum class NmeaFormatter
+{
+    UNSPECIFIED,  //!< Unspecified
+    GGA,          //!< Formatter GGA (NmeaGgaPayload)
+    GLL,          //!< Formatter GLL (NmeaGllPayload)
+    RMC,          //!< Formatter RMC (NmeaRmcPayload)
+    VTG,          //!< Formatter VTG (NmeaVtgPayload)
+    GST,          //!< Formatter GST (NmeaGstPayload)
+    HDT,          //!< Formatter HDT (NmeaHdtPayload)
+    ZDA,          //!< Formatter ZDA (NmeaZdaPayload)
+    GSA,          //!< Formatter GSA (NmeaGsaPayload)
+    GSV,          //!< Formatter GSV (NmeaGsvPayload)
+};
+
+/**
  * @brief NMEA payload base class
  */
 struct NmeaPayload
 {
-    NmeaTalkerId talker = NmeaTalkerId::UNSPECIFIED;  //!< Talker
+    NmeaTalkerId talker_ = NmeaTalkerId::UNSPECIFIED;       //!< Talker
+    NmeaFormatter formatter_ = NmeaFormatter::UNSPECIFIED;  //!< Formatter
     bool valid_ = false;               //!< Payload successfully decoded (true), or not (yet) decoded (false)
     virtual ~NmeaPayload() = default;  //!< Virtual dtor for polymorphism
+
+    /**
+     * @brief Set data from message
+     *
+     * @param[in]  msg       Pointer to the NMEA message
+     * @param[in]  msg_size  Size of the NMEA message (>= 11)
+     *
+     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    virtual bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) = 0;
+
+    /**
+     * @brief Set data from message
+     *
+     * @param[in]  buf  The NMEA message data
+     *
+     * @returns true if message payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    inline bool SetFromBuf(const std::vector<uint8_t>& buf)
+    {
+        return SetFromMsg(buf.data(), buf.size());
+    }
 };
 
 /**
@@ -501,23 +548,15 @@ struct NmeaPayload
 struct NmeaGgaPayload : public NmeaPayload
 {
     NmeaTime time;                                         //!< Time
-    NmeaLlh llh;                                           //!< Position (with height)
+    NmeaLlh llh;                                           //!< Position (with ellipsoidal height)
+    NmeaFloat height_msl;                                  //!< Orthomeric height [m]
     NmeaQualityGga quality = NmeaQualityGga::UNSPECIFIED;  //!< Fix quality
     NmeaInt num_sv;                                        //!< Number of satellites used (may be limited to 12)
     NmeaFloat hdop;                                        //!< Horizontal dilution of precision (only with valid fix)
     NmeaFloat diff_age;                                    //!< Differential data age (optional, NMEA 4.11 only)
     NmeaInt diff_sta;                                      //!< Differential station ID (optional, NMEA 4.11 only)
 
-    /**
-     * @brief Set data from sentence
-     *
-     * @param[in]   msg       Pointer to the NMEA message
-     * @param[in]   msg_size  Size of the NMEA message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* FORMATTER = "GGA";  //!< Formatter
 };
@@ -532,16 +571,7 @@ struct NmeaGllPayload : public NmeaPayload
     NmeaStatusGllRmc status = NmeaStatusGllRmc::UNSPECIFIED;  //!< Positioning system status
     NmeaModeGllVtg mode = NmeaModeGllVtg::UNSPECIFIED;        //!< Positioning system mode
 
-    /**
-     * @brief Set data from sentence
-     *
-     * @param[in]   msg       Pointer to the NMEA message
-     * @param[in]   msg_size  Size of the NMEA message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* FORMATTER = "GLL";  //!< Formatter
 };
@@ -553,22 +583,14 @@ struct NmeaRmcPayload : public NmeaPayload
 {
     NmeaTime time;                                               //!< Time
     NmeaStatusGllRmc status = NmeaStatusGllRmc::UNSPECIFIED;     //!< Positioning system status
-    NmeaLlh llh;                                                 //!< Position
+    NmeaLlh ll;                                                  //!< Position (no height)
     NmeaFloat speed;                                             //!< Speed over ground [knots]
     NmeaFloat course;                                            //!< Course over ground w.r.t. True North [deg]
     NmeaDate date;                                               //!< Date
     NmeaModeRmcGns mode = NmeaModeRmcGns::UNSPECIFIED;           //!< Positioning system mode indicator
     NmeaNavStatusRmc navstatus = NmeaNavStatusRmc::UNSPECIFIED;  //!< Navigational status (optional)
-    /**
-     * @brief Set data from sentence
-     *
-     * @param[in]   msg       Pointer to the NMEA message
-     * @param[in]   msg_size  Size of the NMEA message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* FORMATTER = "RMC";  //!< Formatter
 };
@@ -584,16 +606,7 @@ struct NmeaVtgPayload : public NmeaPayload
     NmeaFloat sogk;  //!< Speed over ground [km/h]
     NmeaModeGllVtg mode = NmeaModeGllVtg::UNSPECIFIED;  //!< Positioning system mode
 
-    /**
-     * @brief Set data from sentence
-     *
-     * @param[in]   msg       Pointer to the NMEA message
-     * @param[in]   msg_size  Size of the NMEA message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* FORMATTER = "VTG";  //!< Talker
 };
@@ -612,16 +625,7 @@ struct NmeaGstPayload : public NmeaPayload
     NmeaFloat std_lon;      //!< Standard deviation of longitude error
     NmeaFloat std_alt;      //!< Standard deviation of altitude error
 
-    /**
-     * @brief Set data from sentence
-     *
-     * @param[in]   msg       Pointer to the NMEA message
-     * @param[in]   msg_size  Size of the NMEA message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* FORMATTER = "GST";  //!< Formatter
 };
@@ -633,16 +637,7 @@ struct NmeaHdtPayload : public NmeaPayload
 {
     NmeaFloat heading;  //!< True heading
 
-    /**
-     * @brief Set data from sentence
-     *
-     * @param[in]   msg       Pointer to the NMEA message
-     * @param[in]   msg_size  Size of the NMEA message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* FORMATTER = "HDT";  //!< Formatter
 };
@@ -657,16 +652,7 @@ struct NmeaZdaPayload : public NmeaPayload
     NmeaInt local_hr;   //!< Local zone hours, always 00 (= UTC)
     NmeaInt local_min;  //!< Local zone minutes, always 00 (= UTC)
 
-    /**
-     * @brief Set data from sentence
-     *
-     * @param[in]   msg       Pointer to the NMEA message
-     * @param[in]   msg_size  Size of the NMEA message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* FORMATTER = "ZDA";  //!< Formatter
 };
@@ -685,16 +671,7 @@ struct NmeaGsaPayload : public NmeaPayload
     NmeaFloat vdop;                                        //!< VDOP
     NmeaSystemId system = NmeaSystemId::UNSPECIFIED;       //!< System ID
 
-    /**
-     * @brief Set data from sentence
-     *
-     * @param[in]   msg       Pointer to the NMEA message
-     * @param[in]   msg_size  Size of the NMEA message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* FORMATTER = "GSA";  //!< Formatter
 };
@@ -714,19 +691,37 @@ struct NmeaGsvPayload : public NmeaPayload
     NmeaSystemId system;            //!< System ID
     NmeaSignalId signal;            //!< Signal ID
 
-    /**
-     * @brief Set data from sentence
-     *
-     * @param[in]   msg       Pointer to the NMEA message
-     * @param[in]   msg_size  Size of the NMEA message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* FORMATTER = "GSV";  //!< Formatter
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//! Pointer to NMEA payload
+using NmeaPayloadPtr = std::unique_ptr<NmeaPayload>;
+
+/**
+ * @brief Decode NMEA message
+ *
+ * @param[in]  msg       Pointer to the NMEA message
+ * @param[in]  msg_size  Size of the NMEA message (>= 11)
+ *
+ * @returns an instance of the decoded payload on success, nullptr otherwise (bad or unknown message)
+ */
+NmeaPayloadPtr NmeaDecodeMessage(const uint8_t* msg, const std::size_t msg_size);
+
+/**
+ * @brief Decode NMEA message
+ *
+ * @param[in]  msg  The NMEA message data
+ *
+ * @returns an instance of the decoded payload on success, nullptr otherwise (bad or unknown message)
+ */
+inline NmeaPayloadPtr NmeaDecodeMessage(const std::vector<uint8_t>& msg)
+{
+    return NmeaDecodeMessage(msg.data(), msg.size());
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 

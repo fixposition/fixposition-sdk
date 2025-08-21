@@ -7,11 +7,11 @@
 #
 ########################################################################################################################
 
-# ROS Jazzy Jalisco (LTS until May 2029) base image (Ubuntu 24.04.6 LTS "Noble")
+# ROS Jazzy Jalisco (LTS until May 2029) base image (Ubuntu 24.04 LTS "Noble")
 FROM ros:jazzy-ros-base
 
 # Metadata for github packages
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Jazzy (Ubuntu 24.04) base image with minimal stuff required to build"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Jazzy (Ubuntu 24.04 Noble) base image with minimal stuff required to build"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 # Variables used in our Docker build and CI scripts

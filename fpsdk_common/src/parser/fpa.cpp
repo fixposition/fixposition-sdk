@@ -112,10 +112,12 @@ bool FpaGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
     }
     std::size_t len = 0;
     FpaMessageMeta meta;
-    if (FpaGetMessageMeta(meta, msg, msg_size)) {
+    if (FpaGetMessageMeta(meta, msg, msg_size) && (meta.payload_ix1_ > meta.payload_ix0_)) {
         char fmt[20];
         snprintf(fmt, sizeof(fmt), "%%.%ds", meta.payload_ix1_ - meta.payload_ix0_ + 1);
         len += snprintf(info, size, fmt, (const char*)&msg[meta.payload_ix0_]);
+    } else {
+        info[0] = '\0';
     }
     return (len > 0) && (len < size);
 }
@@ -858,6 +860,7 @@ bool FpaEoePayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     }
     FPA_TRACE("FpaEoePayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::EOE;
     return ok;
 }
 
@@ -877,6 +880,7 @@ bool FpaGnssantPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
     }
     FPA_TRACE("FpaGnssantPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::GNSSANT;
     return ok;
 }
 
@@ -900,6 +904,7 @@ bool FpaGnsscorrPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_si
     }
     FPA_TRACE("FpaGnsscorrPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::GNSSCORR;
     return ok;
 }
 
@@ -932,6 +937,7 @@ bool FpaRawimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size
     }
     FPA_TRACE("FpaRawimuPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::RAWIMU;
     return ok;
 }
 
@@ -964,6 +970,7 @@ bool FpaCorrimuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
     }
     FPA_TRACE("FpaCorrimuPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::CORRIMU;
     return ok;
 }
 
@@ -986,6 +993,7 @@ bool FpaImubiasPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
     }
     FPA_TRACE("FpaImubiasPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::IMUBIAS;
     return ok;
 }
 
@@ -1005,6 +1013,7 @@ bool FpaLlhPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     }
     FPA_TRACE("FpaLlhPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::LLH;
     return ok;
 }
 
@@ -1029,6 +1038,7 @@ bool FpaOdometryPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_si
     }
     FPA_TRACE("FpaOdometryPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::ODOMETRY;
     return ok;
 }
 
@@ -1053,6 +1063,7 @@ bool FpaOdomenuPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
     }
     FPA_TRACE("FpaOdomenuPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::ODOMENU;
     return ok;
 }
 
@@ -1077,6 +1088,7 @@ bool FpaOdomshPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size
     }
     FPA_TRACE("FpaOdomshPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::ODOMSH;
     return ok;
 }
 
@@ -1106,6 +1118,7 @@ bool FpaOdomstatusPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_
     }
     FPA_TRACE("FpaOdomstatusPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::ODOMSTATUS;
     return ok;
 }
 
@@ -1124,6 +1137,7 @@ bool FpaTextPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     }
     FPA_TRACE("FpaTextPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::TEXT;
     return ok;
 }
 
@@ -1144,6 +1158,7 @@ bool FpaTfPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     }
     FPA_TRACE("FpaTfPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::TF;
     return ok;
 }
 
@@ -1168,6 +1183,7 @@ bool FpaTpPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     }
     FPA_TRACE("FpaTpPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::TP;
     return ok;
 }
 
@@ -1188,8 +1204,52 @@ bool FpaVersionPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
     }
     FPA_TRACE("FpaVersionPayload %s", string::ToStr(ok));
     valid_ = ok;
+    msg_type_ = FpaMessageType::VERSION;
     return ok;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+FpaPayloadPtr FpaDecodeMessage(const uint8_t* msg, const std::size_t msg_size)
+{
+    FpaMessageMeta meta;
+    if (!FpaGetMessageMeta(meta, msg, msg_size)) {
+        return nullptr;
+    }
+
+#define _GEN(_msg_type_, _type_)                           \
+    else if (std::strcmp(meta.msg_type_, _msg_type_) == 0) \
+    {                                                      \
+        auto payload = std::make_unique<_type_>();         \
+        if (payload->SetFromMsg(msg, msg_size)) {          \
+            return payload;                                \
+        }                                                  \
+    }
+
+    if (false) {
+    }  // clang-format off
+    _GEN("EOE",        FpaEoePayload)
+    _GEN("GNSSANT",    FpaGnssantPayload)
+    _GEN("GNSSCORR",   FpaGnsscorrPayload)
+    _GEN("RAWIMU",     FpaRawimuPayload)
+    _GEN("CORRIMU",    FpaCorrimuPayload)
+    _GEN("IMUBIAS",    FpaImubiasPayload)
+    _GEN("LLH",        FpaLlhPayload)
+    _GEN("ODOMETRY",   FpaOdometryPayload)
+    _GEN("ODOMENU",    FpaOdomenuPayload)
+    _GEN("ODOMSH",     FpaOdomshPayload)
+    _GEN("ODOMSTATUS", FpaOdomstatusPayload)
+    _GEN("TEXT",       FpaTextPayload)
+    _GEN("TF",         FpaTfPayload)
+    _GEN("TP",         FpaTpPayload)
+    _GEN("VERSION",    FpaVersionPayload)
+    // clang-format on
+
+#undef _GEN
+
+    return nullptr;
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace fpa
 }  // namespace parser

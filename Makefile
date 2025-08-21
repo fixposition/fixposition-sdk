@@ -257,7 +257,8 @@ $(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-build fpsdk_doc/Doxyfile
             cat fpsdk_doc/Doxyfile; \
             echo "PROJECT_NUMBER = $$(cat $(BUILD_DIR)/FPSDK_VERSION_STRING || echo 'unknown revision')"; \
             echo "OUTPUT_DIRECTORY = $(BUILD_DIR)"; \
-			echo "EXAMPLE_PATH += $(BUILD_DIR)/helpscreens"; \
+            echo "EXAMPLE_PATH += $(BUILD_DIR)/helpscreens"; \
+            if [ -d build-artefacts ]; then echo "EXAMPLE_PATH += build-artefacts"; fi; \
         ) | $(DOXYGEN) -
 	$(V)$(TOUCH) $@
 

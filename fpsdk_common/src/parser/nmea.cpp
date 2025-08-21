@@ -148,10 +148,12 @@ bool NmeaGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, 
     }
     std::size_t len = 0;
     NmeaMessageMeta meta;
-    if (NmeaGetMessageMeta(meta, msg, msg_size)) {
+    if (NmeaGetMessageMeta(meta, msg, msg_size) && (meta.payload_ix1_ > meta.payload_ix0_)) {
         char fmt[20];
         snprintf(fmt, sizeof(fmt), "%%.%ds", meta.payload_ix1_ - meta.payload_ix0_ + 1);
         len += snprintf(info, size, fmt, (const char*)&msg[meta.payload_ix0_]);
+    } else {
+        info[0] = '\0';
     }
     return (len > 0) && (len < size);
 }
@@ -179,10 +181,12 @@ bool NmeaMakeMessage(std::vector<uint8_t>& msg, const std::string& payload)
         }
         ck ^= msg[ix];
         ix++;
-    }
+    }  // clang-format on
+    const int cka = ((ck >> 4) & 0x0f);
+    const int ckb = (ck & 0x0f);
     msg[ix++] = '*';
-    msg[ix++] = '0' + ((ck >> 4) & 0x0f);
-    msg[ix++] = '0' + (ck & 0x0f);
+    msg[ix++] = (cka > 9 ? 'A' - 10 + cka : '0' + cka);
+    msg[ix++] = (ckb > 9 ? 'A' - 10 + ckb : '0' + ckb);
     msg[ix++] = '\r';
     msg[ix++] = '\n';
     return true;
@@ -199,7 +203,6 @@ bool NmeaMakeMessage(std::string& msg, const std::string& payload)
     }
 }
 
-
 // ---------------------------------------------------------------------------------------------------------------------
 
 NmeaCoordinates::NmeaCoordinates(const double degs, const int digits)
@@ -214,10 +217,10 @@ NmeaCoordinates::NmeaCoordinates(const double degs, const int digits)
 // ---------------------------------------------------------------------------------------------------------------------
 
 // clang-format off
-//                                                         GPS      SBAS      GAL      BDS      GLO       QZSS
-/*static*/ const NmeaVersion NmeaVersion::V410         = { 1, 32,   33, 64,   1, 36,   1, 63,   65, 96,    -1,  -1 };
-/*static*/ const NmeaVersion NmeaVersion::V410_UBX_EXT = { 1, 32,   33, 64,   1, 36,   1, 63,   65, 96,   193, 202 };
-/*static*/ const NmeaVersion NmeaVersion::V411         = { 1, 32,   33, 64,   1, 36,   1, 63,   65, 96,     1,  10 };
+//                                                         GPS      SBAS      GAL      BDS      GLO       QZSS       NavIC
+/*static*/ const NmeaVersion NmeaVersion::V410         = { 1, 32,   33, 64,   1, 36,   1, 63,   65, 96,    -1,  -1,   -1, -1 };
+/*static*/ const NmeaVersion NmeaVersion::V410_UBX_EXT = { 1, 32,   33, 64,   1, 36,   1, 63,   65, 96,   193, 202,   -1, -1 };
+/*static*/ const NmeaVersion NmeaVersion::V411         = { 1, 32,   33, 64,   1, 36,   1, 63,   65, 96,     1,  10,    1, 14 };
 // clang-format on
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -697,6 +700,8 @@ static bool GetSignalId(NmeaSignalId& signalid, const std::string& field, const 
                 case 0xff & types::EnumToVal(NmeaSignalId::GAL_E1):     signalid = NmeaSignalId::GAL_E1;     break;
                 case 0xff & types::EnumToVal(NmeaSignalId::GAL_E5A):    signalid = NmeaSignalId::GAL_E5A;    break;
                 case 0xff & types::EnumToVal(NmeaSignalId::GAL_E5B):    signalid = NmeaSignalId::GAL_E5B;    break;
+                case 0xff & types::EnumToVal(NmeaSignalId::GAL_E6BC):   signalid = NmeaSignalId::GAL_E6BC;   break;
+                case 0xff & types::EnumToVal(NmeaSignalId::GAL_E6A):    signalid = NmeaSignalId::GAL_E6A;    break;
                 default: ok = false; break;
             } break;
             case NmeaSystemId::BDS: switch ((int)field[0]) {
@@ -838,10 +843,11 @@ bool NmeaGgaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     // 14 or 12 fields as diff station info is optional
     bool ok = false;
     NmeaParts m;
-    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_) &&
+    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker_, m.meta_.talker_) &&
         ((m.fields_.size() == 14) || (m.fields_.size() == 12))) {
         ok = (GetTime(time, m.fields_[0]) && GetQualityGga(quality, m.fields_[5]) &&
               GetLlh(llh, m.fields_, 1, 3, 8, 10, quality != NmeaQualityGga::NOFIX) &&
+              GetFloat(height_msl, m.fields_[8], quality != NmeaQualityGga::NOFIX) &&
               GetInt(num_sv, m.fields_[6], false, 0, 200) &&
               ((quality == NmeaQualityGga::NOFIX) || GetFloat(hdop, m.fields_[7], true, 0.0)) &&
               ((m.fields_.size() == 12) ||
@@ -849,6 +855,7 @@ bool NmeaGgaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     }
     NMEA_TRACE("NmeaGgaPayload %s", string::ToStr(ok));
     valid_ = ok;
+    formatter_ = NmeaFormatter::GGA;
     return ok;
 }
 
@@ -860,13 +867,14 @@ bool NmeaGllPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     //           0        1     2        3      4     5 6
     bool ok = false;
     NmeaParts m;
-    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 7)) {
+    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker_, m.meta_.talker_) && (m.fields_.size() == 7)) {
         ok = (GetTime(time, m.fields_[4]) && GetStatusGllRmc(status, m.fields_[5]) &&
               GetModeGllVtg(mode, m.fields_[6]) &&
               GetLlh(ll, m.fields_, 0, 2, -1, -1, mode != NmeaModeGllVtg::INVALID));
     }
     NMEA_TRACE("NmeaGllPayload %s", string::ToStr(ok));
     valid_ = ok;
+    formatter_ = NmeaFormatter::GLL;
     return ok;
 }
 
@@ -880,17 +888,18 @@ bool NmeaRmcPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     // $GNRMC,235943.412,V,,,,,,,050180,,,N,V*28
     bool ok = false;
     NmeaParts m;
-    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_) &&
+    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker_, m.meta_.talker_) &&
         ((m.fields_.size() == 12) || (m.fields_.size() == 13))) {
         // Ignore magnetic variation fields_[9] and fields_[10], and fields_[12] is optional
         ok = (GetTime(time, m.fields_[0]) && GetStatusGllRmc(status, m.fields_[1]) &&
               GetFloat(speed, m.fields_[6], false) && GetFloat(course, m.fields_[7], false, 0.0, 360.0) &&
               GetDateDdMmYy(date, m.fields_[8]) && GetModeRmcGns(mode, m.fields_[11]) &&
-              GetLlh(llh, m.fields_, 2, 4, -1, -1, mode != NmeaModeRmcGns::INVALID) &&
+              GetLlh(ll, m.fields_, 2, 4, -1, -1, mode != NmeaModeRmcGns::INVALID) &&
               ((m.fields_.size() == 12) || GetNavStatusRmc(navstatus, m.fields_[12])));
     }
     NMEA_TRACE("NmeaRmcPayload %s", string::ToStr(ok));
     valid_ = ok;
+    formatter_ = NmeaFormatter::RMC;
     return ok;
 }
 
@@ -904,12 +913,13 @@ bool NmeaVtgPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     NmeaParts m;
     if (GetParts(m, FORMATTER, msg, msg_size) && (m.fields_.size() == 9)) {
         // Ignore magnetic course fields_[2] and fields_[3]
-        ok = (GetTalker(talker, m.meta_.talker_) && (m.fields_[1] == "T") && GetFloat(cogt, m.fields_[0], false) &&
+        ok = (GetTalker(talker_, m.meta_.talker_) && (m.fields_[1] == "T") && GetFloat(cogt, m.fields_[0], false) &&
               (m.fields_[5] == "N") && GetFloat(sogn, m.fields_[4], false) && (m.fields_[7] == "K") &&
               GetFloat(sogk, m.fields_[6], false) && GetModeGllVtg(mode, m.fields_[8]));
     }
     NMEA_TRACE("NmeaVtgPayload %s", string::ToStr(ok));
     valid_ = ok;
+    formatter_ = NmeaFormatter::VTG;
     return ok;
 }
 
@@ -922,7 +932,7 @@ bool NmeaGstPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     bool ok = false;
     NmeaParts m;
     if (GetParts(m, FORMATTER, msg, msg_size) && (m.fields_.size() == 8)) {
-        ok = (GetTalker(talker, m.meta_.talker_) && GetTime(time, m.fields_[0]) &&
+        ok = (GetTalker(talker_, m.meta_.talker_) && GetTime(time, m.fields_[0]) &&
               GetFloat(rms_range, m.fields_[1], false) && GetFloat(std_major, m.fields_[2], false) &&
               GetFloat(std_minor, m.fields_[3], false) && GetFloat(angle_major, m.fields_[4], false) &&
               GetFloat(std_lat, m.fields_[5], false) && GetFloat(std_lon, m.fields_[6], false) &&
@@ -930,6 +940,7 @@ bool NmeaGstPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     }
     NMEA_TRACE("NmeaGstPayload %s", string::ToStr(ok));
     valid_ = ok;
+    formatter_ = NmeaFormatter::GST;
     return ok;
 }
 
@@ -943,10 +954,11 @@ bool NmeaHdtPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     NmeaParts m;
     if (GetParts(m, FORMATTER, msg, msg_size) && (m.fields_.size() == 2)) {
         // Ignore true_ind fields_[1]
-        ok = (GetTalker(talker, m.meta_.talker_) && GetFloat(heading, m.fields_[0], false, 0.0, 360.0));
+        ok = (GetTalker(talker_, m.meta_.talker_) && GetFloat(heading, m.fields_[0], false, 0.0, 360.0));
     }
     NMEA_TRACE("NmeaHdtPayload %s", string::ToStr(ok));
     valid_ = ok;
+    formatter_ = NmeaFormatter::HDT;
     return ok;
 }
 
@@ -962,7 +974,7 @@ bool NmeaZdaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     NmeaInt month;
     NmeaInt year;
     if (GetParts(m, FORMATTER, msg, msg_size) && (m.fields_.size() == 6)) {
-        ok = (GetTalker(talker, m.meta_.talker_) && GetTime(time, m.fields_[0]) &&
+        ok = (GetTalker(talker_, m.meta_.talker_) && GetTime(time, m.fields_[0]) &&
               GetInt(day, m.fields_[1], false, 1, 31) && GetInt(month, m.fields_[2], false, 1, 12) &&
               GetInt(year, m.fields_[3], false, 2001, 2099) && GetInt(local_hr, m.fields_[4], false, -13, 13) &&
               GetInt(local_min, m.fields_[5], false, 0, 59));
@@ -973,6 +985,7 @@ bool NmeaZdaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     }
     NMEA_TRACE("NmeaZdaPayload %s", string::ToStr(ok));
     valid_ = ok;
+    formatter_ = NmeaFormatter::ZDA;
     return ok;
 }
 
@@ -985,7 +998,7 @@ bool NmeaGsaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     // $GNGSA,A,1,,,,,,,,,,,,,99.99,99.99,99.99,5*37
     bool ok = false;
     NmeaParts m;
-    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_) && (m.fields_.size() == 18)) {
+    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker_, m.meta_.talker_) && (m.fields_.size() == 18)) {
         ok = GetSystemId(system, m.fields_[17]);
 
         // Satellites
@@ -1011,6 +1024,7 @@ bool NmeaGsaPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     }
     NMEA_TRACE("NmeaGsaPayload %s", string::ToStr(ok));
     valid_ = ok;
+    formatter_ = NmeaFormatter::GSA;
     return ok;
 }
 
@@ -1033,7 +1047,7 @@ bool NmeaGsvPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     //        0 1  2 3
     bool ok = false;
     NmeaParts m;
-    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker, m.meta_.talker_)) {
+    if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker_, m.meta_.talker_)) {
         // The number of fields depends on the number of satellites and the sequence of the message
         static constexpr int MAX_MSGS = 9;
         static constexpr int SV_PER_MSG = 4;
@@ -1057,7 +1071,7 @@ bool NmeaGsvPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
 
         // Now we know the field ix for the signal field. Note that GetSignalId() is only valid for certain talkers. So
         // the checks below should give us an ok for valid talker/system and signal, and false otherwise.
-        system = TalkerIdToSystemId(talker);
+        system = TalkerIdToSystemId(talker_);
         signal = NmeaSignalId::UNSPECIFIED;
         if (ok) {
             ok = (GetSignalId(signal, m.fields_[3 + (num_sv * 4)], system) && (system != NmeaSystemId::UNSPECIFIED) &&
@@ -1100,7 +1114,43 @@ bool NmeaGsvPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     }
     NMEA_TRACE("NmeaGsvPayload %s", string::ToStr(ok));
     valid_ = ok;
+    formatter_ = NmeaFormatter::GSV;
     return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+NmeaPayloadPtr NmeaDecodeMessage(const uint8_t* msg, const std::size_t msg_size)
+{
+    NmeaMessageMeta meta;
+    if (!NmeaGetMessageMeta(meta, msg, msg_size)) {
+        return nullptr;
+    }
+
+#define _GEN(_a_, _b_, _c_, _type_)                                                                     \
+    else if ((meta.formatter_[0] == _a_) && (meta.formatter_[1] == _b_) && (meta.formatter_[2] == _c_)) \
+    {                                                                                                   \
+        auto payload = std::make_unique<_type_>();                                                      \
+        if (payload->SetFromMsg(msg, msg_size)) {                                                       \
+            return payload;                                                                             \
+        }                                                                                               \
+    }
+
+    if (false) {
+    }
+    _GEN('G', 'G', 'A', NmeaGgaPayload)
+    _GEN('G', 'L', 'L', NmeaGllPayload)
+    _GEN('R', 'M', 'C', NmeaRmcPayload)
+    _GEN('V', 'T', 'G', NmeaVtgPayload)
+    _GEN('G', 'S', 'T', NmeaGstPayload)
+    _GEN('H', 'D', 'T', NmeaHdtPayload)
+    _GEN('Z', 'D', 'A', NmeaZdaPayload)
+    _GEN('G', 'S', 'A', NmeaGsaPayload)
+    _GEN('G', 'S', 'V', NmeaGsvPayload)
+
+#undef _GEN
+
+    return nullptr;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

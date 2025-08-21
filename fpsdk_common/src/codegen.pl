@@ -231,6 +231,7 @@ my @UBX_MESSAGES =
     { class => 'NAV',    name => 'SBAS',           msgid => 0x32 },
     { class => 'NAV',    name => 'SIG',            msgid => 0x43 },
     { class => 'NAV',    name => 'SLAS',           msgid => 0x42 },
+    { class => 'NAV',    name => 'SOL',            msgid => 0x01 },
     { class => 'NAV',    name => 'STATUS',         msgid => 0x03 },
     { class => 'NAV',    name => 'SVIN',           msgid => 0x3b },
     { class => 'NAV',    name => 'TIMEBDS',        msgid => 0x24 },

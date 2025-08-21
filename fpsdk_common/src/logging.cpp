@@ -202,7 +202,7 @@ void LoggingDefaultWriteFn(const LoggingParams& params, const LoggingLevel level
         if (len >= sizeof(output)) {
             len = sizeof(output) - 10;
         }
-        len += std::snprintf(&output[len], sizeof(output) - len, "%s", suffix);
+        /* len += */ std::snprintf(&output[len], sizeof(output) - len, "%s", suffix);
     }
 
     // Put the entire output line at once (see comment above)

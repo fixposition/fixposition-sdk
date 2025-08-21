@@ -133,6 +133,7 @@ static const UbxMessagesInfo MSG_INFO =
     { UBX_NAV_CLSID,                 UBX_NAV_SBAS_MSGID,            UBX_NAV_SBAS_STRID             },
     { UBX_NAV_CLSID,                 UBX_NAV_SIG_MSGID,             UBX_NAV_SIG_STRID              },
     { UBX_NAV_CLSID,                 UBX_NAV_SLAS_MSGID,            UBX_NAV_SLAS_STRID             },
+    { UBX_NAV_CLSID,                 UBX_NAV_SOL_MSGID,             UBX_NAV_SOL_STRID              },
     { UBX_NAV_CLSID,                 UBX_NAV_STATUS_MSGID,          UBX_NAV_STATUS_STRID           },
     { UBX_NAV_CLSID,                 UBX_NAV_SVIN_MSGID,            UBX_NAV_SVIN_STRID             },
     { UBX_NAV_CLSID,                 UBX_NAV_TIMEBDS_MSGID,         UBX_NAV_TIMEBDS_STRID          },
@@ -354,12 +355,9 @@ bool UbxMakeMessage(
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#define UbxSvStr(gnssId, svId) fpsdk::common::gnss::SatStr(fpsdk::common::gnss::UbxGnssIdSvIdToSat(gnssId, svId))
-
 static const char* UbxSigStr(const uint8_t gnssId, const uint8_t sigId)
-{
+{  // clang-format off
     switch (gnssId) {
-            // clang-format off
         case UBX_GNSSID_GPS:
             switch (sigId) {
                 case UBX_SIGID_GPS_L1CA: return "L1CA";
@@ -425,7 +423,7 @@ static const char* UbxSigStr(const uint8_t gnssId, const uint8_t sigId)
             break;
     }
     return "?";
-}
+}  // clang-format on
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -438,7 +436,8 @@ std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* m
     // Meta information
     UBX_RXM_SFRBX_V2_GROUP0 head;
     std::memcpy(&head, &msg[UBX_HEAD_SIZE], sizeof(head));
-    int len = std::snprintf(info, size, "%-4s %-5s ", UbxSvStr(head.gnssId, head.svId), UbxSigStr(head.gnssId, head.sigId));
+    int len = std::snprintf(info, size, "%-4s %-5s ", gnss::UbxGnssIdSvIdToSat(head.gnssId, head.svId).GetStr(),
+        UbxSigStr(head.gnssId, head.sigId));
 
     // Raw sub_frame words
     uint32_t dwrd[30];
@@ -472,7 +471,8 @@ std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* m
                 }
                 // sub frame 5, page 25
                 else if (sv_id == 51) {
-                    return len + std::snprintf(&info[len], size - len, "GPS LNAV toa, health");  // health 1-24, ALM reference time
+                    return len + std::snprintf(&info[len], size - len,
+                                     "GPS LNAV toa, health");  // health 1-24, ALM reference time
                 }
                 // sub frame 4, page 13
                 else if (sv_id == 52) {
@@ -488,7 +488,8 @@ std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* m
                 }
                 // sub frame 4, page 25
                 else if (sv_id == 63) {
-                    return len + std::snprintf(&info[len], size - len, "GPS LNAV AS, health");  // anti-spoofing flags, health 25-32
+                    return len + std::snprintf(&info[len], size - len,
+                                     "GPS LNAV AS, health");  // anti-spoofing flags, health 25-32
                 }
                 // reserved
                 else {
@@ -594,10 +595,10 @@ std::size_t UbxMonVerToVerStr(char* str, const std::size_t size, const uint8_t* 
         std::memcpy(&gr1, &msg[offs], sizeof(gr1));
         if ((verStr[0] == '\0') && (strncmp("FWVER=", gr1.extension, 6) == 0)) {
             gr1.extension[sizeof(gr1.extension) - 1] = '\0';
-            strcat(verStr, &gr1.extension[6]);
+            std::snprintf(verStr, sizeof(verStr), "%s", &gr1.extension[6]);
         } else if ((modStr[0] == '\0') && (strncmp("MOD=", gr1.extension, 4) == 0)) {
             gr1.extension[sizeof(gr1.extension) - 1] = '\0';
-            strcat(modStr, &gr1.extension[4]);
+            std::snprintf(modStr, sizeof(modStr), "%s", &gr1.extension[4]);
         }
         offs += sizeof(gr1);
         if ((verStr[0] != '\0') && (modStr[0] != '\0')) {
@@ -605,7 +606,7 @@ std::size_t UbxMonVerToVerStr(char* str, const std::size_t size, const uint8_t* 
         }
     }
     if (verStr[0] == '\0') {
-        strcat(verStr, gr0.swVersion);
+        std::snprintf(verStr, sizeof(verStr), "%s", gr0.swVersion);
     }
 
     std::size_t len = 0;
@@ -881,6 +882,55 @@ static std::size_t StrUbxMonTemp(char* info, const std::size_t size, const uint8
     return std::snprintf(info, size, "%d C, %d", temp.temperature, temp.unknown);
 }
 
+static std::size_t StrUbxMonRf(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
+{
+    if ((UBX_MON_RF_VERSION(msg) != UBX_MON_RF_V0_VERSION) || (msg_size < UBX_MON_RF_V0_MIN_SIZE)) {
+        return 0;
+    }
+
+    UBX_MON_RF_V0_GROUP0 head;
+    std::memcpy(&head, &msg[UBX_HEAD_SIZE], sizeof(head));
+
+    constexpr std::array<const char*, 4> jamStateStrs = { { "UNKN", "OK", "WARN", "CRIT" } };
+    constexpr std::array<const char*, 5> antStatusStrs = { { "INIT", "DONTKNOW", "OK", "SHORT", "OPEN" } };
+    constexpr std::array<const char*, 3> antPowerStrs = { { "OFF", "ON", "DONTKNOW" } };
+    int len = 0;
+    int rem = size;
+    for (int ix = 0; (ix < head.nBlocks) && (rem > 20); ix++) {
+        UBX_MON_RF_V0_GROUP1 rf;
+        std::memcpy(&rf, &msg[UBX_HEAD_SIZE + sizeof(head) + (ix * sizeof(rf))], sizeof(rf));
+        const uint8_t jamState = UBX_MON_RF_V0_FLAGS_JAMMINGSTATE(rf.flags);
+        const float noise = (float)rf.noisePerMS / (float)UBX_MON_RF_V0_NOISEPERMS_MAX * 1e2f;
+        const float agc = (float)rf.agcCnt / (float)UBX_MON_RF_V0_AGCCNT_MAX * 1e2f;
+        len += std::snprintf(&info[len], rem,
+            "%sRF%d (jam %s, ant %s %s, noise %.0f%%, agc %.0f%%, IQ %.1f/%.1f %+.1f/%+.1f)", ix == 0 ? "" : ", ", ix,
+            jamState < jamStateStrs.size() ? jamStateStrs[jamState] : "?",
+            rf.antStatus < antStatusStrs.size() ? antStatusStrs[rf.antStatus] : "?",
+            rf.antPower < antPowerStrs.size() ? antPowerStrs[rf.antPower] : "?", noise, agc,
+            (float)rf.magI * (1.0f / 255.0f), (float)rf.magQ * (1.0f / 255.0f), (float)rf.ofsI * (2.0f / 255.0f),
+            (float)rf.ofsQ * (2.0f / 255.0f));
+        rem = size - len;
+    }
+    return len;
+}
+
+static std::size_t StrUbxMonSys(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
+{
+    if ((UBX_MON_SYS_VERSION(msg) != UBX_MON_SYS_V1_VERSION) || (msg_size != UBX_MON_SYS_V1_SIZE)) {
+        return 0;
+    }
+    UBX_MON_SYS_V1_GROUP0 sys;
+    constexpr std::array<const char*, 11> bootTypeStrs = { { "UNKNOWN", "COLDSTART", "WATCHDOG", "HWRESET", "HWBACKUP",
+        "SWBACKUP", "SWRESET", "VIOFAIL", "VDDXFAIL", "VDDRFFAIL", "VCOREHIGHFAI" } };
+    std::memcpy(&sys, &msg[UBX_HEAD_SIZE], sizeof(sys));
+    return std::snprintf(info, size,
+        "boot=%s cpu=%" PRIu8 "/%" PRIu8 " mem=%" PRIu8 "/%" PRIu8 " io=%" PRIu8 "/%" PRIu8 " run=%" PRIu32
+        " N=%" PRIu16 " W=%" PRIu16 " E=%" PRIu16 " temp=%" PRIi8,
+        sys.bootType < bootTypeStrs.size() ? bootTypeStrs[sys.bootType] : "?", sys.cpuLoad, sys.cpuLoadMax,
+        sys.memUsage, sys.memUsageMax, sys.ioUsage, sys.ioUsageMax, sys.runTime, sys.noticeCount, sys.warnCount,
+        sys.errorCount, sys.tempValue);
+}
+
 static std::size_t StrUbxRxmSfrbx(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
     if ((UBX_RXM_SFRBX_VERSION(msg) != UBX_RXM_SFRBX_V2_VERSION) || (msg_size < UBX_RXM_SFRBX_V2_MIN_SIZE)) {
@@ -907,14 +957,14 @@ static std::size_t StrUbxCfgValset(char* info, const std::size_t size, const uin
     layers[0] = '\0';
     layers[1] = '\0';
     std::size_t len = 0;
-    if (CheckBitsAll(head.layers, Bit<uint8_t>(UBX_CFG_VALSET_V1_LAYERS_RAM))) {
+    if (CheckBitsAll(head.layers, UBX_CFG_VALSET_V1_LAYERS_RAM)) {
         len += std::snprintf(&layers[len], sizeof(layers) - len, ",RAM");
     }
-    if (CheckBitsAll(head.layers, Bit<uint8_t>(UBX_CFG_VALSET_V1_LAYERS_BBR))) {
+    if (CheckBitsAll(head.layers, UBX_CFG_VALSET_V1_LAYERS_BBR)) {
         len += std::snprintf(&layers[len], sizeof(layers) - len, ",BBR");
     }
-    if (CheckBitsAll(head.layers, Bit<uint8_t>(UBX_CFG_VALSET_V1_LAYERS_FLASH))) {
-        len += std::snprintf(&layers[len], sizeof(layers) - len, ",Flash");
+    if (CheckBitsAll(head.layers, UBX_CFG_VALSET_V1_LAYERS_FLASH)) {
+        /* len += */ std::snprintf(&layers[len], sizeof(layers) - len, ",Flash");
     }
     switch (head.version) {
         case UBX_CFG_VALSET_V0_VERSION: {
@@ -925,16 +975,16 @@ static std::size_t StrUbxCfgValset(char* info, const std::size_t size, const uin
             const char* transaction = "?";
             switch (head.transaction) {
                 case UBX_CFG_VALSET_V1_TRANSACTION_NONE:
-                    transaction = "none";
+                    transaction = "NONE";
                     break;
                 case UBX_CFG_VALSET_V1_TRANSACTION_BEGIN:
-                    transaction = "begin";
+                    transaction = "BEGIN";
                     break;
                 case UBX_CFG_VALSET_V1_TRANSACTION_CONTINUE:
-                    transaction = "continue";
+                    transaction = "CONTINUE";
                     break;
                 case UBX_CFG_VALSET_V1_TRANSACTION_END:
-                    transaction = "end";
+                    transaction = "END";
                     break;
             }
             return std::snprintf(
@@ -1141,7 +1191,9 @@ bool UbxGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
         case UBX_RXM_SFRBX_MSGID:        len = StrUbxRxmSfrbx(info, size, msg, msg_size);           break; } break;
         case UBX_MON_CLSID:              switch (msg_id) {
         case UBX_MON_VER_MSGID:          len = StrUbxMonVer(info, size, msg, msg_size);             break;
-        case UBX_MON_TEMP_MSGID:         len = StrUbxMonTemp(info, size, msg, msg_size);            break; } break;
+        case UBX_MON_TEMP_MSGID:         len = StrUbxMonTemp(info, size, msg, msg_size);            break;
+        case UBX_MON_RF_MSGID:           len = StrUbxMonRf(info, size, msg, msg_size);              break;
+        case UBX_MON_SYS_MSGID:          len = StrUbxMonSys(info, size, msg, msg_size);             break; } break;
         case UBX_CFG_CLSID:              switch (msg_id) {
         case UBX_CFG_VALSET_MSGID:       len = StrUbxCfgValset(info, size, msg, msg_size);          break;
         case UBX_CFG_VALGET_MSGID:       len = StrUbxCfgValget(info, size, msg, msg_size);          break; } break;

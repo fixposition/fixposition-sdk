@@ -108,21 +108,24 @@ OutputFile::~OutputFile()
 
 bool OutputFile::Open(const std::string& path)
 {
-    Close();
+    if (IsOpen()) {
+        return false;
+    }
 
     // Open file
+    path_ = path;
     if (fpsdk::common::string::StrEndsWith(path, ".gz")) {
         fh_ = std::make_unique<gzofstream>(path.c_str());
     } else {
         fh_ = std::make_unique<std::ofstream>(path, std::ios::binary);
     }
     if (fh_->fail()) {
-        WARNING("OutputFile: open fail %s: %s", path.c_str(), string::StrError(errno).c_str());
+        error_ = string::StrError(errno);
+        WARNING("OutputFile: open fail %s: %s", path.c_str(), error_.c_str());
         fh_.reset();
         return false;
     }
 
-    path_ = path;
     return true;
 }
 
@@ -133,6 +136,8 @@ void OutputFile::Close()
     if (fh_) {
         fh_.reset();
         path_.clear();
+        size_ = 0;
+        error_.clear();
     }
 }
 
@@ -151,7 +156,8 @@ bool OutputFile::Write(const uint8_t* data, const std::size_t size)
     bool ok = true;
     fh_->write((const char*)data, size);
     if (fh_->fail()) {
-        WARNING("OutputFile: write fail %s: %s", path_.c_str(), string::StrError(errno).c_str());
+        error_ = string::StrError(errno);
+        WARNING("OutputFile: write fail %s: %s", path_.c_str(), error_.c_str());
         ok = false;
     }
     return ok;
@@ -159,12 +165,141 @@ bool OutputFile::Write(const uint8_t* data, const std::size_t size)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const std::string& OutputFile::GetPath() const
+const std::string& OutputFile::Path() const
 {
     return path_;
 }
 
+bool OutputFile::IsOpen() const
+{
+    return fh_ ? true : false;
+}
+
+std::size_t OutputFile::Size() const
+{
+    return size_;
+}
+
+const std::string& OutputFile::Error() const
+{
+    return error_;
+}
+
+/* ****************************************************************************************************************** */
+
+InputFile::InputFile()
+{
+}
+
+InputFile::~InputFile()
+{
+    Close();
+}
+
 // ---------------------------------------------------------------------------------------------------------------------
+
+bool InputFile::Open(const std::string& path)
+{
+    if (IsOpen()) {
+        return false;
+    }
+
+    // Open file
+    path_ = path;
+    const bool is_gz = fpsdk::common::string::StrEndsWith(path, ".gz");
+    if (is_gz) {
+        fh_ = std::make_unique<gzifstream>(path.c_str());
+
+    } else {
+        fh_ = std::make_unique<std::ifstream>(path, std::ios::binary);
+    }
+    if (fh_->fail()) {
+        error_ = string::StrError(errno);
+        WARNING("InputFile: open fail %s: %s", path.c_str(), error_.c_str());
+        fh_.reset();
+        return false;
+    }
+    size_ = FileSize(path_);
+    can_seek_ = !is_gz;
+
+    return true;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void InputFile::Close()
+{
+    if (fh_) {
+        fh_.reset();
+        path_.clear();
+        size_ = 0;
+        pos_ = 0;
+        error_.clear();
+        can_seek_ = false;
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::size_t InputFile::Read(uint8_t* data, const std::size_t size)
+{
+    if (!fh_ || (data == NULL) || (size == 0)) {
+        return false;
+    }
+    fh_->read((char*)data, size);
+    const std::size_t n = fh_->gcount();
+    pos_ += n;
+    return n;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const std::string& InputFile::Path() const
+{
+    return path_;
+}
+
+bool InputFile::IsOpen() const
+{
+    return fh_ ? true : false;
+}
+
+std::size_t InputFile::Size() const
+{
+    return size_;
+}
+
+std::size_t InputFile::Tell() const
+{
+    return pos_;
+}
+
+const std::string& InputFile::Error() const
+{
+    return error_;
+}
+
+bool InputFile::CanSeek() const
+{
+    return can_seek_;
+}
+
+bool InputFile::Seek(const std::size_t pos)
+{
+    if (!can_seek_ || !fh_ || (pos > size_)) {
+        return false;
+    }
+    fh_->clear();  // seems to be neccessary or seekg() sometimes fails
+    fh_->seekg(pos, std::ios::beg);
+    if (fh_->fail()) {
+        error_ = string::StrError(errno);
+        WARNING("InputFile: seek %s %" PRIuMAX " fail: %s", path_.c_str(), pos, error_.c_str());
+        return false;
+    }
+    return true;
+}
+
+/* ****************************************************************************************************************** */
 
 bool FileSlurp(const std::string& path, std::vector<uint8_t>& data)
 {

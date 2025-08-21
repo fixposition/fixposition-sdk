@@ -24,6 +24,11 @@ jobs:
               run: |
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
+            - name: Artefacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: fpsdk_common_versions_trixie
+                  path: build/trixie-ci_build_toplevel_release_noros/*/*_versions.txt
 
     ci-fpsdk-noetic:
         runs-on: ubuntu-latest
@@ -39,6 +44,11 @@ jobs:
               run: |
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
+            - name: Artefacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: fpsdk_common_versions_noetic
+                  path: build/noetic-ci_build_toplevel_release_ros1/*/*_versions.txt
 
     ci-fpsdk-humble:
         runs-on: ubuntu-latest
@@ -54,6 +64,11 @@ jobs:
               run: |
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
+            - name: Artefacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: fpsdk_common_versions_humble
+                  path: build/humble-ci_build_toplevel_release_ros2/*/*_versions.txt
 
     ci-fpsdk-jazzy:
         runs-on: ubuntu-latest
@@ -69,6 +84,11 @@ jobs:
               run: |
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
+            - name: Artefacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: fpsdk_common_versions_jazzy
+                  path: build/jazzy-ci_build_toplevel_release_ros2/*/*_versions.txt
 
     ci-images:
         runs-on: ubuntu-latest
@@ -123,6 +143,17 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
+            ##### Get artefacts from build jobs
+
+            - name: Get build artefacts
+              uses: actions/download-artifact@v5
+              with:
+                  path: build-artefacts  # See Doxyfile and Makefile
+              # We'll get:
+              #     build-artefacts/fpsdk_common_versions_trixie/fpsdk_common/fpsdk_common_versions.txt
+              #     build-artefacts/fpsdk_common_versions_jazzy/fpsdk_common/fpsdk_common_versions.txt
+              #     ...
+
             ##### Generate HTML content
 
             - name: Build documentation
@@ -141,8 +172,8 @@ jobs:
 
             ##### Archive generated HTML as artefacts
 
-            # https://github.com/actions/upload-pages-artifact (This, not actions/upload-artifact, wich doesn't work for
-            # pages deployment. Both actions make the artefact show up as a job artefact.
+            # https://github.com/actions/upload-pages-artifact (This, not actions/upload-artifact, which doesn't work
+            # for pages deployment. Both actions make the artefact show up as a job artefact.
             - name: Upload pages artefact
               uses: actions/upload-pages-artifact@v3
               with:
