@@ -125,21 +125,21 @@ int main(int /*argc*/, char** /*argv*/)
     // The collector of messages
     CollectedMsgs collected_msgs;
     while (parser.Process(msg)) {
-        DEBUG("Message %-s (size %" PRIuMAX " bytes)", msg.name_.c_str(), msg.data_.size());
+        DEBUG("Message %-s (size %" PRIuMAX " bytes)", msg.name_.c_str(), msg.Size());
         bool msg_ok = true;
 
         // Collect FP_A-ODOMETRY
         if (msg.name_ == FpaOdometryPayload::MSG_NAME) {
-            msg_ok = collected_msgs.fpa_odometry_.SetFromMsg(msg.data_.data(), msg.data_.size());
+            msg_ok = collected_msgs.fpa_odometry_.SetFromMsg(msg.Data(), msg.Size());
         }
         // Collect FP_A-ODOMSTATUS
         else if (msg.name_ == FpaOdomstatusPayload::MSG_NAME) {
-            msg_ok = collected_msgs.fpa_odomstatus_.SetFromMsg(msg.data_.data(), msg.data_.size());
+            msg_ok = collected_msgs.fpa_odomstatus_.SetFromMsg(msg.Data(), msg.Size());
         }
         // FP_A-EOE: Check if it the *fusion* end of epoch, otherwise ignore
         else if (msg.name_ == FpaEoePayload::MSG_NAME) {
             FpaEoePayload fpa_eoe;
-            msg_ok = fpa_eoe.SetFromMsg(msg.data_.data(), msg.data_.size());
+            msg_ok = fpa_eoe.SetFromMsg(msg.Data(), msg.Size());
             if (fpa_eoe.epoch == FpaEpoch::FUSION) {
                 // Add it to the collection and process the data
                 collected_msgs.fpa_eoe_ = fpa_eoe;
@@ -155,7 +155,7 @@ int main(int /*argc*/, char** /*argv*/)
         if (!msg_ok) {
             msg.MakeInfo();
             WARNING("Failed decoding %s: %s", msg.name_.c_str(), msg.info_.c_str());
-            // DEBUG_HEXDUMP(msg.data_.data(), msg.data_.size(), NULL, NULL);  // Hexdump of the raw message data
+            // DEBUG_HEXDUMP(msg.Data(), msg.Size(), NULL, NULL);  // Hexdump of the raw message data
         }
     }
 

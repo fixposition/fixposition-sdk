@@ -78,7 +78,9 @@
 /* LIBC/STL */
 #include <array>
 #include <cstdint>
+#include <memory>
 #include <string>
+#include <vector>
 
 /* EXTERNAL */
 
@@ -126,10 +128,10 @@ bool FpaGetMessageMeta(FpaMessageMeta& meta, const uint8_t* msg, const std::size
  *
  * Generates a name (string) in the form "FP_A-MESSAGEID" (for example, "FP_A-ODOMETRY").
  *
- * @param[out] name      String to write the name to
- * @param[in]  size      Size of \c name (incl. nul termination)
- * @param[in]  msg       Pointer to the FP_A message
- * @param[in]  msg_size  Size of the \c msg
+ * @param[out]  name      String to write the name to
+ * @param[in]   size      Size of \c name (incl. nul termination)
+ * @param[in]   msg       Pointer to the FP_A message
+ * @param[in]   msg_size  Size of the \c msg
  *
  * @note No check on the data provided is done. The caller must ensure that the data is a valid FP_A or FP_A message.
  *
@@ -532,12 +534,60 @@ struct FpaGpsTime
 };
 
 /**
+ * @brief FP_A message types
+ */
+enum class FpaMessageType
+{
+    UNSPECIFIED,  //!< Unspecified
+    EOE,          //!< FpaEoePayload
+    GNSSANT,      //!< FpaGnssantPayload
+    GNSSCORR,     //!< FpaGnsscorrPayload
+    RAWIMU,       //!< FpaRawimuPayload
+    CORRIMU,      //!< FpaCorrimuPayload
+    IMUBIAS,      //!< FpaImubiasPayload
+    LLH,          //!< FpaLlhPayload
+    ODOMETRY,     //!< FpaOdometryPayload
+    ODOMENU,      //!< FpaOdomenuPayload
+    ODOMSH,       //!< FpaOdomshPayload
+    ODOMSTATUS,   //!< FpaOdomstatusPayload
+    TEXT,         //!< FpaTextPayload
+    TF,           //!< FpaTfPayload
+    TP,           //!< FpaTpPayload
+    VERSION,      //!< FpaVersionPayload
+};
+
+/**
  * @brief FP_A payload base class
  */
 struct FpaPayload
 {
-    bool valid_ = false;              //!< Payload successfully decoded (true), or not (yet) decoded (false)
-    virtual ~FpaPayload() = default;  //!< Virtual dtor for polymorphism
+    bool valid_ = false;  //!< Payload successfully decoded (true), or not (yet) decoded (false)
+    FpaMessageType msg_type_ = FpaMessageType::UNSPECIFIED;  //!< Message (payload) type
+    virtual ~FpaPayload() = default;                         //!< Virtual dtor for polymorphism
+
+    /**
+     * @brief Set data from message
+     *
+     * @param[in]  msg       Pointer to the FP_A message
+     * @param[in]  msg_size  Size of the FP_A message (>= 11)
+     *
+     * @returns true if message payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    virtual bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) = 0;
+
+    /**
+     * @brief Set data from message
+     *
+     * @param[in]  buf  The FP_A message data
+     *
+     * @returns true if message payload was correct and all data could be extracted (fields are now valid), or false
+     *          otherwise (fields are now invalid)
+     */
+    inline bool SetFromBuf(const std::vector<uint8_t>& buf)
+    {
+        return SetFromMsg(buf.data(), buf.size());
+    }
 };
 
 /**
@@ -548,16 +598,7 @@ struct FpaEoePayload : public FpaPayload
     FpaGpsTime gps_time;                     //!< Time
     FpaEpoch epoch = FpaEpoch::UNSPECIFIED;  //!< Indicates which epoch ended ("FUSION", "GNSS", "GNSS1", "GNSS2")
 
-    /**
-     * @brief Set data from message
-     *
-     * @param[in]   msg       Pointer to the FP_A message
-     * @param[in]   msg_size  Size of the FP_A message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* MSG_NAME = "FP_A-EOE";  //!< Message name
 };
@@ -576,16 +617,7 @@ struct FpaGnssantPayload : public FpaPayload
     FpaInt       gnss2_age;   //!< Time since gnss2_state or gnss2_power information last changed, 0-604800
     // clang-format on
 
-    /**
-     * @brief Set data from message
-     *
-     * @param[in]   msg       Pointer to the FP_A message
-     * @param[in]   msg_size  Size of the FP_A message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* MSG_NAME = "FP_A-GNSSANT";  //!< Message name
 };
@@ -611,16 +643,7 @@ struct FpaGnsscorrPayload : public FpaPayload
     FpaInt      sta_dist;          //!< Correction station baseline length (approximate 3d distance), range 0-100000
     // clang-format on
 
-    /**
-     * @brief Set data from message
-     *
-     * @param[in]   msg       Pointer to the FP_A message
-     * @param[in]   msg_size  Size of the FP_A message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* MSG_NAME = "FP_A-GNSSCORR";  //!< Message name
 };
@@ -645,17 +668,6 @@ struct FpaImuPayload : public FpaPayload
     bool         bias_comp = false; //!< Signal is bias compensated (true) or not (false), always false for RAWIMU, may be true for CORRIMU
     FpaImuStatus imu_status = FpaImuStatus::UNSPECIFIED;  //!< IMU bias status (only available for version 2 messages)
     // clang-format on
-
-    /**
-     * @brief Set data from message
-     *
-     * @param[in]   msg       Pointer to the FP_A message
-     * @param[in]   msg_size  Size of the FP_A message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    virtual bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) = 0;
 };
 
 /**
@@ -694,16 +706,7 @@ struct FpaImubiasPayload : public FpaPayload
     FpaFloat3      bias_cov_gyr;  //!< Gyroscope bias covariance, X/Y/Z components
     // clang-format on
 
-    /**
-     * @brief Set data from message
-     *
-     * @param[in]   msg       Pointer to the FP_A message
-     * @param[in]   msg_size  Size of the FP_A message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* MSG_NAME = "FP_A-IMUBIAS";  //!< Message name
 };
@@ -718,16 +721,7 @@ struct FpaLlhPayload : public FpaPayload
     FpaFloat6 cov_enu;    //!< Position covariance in ENU, EE/NN/UU/EN/NU/EU components [m^2]
     // clang-format on
 
-    /**
-     * @brief Set data from message
-     *
-     * @param[in]   msg       Pointer to the FP_A message
-     * @param[in]   msg_size  Size of the FP_A message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* MSG_NAME = "FP_A-LLH";  //!< Message name
 };
@@ -764,15 +758,6 @@ struct FpaOdomPayload : public FpaPayload
     char                   version[100] = { 0 }; //!< Software version string
     // clang-format on
 
-    /**
-     * @brief Set data from message
-     *
-     * @param[in]   msg       Pointer to the FP_A message
-     * @param[in]   msg_size  Size of the FP_A message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
     virtual bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) = 0;
 };
 
@@ -834,16 +819,7 @@ struct FpaOdomstatusPayload : public FpaPayload
     FpaMarkersConv     markers_conv;     //!< Marker convergence status
     // clang-format on
 
-    /**
-     * @brief Set data from message
-     *
-     * @param[in]   msg       Pointer to the FP_A message
-     * @param[in]   msg_size  Size of the FP_A message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* MSG_NAME = "FP_A-ODOMSTATUS";  //!< Message name
 };
@@ -857,16 +833,7 @@ struct FpaTextPayload : public FpaPayload
     char          text[MAX_FP_A_SIZE] = { 0 };  //!< Text (nul-terminated string)
     // clang-format on
 
-    /**
-     * @brief Set data from message
-     *
-     * @param[in]   msg       Pointer to the FP_A message
-     * @param[in]   msg_size  Size of the FP_A message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* MSG_NAME = "FP_A-TEXT";  //!< Message name
 };
@@ -883,16 +850,7 @@ struct FpaTfPayload : public FpaPayload
     FpaFloat4  orientation;          //!< Rotation in quaternion, W/X/Y/Z components
     // clang-format on
 
-    /**
-     * @brief Set data from message
-     *
-     * @param[in]   msg       Pointer to the FP_A message
-     * @param[in]   msg_size  Size of the FP_A message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* MSG_NAME = "FP_A-TF";  //!< Message name
 };
@@ -911,16 +869,7 @@ struct FpaTpPayload : public FpaPayload
     FpaInt      gps_leaps;                            //!< GPS leapseconds
     // clang-format on
 
-    /**
-     * @brief Set data from message
-     *
-     * @param[in]   msg       Pointer to the FP_A message
-     * @param[in]   msg_size  Size of the FP_A message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* MSG_NAME = "FP_A-TP";  //!< Message name
 };
@@ -937,19 +886,38 @@ struct FpaVersionPayload : public FpaPayload
     char product_model[100] = { 0 }; //!< Product model
     // clang-format on
 
-    /**
-     * @brief Set data from message
-     *
-     * @param[in]   msg       Pointer to the FP_A message
-     * @param[in]   msg_size  Size of the FP_A message (>= 11)
-     *
-     * @returns true if sentence payload was correct and all data could be extracted (fields are now valid), or false
-     *          otherwise (fields are now invalid)
-     */
-    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size);
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* MSG_NAME = "FP_A-VERSION";  //!< Message name
 };
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+//! Pointer to FP_A payload
+using FpaPayloadPtr = std::unique_ptr<FpaPayload>;
+
+/**
+ * @brief Decode FP_A message
+ *
+ * @param[in]  msg       Pointer to the FP_A message
+ * @param[in]  msg_size  Size of the FP_A message (>= 11)
+ *
+ * @returns an instance of the decoded payload on success, nullptr otherwise (bad or unknown message)
+ */
+FpaPayloadPtr FpaDecodeMessage(const uint8_t* msg, const std::size_t msg_size);
+
+/**
+ * @brief Decode FP_A message
+ *
+ * @param[in]  msg  The FP_A message data
+ *
+ * @returns an instance of the decoded payload on success, nullptr otherwise (bad or unknown message)
+ */
+inline FpaPayloadPtr FpaDecodeMessage(const std::vector<uint8_t>& msg)
+{
+    return FpaDecodeMessage(msg.data(), msg.size());
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace fpa
 }  // namespace parser

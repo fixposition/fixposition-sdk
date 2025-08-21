@@ -115,7 +115,7 @@ TEST(ParserUbxTest, UbxMakeMessage)
         parser.Add(msg);
         ParserMsg parser_message;
         EXPECT_TRUE(parser.Process(parser_message));
-        EXPECT_EQ(parser_message.data_.size(), UBX_FRAME_SIZE + payload.size());
+        EXPECT_EQ(parser_message.Size(), UBX_FRAME_SIZE + payload.size());
         EXPECT_EQ(std::string(parser_message.name_), std::string("UBX-AA-55"));
         // Payload should be the same
         EXPECT_TRUE(std::memcmp(payload.data(), &parser_message.data_[UBX_HEAD_SIZE], payload.size()) == 0);

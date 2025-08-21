@@ -121,3 +121,25 @@ message(STATUS "fpsdk: FPSDK_VERSION_STRING=${FPSDK_VERSION_STRING}")
 
 
 ########################################################################################################################
+
+macro(fpsdk_save_versions)
+    set(options)
+    set(one_value_args FILE)
+    set(multi_value_args PACKAGES)
+    cmake_parse_arguments(FPSDK_SAVE_VERSIONS "${options}" "${one_value_args}" "${multi_value_args}" ${ARGN})
+
+    list(SORT FPSDK_SAVE_VERSIONS_PACKAGES)
+    list(REMOVE_DUPLICATES FPSDK_SAVE_VERSIONS_PACKAGES)
+
+    message(STATUS "fpsdk: Saving versions to ${FPSDK_SAVE_VERSIONS_FILE}")
+    write_file(${FPSDK_SAVE_VERSIONS_FILE} "# Versions for ${PROJECT_NAME}")
+
+    foreach(_pkg ${FPSDK_SAVE_VERSIONS_PACKAGES})
+        string(SUBSTRING "${_pkg}                    " 0 20 _name)
+        write_file(${FPSDK_SAVE_VERSIONS_FILE} "${_name} ${${_pkg}_VERSION}" APPEND)
+    endforeach()
+
+endmacro()
+
+
+########################################################################################################################

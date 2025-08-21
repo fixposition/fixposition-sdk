@@ -12,6 +12,9 @@
  */
 
 /* LIBC/STL */
+#include <map>
+#include <set>
+#include <unordered_map>
 
 /* EXTERNAL */
 #include <gtest/gtest.h>
@@ -24,21 +27,21 @@ namespace {
 /* ****************************************************************************************************************** */
 using namespace fpsdk::common::gnss;
 
-TEST(GnssTest, GnssFixTypeStr)
+TEST(GnssTest, FixTypeStr)
 {
     // clang-format off
-    EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::UNKNOWN)),        std::string("UNKNOWN"));
-    EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::NOFIX)),          std::string("NOFIX"));
-    EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::DRONLY)),         std::string("DRONLY"));
-    EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::TIME)),           std::string("TIME"));
-    EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::SPP_2D)),         std::string("SPP_2D"));
-    EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::SPP_3D)),         std::string("SPP_3D"));
-    EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::SPP_3D_DR)),      std::string("SPP_3D_DR"));
-    EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::RTK_FLOAT)),      std::string("RTK_FLOAT"));
-    EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::RTK_FIXED)),      std::string("RTK_FIXED"));
-    EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::RTK_FLOAT_DR)),   std::string("RTK_FLOAT_DR"));
-    EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::RTK_FIXED_DR)),   std::string("RTK_FIXED_DR"));
-    EXPECT_EQ(std::string(GnssFixTypeStr((GnssFixType)99)),             std::string("?")); // NOLINT
+    EXPECT_EQ(std::string(FixTypeStr(FixType::UNKNOWN)),        std::string("UNKNOWN"));
+    EXPECT_EQ(std::string(FixTypeStr(FixType::NOFIX)),          std::string("NOFIX"));
+    EXPECT_EQ(std::string(FixTypeStr(FixType::DRONLY)),         std::string("DRONLY"));
+    EXPECT_EQ(std::string(FixTypeStr(FixType::TIME)),           std::string("TIME"));
+    EXPECT_EQ(std::string(FixTypeStr(FixType::SPP_2D)),         std::string("SPP_2D"));
+    EXPECT_EQ(std::string(FixTypeStr(FixType::SPP_3D)),         std::string("SPP_3D"));
+    EXPECT_EQ(std::string(FixTypeStr(FixType::SPP_3D_DR)),      std::string("SPP_3D_DR"));
+    EXPECT_EQ(std::string(FixTypeStr(FixType::RTK_FLOAT)),      std::string("RTK_FLOAT"));
+    EXPECT_EQ(std::string(FixTypeStr(FixType::RTK_FIXED)),      std::string("RTK_FIXED"));
+    EXPECT_EQ(std::string(FixTypeStr(FixType::RTK_FLOAT_DR)),   std::string("RTK_FLOAT_DR"));
+    EXPECT_EQ(std::string(FixTypeStr(FixType::RTK_FIXED_DR)),   std::string("RTK_FIXED_DR"));
+    EXPECT_EQ(std::string(FixTypeStr((FixType)99)),             std::string("?")); // NOLINT
     // clang-format on
 }
 
@@ -104,79 +107,141 @@ TEST(GnssTest, BandStr)
 
 TEST(GnssTest, Sat)
 {
-    const Sat sat = GnssSvNrToSat(Gnss::GPS, 12);
-    DEBUG("sat=%04x %02x %02x", sat, (int)SatToGnss(sat), (int)SatToSvNr(sat));
-    EXPECT_NE(sat, INVALID_SAT);
-    EXPECT_EQ(SatToGnss(sat), Gnss::GPS);
-    EXPECT_EQ(SatToSvNr(sat), 12);
+    {
+        const Sat sat(Gnss::GPS, 12);
+        EXPECT_NE(sat, INVALID_SAT);
+        EXPECT_EQ(sat.GetGnss(), Gnss::GPS);
+        EXPECT_EQ(sat.GetSvNr(), 12);
+    }
+    {
+        const Sat sat1(Gnss::GPS, 12);
+        const Sat sat2(Gnss::GAL, 12);
+        const Sat sat3(Gnss::GAL, 12);
+        EXPECT_LT(sat1, sat2);
+        EXPECT_NE(sat1, sat2);
+        EXPECT_EQ(sat2, sat3);
+    }
+    {
+        std::map<Sat, bool> map;
+        map.emplace(Sat(Gnss::GAL, 12), true);
+        map.emplace(Sat(Gnss::GPS, 12), true);
+        EXPECT_EQ(map.begin()->first, Sat(Gnss::GPS, 12));
+    }
+    {
+        std::unordered_map<Sat, bool> umap;
+        umap.emplace(Sat(Gnss::GAL, 12), true);
+        umap.emplace(Sat(Gnss::GPS, 12), true);
+        EXPECT_EQ(umap.size(), 2);
+    }
+    {
+        std::set<Sat> set;
+        set.emplace(Sat(Gnss::GAL, 12));
+        set.emplace(Sat(Gnss::GPS, 12));
+        EXPECT_EQ(set.size(), 2);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 TEST(GnssTest, SatSig)
 {
-    const SatSig satsig = GnssSvNrBandSignalToSatSig(Gnss::GPS, 12, Band::L1, Signal::GPS_L1CA);
-    DEBUG("satsig=%08x %02x  %02x  %02x %02x", satsig, (int)SatSigToGnss(satsig), (int)SatSigToSvNr(satsig),
-        (int)SatSigToBand(satsig), (int)SatSigToSignal(satsig));
-    EXPECT_NE(satsig, INVALID_SATSIG);
-    EXPECT_EQ(SatSigToGnss(satsig), Gnss::GPS);
-    EXPECT_EQ(SatSigToSvNr(satsig), 12);
-    EXPECT_EQ(SatSigToBand(satsig), Band::L1);
-    EXPECT_EQ(SatSigToSignal(satsig), Signal::GPS_L1CA);
+    {
+        const SatSig satsig(Gnss::GPS, 12, Band::L1, Signal::GPS_L1CA);
+        EXPECT_NE(satsig, INVALID_SATSIG);
+        EXPECT_EQ(satsig.GetGnss(), Gnss::GPS);
+        EXPECT_EQ(satsig.GetSvNr(), 12);
+        EXPECT_EQ(satsig.GetBand(), Band::L1);
+        EXPECT_EQ(satsig.GetSignal(), Signal::GPS_L1CA);
+    }
+    {
+        const SatSig satsig(Sat(Gnss::GPS, 12), Signal::GPS_L1CA);
+        EXPECT_NE(satsig, INVALID_SATSIG);
+        EXPECT_EQ(satsig.GetGnss(), Gnss::GPS);
+        EXPECT_EQ(satsig.GetSvNr(), 12);
+        EXPECT_EQ(satsig.GetBand(), Band::L1);
+        EXPECT_EQ(satsig.GetSignal(), Signal::GPS_L1CA);
+    }
+    {
+        EXPECT_EQ(INVALID_SATSIG.GetSat(), INVALID_SAT);
+    }
+    {
+        std::map<SatSig, bool> map;
+        map.emplace(SatSig(Gnss::GPS, 12, Band::L1, Signal::GPS_L2C), true);
+        map.emplace(SatSig(Gnss::GPS, 12, Band::L1, Signal::GPS_L1CA), true);
+        EXPECT_EQ(map.begin()->first, SatSig(Gnss::GPS, 12, Band::L1, Signal::GPS_L1CA));
+    }
+    {
+        std::unordered_map<SatSig, bool> umap;
+        umap.emplace(SatSig(Gnss::GPS, 12, Band::L1, Signal::GPS_L2C), true);
+        umap.emplace(SatSig(Gnss::GPS, 12, Band::L1, Signal::GPS_L1CA), true);
+        EXPECT_EQ(umap.size(), 2);
+    }
+    {
+        std::set<SatSig> set;
+        set.emplace(SatSig(Gnss::GPS, 12, Band::L1, Signal::GPS_L2C));
+        set.emplace(SatSig(Gnss::GPS, 12, Band::L1, Signal::GPS_L1CA));
+        EXPECT_EQ(set.size(), 2);
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 TEST(GnssTest, SatStr)
-{
+{  // clang-format off
+
     // Valid
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::GPS, 1))), std::string("G01"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::SBAS, 22))), std::string("S22"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::GAL, 12))), std::string("E12"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::BDS, 5))), std::string("C05"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::QZSS, 9))), std::string("J09"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::GLO, 15))), std::string("R15"));
+    EXPECT_EQ(std::string(Sat(Gnss::GPS,     1).GetStr()), std::string("G01"));
+    EXPECT_EQ(std::string(Sat(Gnss::SBAS,   22).GetStr()), std::string("S22"));
+    EXPECT_EQ(std::string(Sat(Gnss::GAL,    12).GetStr()), std::string("E12"));
+    EXPECT_EQ(std::string(Sat(Gnss::BDS,     5).GetStr()), std::string("C05"));
+    EXPECT_EQ(std::string(Sat(Gnss::QZSS,    9).GetStr()), std::string("J09"));
+    EXPECT_EQ(std::string(Sat(Gnss::GLO,    15).GetStr()), std::string("R15"));
 
     // Invalid
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::GPS, 0))), std::string("G??"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::GPS, 33))), std::string("G??"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::SBAS, 19))), std::string("S??"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::SBAS, 59))), std::string("S??"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::GAL, 37))), std::string("E??"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::BDS, 64))), std::string("C??"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::QZSS, 11))), std::string("J??"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::GLO, 33))), std::string("R??"));
-    EXPECT_EQ(std::string(SatStr(GnssSvNrToSat(Gnss::UNKNOWN, 12))), std::string("???"));
+    EXPECT_EQ(std::string(Sat(Gnss::GPS,     0).GetStr()), std::string("G??"));
+    EXPECT_EQ(std::string(Sat(Gnss::GPS,    33).GetStr()), std::string("G??"));
+    EXPECT_EQ(std::string(Sat(Gnss::SBAS,   19).GetStr()), std::string("S??"));
+    EXPECT_EQ(std::string(Sat(Gnss::SBAS,   59).GetStr()), std::string("S??"));
+    EXPECT_EQ(std::string(Sat(Gnss::GAL,    37).GetStr()), std::string("E??"));
+    EXPECT_EQ(std::string(Sat(Gnss::BDS,    64).GetStr()), std::string("C??"));
+    EXPECT_EQ(std::string(Sat(Gnss::QZSS,   11).GetStr()), std::string("J??"));
+    EXPECT_EQ(std::string(Sat(Gnss::GLO,    33).GetStr()), std::string("R??"));
+    EXPECT_EQ(std::string(Sat(Gnss::UNKNOWN, 2).GetStr()), std::string("???"));
+
+    // clang-format on
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 
 TEST(GnssTest, StrSat)
-{
+{  // clang-format off
+
     // Valid
-    EXPECT_EQ(StrSat("G01"), GnssSvNrToSat(Gnss::GPS, 1));
-    EXPECT_EQ(StrSat("S22"), GnssSvNrToSat(Gnss::SBAS, 22));
-    EXPECT_EQ(StrSat("E12"), GnssSvNrToSat(Gnss::GAL, 12));
-    EXPECT_EQ(StrSat("C05"), GnssSvNrToSat(Gnss::BDS, 5));
-    EXPECT_EQ(StrSat("J09"), GnssSvNrToSat(Gnss::QZSS, 9));
-    EXPECT_EQ(StrSat("R15"), GnssSvNrToSat(Gnss::GLO, 15));
+    EXPECT_EQ(Sat("G01"), Sat(Gnss::GPS,   1));
+    EXPECT_EQ(Sat("S22"), Sat(Gnss::SBAS, 22));
+    EXPECT_EQ(Sat("E12"), Sat(Gnss::GAL,  12));
+    EXPECT_EQ(Sat("C05"), Sat(Gnss::BDS,   5));
+    EXPECT_EQ(Sat("J09"), Sat(Gnss::QZSS,  9));
+    EXPECT_EQ(Sat("R15"), Sat(Gnss::GLO,  15));
 
     // Invalid
-    EXPECT_EQ(StrSat("G00"), INVALID_SAT);
-    EXPECT_EQ(StrSat("G33"), INVALID_SAT);
-    EXPECT_EQ(StrSat("S19"), INVALID_SAT);
-    EXPECT_EQ(StrSat("S59"), INVALID_SAT);
-    EXPECT_EQ(StrSat("E37"), INVALID_SAT);
-    EXPECT_EQ(StrSat("C64"), INVALID_SAT);
-    EXPECT_EQ(StrSat("J11"), INVALID_SAT);
-    EXPECT_EQ(StrSat("R33"), INVALID_SAT);
-    EXPECT_EQ(StrSat("gugugs"), INVALID_SAT);
-    EXPECT_EQ(StrSat(""), INVALID_SAT);
-    EXPECT_EQ(StrSat("G1"), INVALID_SAT);
-    EXPECT_EQ(StrSat("E1"), INVALID_SAT);
-    EXPECT_EQ(StrSat("C1"), INVALID_SAT);
-    EXPECT_EQ(StrSat("J1"), INVALID_SAT);
-    EXPECT_EQ(StrSat("R1"), INVALID_SAT);
+    EXPECT_EQ(Sat("G00"),    INVALID_SAT);
+    EXPECT_EQ(Sat("G33"),    INVALID_SAT);
+    EXPECT_EQ(Sat("S19"),    INVALID_SAT);
+    EXPECT_EQ(Sat("S59"),    INVALID_SAT);
+    EXPECT_EQ(Sat("E37"),    INVALID_SAT);
+    EXPECT_EQ(Sat("C64"),    INVALID_SAT);
+    EXPECT_EQ(Sat("J11"),    INVALID_SAT);
+    EXPECT_EQ(Sat("R33"),    INVALID_SAT);
+    EXPECT_EQ(Sat("gugugs"), INVALID_SAT);
+    EXPECT_EQ(Sat(""),       INVALID_SAT);
+    EXPECT_EQ(Sat("G1"),     INVALID_SAT);
+    EXPECT_EQ(Sat("E1"),     INVALID_SAT);
+    EXPECT_EQ(Sat("C1"),     INVALID_SAT);
+    EXPECT_EQ(Sat("J1"),     INVALID_SAT);
+    EXPECT_EQ(Sat("R1"),     INVALID_SAT);
+
+    // clang-format on
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -191,8 +256,9 @@ TEST(GnssTest, UbxGnssIdToGnss)
 
 TEST(GnssTest, UbxGnssIdSvIdToSat)
 {
-    EXPECT_EQ(UbxGnssIdSvIdToSat(0, 12), GnssSvNrToSat(Gnss::GPS, 12));
-    EXPECT_EQ(UbxGnssIdSvIdToSat(2, 1), GnssSvNrToSat(Gnss::GAL, 1));
+    EXPECT_EQ(UbxGnssIdSvIdToSat(0, 12), Sat(Gnss::GPS, 12));
+    EXPECT_EQ(UbxGnssIdSvIdToSat(2, 1), Sat(Gnss::GAL, 1));
+    EXPECT_EQ(UbxGnssIdSvIdToSat(1, 123), Sat(Gnss::SBAS, 23));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

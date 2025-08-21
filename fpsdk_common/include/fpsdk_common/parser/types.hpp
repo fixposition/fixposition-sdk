@@ -100,7 +100,7 @@ struct ParserMsg
     std::string          name_;     //!< Name of the message
     mutable std::string  info_;     //!< Message (debug) info, default empty, call MakeInfo() to fill
     uint64_t             seq_ = 0;  //!< Message counter (starting at 1)
-    // clang-formt on
+    // clang-format on
 
     /**
      * @brief Make info_ field
@@ -109,12 +109,27 @@ struct ParserMsg
      * useful into the info_ field.
      */
     void MakeInfo() const;
+
+    /**
+     * @brief Get message raw data
+     *
+     * @returns a pointer to the message raw data
+     */ // clang-format off
+    inline const uint8_t* Data() const { return data_.data(); }  // clang-format on
+
+    /**
+     * @brief Get message raw size
+     *
+     * @returns the message raw size
+     */ // clang-format off
+    inline std::size_t Size() const { return data_.size(); }  // clang-format on
 };
 
 /**
  * @brief Parser statistics
  */
-struct ParserStats {
+struct ParserStats
+{
     uint64_t n_msgs_ = 0;    //!< Number of messages parsed
     uint64_t s_msgs_ = 0;    //!< Total size of messages parsed
     uint64_t n_fpa_ = 0;     //!< Number of Protocol::FP_A messages

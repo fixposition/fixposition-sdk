@@ -42,7 +42,7 @@ namespace parsertool {
     <b>Print info on all messages found in a file:</b>
 
     @verbatim
-    $ parsertool fpsdk_common/test/data/mixed.bin
+    $ parsertool fpsdk_common/test/data/test_data_mixed.bin
     @endverbatim
 
     Outputs:

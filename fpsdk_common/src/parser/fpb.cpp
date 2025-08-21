@@ -172,7 +172,7 @@ bool FpbGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
     std::size_t len = 0;
 
     // Common stringification
-    len += snprintf(&info[len], size - len, "%04" PRIx16 "@%" PRIu16, FpbMsgId(msg), FpbMsgTime(msg));
+    len += snprintf(&info[len], size - len, "%04" PRIx16 "@%05" PRIu16, FpbMsgId(msg), FpbMsgTime(msg));
 
     // Specific stringification for some messages
     switch (FpbMsgId(msg)) {

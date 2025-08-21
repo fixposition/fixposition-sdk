@@ -10,7 +10,7 @@
 # ROS Noetic (until May 2025) base image (Ubuntu 20.04.6 LTS "Focal")
 FROM ros:noetic-ros-base
 
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Noetic (Ubuntu 20.04) base image with minimal stuff required to build"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Noetic (Ubuntu 20.04 Focal) base image with minimal stuff required to build"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 ENV FPSDK_IMAGE=noetic-base

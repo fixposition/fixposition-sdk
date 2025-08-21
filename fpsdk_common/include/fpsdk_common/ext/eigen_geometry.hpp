@@ -7,12 +7,11 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wshadow"
-#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#pragma GCC diagnostic ignored "-Wclass-memaccess"  // NOLINT
 #if defined(__GNUC__) && (__GNUC__ >= 9)
 #  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #  pragma GCC diagnostic ignored "-Wdeprecated-copy"
 #endif
-#pragma GCC diagnostic ignored "-Wclass-memaccess"
 #include <Eigen/Geometry>
 #pragma GCC diagnostic pop
 // See exmplanation in eigen_core.hpp
