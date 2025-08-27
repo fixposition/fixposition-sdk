@@ -745,6 +745,9 @@ struct LeapSecInfo
 // TAI (CLOCK_TAI) has TAI_OFFS leap seconds.
 static constexpr int TAI_OFFS = 10;  // offset of CLOCK_TAI to our atomic time
 
+// TODO: consider making some CI that uses the IERS bulletins or https://data.iana.org/time-zones/data/leap-seconds.list
+//       to check, and possibly update, this table.
+
 // See IERS "Bulletin C" #70 July 2025 (https://hpiers.obspm.fr/iers/bul/bulc/bulletinc.dat)
 // See also https://data.iana.org/time-zones/data/leap-seconds.list
 // See also /usr/share/zoneinfo/{leapseconds,leap-seconds.list}
