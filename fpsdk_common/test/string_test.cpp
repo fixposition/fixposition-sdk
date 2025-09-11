@@ -742,7 +742,6 @@ TEST(StringTest, BufToStr)
 
 TEST(StringTest, Base64)
 {
-
     {
         const std::vector<uint8_t> data = StrToBuf("Hello World");
         const auto str = Base64Enc(data);
