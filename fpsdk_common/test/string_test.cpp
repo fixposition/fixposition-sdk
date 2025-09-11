@@ -738,6 +738,28 @@ TEST(StringTest, BufToStr)
     EXPECT_EQ(buf.size(), str.size());
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(StringTest, Base64)
+{
+    {
+        const std::vector<uint8_t> data = StrToBuf("Hello World");
+        const auto str = Base64Enc(data);
+        EXPECT_EQ(str, "SGVsbG8gV29ybGQ=");
+        const auto data2 = Base64Dec(str);
+        EXPECT_EQ(data, data2);
+    }
+    {
+        const std::vector<uint8_t> data = { 0x4c, 0x6a, 0x9c, 0xbc, 0xa6, 0x00, 0xe1, 0x18, 0x22, 0x12, 0xc8, 0xf8,
+            0x12, 0xfb, 0x79, 0x84, 0x22, 0x85, 0xd1, 0x0e, 0x51, 0xc5, 0xf9, 0x18, 0xab, 0xc1, 0xf3, 0x35, 0xde, 0x2f,
+            0x00, 0x26 };
+        const auto str = Base64Enc(data);
+        EXPECT_EQ(str, "TGqcvKYA4RgiEsj4Evt5hCKF0Q5RxfkYq8HzNd4vACY=");
+        const auto data2 = Base64Dec(str);
+        EXPECT_EQ(data, data2);
+    }
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace
 

@@ -424,6 +424,24 @@ std::vector<uint8_t> StrToBuf(const std::string& str);
  */
 std::string BufToStr(const std::vector<uint8_t>& buf);
 
+/**
+ * @brief Encode to base64
+ *
+ * @param[in]  buf  The data to encode
+ *
+ * @returns the base64 encoded data
+ */
+std::string Base64Enc(const std::vector<uint8_t>& buf);
+
+/**
+ * @brief Decode from base64
+ *
+ * @param[in]  str  The base64 encoded data
+ *
+ * @returns the decoded data
+ */
+std::vector<uint8_t> Base64Dec(const std::string& str);
+
 /* ****************************************************************************************************************** */
 }  // namespace string
 }  // namespace common
