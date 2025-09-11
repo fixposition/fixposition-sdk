@@ -22,8 +22,10 @@
 #include <unordered_map>
 
 /* EXTERNAL */
+#include <boost/beast/core/detail/base64.hpp>
 
 /* PACKAGE */
+#include "fpsdk_common/logging.hpp"
 #include "fpsdk_common/math.hpp"
 #include "fpsdk_common/string.hpp"
 
@@ -66,7 +68,7 @@ std::string Strftime(const char* const fmt, const int64_t ts, const bool utc)
 {
     std::vector<char> str(1000);
     struct tm now;
-    const time_t t = (ts <= 0 ? time(NULL) : ts);
+    const time_t t = (ts <= 0 ? std::time(NULL) : ts);
     bool ok = false;
     if (utc) {
         ok = gmtime_r(&t, &now) == &now;
@@ -519,6 +521,25 @@ std::vector<uint8_t> StrToBuf(const std::string& str)
 std::string BufToStr(const std::vector<uint8_t>& buf)
 {
     return { (const char*)buf.data(), buf.size() };
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+std::string Base64Enc(const std::vector<uint8_t>& buf)
+{
+    std::string str;
+    str.resize(boost::beast::detail::base64::encoded_size(buf.size()));
+    boost::beast::detail::base64::encode(str.data(), buf.data(), buf.size());
+    return str;
+}
+
+std::vector<uint8_t> Base64Dec(const std::string& str)
+{
+    std::vector<uint8_t> data;
+    data.resize(boost::beast::detail::base64::decoded_size(str.size()));
+    boost::beast::detail::base64::decode(data.data(), str.data(), str.size());
+    data.resize(data.size() - 1);
+    return data;
 }
 
 /* ****************************************************************************************************************** */
