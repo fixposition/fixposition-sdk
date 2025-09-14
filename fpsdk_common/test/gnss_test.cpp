@@ -38,7 +38,7 @@ TEST(GnssTest, GnssFixTypeStr)
     EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::RTK_FIXED)),      std::string("RTK_FIXED"));
     EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::RTK_FLOAT_DR)),   std::string("RTK_FLOAT_DR"));
     EXPECT_EQ(std::string(GnssFixTypeStr(GnssFixType::RTK_FIXED_DR)),   std::string("RTK_FIXED_DR"));
-    EXPECT_EQ(std::string(GnssFixTypeStr((GnssFixType)99)),             std::string("?"));
+    EXPECT_EQ(std::string(GnssFixTypeStr((GnssFixType)99)),             std::string("?")); // NOLINT
     // clang-format on
 }
 
@@ -55,7 +55,7 @@ TEST(GnssTest, GnssStr)
     EXPECT_EQ(std::string(GnssStr(Gnss::QZSS)),       std::string("QZSS"));
     EXPECT_EQ(std::string(GnssStr(Gnss::GLO)),        std::string("GLO"));
     EXPECT_EQ(std::string(GnssStr(Gnss::NAVIC)),      std::string("NAVIC"));
-    EXPECT_EQ(std::string(GnssStr((Gnss)99)),         std::string("?"));
+    EXPECT_EQ(std::string(GnssStr((Gnss)99)),         std::string("?")); // NOLINT
     // clang-format on
 }
 
@@ -83,7 +83,7 @@ TEST(GnssTest, SignalStr)
     EXPECT_EQ(std::string(SignalStr(Signal::QZSS_L5)),      std::string("QZSS_L5"));
     EXPECT_EQ(std::string(SignalStr(Signal::SBAS_L1CA)),    std::string("SBAS_L1CA"));
     EXPECT_EQ(std::string(SignalStr(Signal::NAVIC_L5A)),    std::string("NAVIC_L5A"));
-    EXPECT_EQ(std::string(SignalStr((Signal)99)),           std::string("?"));
+    EXPECT_EQ(std::string(SignalStr((Signal)99)),           std::string("?")); // NOLINT
     // clang-format on
 }
 
@@ -96,7 +96,7 @@ TEST(GnssTest, BandStr)
     EXPECT_EQ(std::string(BandStr(Band::L1)),       std::string("L1"));
     EXPECT_EQ(std::string(BandStr(Band::L2)),       std::string("L2"));
     EXPECT_EQ(std::string(BandStr(Band::L5)),       std::string("L5"));
-    EXPECT_EQ(std::string(BandStr((Band)99)),       std::string("?"));
+    EXPECT_EQ(std::string(BandStr((Band)99)),       std::string("?")); // NOLINT
     // clang-format on
 }
 

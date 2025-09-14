@@ -44,6 +44,7 @@ help:
 	@echo "    install             Install packages (into INSTALL_PREFIX path)"
 	@echo "    doc                 Generate documentation (into build directory)"
 	@echo "    doc-dev             Generate documentation and start webserver to view it"
+	@echo "    lint                Run linter"
 	@echo
 	@echo "Typically you want to do something like this:"
 	@echo
@@ -71,6 +72,8 @@ CAT        := cat
 PYTHON     := python
 SED        := sed
 LN         := ln
+TEE        := tee
+RUN_CLANG_TIDY := run-clang-tidy
 
 ifeq ($(VERBOSE),1)
 V =
@@ -140,10 +143,12 @@ ifneq ($(VERBOSE),0)
 endif
 
 ifeq ($(GITHUB_WORKSPACE),)
-  CMAKE_ARGS_BUILD = --parallel $(shell nproc --ignore=2)
+  PARALLEL := $(shell nproc --ignore=2)
+  CMAKE_ARGS_BUILD = --parallel $(PARALLEL)
   NICE_BUILD=$(NICE) -19
 else
-  CMAKE_ARGS_BUILD = --parallel 4
+  PARALLEL := 4
+  CMAKE_ARGS_BUILD = --parallel $(PARALLEL)
   NICE_BUILD=
 endif
 
@@ -259,6 +264,17 @@ $(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-build fpsdk_doc/Doxyfile
 .PHONY: doc-dev
 doc-dev: $(BUILD_DIR)/.make-doc
 	$(V)(cd $(BUILD_DIR)/doc && $(PYTHON) -m http.server 8000)
+
+# ----------------------------------------------------------------------------------------------------------------------
+
+.PHONY: lint
+lint: $(BUILD_DIR)/.lint-clang-tidy
+
+$(BUILD_DIR)/.lint-clang-tidy: $(BUILD_DIR)/.make-build
+	@echo "$(HLW)***** clang-tidy ($(BUILD_TYPE)) *****$(HLO)"
+	$(V)$(NICE_BUILD) $(RUN_CLANG_TIDY) -p $(BUILD_DIR) -header-filter=.* -j $(PARALLEL) \
+	    | $(TEE) $(BUILD_DIR)/clang-tidy.log
+	$(V)$(TOUCH) $@
 
 # ----------------------------------------------------------------------------------------------------------------------
 

@@ -7,14 +7,14 @@
 #
 ########################################################################################################################
 
-FROM ghcr.io/fixposition/fixposition-sdk:bookworm-base
+FROM ghcr.io/fixposition/fixposition-sdk:trixie-base
 
 # Metadata for github packages
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Bookworm image for Github CI jobs"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Trixie image for Github CI jobs"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 # Variables used in our Docker build and CI scripts
-ENV FPSDK_IMAGE=bookworm-ci
+ENV FPSDK_IMAGE=trixie-ci
 
 # Install pre-commit hooks (root user)
 COPY .pre-commit-config.yaml /tmp

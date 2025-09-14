@@ -8,7 +8,7 @@ on:
 jobs:
     # Note: job names should be unique across all workflows (e.g. to reference them as pull request checks)!
 
-    docker-fpsdk-bookworm:
+    docker-fpsdk-trixie:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -19,14 +19,27 @@ jobs:
                   registry: ghcr.io
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
-            - name: Build
+            # Build and push (!) one image after the other. E.g. we must build and push base before we can build ci, because it needs base (in the registry)
+            - name: Build and push (base)
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-bookworm-base build-bookworm-ci build-bookworm-dev build-bookworm-run
-            - name: Push
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-base
+                  docker compose push build-trixie-base
+            - name: Build and push (ci)
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-bookworm-base build-bookworm-ci build-bookworm-dev build-bookworm-run
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-ci
+                  docker compose push build-trixie-ci
+            - name: Build and push (dev)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-dev
+                  docker compose push build-trixie-dev
+            - name: Build and push (run)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-run
+                  docker compose push build-trixie-run
 
     docker-fpsdk-noetic:
         runs-on: ubuntu-latest
@@ -39,14 +52,28 @@ jobs:
                   registry: ghcr.io
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
-            - name: Build
+            # Build and push (!) one image after the other. E.g. we must build and push base before we can build ci, because it needs base (in the registry)
+            - name: Build and push (base)
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-noetic-base build-noetic-ci build-noetic-dev build-noetic-run
-            - name: Push
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-noetic-base
+                  docker compose push build-noetic-base
+            - name: Build and push (ci)
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-noetic-base build-noetic-ci build-noetic-dev build-noetic-run
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-noetic-ci
+                  docker compose push build-noetic-ci
+            - name: Build and push (dev)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-noetic-dev
+                  docker compose push build-noetic-dev
+            - name: Build and push (run)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-noetic-run
+                  docker compose push build-noetic-run
+
 
     docker-fpsdk-humble:
         runs-on: ubuntu-latest
@@ -59,14 +86,28 @@ jobs:
                   registry: ghcr.io
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
-            - name: Build
+            # Build and push (!) one image after the other. E.g. we must build and push base before we can build ci, because it needs base (in the registry)
+            - name: Build and push (base)
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-humble-base build-humble-ci build-humble-dev build-humble-run
-            - name: Push
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-humble-base
+                  docker compose push build-humble-base
+            - name: Build and push (ci)
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-humble-base build-humble-ci build-humble-dev build-humble-run build-humble-dev
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-humble-ci
+                  docker compose push build-humble-ci
+            - name: Build and push (dev)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-humble-dev
+                  docker compose push build-humble-dev
+            - name: Build and push (run)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-humble-run
+                  docker compose push build-humble-run
+
 
     docker-fpsdk-jazzy:
         runs-on: ubuntu-latest
@@ -79,19 +120,33 @@ jobs:
                   registry: ghcr.io
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
-            - name: Build
+            # Build and push (!) one image after the other. E.g. we must build and push base before we can build ci, because it needs base (in the registry)
+            - name: Build and push (base)
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-jazzy-base build-jazzy-ci build-jazzy-dev build-jazzy-run
-            - name: Push
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-jazzy-base
+                  docker compose push build-jazzy-base
+            - name: Build and push (ci)
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-jazzy-base build-jazzy-ci build-jazzy-dev build-jazzy-run
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-jazzy-ci
+                  docker compose push build-jazzy-ci
+            - name: Build and push (dev)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-jazzy-dev
+                  docker compose push build-jazzy-dev
+            - name: Build and push (run)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-jazzy-run
+                  docker compose push build-jazzy-run
+
 
     docker-fpsdk-cleanup:
         runs-on: ubuntu-latest
         needs:
-            - docker-fpsdk-bookworm
+            - docker-fpsdk-trixie
             - docker-fpsdk-noetic
             - docker-fpsdk-humble
             - docker-fpsdk-jazzy

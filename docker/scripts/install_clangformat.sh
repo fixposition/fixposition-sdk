@@ -14,9 +14,6 @@
 set -eEu
 
 case ${FPSDK_IMAGE} in
-    bookworm-*)
-        distro=bookworm
-        ;;
     humble-*)
         distro=jammy
         ;;
@@ -29,13 +26,13 @@ case ${FPSDK_IMAGE} in
 esac
 
 curl https://apt.llvm.org/llvm-snapshot.gpg.key > /etc/apt/trusted.gpg.d/llvm.asc
-echo "deb http://apt.llvm.org/${distro}/ llvm-toolchain-${distro}-17 main" > /etc/apt/sources.list.d/llvm.list
+echo "deb http://apt.llvm.org/${distro}/ llvm-toolchain-${distro}-19 main" > /etc/apt/sources.list.d/llvm.list
 export DEBIAN_FRONTEND=noninteractive
 apt-get -y update
 apt-get -y --no-install-recommends install \
-    clang-format-17
+    clang-format-19
 apt-get clean
-ln -s /usr/bin/clang-format-17 /usr/bin/clang-format
-ln -s /usr/bin/clang-format-diff-17 /usr/bin/clang-format-diff
+ln -s /usr/bin/clang-format-19 /usr/bin/clang-format
+ln -s /usr/bin/clang-format-diff-19 /usr/bin/clang-format-diff
 
 ########################################################################################################################

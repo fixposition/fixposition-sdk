@@ -13,71 +13,75 @@
 ########################################################################################################################
 set -eEu
 
-if [ "${FPSDK_IMAGE%-*}" = "bookworm" ]; then
-    echo deb http://deb.debian.org/debian           bookworm            main non-free contrib non-free-firmware  > /etc/apt/sources.list.d/debian.list
-    echo deb http://deb.debian.org/debian-security  bookworm-security   main non-free contrib non-free-firmware >> /etc/apt/sources.list.d/debian.list
-    echo deb http://deb.debian.org/debian           bookworm-backports  main non-free contrib non-free-firmware >> /etc/apt/sources.list.d/debian.list
-    echo deb http://deb.debian.org/debian           bookworm-updates    main non-free contrib non-free-firmware >> /etc/apt/sources.list.d/debian.list
+if [ "${FPSDK_IMAGE%-*}" = "trixie" ]; then
+    # TODO: use new .sources format
+    echo deb http://deb.debian.org/debian           trixie              main non-free contrib non-free-firmware  > /etc/apt/sources.list.d/debian.list
+    echo deb http://deb.debian.org/debian-security  trixie-security     main non-free contrib non-free-firmware >> /etc/apt/sources.list.d/debian.list
+    echo deb http://deb.debian.org/debian           trixie-backports    main non-free contrib non-free-firmware >> /etc/apt/sources.list.d/debian.list
+    echo deb http://deb.debian.org/debian           trixie-updates      main non-free contrib non-free-firmware >> /etc/apt/sources.list.d/debian.list
     rm /etc/apt/sources.list.d/debian.sources
 fi
 
 # List of packages, with filter for the different images we make
 packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
-    noetic.humble.jazzy.bookworm    ack
-    noetic.humble.jazzy.bookworm    aptitude
-    noetic.humble.jazzy.bookworm    bash-completion
-    noetic.humble.jazzy.bookworm    bind9-dnsutils
-    noetic.humble.jazzy.bookworm    bsdmainutils
-    noetic.humble.jazzy.bookworm    can-utils
-    noetic.humble.jazzy.bookworm    ccache
-    noetic.humble.jazzy.bookworm    chrpath
-    noetic.humble.jazzy.bookworm    curl
-    noetic.humble.jazzy.bookworm    dlocate
-    noetic.humble.jazzy.bookworm    evtest
-    noetic.humble.jazzy.bookworm    file
-    noetic.humble.jazzy.bookworm    flip
-    noetic.humble.jazzy.bookworm    gdb
-    noetic.humble.jazzy.bookworm    git-lfs
-    noetic.humble.jazzy.bookworm    htop
-    noetic.humble.jazzy.bookworm    iproute2
-    noetic.humble.jazzy.bookworm    iputils-ping
-    noetic.humble.jazzy.bookworm    less
-    noetic.humble.jazzy.bookworm    libboost-doc
-    noetic.humble.jazzy.bookworm    libevdev-dev
-    noetic.humble.jazzy.bookworm    libgpiod-dev
-    noetic.humble.jazzy.bookworm    libiio-dev
-    noetic.humble.jazzy.bookworm    libssl-doc
-    ....................bookworm    linux-perf
-    noetic.humble.jazzy.........    linux-tools-common                          # perf
-    noetic.humble.jazzy.bookworm    lsb-release
-    noetic.humble.jazzy.bookworm    man
-    noetic.humble.jazzy.bookworm    man-db
-    noetic.humble.jazzy.bookworm    manpages
-    noetic.humble.jazzy.bookworm    manpages
-    noetic.humble.jazzy.bookworm    manpages-dev
-    noetic.humble.jazzy.bookworm    manpages-dev
-    noetic.humble.jazzy.bookworm    manpages-posix
-    noetic.humble.jazzy.bookworm    manpages-posix-dev
-    noetic.humble.jazzy.bookworm    moreutils
-    noetic.humble.jazzy.bookworm    ncdu
-    noetic.humble.jazzy.bookwork    net-tools
-    noetic.humble...............    netcat
-    ..............jazzy.bookworm    netcat-openbsd
-    noetic.humble.jazzy.bookworm    openssh-client
-    noetic.humble.jazzy.bookworm    psmisc
-    noetic.humble.jazzy.bookworm    pv
-    noetic.humble.jazzy.bookworm    sl
-    noetic.humble.jazzy.bookworm    rsync
-    noetic.humble.jazzy.bookworm    socat
-    noetic.humble.jazzy.bookworm    strace
-    noetic.humble.jazzy.bookworm    systemd-journal-remote
-    noetic.humble.jazzy.bookworm    tcpdump
-    noetic.humble.jazzy.bookworm    tig
-    noetic.humble.jazzy.bookworm    valgrind
-    noetic.humble.jazzy.bookworm    vim
-    noetic.humble.jazzy.bookworm    wget
-    noetic.humble.jazzy.bookworm    xauth
-    noetic.humble.jazzy.bookworm    xxd
+    noetic.humble.jazzy.trixie      ack
+    noetic.humble.jazzy.trixie      aptitude
+    noetic.humble.jazzy.trixie      bash-completion
+    noetic.humble.jazzy.trixie      bind9-dnsutils
+    noetic.humble.jazzy.trixie      bsdmainutils
+    noetic.humble.jazzy.trixie      can-utils
+    noetic.humble.jazzy.trixie      ccache
+    noetic.humble.jazzy.trixie      chrpath
+    ....................trixie      clang-tools
+    ....................trixie      clang-tidy
+    ....................trixie      clangd
+    noetic.humble.jazzy.trixie      curl
+    noetic.humble.jazzy.trixie      dlocate
+    noetic.humble.jazzy.trixie      evtest
+    noetic.humble.jazzy.trixie      file
+    noetic.humble.jazzy.trixie      flip
+    noetic.humble.jazzy.trixie      gdb
+    noetic.humble.jazzy.trixie      git-lfs
+    noetic.humble.jazzy.trixie      htop
+    noetic.humble.jazzy.trixie      iproute2
+    noetic.humble.jazzy.trixie      iputils-ping
+    noetic.humble.jazzy.trixie      less
+    noetic.humble.jazzy.trixie      libboost-doc
+    noetic.humble.jazzy.trixie      libevdev-dev
+    noetic.humble.jazzy.trixie      libgpiod-dev
+    noetic.humble.jazzy.trixie      libiio-dev
+    noetic.humble.jazzy.trixie      libssl-doc
+    ....................trixie      linux-perf
+    noetic.humble.jazzy.......      linux-tools-common                          # perf
+    noetic.humble.jazzy.trixie      lsb-release
+    noetic.humble.jazzy.trixie      man
+    noetic.humble.jazzy.trixie      man-db
+    noetic.humble.jazzy.trixie      manpages
+    noetic.humble.jazzy.trixie      manpages
+    noetic.humble.jazzy.trixie      manpages-dev
+    noetic.humble.jazzy.trixie      manpages-dev
+    noetic.humble.jazzy.trixie      manpages-posix
+    noetic.humble.jazzy.trixie      manpages-posix-dev
+    noetic.humble.jazzy.trixie      moreutils
+    noetic.humble.jazzy.trixie      ncdu
+    noetic.humble.jazzy.trixie      net-tools
+    noetic.humble.............      netcat
+    ..............jazzy.trixie      netcat-openbsd
+    noetic.humble.jazzy.trixie      openssh-client
+    noetic.humble.jazzy.trixie      psmisc
+    noetic.humble.jazzy.trixie      pv
+    noetic.humble.jazzy.trixie      sl
+    noetic.humble.jazzy.trixie      rsync
+    noetic.humble.jazzy.trixie      socat
+    noetic.humble.jazzy.trixie      strace
+    noetic.humble.jazzy.trixie      systemd-journal-remote
+    noetic.humble.jazzy.trixie      tcpdump
+    noetic.humble.jazzy.trixie      tig
+    noetic.humble.jazzy.trixie      valgrind
+    noetic.humble.jazzy.trixie      vim
+    noetic.humble.jazzy.trixie      wget
+    noetic.humble.jazzy.trixie      xauth
+    noetic.humble.jazzy.trixie      xxd
 EOF
 )
 

@@ -500,14 +500,17 @@ function doxygen_release_ros2
 
 # Build stuff without ROS first
 echo "===== non-ROS builds ====="
-do_step pre_commit_check               || true # continue
+if [ "${FPSDK_IMAGE%-*}" = "trixie" ]; then
+    do_step pre_commit_check           || true # continue
+fi
 do_step build_toplevel_release_noros   || true # continue
 do_step test_toplevel_release_noros    || true # continue
 do_step build_toplevel_debug_noros     || true # continue
 do_step test_toplevel_debug_noros      || true # continue
 do_step build_projs_release_noros      || true # continue
-do_step doxygen_release_noros          || true # continue
-
+if [ "${FPSDK_IMAGE%-*}" = "trixie" ]; then
+    do_step doxygen_release_noros      || true # continue
+fi
 do_step build_toplevel_release_noros_mindeps   || true # continue
 do_step build_projs_release_noros_mindeps      || true # continue
 
@@ -527,7 +530,7 @@ if [ "${ROS_DISTRO}" = "noetic" ]; then
     do_step test_toplevel_debug_ros1      || true # continue
     do_step build_projs_release_ros1      || true # continue
     do_step build_catkin_release          || true # continue
-    do_step doxygen_release_ros1          || true # continue
+    #do_step doxygen_release_ros1          || true # continue
 
 # - Or ROS 2
 elif [ "${ROS_DISTRO}" = "humble" -o "${ROS_DISTRO}" = "jazzy" ]; then
@@ -542,7 +545,7 @@ elif [ "${ROS_DISTRO}" = "humble" -o "${ROS_DISTRO}" = "jazzy" ]; then
     do_step test_toplevel_debug_ros2      || true # continue
     do_step build_projs_release_ros2      || true # continue
     do_step build_colcon_release          || true # continue
-    do_step doxygen_release_ros2          || true # continue
+    #do_step doxygen_release_ros2          || true # continue
 fi
 
 ########################################################################################################################

@@ -1025,7 +1025,7 @@ static constexpr uint8_t     UBX_ESF_MEAS_V0_DATA_DATATYPE_GET(const uint32_t da
 static constexpr double      UBX_ESF_MEAS_V0_CALIBTTAG_SCALE                                        = 1e-3;  //!< @todo documentation
 static constexpr std::size_t UBX_ESF_MEAS_V0_SIZE(const uint8_t* msg)                               { return /* argh.. nice message design! */ \
     sizeof(UBX_ESF_MEAS_V0_GROUP0) + UBX_FRAME_SIZE + (UBX_ESF_MEAS_V0_FLAGS_NUMMEAS_GET(*((uint16_t *)&((uint8_t *)(msg))[UBX_HEAD_SIZE + 4])) * sizeof(UBX_ESF_MEAS_V0_GROUP1)) +
-    UBX_ESF_MEAS_V0_FLAGS_CALIBTTAGVALID(*((uint16_t *)&((uint8_t *)(msg))[UBX_HEAD_SIZE + 4])) ? sizeof(UBX_ESF_MEAS_V0_GROUP2) : 0; }  //!< @todo documentation
+    (UBX_ESF_MEAS_V0_FLAGS_CALIBTTAGVALID(*((uint16_t *)&((uint8_t *)(msg))[UBX_HEAD_SIZE + 4])) ? sizeof(UBX_ESF_MEAS_V0_GROUP2) : 0); }  //!< @todo documentation
 // clang-format on
 
 ///@}

@@ -16,10 +16,10 @@ LABEL org.opencontainers.image.source=https://github.com/fixposition
 # Variables used in our Docker build and CI scripts
 ENV FPSDK_IMAGE=jazzy-ci
 
-# Install pre-commit hooks (root user)
-COPY .pre-commit-config.yaml /tmp
-COPY docker/scripts/install_precommithooks.sh /tmp
-RUN /tmp/install_precommithooks.sh && rm -f /tmp/install_precommithooks.sh /tmp/.pre-commit-config.yaml
+# # Install pre-commit hooks (root user)
+# COPY .pre-commit-config.yaml /tmp
+# COPY docker/scripts/install_precommithooks.sh /tmp
+# RUN /tmp/install_precommithooks.sh && rm -f /tmp/install_precommithooks.sh /tmp/.pre-commit-config.yaml
 
 # Install useful stuff
 COPY docker/scripts/install_apt_ci.sh /tmp

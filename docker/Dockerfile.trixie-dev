@@ -7,14 +7,14 @@
 #
 ########################################################################################################################
 
-FROM ghcr.io/fixposition/fixposition-sdk:bookworm-base
+FROM ghcr.io/fixposition/fixposition-sdk:trixie-base
 
 # Metadata for github packages
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Bookworm image for vscode devcontainer"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Trixie image for vscode devcontainer"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 # Variables used in our Docker build and CI scripts
-ENV FPSDK_IMAGE=bookworm-dev
+ENV FPSDK_IMAGE=trixie-dev
 
 # Add user for devcontainer, see ../.devcontainer/devcontainer.json
 COPY docker/scripts/adduser_fpsdk.sh /tmp
