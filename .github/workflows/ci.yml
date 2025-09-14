@@ -110,7 +110,7 @@ jobs:
     ci-pages:
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/fixposition/fixposition-sdk:noetic-ci
+            image: ghcr.io/fixposition/fixposition-sdk:trixie-ci
         needs: # we build the documentation only if these are successful
             - ci-fpsdk-trixie
             - ci-fpsdk-noetic
@@ -128,7 +128,6 @@ jobs:
             - name: Build documentation
               shell: bash
               run: |
-                  source /opt/ros/${ROS_DISTRO}/setup.bash
                   echo "github.ref: ${{ github.ref }}"
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   buildname=doc-release
