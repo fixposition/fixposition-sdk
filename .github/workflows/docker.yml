@@ -19,14 +19,26 @@ jobs:
                   registry: ghcr.io
                   username: ${{ github.actor }}
                   password: ${{ secrets.GITHUB_TOKEN }}
-            - name: Build
+            - name: Build and push (base)
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-base build-trixie-ci build-trixie-dev build-trixie-run
-            - name: Push
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-base
+                  docker compose push build-trixie-base
+            - name: Build and push (ci)
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-trixie-base build-trixie-ci build-trixie-dev build-trixie-run
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-ci
+                  docker compose push build-trixie-ci
+            - name: Build and push (dev)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-dev
+                  docker compose push build-trixie-dev
+            - name: Build and push (run)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-run
+                  docker compose push build-trixie-run
 
     docker-fpsdk-noetic:
         runs-on: ubuntu-latest
