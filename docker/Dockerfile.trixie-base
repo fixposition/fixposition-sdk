@@ -7,32 +7,20 @@
 #
 ########################################################################################################################
 
-# Debian Bookworm (LTS until (at least) June 2026)
-FROM debian:bookworm
+# Debian 13 Trixie
+FROM debian:trixie
 
 # Metadata for github packages
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Bookworm base image with minimal stuff required to build"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Trixie base image with minimal stuff required to build"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 # Variables used in our Docker build and CI scripts
-ENV FPSDK_IMAGE=bookworm-base
+ENV FPSDK_IMAGE=trixie-base
 ENV ROS_DISTRO=
 
 # Install stuff
 COPY docker/scripts/install_apt_base.sh /tmp
 RUN /tmp/install_apt_base.sh && rm -f /tmp/install_apt_base.sh
-
-# Download, build and install clang-format
-COPY docker/scripts/install_clangformat.sh /tmp
-RUN /tmp/install_clangformat.sh && rm -f /tmp/install_clangformat.sh
-
-# Download, build and install capnp (not currently used, though)
-COPY docker/scripts/install_capnp.sh /tmp
-RUN /tmp/install_capnp.sh && rm -f /tmp/install_capnp.sh
-
-# Download, build and install PROJ
-COPY docker/scripts/install_proj.sh /tmp
-RUN /tmp/install_proj.sh && rm -f /tmp/install_proj.sh
 
 # Download, build and install Doxygen
 COPY docker/scripts/install_doxygen.sh /tmp
@@ -45,18 +33,6 @@ RUN /usr/sbin/ldconfig
 # can be tricky and we better prevent that from happening. It doesn't work for all packages, though. For example,
 # ROS packages insist on libgtest.
 COPY <<EOF /etc/apt/preferences.d/manually-built-and-installed
-Package: clang-format clang-format-13 clang-format-14 clang-format-15 clang-format-16
-Pin: origin *
-Pin-Priority: -1
-
-Package: capnproto libcapnp-* libcapnp-dev
-Pin: origin *
-Pin-Priority: -1
-
-Package: proj proj-ps-doc proj-data proj-rdnap proj-bin libproj15 libproj-dev
-Pin: origin *
-Pin-Priority: -1
-
 Package: doxygen doxygen-*
 Pin: origin *
 Pin-Priority: -1

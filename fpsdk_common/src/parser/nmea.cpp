@@ -1066,7 +1066,7 @@ bool NmeaGsvPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
 
         // Read the sat/sig and populate the AzEl and Cno arrays
         for (std::size_t field_offs = 3;
-             ok && ((int)field_offs < (3 + (num_sv * 4))) && ((field_offs + 3) < m.fields_.size()); field_offs += 4) {
+            ok && ((int)field_offs < (3 + (num_sv * 4))) && ((field_offs + 3) < m.fields_.size()); field_offs += 4) {
             NmeaSat sat;
             NmeaInt el;
             NmeaInt az;

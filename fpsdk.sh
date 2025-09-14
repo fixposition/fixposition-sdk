@@ -22,7 +22,7 @@ function main
 {
     # Get command line options
     OPTERR=1
-    local image=bookworm
+    local image=trixie
     local update=0
     local volume_args=
     local docker_args=
@@ -41,8 +41,8 @@ function main
                 echo "    -d          Enable debug output (of this script)"
                 echo "    -u          Update (pull) the necessary Docker <image>"
                 echo "    -t          Executes <command> with docker run --tty"
-                echo "    -i <image>  Specifies which Docker image to use (default: bookworm). Available images are:"
-                echo "                bookworm  -- Debian Bookworm (no ROS, some functionality not available)"
+                echo "    -i <image>  Specifies which Docker image to use (default: trixie). Available images are:"
+                echo "                trixie    -- Debian Trixie (no ROS, some functionality not available)"
                 echo "                noetic    -- ROS1 Noetic (additional ROS1 functionality available)"
                 echo "                humble    -- ROS2 Humble (additional ROS2 functionality available)"
                 echo "                jazzy     -- ROS2 Jazzy (additional ROS2 functionality available)"

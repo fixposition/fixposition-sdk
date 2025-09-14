@@ -500,7 +500,9 @@ function doxygen_release_ros2
 
 # Build stuff without ROS first
 echo "===== non-ROS builds ====="
-do_step pre_commit_check               || true # continue
+if [ "${FPSDK_IMAGE%-*}" = "trixie" ]; then
+    do_step pre_commit_check           || true # continue
+fi
 do_step build_toplevel_release_noros   || true # continue
 do_step test_toplevel_release_noros    || true # continue
 do_step build_toplevel_debug_noros     || true # continue

@@ -7,7 +7,7 @@
 #
 ########################################################################################################################
 
-# ROS Noetic (until May, 2025) base image (Ubuntu 20.04.6 LTS "Focal")
+# ROS Noetic (until May 2025) base image (Ubuntu 20.04.6 LTS "Focal")
 FROM ros:noetic-ros-base
 
 LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Noetic (Ubuntu 20.04) base image with minimal stuff required to build"
@@ -34,10 +34,6 @@ RUN /tmp/install_clangformat.sh && rm -f /tmp/install_clangformat.sh
 COPY docker/scripts/install_gtest.sh /tmp
 RUN /tmp/install_gtest.sh && rm -f /tmp/install_gtest.sh
 
-# Download, build and install capnp (not currently used, though)
-COPY docker/scripts/install_capnp.sh /tmp
-RUN /tmp/install_capnp.sh && rm -f /tmp/install_capnp.sh
-
 # Download, build and install PROJ
 COPY docker/scripts/install_proj.sh /tmp
 RUN /tmp/install_proj.sh && rm -f /tmp/install_proj.sh
@@ -58,10 +54,6 @@ RUN /usr/sbin/ldconfig
 # example, ros-noetic stuff insists on libgtest.
 COPY <<EOF /etc/apt/preferences.d/manually-built-and-installed
 Package: clang-format clang-format-6.0 clang-format-7 clang-format-8 clang-format-9 clang-format-10 clang-format-11 clang-format-12
-Pin: origin *
-Pin-Priority: -1
-
-Package: capnproto libcapnp-* libcapnp-dev
 Pin: origin *
 Pin-Priority: -1
 

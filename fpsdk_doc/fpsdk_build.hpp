@@ -36,7 +36,7 @@ namespace fpsdk {
 
     For building the libraries and apps:
 
-    - **Linux**, GCC (C++-17), glibc, cmake, bash, etc. (tested with Ubuntu 20.04/22.04/24.04 and Debian Bookworm)
+    - **Linux**, GCC (C++-17), glibc, cmake, bash, etc. (tested with Ubuntu 20.04/22.04/24.04 and Debian Trixie)
     - boost            (≥ 1.71.0, tested with 1.71.0, 1.74.1, 1.83.0)
     - curl             (≥ 7.68.0, tested with 7.68.0, 7.88.1, 8.5.0)
     - Eigen3           (≥ 3.3.7,  tested with 3.3.7, 3.4.0)
@@ -45,7 +45,7 @@ namespace fpsdk {
     - OpenSSL (libssl) (≥ 1.1.x,  tested with 1.1.1, 3.0.2, 3.0.13, 3.0.15)
     - nlohmann-json3   (≥ 3.7.3,  tested with 3.7.3, 3.11.3)
     - Various Linux tools, including Bash, CMake, make, xxd, sed, awk, ...
-    - PROJ         (*) (≥ 9.4.x,  tested with 9.4.0, 9.4.1)
+    - PROJ         (*) (≥ 9.4.x,  tested with 9.4.1, 9.6.0)
     - ROS1         (*) (Noetic), or
     - ROS2         (*) (Humble or Jazzy)
 
@@ -53,7 +53,7 @@ namespace fpsdk {
 
     For development additionally:
 
-    - clang-format (≥ 17, tested with 17)
+    - clang-format (≥ 19, tested with 19)
     - Doxygen      (≥ 1.11.0, tested with 1.11.0)
     - GTest        (≥ 1.12.0, tested with 1.12.1 and 1.13.0)
 
@@ -120,8 +120,8 @@ namespace fpsdk {
 
     This details the manual setup of the dependencies and building the SDK on a ROS1 system (for example, Ubuntu 20.04
     with ROS Noetic). It works similarly for ROS2 (for example, Ubuntu 22.04 with ROS Humble) or non-ROS (for example,
-    Debian Bookworm) based systems. Refer to the Docker configration files and scripts in the docker/ folder on
-    installing the required dependencies.
+    Debian Trixie) based systems. Refer to the Docker configration files and scripts in the docker/ folder on installing
+    the required dependencies.
 
     1. Setup build system, install dependencies
 

@@ -8,7 +8,7 @@ on:
 jobs:
     # Note: job names should be unique across all workflows (e.g. to reference them as pull request checks)!
 
-    docker-fpsdk-bookworm:
+    docker-fpsdk-trixie:
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -22,11 +22,11 @@ jobs:
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-bookworm-base build-bookworm-ci build-bookworm-dev build-bookworm-run
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-base build-trixie-ci build-trixie-dev build-trixie-run
             - name: Push
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-bookworm-base build-bookworm-ci build-bookworm-dev build-bookworm-run
+                  docker compose push build-trixie-base build-trixie-ci build-trixie-dev build-trixie-run
 
     docker-fpsdk-noetic:
         runs-on: ubuntu-latest
@@ -91,7 +91,7 @@ jobs:
     docker-fpsdk-cleanup:
         runs-on: ubuntu-latest
         needs:
-            - docker-fpsdk-bookworm
+            - docker-fpsdk-trixie
             - docker-fpsdk-noetic
             - docker-fpsdk-humble
             - docker-fpsdk-jazzy

@@ -7,14 +7,14 @@
 #
 ########################################################################################################################
 
-FROM ghcr.io/fixposition/fixposition-sdk:bookworm-base
+FROM ghcr.io/fixposition/fixposition-sdk:trixie-base
 
 # Metadata for github packages
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Bookworm image with pre-built binaries"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Trixie image with pre-built binaries"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 # Variables used in our Docker build and CI scripts
-ENV FPSDK_IMAGE=bookworm-run
+ENV FPSDK_IMAGE=trixie-run
 
 # Install useful stuff
 COPY docker/scripts/install_apt_run.sh /tmp

@@ -15,7 +15,7 @@ set -eEu
 
 # List of packages, with filter for the different images we make
 packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
-    noetic.humble.jazzy.bookworm    rsync
+    noetic.humble.jazzy.trixie      rsync
 EOF
 )
 

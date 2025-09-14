@@ -13,34 +13,34 @@ services:
 
     # ----- no ROS -----------------------------------------------------------------------------------------------------
 
-    build-bookworm-base:
-        image: ghcr.io/fixposition/fixposition-sdk:bookworm-base
+    build-trixie-base:
+        image: ghcr.io/fixposition/fixposition-sdk:trixie-base
         build:
             context: ..
-            dockerfile: docker/Dockerfile.bookworm-base
-    build-bookworm-ci:
-        image: ghcr.io/fixposition/fixposition-sdk:bookworm-ci
+            dockerfile: docker/Dockerfile.trixie-base
+    build-trixie-ci:
+        image: ghcr.io/fixposition/fixposition-sdk:trixie-ci
         build:
             context: ..
-            dockerfile: docker/Dockerfile.bookworm-ci
+            dockerfile: docker/Dockerfile.trixie-ci
         depends_on:
-            - build-bookworm-base
-    build-bookworm-dev:
-        image: ghcr.io/fixposition/fixposition-sdk:bookworm-dev
+            - build-trixie-base
+    build-trixie-dev:
+        image: ghcr.io/fixposition/fixposition-sdk:trixie-dev
         build:
             context: ..
-            dockerfile: docker/Dockerfile.bookworm-dev
+            dockerfile: docker/Dockerfile.trixie-dev
         depends_on:
-            - build-bookworm-base
+            - build-trixie-base
 
-    bookworm-base:
-        image: ghcr.io/fixposition/fixposition-sdk:bookworm-base
+    trixie-base:
+        image: ghcr.io/fixposition/fixposition-sdk:trixie-base
         command: tail -f
-    bookworm-ci:
-        image: ghcr.io/fixposition/fixposition-sdk:bookworm-ci
+    trixie-ci:
+        image: ghcr.io/fixposition/fixposition-sdk:trixie-ci
         command: tail -f
-    bookworm-dev:
-        image: ghcr.io/fixposition/fixposition-sdk:bookworm-dev
+    trixie-dev:
+        image: ghcr.io/fixposition/fixposition-sdk:trixie-dev
         volumes:
             # Bash config
             - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
@@ -52,7 +52,7 @@ services:
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
           - SYS_PTRACE # Set kernel.yama.ptrace_scope = 0 in /etc/sysctl.d/10-ptrace.conf
-        hostname: fpsdk-bookworm-dev-${USER}
+        hostname: fpsdk-trixie-dev-${USER}
         # Apparently required... (so that the container doesn't kill itself?)
         command: tail -f
 
@@ -189,15 +189,15 @@ services:
 
     # ----- containers to run pre-built apps ---------------------------------------------------------------------------
 
-    build-bookworm-run:
-        image: ghcr.io/fixposition/fixposition-sdk:bookworm-run
+    build-trixie-run:
+        image: ghcr.io/fixposition/fixposition-sdk:trixie-run
         build:
             context: ..
-            dockerfile: docker/Dockerfile.bookworm-run
+            dockerfile: docker/Dockerfile.trixie-run
         depends_on:
-            - bookworm-base
-    bookworm-run:
-        image: ghcr.io/fixposition/fixposition-sdk:bookworm-run
+            - trixie-base
+    trixie-run:
+        image: ghcr.io/fixposition/fixposition-sdk:trixie-run
         command: tail -f
 
     build-noetic-run:
