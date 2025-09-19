@@ -80,7 +80,7 @@
  *     // Run parser and print message name and size to the screen
  *     while (parser.Process(msg)) {
  *         msg.MakeInfo();  // Try to populate msg.info_
- *         INFO("Message %s, size %d (%s)", msg.name_.c_str(), (int)msg.data_.size(), msg.info_.c_str());
+ *         INFO("Message %s, size %d (%s)", msg.name_.c_str(), (int)msg.Size(), msg.info_.c_str());
  *     }
  * }
  *
@@ -88,7 +88,7 @@
  * // If there is anytghing, we should see only type OTHER "messages" here.
  * while (parser.Flush(msg)) {
  *     msg.MakeInfo();
- *     INFO("Message %s, size %d", msg.name_.c_str(), (int)msg.data_.size(), msg.info_.c_str());
+ *     INFO("Message %s, size %d", msg.name_.c_str(), (int)msg.Size(), msg.info_.c_str());
  * }
  * @endcode
  *

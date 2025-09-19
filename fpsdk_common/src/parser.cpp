@@ -264,8 +264,8 @@ void Parser::EmitMessage(ParserMsg& msg, const std::size_t size, const Protocol 
     msg.proto_ = proto;
     msg.info_.clear();
     char sname[MAX_NAME_SIZE];
-    const uint8_t* mdata = msg.data_.data();
-    const std::size_t msize = msg.data_.size();
+    const uint8_t* mdata = msg.Data();
+    const std::size_t msize = msg.Size();
     switch (proto) {  // clang-format off
         case Protocol::FP_A:  // Handled in case Protocol::NMEA below                                                   // GCOVR_EXCL_LINE
             break;                                                                                                      // GCOVR_EXCL_LINE
@@ -301,7 +301,7 @@ void Parser::EmitMessage(ParserMsg& msg, const std::size_t size, const Protocol 
 
     stats_.Update(msg);
     msg.seq_ = stats_.n_msgs_;
-    PARSER_TRACE("process: emit %s, size %d", msg.name_.c_str(), (int)msg.data_.size());
+    PARSER_TRACE("process: emit %s, size %d", msg.name_.c_str(), (int)msg.Size());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -327,7 +327,7 @@ void Parser::EmitGarbage(ParserMsg& msg)
     stats_.Update(msg);
     msg.seq_ = stats_.n_msgs_;
 
-    PARSER_TRACE("process: emit %s, size %d ", msg.name_.c_str(), (int)msg.data_.size());
+    PARSER_TRACE("process: emit %s, size %d ", msg.name_.c_str(), (int)msg.Size());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

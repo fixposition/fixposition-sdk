@@ -9,7 +9,7 @@
 
 FROM ghcr.io/fixposition/fixposition-sdk:noetic-base
 
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Noetic (Ubuntu 20.04) image for vscode devcontainer"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Noetic (Ubuntu 20.04 Focal) image for vscode devcontainer"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 ENV FPSDK_IMAGE=noetic-dev

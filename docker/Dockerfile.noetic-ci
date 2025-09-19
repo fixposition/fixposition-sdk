@@ -10,7 +10,7 @@
 FROM ghcr.io/fixposition/fixposition-sdk:noetic-base
 
 # Metadata for github packages
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Noetic (Ubuntu 20.04) base image for Github CI jobs"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Noetic (Ubuntu 20.04 Focal) base image for Github CI jobs"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 # Variables used in our Docker build and CI scripts

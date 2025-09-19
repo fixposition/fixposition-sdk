@@ -69,6 +69,8 @@ constexpr inline T RadToDeg(T radians)
  */
 struct DegMinSec
 {
+    DegMinSec() = default;  //!< Default ctor
+
     /**
      * @brief Set from fractional degrees
      *

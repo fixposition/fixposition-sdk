@@ -1,5 +1,6 @@
 #ifndef _DOXYGEN_
 // clang-format off
+// NOLINTBEGIN
 /*
  * A C++ I/O streams interface to the zlib gz* functions
  *
@@ -480,3 +481,4 @@ gzofstream::close()
     this->setstate(std::ios_base::failbit);
 }
 #endif // !_DOXYGEN_
+// NOLINTEND

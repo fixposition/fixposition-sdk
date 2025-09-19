@@ -117,7 +117,7 @@ TEST(ParserFpbTest, FpbMakeMessage)
         parser.Add(msg);
         ParserMsg parser_msg;
         EXPECT_TRUE(parser.Process(parser_msg));
-        EXPECT_EQ(parser_msg.data_.size(), FP_B_FRAME_SIZE + payload.size());
+        EXPECT_EQ(parser_msg.Size(), FP_B_FRAME_SIZE + payload.size());
         EXPECT_EQ(std::string(parser_msg.name_), std::string("FP_B-UNITTEST2"));
         // Payload should be the same
         EXPECT_TRUE(std::memcmp(payload.data(), &parser_msg.data_[FP_B_HEAD_SIZE], payload.size()) == 0);

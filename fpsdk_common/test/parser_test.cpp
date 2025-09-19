@@ -125,11 +125,11 @@ class ParserTest : public ::testing::Test
         std::size_t size = 0;
         while (parser.Process(msg)) {
             EXPECT_EQ(std::string(msg.name_), std::string("OTHER"));
-            size += msg.data_.size();
+            size += msg.Size();
         }
         while (parser.Flush(msg)) {
             EXPECT_EQ(std::string(msg.name_), std::string("OTHER"));
-            size += msg.data_.size();
+            size += msg.Size();
         }
         EXPECT_EQ(size, data.size());
     }
@@ -177,7 +177,7 @@ TEST_F(ParserTest, Parser)
     EXPECT_FALSE(parser.Process(msg));
     EXPECT_TRUE(parser.Add(garbage1));
     EXPECT_TRUE(parser.Process(msg));
-    EXPECT_EQ(std::vector<uint8_t>(msg.data_.data(), msg.data_.data() + garbage2.size()), garbage2);
+    EXPECT_EQ(std::vector<uint8_t>(msg.Data(), msg.Data() + garbage2.size()), garbage2);
     EXPECT_EQ(
         std::vector<uint8_t>(&msg.data_[garbage2.size()], &msg.data_[garbage2.size()] + garbage1.size()), garbage1);
 
@@ -561,7 +561,7 @@ TEST_F(ParserTest, IncompleteMsg)
         EXPECT_TRUE(parser.Add(data, sizeof(data) - 1));
         EXPECT_FALSE(parser.Process(msg));
         EXPECT_TRUE(parser.Flush(msg));
-        EXPECT_EQ(msg.data_.size(), sizeof(data) - 1);
+        EXPECT_EQ(msg.Size(), sizeof(data) - 1);
     }
 }
 

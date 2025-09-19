@@ -74,6 +74,9 @@ else()
     endif()
 endif()
 
+fpsdk_save_versions(FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_versions.txt
+    PACKAGES CMAKE Boost yaml-cpp ZLIB Eigen3 nlohmann_json OpenSSL PROJ)
+
 
 # SHARED LIBRARY =======================================================================================================
 

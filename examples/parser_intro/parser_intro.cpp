@@ -144,8 +144,8 @@ int main(int /*argc*/, char** /*argv*/)
     // documentation.
     ParserMsg msg;
     while (parser.Process(msg)) {
-        INFO("Message %-20s (size %" PRIuMAX " bytes)", msg.name_.c_str(), msg.data_.size());
-        // DEBUG_HEXDUMP(msg.data_.data(), msg.data_.size(), NULL, NULL);  // Hexdump of the raw message data
+        INFO("Message %-20s (size %" PRIuMAX " bytes)", msg.name_.c_str(), msg.Size());
+        // DEBUG_HEXDUMP(msg.Data(), msg.Size(), NULL, NULL);  // Hexdump of the raw message data
     }
     // This should print the following output:
     //
@@ -182,8 +182,8 @@ int main(int /*argc*/, char** /*argv*/)
         WARNING("Parser overflow, SAMPLE_DATA_2 is too large!");
     }
     while (parser.Process(msg)) {
-        INFO("Message %-20s (size %" PRIuMAX " bytes)", msg.name_.c_str(), msg.data_.size());
-        // DEBUG_HEXDUMP(msg.data_.data(), msg.data_.size(), NULL, NULL);  // Hexdump of the raw message data
+        INFO("Message %-20s (size %" PRIuMAX " bytes)", msg.name_.c_str(), msg.Size());
+        // DEBUG_HEXDUMP(msg.Data(), msg.Size(), NULL, NULL);  // Hexdump of the raw message data
     }
     // This should print the following output:
     //
@@ -205,8 +205,8 @@ int main(int /*argc*/, char** /*argv*/)
     // a valid message:
     INFO("Flushing parser");
     while (parser.Flush(msg)) {
-        INFO("Message %-20s (size %" PRIuMAX " bytes)", msg.name_.c_str(), msg.data_.size());
-        DEBUG_HEXDUMP(msg.data_.data(), msg.data_.size(), NULL, NULL);
+        INFO("Message %-20s (size %" PRIuMAX " bytes)", msg.name_.c_str(), msg.Size());
+        DEBUG_HEXDUMP(msg.Data(), msg.Size(), NULL, NULL);
     }
     // This should print:
     //
@@ -237,10 +237,10 @@ int main(int /*argc*/, char** /*argv*/)
     while (parser.Process(msg)) {
         // Is it a FP_A-ODOMETRY?
         if (msg.name_ == FpaOdometryPayload::MSG_NAME) {
-            INFO("Message %-20s (size %" PRIuMAX " bytes)", msg.name_.c_str(), msg.data_.size());
+            INFO("Message %-20s (size %" PRIuMAX " bytes)", msg.name_.c_str(), msg.Size());
             // We can now try to decode it
             FpaOdometryPayload payload;
-            if (payload.SetFromMsg(msg.data_.data(), msg.data_.size())) {
+            if (payload.SetFromMsg(msg.Data(), msg.Size())) {
                 INFO("Decode OK");
             }
             // Decoding failed
@@ -289,11 +289,11 @@ int main(int /*argc*/, char** /*argv*/)
         }
         // Ignore invalid FP_A-ODOMETRY messages
         FpaOdometryPayload payload;
-        if (!payload.SetFromMsg(msg.data_.data(), msg.data_.size())) {
+        if (!payload.SetFromMsg(msg.Data(), msg.Size())) {
             continue;
         }
 
-        INFO("Message %-20s (size %" PRIuMAX " bytes)", msg.name_.c_str(), msg.data_.size());
+        INFO("Message %-20s (size %" PRIuMAX " bytes)", msg.name_.c_str(), msg.Size());
 
         // Some the message fields are optional and in principle any field can be a "null" (empty) field. It is highly
         // recommended to *always* check if the desired fields are valid.

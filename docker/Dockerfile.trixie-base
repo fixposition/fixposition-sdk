@@ -11,7 +11,7 @@
 FROM debian:trixie
 
 # Metadata for github packages
-LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Trixie base image with minimal stuff required to build"
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: Debian Trixie 13 base image with minimal stuff required to build"
 LABEL org.opencontainers.image.source=https://github.com/fixposition
 
 # Variables used in our Docker build and CI scripts
