@@ -12,6 +12,7 @@
  */
 
 /* LIBC/STL */
+#include <cstring>
 #include <string>
 
 /* EXTERNAL */
@@ -32,7 +33,7 @@ TEST(ParserFpaTest, FpaGetMessageMeta)
         //                     TTTTTTTT V PPPPPPPPPPP
         const char* msg = "$FP,ODOMETRY,1,...,...,...*xx\r\n";
         FpaMessageMeta meta;
-        EXPECT_TRUE(FpaGetMessageMeta(meta, (const uint8_t*)msg, strlen(msg))) << msg;
+        EXPECT_TRUE(FpaGetMessageMeta(meta, (const uint8_t*)msg, std::strlen(msg))) << msg;
         EXPECT_EQ(std::string(meta.msg_type_), std::string("ODOMETRY")) << msg;
         EXPECT_EQ(meta.msg_version_, 1) << msg;
         EXPECT_EQ(meta.payload_ix0_, 15) << msg;
@@ -43,7 +44,7 @@ TEST(ParserFpaTest, FpaGetMessageMeta)
         //                     TTTTTTTT V
         const char* msg = "$FP,ODOMETRY,1*xx\r\n";
         FpaMessageMeta meta;
-        EXPECT_TRUE(FpaGetMessageMeta(meta, (const uint8_t*)msg, strlen(msg))) << msg;
+        EXPECT_TRUE(FpaGetMessageMeta(meta, (const uint8_t*)msg, std::strlen(msg))) << msg;
         EXPECT_EQ(std::string(meta.msg_type_), std::string("ODOMETRY")) << msg;
         EXPECT_EQ(meta.msg_version_, 1) << msg;
         EXPECT_EQ(meta.payload_ix0_, 0) << msg;
@@ -54,7 +55,7 @@ TEST(ParserFpaTest, FpaGetMessageMeta)
         //                     TTTTTTTT
         const char* msg = "$FP,ODOMETRY*xx\r\n";
         FpaMessageMeta meta;
-        EXPECT_TRUE(FpaGetMessageMeta(meta, (const uint8_t*)msg, strlen(msg))) << msg;
+        EXPECT_TRUE(FpaGetMessageMeta(meta, (const uint8_t*)msg, std::strlen(msg))) << msg;
         EXPECT_EQ(std::string(meta.msg_type_), std::string("ODOMETRY")) << msg;
         EXPECT_LT(meta.msg_version_, 0) << msg;
         EXPECT_EQ(meta.payload_ix0_, 0) << msg;
@@ -65,7 +66,7 @@ TEST(ParserFpaTest, FpaGetMessageMeta)
         //                     TTTTTTTT
         const char* msg = "$FP,ODOMETRY,*xx\r\n";
         FpaMessageMeta meta;
-        EXPECT_TRUE(FpaGetMessageMeta(meta, (const uint8_t*)msg, strlen(msg))) << msg;
+        EXPECT_TRUE(FpaGetMessageMeta(meta, (const uint8_t*)msg, std::strlen(msg))) << msg;
         EXPECT_EQ(std::string(meta.msg_type_), std::string("ODOMETRY")) << msg;
         EXPECT_LT(meta.msg_version_, 0) << msg;
         EXPECT_EQ(meta.payload_ix0_, 0) << msg;
@@ -76,7 +77,7 @@ TEST(ParserFpaTest, FpaGetMessageMeta)
         //                     TTTTTTTT
         const char* msg = "$FP,ODOMETRY,notanumber*xx\r\n";
         FpaMessageMeta meta;
-        EXPECT_TRUE(FpaGetMessageMeta(meta, (const uint8_t*)msg, strlen(msg))) << msg;
+        EXPECT_TRUE(FpaGetMessageMeta(meta, (const uint8_t*)msg, std::strlen(msg))) << msg;
         EXPECT_EQ(std::string(meta.msg_type_), std::string("ODOMETRY")) << msg;
         EXPECT_LT(meta.msg_version_, 0) << msg;
         EXPECT_EQ(meta.payload_ix0_, 13) << msg;
@@ -94,12 +95,12 @@ TEST(ParserFpaTest, FpaGetMessageMeta)
     {
         const char* msg = "$ABCDEFGHIJKLMNOP";
         FpaMessageMeta meta;
-        EXPECT_FALSE(FpaGetMessageMeta(meta, (const uint8_t*)msg, strlen(msg)));
+        EXPECT_FALSE(FpaGetMessageMeta(meta, (const uint8_t*)msg, std::strlen(msg)));
     }
     {
         const char* msg = "$GNABCDEFGHIJKLMNOPQRSTUVW,123,456,789*xx\r\n";
         FpaMessageMeta meta;
-        EXPECT_FALSE(FpaGetMessageMeta(meta, (const uint8_t*)msg, strlen(msg))) << msg;
+        EXPECT_FALSE(FpaGetMessageMeta(meta, (const uint8_t*)msg, std::strlen(msg))) << msg;
         EXPECT_EQ(std::string(meta.msg_type_), std::string("")) << msg;
         EXPECT_EQ(meta.msg_version_, 0) << msg;
         EXPECT_EQ(meta.payload_ix0_, 0) << msg;
@@ -114,19 +115,19 @@ TEST(ParserFpaTest, FpaGetMessageName)
     {
         const char* msg = "$FP,ODOMETRY,1,...,...,...*xx\r\n";
         char name[100];
-        EXPECT_TRUE(FpaGetMessageName(name, sizeof(name), (const uint8_t*)msg, strlen(msg))) << msg;
+        EXPECT_TRUE(FpaGetMessageName(name, sizeof(name), (const uint8_t*)msg, std::strlen(msg))) << msg;
         EXPECT_EQ(std::string(name), std::string("FP_A-ODOMETRY")) << msg;
     }
     {
         const char* msg = "$FP,ODOMETRY,1*xx\r\n";
         char name[100];
-        EXPECT_TRUE(FpaGetMessageName(name, sizeof(name), (const uint8_t*)msg, strlen(msg))) << msg;
+        EXPECT_TRUE(FpaGetMessageName(name, sizeof(name), (const uint8_t*)msg, std::strlen(msg))) << msg;
         EXPECT_EQ(std::string(name), std::string("FP_A-ODOMETRY")) << msg;
     }
     {
         const char* msg = "$FP,ODOMETRY,X*xx\r\n";  // Bad msg_version
         char name[100];
-        EXPECT_TRUE(FpaGetMessageName(name, sizeof(name), (const uint8_t*)msg, strlen(msg))) << msg;
+        EXPECT_TRUE(FpaGetMessageName(name, sizeof(name), (const uint8_t*)msg, std::strlen(msg))) << msg;
         EXPECT_EQ(std::string(name), std::string("FP_A-ODOMETRY")) << msg;
     }
     // Bad input
@@ -188,8 +189,9 @@ TEST(ParserFpaTest, FpaEoePayload)
     {
         FpaEoePayload payload;
         const char* msg = "$FP,EOE,1,2322,309663.800000,FUSION*62\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::EOE);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2322);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -199,8 +201,9 @@ TEST(ParserFpaTest, FpaEoePayload)
     {
         FpaEoePayload payload;
         const char* msg = "$FP,EOE,1,,,GNSS1*7C\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::EOE);
         EXPECT_FALSE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 0);
         EXPECT_FALSE(payload.gps_time.tow.valid);
@@ -210,8 +213,9 @@ TEST(ParserFpaTest, FpaEoePayload)
     {
         FpaEoePayload payload;
         const char* msg = "$FP,EOE,1,,,CHABIS*XX\r\n";
-        EXPECT_FALSE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_FALSE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_FALSE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::EOE);
         EXPECT_FALSE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 0);
         EXPECT_FALSE(payload.gps_time.tow.valid);
@@ -227,8 +231,9 @@ TEST(ParserFpaTest, FpaGnssantPayload)
     {
         FpaGnssantPayload payload;
         const char* msg = "$FP,GNSSANT,1,2234,305129.200151,short,off,0,open,on,28*65\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::GNSSANT);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2234);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -245,8 +250,9 @@ TEST(ParserFpaTest, FpaGnssantPayload)
     {
         FpaGnssantPayload payload;
         const char* msg = "$FP,GNSSANT,1,,,,,,,,*XX\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::GNSSANT);
         EXPECT_FALSE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 0);
         EXPECT_FALSE(payload.gps_time.tow.valid);
@@ -270,8 +276,9 @@ TEST(ParserFpaTest, FpaGnsscorrPayload)
         FpaGnsscorrPayload payload;
         const char* msg =  // clang-format off
             "$FP,GNSSCORR,1,2237,250035.999865,8,25,18,8,25,18,0.2,1.0,0.8,5.3,2,47.366986804,8.532965023,481.1094,7254*3F\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::GNSSCORR);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2237);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -306,13 +313,13 @@ TEST(ParserFpaTest, FpaGnsscorrPayload)
     {
         FpaGnsscorrPayload payload;
         const char* msg = "$FP,GNSSCORR,1,2237,250548.999744,8,25,18,8,25,18,,,,,,,,,*24\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_TRUE(payload.gps_time.week.valid);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::GNSSCORR);
         EXPECT_EQ(payload.gps_time.week.value, 2237);
         EXPECT_TRUE(payload.gps_time.tow.valid);
         EXPECT_NEAR(payload.gps_time.tow.value, 250548.999744, 1e-9);
-
         EXPECT_EQ(payload.gnss1_fix, FpaGnssFix::RTK_FIXED);
         EXPECT_TRUE(payload.gnss1_nsig_l1.valid);
         EXPECT_EQ(payload.gnss1_nsig_l1.value, 25);
@@ -351,8 +358,9 @@ TEST(ParserFpaTest, FpaRawimuPayload)
         FpaRawimuPayload payload;
         const char* msg =  // clang-format off
             "$FP,RAWIMU,1,2197,126191.777855,-0.199914,0.472851,9.917973,0.023436,0.007723,0.002131*34\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::RAWIMU);
         EXPECT_EQ(payload.which, FpaImuPayload::Which::RAWIMU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2197);
@@ -373,8 +381,9 @@ TEST(ParserFpaTest, FpaRawimuPayload)
         FpaRawimuPayload payload;
         const char* msg =  // clang-format off
             "$FP,RAWIMU,1,,,,,,,,*XX\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::RAWIMU);
         EXPECT_EQ(payload.which, FpaImuPayload::Which::RAWIMU);
         EXPECT_FALSE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 0);
@@ -396,8 +405,9 @@ TEST(ParserFpaTest, FpaRawimuPayload)
         FpaRawimuPayload payload;
         const char* msg =  // clang-format off
             "$FP,RAWIMU,2,2368,228734.073983,-0.118514,-0.082600,9.894035,0.014381,0.004794,-0.003196,0,1,*1C\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::RAWIMU);
         EXPECT_EQ(payload.which, FpaImuPayload::Which::RAWIMU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2368);
@@ -425,8 +435,9 @@ TEST(ParserFpaTest, FpaCorrimuPayload)
         FpaCorrimuPayload payload;
         const char* msg =  // clang-format off
             "$FP,CORRIMU,1,2197,126191.777855,-0.195224,0.393969,9.869998,0.013342,-0.004620,-0.000728*7D\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::CORRIMU);
         EXPECT_EQ(payload.which, FpaImuPayload::Which::CORRIMU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2197);
@@ -445,8 +456,9 @@ TEST(ParserFpaTest, FpaCorrimuPayload)
         FpaCorrimuPayload payload;
         const char* msg =  // clang-format off
             "$FP,CORRIMU,1,,,,,,,,*XX\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::CORRIMU);
         EXPECT_EQ(payload.which, FpaImuPayload::Which::CORRIMU);
         EXPECT_FALSE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 0);
@@ -466,8 +478,9 @@ TEST(ParserFpaTest, FpaCorrimuPayload)
         FpaCorrimuPayload payload;
         const char* msg =  // clang-format off
             "$FP,CORRIMU,2,2368,228734.073983,-0.102908,-0.096532,9.732782,0.002208,0.001499,-0.001206,1,1,*54\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::CORRIMU);
         EXPECT_EQ(payload.which, FpaImuPayload::Which::CORRIMU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2368);
@@ -494,8 +507,9 @@ TEST(ParserFpaTest, FpaImubiasPayload)
         FpaImubiasPayload payload;
         const char* msg =  // clang-format off
             "$FP,IMUBIAS,1,2342,321247.000000,2,1,1,3,0.008914,0.019806,0.150631,0.027202,0.010599,0.011393,0.00001,0.00001,0.00001,0.00001,0.00001,0.00001*4C\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::IMUBIAS);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2342);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -524,8 +538,9 @@ TEST(ParserFpaTest, FpaImubiasPayload)
     {
         FpaImubiasPayload payload;
         const char* msg = "$FP,IMUBIAS,1,2342,323844.000000,,,,,,,,,,,,,,,,*4C\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::IMUBIAS);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2342);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -561,8 +576,9 @@ TEST(ParserFpaTest, FpaLlhPayload)
         FpaLlhPayload payload;
         const char* msg =  // clang-format off
             "$FP,LLH,1,2231,227563.250000,47.392357470,8.448121451,473.5857,0.04533,0.03363,0.02884,0.00417,0.00086,-0.00136*62\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::LLH);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2231);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -582,8 +598,9 @@ TEST(ParserFpaTest, FpaLlhPayload)
     {
         FpaLlhPayload payload;
         const char* msg = "$FP,LLH,1,2231,227563.250000,,,,,,,,,*XX\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::LLH);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2231);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -613,8 +630,9 @@ TEST(ParserFpaTest, FpaOdometryPayload)
             "-17.1078,-0.0526,-0.3252,0.02245,0.00275,0.10369,-1.0385,-1.3707,9.8249,4,1,8,8,1,"
             "0.01761,0.02274,0.01713,-0.00818,0.00235,0.00129,0.00013,0.00015,0.00014,-0.00001,0.00001,0.00002,"
             "0.03482,0.06244,0.05480,0.00096,0.00509,0.00054,fp_release_vr2_2.54.0_160*4F\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::ODOMETRY);
         EXPECT_EQ(payload.which, FpaOdomPayload::Which::ODOMETRY);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2231);
@@ -682,8 +700,9 @@ TEST(ParserFpaTest, FpaOdomenuPayload)
             "-1.6994,-0.0222,0.20063,0.08621,-1.21972,-3.6947,-3.3827,9.7482,4,1,8,8,1,0.00415,0.00946,0.00746,"
             "-0.00149,-0.00084,0.00025,0.00003,0.00003,0.00012,0.00000,0.00000,0.00000,0.01742,0.01146,0.01612,"
             "-0.00550,-0.00007,-0.00050*74\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::ODOMENU);
         EXPECT_EQ(payload.which, FpaOdomPayload::Which::ODOMENU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2180);
@@ -704,8 +723,9 @@ TEST(ParserFpaTest, FpaOdomshPayload)
             "-1.6994,-0.0222,0.20063,0.08621,-1.21972,-3.6947,-3.3827,9.7482,4,1,8,8,1,0.00415,0.00946,0.00746,"
             "-0.00149,-0.00084,0.00025,0.00003,0.00003,0.00012,0.00000,0.00000,0.00000,0.01742,0.01146,0.01612,"
             "-0.00550,-0.00007,-0.00050*74\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::ODOMSH);
         EXPECT_EQ(payload.which, FpaOdomPayload::Which::ODOMSH);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2180);
@@ -723,7 +743,8 @@ TEST(ParserFpaTest, FpaOdomstatusPayload)
         FpaOdomstatusPayload payload;
         const char* msg =  // clang-format off
             "$FP,ODOMSTATUS,1,2342,321241.350000,2,2,1,1,1,1,,0,,,,,,1,1,3,8,8,3,5,5,,0,6,,,,,,,,,,,,*24\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::ODOMSTATUS);
         EXPECT_TRUE(payload.valid_);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2342);
@@ -753,8 +774,9 @@ TEST(ParserFpaTest, FpaOdomstatusPayload)
     {
         FpaOdomstatusPayload payload;
         const char* msg = "$FP,ODOMSTATUS,1,2342,324917.700000,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,*1E\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::ODOMSTATUS);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2342);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -789,16 +811,18 @@ TEST(ParserFpaTest, FpaTextPayload)
     {
         FpaTextPayload payload;
         const char* msg = "$FP,TEXT,1,INFO,Fixposition AG - www.fixposition.com*09\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::TEXT);
         EXPECT_EQ(payload.level, FpaTextLevel::INFO);
         EXPECT_EQ(std::string(payload.text), "Fixposition AG - www.fixposition.com");
     }
     {
         FpaTextPayload payload;
         const char* msg = "$FP,TEXT,1,NOPE,blabla*09\r\n";
-        EXPECT_FALSE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_FALSE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_FALSE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::TEXT);
         EXPECT_EQ(payload.level, FpaTextLevel::UNSPECIFIED);
         EXPECT_EQ(payload.text[0], '\0');
     }
@@ -812,8 +836,9 @@ TEST(ParserFpaTest, FpaTfPayload)
         FpaTfPayload payload;
         const char* msg =  // clang-format off
             "$FP,TF,2,2233,315835.000000,VRTK,CAM,-0.00000,-0.00000,-0.00000,1.000000,0.000000,0.000000,0.000000*6B\r\n";  // clang-format on
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, strlen(msg)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::TF);
         EXPECT_EQ(payload.gps_time.week.value, 2233);
         EXPECT_TRUE(payload.gps_time.tow.valid);
         EXPECT_NEAR(payload.gps_time.tow.value, 315835.000000, 1e-9);
@@ -838,8 +863,9 @@ TEST(ParserFpaTest, FpaTpPayload)
     {
         FpaTpPayload payload;
         const char* msg_v1 = "$FP,TP,1,GNSS1,UTC,USNO,195391,0.000000000000,18*4F\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg_v1, strlen(msg_v1)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg_v1, std::strlen(msg_v1)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::TP);
         EXPECT_EQ(std::string(payload.tp_name), "GNSS1");
         EXPECT_EQ(payload.timebase, FpaTimebase::UTC);
         EXPECT_EQ(payload.timeref, FpaTimeref::UTC_USNO);
@@ -856,8 +882,9 @@ TEST(ParserFpaTest, FpaTpPayload)
     {
         FpaTpPayload payload;
         const char* msg_v2 = "$FP,TP,2,GNSS1,UTC,NONE,124512,0.000000000000,18,2349*66\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg_v2, strlen(msg_v2)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg_v2, std::strlen(msg_v2)));
         EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::TP);
         EXPECT_EQ(std::string(payload.tp_name), "GNSS1");
         EXPECT_EQ(payload.timebase, FpaTimebase::UTC);
         EXPECT_EQ(payload.timeref, FpaTimeref::UTC_NONE);
@@ -894,7 +921,7 @@ TEST(ParserFpaTest, FpaTimestamps)
 
     for (auto& t : tests) {
         FpaLlhPayload payload;
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)t.msg, strlen(t.msg))) << t.msg;
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)t.msg, std::strlen(t.msg))) << t.msg;
         EXPECT_TRUE(payload.valid_);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, t.wno);
@@ -910,13 +937,27 @@ TEST(ParserFpaTest, FpaVersionPayload)
     {
         FpaVersionPayload payload;
         const char* msg_v1 = "$FP,VERSION,1,fp_vrtk2-release-vr2_2.123.0-456,NAV_VR2,v1.3b,fp-5d6f64,VRTK2_STK,*3F\r\n";
-        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg_v1, strlen(msg_v1)));
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg_v1, std::strlen(msg_v1)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_EQ(std::string(payload.sw_version), "fp_vrtk2-release-vr2_2.123.0-456");
         EXPECT_EQ(std::string(payload.hw_name), "NAV_VR2");
         EXPECT_EQ(std::string(payload.hw_ver), "v1.3b");
         EXPECT_EQ(std::string(payload.hw_uid), "fp-5d6f64");
         EXPECT_EQ(std::string(payload.product_model), "VRTK2_STK");
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ParserNmeaTest, FpaDecodeMessage)
+{
+    {
+        const char* msg = "$FP,VERSION,1,fp_vrtk2-release-vr2_2.123.0-456,NAV_VR2,v1.3b,fp-5d6f64,VRTK2_STK,*3F\r\n";
+        const FpaPayloadPtr payload = FpaDecodeMessage((const uint8_t*)msg, std::strlen(msg));
+        EXPECT_TRUE(payload);
+        EXPECT_EQ(payload->msg_type_, FpaMessageType::VERSION);
+        const auto version = dynamic_cast<const FpaVersionPayload&>(*payload);
+        EXPECT_EQ(std::string(version.product_model), "VRTK2_STK");
     }
 }
 

@@ -156,7 +156,7 @@ bool DoExtract(const FplToolOptions& opts)
 
     // Close output files
     for (auto& entry : output_files) {
-        const std::string path = entry.second->GetPath();
+        const std::string path = entry.second->Path();
         entry.second->Close();
         const double raw_size = FileSize(path) / 1024.0 / 1024.0;
         if (ok) {

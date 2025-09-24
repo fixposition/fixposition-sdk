@@ -108,7 +108,7 @@ void ParserMsg::MakeInfo() const
             constexpr int num = 16;
             sinfo[0] = '\0';
             for (int ix = 0; (ix < num) && (ix < msize); ix++) {
-                std::snprintf(&sinfo[ix * 3], sizeof(sinfo - (ix * 3)), "%02x ", mdata[ix]);
+                std::snprintf(&sinfo[ix * 3], sizeof(sinfo) - (ix * 3), "%02x ", mdata[ix]);
             }
             if (msize > 16) {
                 sinfo[(num * 3) + 0] = '.';
@@ -128,7 +128,7 @@ void ParserMsg::MakeInfo() const
 
 void ParserStats::Update(const ParserMsg& msg)
 {
-    const auto size = msg.data_.size();
+    const auto size = msg.Size();
     switch (msg.proto_) {
         case Protocol::FP_A:
             n_fpa_++;

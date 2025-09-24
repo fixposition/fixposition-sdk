@@ -140,6 +140,7 @@ class OutputFile
      * @returns true on success, false otherwise
      */
     bool Write(const std::vector<uint8_t>& data);
+
     /**
      * @brief Write data to file
      *
@@ -155,11 +156,127 @@ class OutputFile
      *
      * @returns the file path if the file has been opened before, the empty string otherwise
      */
-    const std::string& GetPath() const;
+    const std::string& Path() const;
+
+    /**
+     * @brief Check if output file is open
+     *
+     * @returns true if the file is open, false otherwise
+     */
+    bool IsOpen() const;
+
+    /**
+     * @brief Get file size
+     *
+     * @returns the size written to the file so far
+     */
+    std::size_t Size() const;
+
+    /**
+     * @brief Get error
+     *
+     * @returns an error string in case of error (e.g. after Write() failed), the empty string if there's no error
+     */
+    const std::string& Error() const;
 
    private:
     std::string path_;                  //!< File path
     std::unique_ptr<std::ostream> fh_;  //!< File handle
+    std::size_t size_ = 0;              //!< Size written
+    std::string error_;                 //!< Last error
+};
+
+/**
+ * @brief Input file handle
+ */
+class InputFile
+{
+   public:
+    InputFile();
+    ~InputFile();
+
+    /**
+     * @brief Open input file for reading
+     *
+     * @param[in]  path  The path / filename, can end in ".gz" for compressed output
+     *
+     * @returns true on success, failure otherwise
+     */
+    bool Open(const std::string& path);
+
+    /**
+     * @brief Close input file
+     */
+    void Close();
+
+    /**
+     * @brief Read data from file
+     *
+     * @param[out]  data  Buffer to read into
+     * @param[in]   size  Size of buffer (> 0)
+     *
+     * @returns the size read, 0 if at end of file
+     */
+    std::size_t Read(uint8_t* data, const std::size_t size);
+
+    /**
+     * @brief Get file path
+     *
+     * @returns the file path if the file has been opened before, the empty string otherwise
+     */
+    const std::string& Path() const;
+
+    /**
+     * @brief Check if output file is open
+     *
+     * @returns true if the file is open, false otherwise
+     */
+    bool IsOpen() const;
+
+    /**
+     * @brief Get file size
+     *
+     * @returns the file size
+     */
+    std::size_t Size() const;
+
+    /**
+     * @brief Get file position
+     *
+     * @returns the current file position
+     */
+    std::size_t Tell() const;
+
+    /**
+     * @brief Seek to position
+     *
+     * @param[in]  pos  Position to seek to
+     *
+     * @returns true on success, false otherwise (our of range, cannot seek)
+     */
+    bool Seek(const std::size_t pos);
+
+    /**
+     * @brief Check if handle can seek
+     *
+     * @returns true if Seek() is possible, false if not (e.g. compressed file)
+     */
+    bool CanSeek() const;
+
+    /**
+     * @brief Get error
+     *
+     * @returns an error string in case of error (e.g. after Open() failed), the empty string if there's no error
+     */
+    const std::string& Error() const;
+
+   private:
+    std::string path_;                  //!< File path
+    std::unique_ptr<std::istream> fh_;  //!< File handle
+    std::size_t size_ = 0;              //!< File size
+    std::size_t pos_ = 0;               //!< File position
+    std::string error_;                 //!< Last error
+    bool can_seek_ = false;             //!< Seek possible?
 };
 
 /**

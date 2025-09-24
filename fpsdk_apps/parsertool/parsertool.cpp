@@ -276,7 +276,7 @@ class ParserTool
     {
         const auto output_file = Sprintf("%06" PRIuMAX "_%s.bin", msg.seq_, msg.name_.c_str());
         std::ofstream output(output_file, std::ios::binary);
-        output.write((const char*)msg.data_.data(), msg.data_.size());
+        output.write((const char*)msg.Data(), msg.Size());
         output.close();
     }
 
@@ -297,12 +297,11 @@ class ParserTool
         }
 
         if (opts_.stdout_) {
-            std::fwrite(msg.data_.data(), msg.data_.size(), 1, stdout);
+            std::fwrite(msg.Data(), msg.Size(), 1, stdout);
         } else {
             msg.MakeInfo();
             std::printf("message %06" PRIuMAX " %8" PRIuMAX " %5" PRIuMAX " %-8s %-30s %s\n", msg.seq_, offs,
-                msg.data_.size(), ProtocolStr(msg.proto_), msg.name_.c_str(),
-                msg.info_.empty() ? "-" : msg.info_.c_str());
+                msg.Size(), ProtocolStr(msg.proto_), msg.name_.c_str(), msg.info_.empty() ? "-" : msg.info_.c_str());
             if (hexdump) {
                 for (auto& line : HexDump(msg.data_)) {
                     std::printf("%s\n", line.c_str());
@@ -314,7 +313,7 @@ class ParserTool
         }
 
         stats_.Update(msg);
-        offs_ += msg.data_.size();
+        offs_ += msg.Size();
     }
 
     // -----------------------------------------------------------------------------------------------------------------

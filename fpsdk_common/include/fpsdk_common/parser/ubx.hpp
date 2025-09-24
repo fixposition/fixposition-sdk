@@ -368,6 +368,8 @@ static constexpr uint8_t     UBX_NAV_SIG_MSGID              = 0x43;             
 static constexpr const char* UBX_NAV_SIG_STRID              = "UBX-NAV-SIG";            //!< UBX-NAV-SIG message name
 static constexpr uint8_t     UBX_NAV_SLAS_MSGID             = 0x42;                     //!< UBX-NAV-SLAS message ID
 static constexpr const char* UBX_NAV_SLAS_STRID             = "UBX-NAV-SLAS";           //!< UBX-NAV-SLAS message name
+static constexpr uint8_t     UBX_NAV_SOL_MSGID              = 0x01;                     //!< UBX-NAV-SOL message ID
+static constexpr const char* UBX_NAV_SOL_STRID              = "UBX-NAV-SOL";            //!< UBX-NAV-SOL message name
 static constexpr uint8_t     UBX_NAV_STATUS_MSGID           = 0x03;                     //!< UBX-NAV-STATUS message ID
 static constexpr const char* UBX_NAV_STATUS_STRID           = "UBX-NAV-STATUS";         //!< UBX-NAV-STATUS message name
 static constexpr uint8_t     UBX_NAV_SVIN_MSGID             = 0x3b;                     //!< UBX-NAV-SVIN message ID
@@ -607,7 +609,7 @@ struct UbxMsgInfo
 
 // @fp_codegen_begin{FPSDK_COMMON_PARSER_UBX_MSGINFO_HPP}
 using UbxClassesInfo = std::array<UbxMsgInfo, 15>;    //!< UBX classes lookup table
-using UbxMessagesInfo = std::array<UbxMsgInfo, 185>;  //!< UBX messages lookup table
+using UbxMessagesInfo = std::array<UbxMsgInfo, 186>;  //!< UBX messages lookup table
 // @fp_codegen_end{FPSDK_COMMON_PARSER_UBX_MSGINFO_HPP}
 
 /**
@@ -728,8 +730,8 @@ static constexpr uint8_t UBX_SIGID_NAVIC_L5A     =  0;      //!< NavIC L5 A
 //! UBX-ACK-ACK (version 0, output) payload
 struct UBX_ACK_ACK_V0_GROUP0  // clang-format off
 {
-    uint8_t clsId;                                    //!< Class ID of ack'ed message
-    uint8_t msgId;                                    //!< Message ID of ack'ed message
+    uint8_t clsId;           //!< Class ID of ack'ed message
+    uint8_t msgId;           //!< Message ID of ack'ed message
 };  // clang-format on
 
 // clang-format off
@@ -746,8 +748,8 @@ static constexpr std::size_t UBX_ACK_ACK_V0_SIZE                                
 //! UBX-ACK-NCK (version 0, output) payload
 struct UBX_ACK_NAK_V0_GROUP0  // clang-format off
 {
-    uint8_t clsId;                                    //!< Class ID of not-ack'ed message
-    uint8_t msgId;                                    //!< Message ID of not-ack'ed message
+    uint8_t clsId;           //!< Class ID of not-ack'ed message
+    uint8_t msgId;           //!< Message ID of not-ack'ed message
 };
 // clang-format on
 
@@ -1014,17 +1016,17 @@ static_assert(sizeof(UBX_ESF_MEAS_V0_GROUP2) == 4, "");
 
 // clang-format off
 static constexpr std::size_t UBX_ESF_MEAS_V0_MIN_SIZE                                               = sizeof(UBX_ESF_MEAS_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
-static constexpr uint8_t     UBX_ESF_MEAS_V0_FLAGS_TIMEMARKSENT_GET(const uint16_t flags)           { return flags & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_ESF_MEAS_V0_FLAGS_TIMEMARKSENT(const uint16_t flags)               { return flags & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_MEAS_V0_FLAGS_TIMEMARKSENT_NONE                                = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_MEAS_V0_FLAGS_TIMEMARKSENT_EXT0                                = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_MEAS_V0_FLAGS_TIMEMARKSENT_EXT1                                = 2;  //!< @todo documentation
 static constexpr bool        UBX_ESF_MEAS_V0_FLAGS_CALIBTTAGVALID(const uint16_t flags)             { return (flags & 0x0008) == 0x0008; }  //!< @todo documentation
-static constexpr std::size_t UBX_ESF_MEAS_V0_FLAGS_NUMMEAS_GET(const uint16_t flags)                { return (flags >> 11) & 0x1f; }  //!< @todo documentation
-static constexpr uint32_t    UBX_ESF_MEAS_V0_DATA_DATAFIELD_GET(const uint32_t data)                { return data & 0x00ffffff; }  //!< @todo documentation
-static constexpr uint8_t     UBX_ESF_MEAS_V0_DATA_DATATYPE_GET(const uint32_t data)                 { return (data >> 24) & 0x0000003f; } //!< same enum as UBX-ESF-STATUS.type it seems
+static constexpr std::size_t UBX_ESF_MEAS_V0_FLAGS_NUMMEAS(const uint16_t flags)                    { return (flags >> 11) & 0x1f; }  //!< @todo documentation
+static constexpr uint32_t    UBX_ESF_MEAS_V0_DATA_DATAFIELD(const uint32_t data)                    { return data & 0x00ffffff; }  //!< @todo documentation
+static constexpr uint8_t     UBX_ESF_MEAS_V0_DATA_DATATYPE(const uint32_t data)                     { return (data >> 24) & 0x0000003f; } //!< same enum as UBX-ESF-STATUS.type it seems
 static constexpr double      UBX_ESF_MEAS_V0_CALIBTTAG_SCALE                                        = 1e-3;  //!< @todo documentation
 static constexpr std::size_t UBX_ESF_MEAS_V0_SIZE(const uint8_t* msg)                               { return /* argh.. nice message design! */ \
-    sizeof(UBX_ESF_MEAS_V0_GROUP0) + UBX_FRAME_SIZE + (UBX_ESF_MEAS_V0_FLAGS_NUMMEAS_GET(*((uint16_t *)&((uint8_t *)(msg))[UBX_HEAD_SIZE + 4])) * sizeof(UBX_ESF_MEAS_V0_GROUP1)) +
+    sizeof(UBX_ESF_MEAS_V0_GROUP0) + UBX_FRAME_SIZE + (UBX_ESF_MEAS_V0_FLAGS_NUMMEAS(*((uint16_t *)&((uint8_t *)(msg))[UBX_HEAD_SIZE + 4])) * sizeof(UBX_ESF_MEAS_V0_GROUP1)) +
     (UBX_ESF_MEAS_V0_FLAGS_CALIBTTAGVALID(*((uint16_t *)&((uint8_t *)(msg))[UBX_HEAD_SIZE + 4])) ? sizeof(UBX_ESF_MEAS_V0_GROUP2) : 0); }  //!< @todo documentation
 // clang-format on
 
@@ -1068,21 +1070,21 @@ static constexpr std::size_t UBX_ESF_STATUS_V2_MIN_SIZE                         
 static constexpr std::size_t UBX_ESF_STATUS_V2_SIZE(const uint8_t* msg)                             { return  //!< @todo documentation
     sizeof(UBX_ESF_STATUS_V2_GROUP0) + UBX_FRAME_SIZE + (((uint8_t *)(msg))[UBX_HEAD_SIZE + 15] * sizeof(UBX_ESF_STATUS_V2_GROUP1)); }  //!< @todo documentation
 static constexpr double      UBX_ESF_STATUS_V2_ITOW_SCALE                                           = 1e-3;  //!< @todo documentation
-static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS_GET(const uint8_t initStatus1) { return initStatus1 & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS(const uint8_t initStatus1)  { return initStatus1 & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS_OFF                         = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS_INITALIZING                 = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS_INITIALIZED                 = 2;  //!< @todo documentation
-static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS_GET(const uint8_t initStatus1) { return (initStatus1 >> 2) & 0x07; }  //!< @todo documentation
+static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS(const uint8_t initStatus1)  { return (initStatus1 >> 2) & 0x07; }  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS_OFF                         = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS_INITALIZING                 = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS_INITIALIZED1                = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS_INITIALIZED2                = 3;  //!< @todo documentation
-static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS_GET(const uint8_t initStatus1){ return (initStatus1 >> 5) & 0x07; }  //!< @todo documentation
+static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS(const uint8_t initStatus1) { return (initStatus1 >> 5) & 0x07; }  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS_OFF                        = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS_INITALIZING                = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS_INITIALIZED1               = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS_INITIALIZED2               = 3;  //!< @todo documentation
-static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS2_IMUINITSTATUS_GET(const uint8_t initStatus2){ return initStatus2 & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS2_IMUINITSTATUS(const uint8_t initStatus2) { return initStatus2 & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS2_IMUINITSTATUS_OFF                        = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS2_IMUINITSTATUS_INITALIZING                = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS2_IMUINITSTATUS_INITIALIZED1               = 2;  //!< @todo documentation
@@ -1091,15 +1093,15 @@ static constexpr uint8_t     UBX_ESF_STATUS_V2_FUSIONMODE_INIT                  
 static constexpr uint8_t     UBX_ESF_STATUS_V2_FUSIONMODE_FUSION                                    = 0x01;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_FUSIONMODE_SUSPENDED                                 = 0x02;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_FUSIONMODE_DISABLED                                  = 0x03;  //!< @todo documentation
-static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS1_TYPE_GET(const uint8_t sensStatus1)      { return sensStatus1 & 0x3f; } //!< same enum as UBX-ESF-MEAS.dataType it seems  //!< @todo documentation
+static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS1_TYPE(const uint8_t sensStatus1)          { return sensStatus1 & 0x3f; } //!< same enum as UBX-ESF-MEAS.dataType it seems  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS1_USED                                     = 0x40;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS1_READY                                    = 0x80;  //!< @todo documentation
-static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS_GET(const uint8_t sensStatus2)  { return sensStatus2 & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS(const uint8_t sensStatus2)   { return sensStatus2 & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS_NOTCALIB                     = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS_CALIBRATING                  = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS_CALIBRATED1                  = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS_CALIBRATED2                  = 3;  //!< @todo documentation
-static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_TIMESTATUS_GET(const uint8_t sensStatus2)   { return (sensStatus2 >> 2) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_TIMESTATUS(const uint8_t sensStatus2)    { return (sensStatus2 >> 2) & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_TIMESTATUS_NODATA                        = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_TIMESTATUS_FIRSTBYTE                     = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_TIMESTATUS_EVENT                         = 2;  //!< @todo documentation
@@ -1161,7 +1163,7 @@ static constexpr std::size_t UBX_MON_COMMS_V0_SIZE(const uint8_t* msg)          
     sizeof(UBX_MON_COMMS_V0_GROUP0) + UBX_FRAME_SIZE + (((uint8_t *)(msg))[UBX_HEAD_SIZE + 1] * sizeof(UBX_MON_COMMS_V0_GROUP1)); }  //!< @todo documentation
 static constexpr bool        UBX_MON_COMMS_V0_TXERRORS_MEM(const uint8_t txErrors)                  { return (txErrors & 0x01) == 0x01; }  //!< @todo documentation
 static constexpr bool        UBX_MON_COMMS_V0_TXERRORS_ALLOC(const uint8_t txErrors)                { return (txErrors & 0x02) == 0x02; }  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_COMMS_V0_TXERRORS_OUTPUTPORT_GET(const uint8_t txErrors)       { return (txErrors >> 3) & 0x7; }  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_COMMS_V0_TXERRORS_OUTPUTPORT(const uint8_t txErrors)           { return (txErrors >> 3) & 0x7; }  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_COMMS_V0_TXERRORS_OUTPUTPORT_NA                                = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_COMMS_V0_TXERRORS_OUTPUTPORT_I2C                               = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_COMMS_V0_TXERRORS_OUTPUTPORT_UART1                             = 2;  //!< @todo documentation
@@ -1212,7 +1214,7 @@ static_assert(sizeof(UBX_MON_HW_V0_GROUP0) == 60, "");
 static constexpr std::size_t UBX_MON_HW_V0_SIZE                                                     = sizeof(UBX_MON_HW_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_RTCCALIB                                           = 0x01;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_SAFEBOOT                                           = 0x02;  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_JAMMINGSTATE_GET(const uint8_t flags)              { return (flags >> 2) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_JAMMINGSTATE(const uint8_t flags)                  { return (flags >> 2) & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_JAMMINGSTATE_UNKNOWN                               = 0x00;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_JAMMINGSTATE_OK                                    = 0x01;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_JAMMINGSTATE_WARNING                               = 0x02;  //!< @todo documentation
@@ -1256,7 +1258,7 @@ struct UBX_MON_HW2_V0_GROUP0  // clang-format off
 static_assert(sizeof(UBX_MON_HW2_V0_GROUP0) == 28, "");
 
 // clang-format off
-static constexpr std::size_t UBX_MON_HW2_V0_SIZE                                                    = sizeof(UBX_MON_HW2_V0_GROUP0);   //!< @todo documentation+ UBX_FRAME_SIZE
+static constexpr std::size_t UBX_MON_HW2_V0_SIZE                                                    = sizeof(UBX_MON_HW2_V0_GROUP0) + UBX_FRAME_SIZE;   //!< @todo documentation+ UBX_FRAME_SIZE
 static constexpr uint8_t     UBX_MON_HW2_V0_CFGSOURCE_ROM                                           = 114;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW2_V0_CFGSOURCE_OTP                                           = 111;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW2_V0_CFGSOURCE_PIN                                           = 112;  //!< @todo documentation
@@ -1369,7 +1371,7 @@ static constexpr uint8_t     UBX_MON_RF_V0_VERSION                              
 static constexpr std::size_t UBX_MON_RF_V0_MIN_SIZE                                                 = sizeof(UBX_MON_RF_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr std::size_t UBX_MON_RF_V0_SIZE(const uint8_t* msg)                                 { return
     sizeof(UBX_MON_RF_V0_GROUP0) + UBX_FRAME_SIZE + (((uint8_t *)(msg))[UBX_HEAD_SIZE + 1] * sizeof(UBX_MON_RF_V0_GROUP1)); }  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_RF_V0_FLAGS_JAMMINGSTATE(const uint8_t f)                      { return f & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_RF_V0_FLAGS_JAMMINGSTATE(const uint8_t flags)                  { return flags & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_FLAGS_JAMMINGSTATE_UNKN                                  = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_FLAGS_JAMMINGSTATE_OK                                    = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_FLAGS_JAMMINGSTATE_WARN                                  = 2;  //!< @todo documentation
@@ -1405,10 +1407,12 @@ struct UBX_MON_SPAN_V0_GROUP0  // clang-format off
 
 static_assert(sizeof(UBX_MON_SPAN_V0_GROUP0) == 4, "");
 
+static constexpr std::size_t UBX_MON_SPAN_V0_NUM_BINS = 255;  //!< Number of bins
+
 //! UBX-MON-RF (version 0, output) payload repeated group
 struct UBX_MON_SPAN_V0_GROUP1  // clang-format off
 {
-    uint8_t  spectrum[256];  //!< @todo documentation
+    uint8_t  spectrum[UBX_MON_SPAN_V0_NUM_BINS];  //!< @todo documentation
     uint32_t span;           //!< @todo documentation
     uint32_t res;            //!< @todo documentation
     uint32_t center;         //!< @todo documentation
@@ -1426,6 +1430,50 @@ static constexpr std::size_t UBX_MON_SPAN_V0_SIZE(const uint8_t* msg)           
     sizeof(UBX_MON_SPAN_V0_GROUP0) + UBX_FRAME_SIZE + (((uint8_t *)(msg))[UBX_HEAD_SIZE + 1] * sizeof(UBX_MON_SPAN_V0_GROUP1)); }  //!< @todo documentation
 static constexpr double      UBX_MON_SPAN_BIN_CENT_FREQ(const uint32_t center, const uint32_t span, const int ix)  { return
     (double)center + ((double)span * (((double)(ix) - 128.0) / 256.0)); }  //!< @todo documentation
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+/**
+ * @name UBX-MON-SYS message
+ * @{
+ */
+
+//! UBX-MON-SYS (version 1, output) payload
+struct UBX_MON_SYS_V1_GROUP0  // clang-format off
+{
+    uint8_t  msgVer;       //!< @todo documentation
+    uint8_t  bootType;     //!< @todo documentation
+    uint8_t  cpuLoad;      //!< @todo documentation
+    uint8_t  cpuLoadMax;   //!< @todo documentation
+    uint8_t  memUsage;     //!< @todo documentation
+    uint8_t  memUsageMax;  //!< @todo documentation
+    uint8_t  ioUsage;      //!< @todo documentation
+    uint8_t  ioUsageMax;   //!< @todo documentation
+    uint32_t runTime;      //!< @todo documentation
+    uint16_t noticeCount;  //!< @todo documentation
+    uint16_t warnCount;    //!< @todo documentation
+    uint16_t errorCount;   //!< @todo documentation
+    int8_t   tempValue;    //!< @todo documentation
+    uint8_t  reserved[5];  //!< @todo documentation
+};  // clang-format on
+
+static_assert(sizeof(UBX_MON_SYS_V1_GROUP0) == 24, "");
+
+// clang-format off
+static constexpr uint8_t     UBX_MON_SYS_VERSION(const uint8_t* msg)                                { return msg[UBX_HEAD_SIZE]; }  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_VERSION                                                 = 0x01;  //!< @todo documentation
+static constexpr std::size_t UBX_MON_SYS_V1_SIZE                                                    = sizeof(UBX_MON_SYS_V1_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_UNKNOWN                                        =  0;  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_COLDSTART                                      =  1;  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_WATCHDOG                                       =  2;  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_HWRESET                                        =  3;  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_HWBACKUP                                       =  4;  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_SWBACKUP                                       =  5;  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_SWRESET                                        =  6;  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VIOFAIL                                        =  7;  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VDDXFAIL                                       =  8;  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VDDRFFAIL                                      =  9;  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VCOREHIGHFAIL                                  = 10;  //!< @todo documentation
 // clang-format on
 
 ///@}
@@ -2067,8 +2115,8 @@ static constexpr bool        UBX_NAV_STATUS_V0_FLAGS_GPSFIXOK(const uint8_t flag
 static constexpr bool        UBX_NAV_STATUS_V0_FLAGS_DIFFSOLN(const uint8_t flags)                  { return (flags & 0x02) == 0x02; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_STATUS_V0_FLAGS_WKNSET(const uint8_t flags)                    { return (flags & 0x04) == 0x04; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_STATUS_V0_FLAGS_TOWSET(const uint8_t flags)                    { return (flags & 0x08) == 0x08; }  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_STATUS_V0_FIXSTAT_DIFFCORR                                     = 0x01;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_STATUS_V0_FIXSTAT_CARRSOLNVALID                                = 0x02;  //!< @todo documentation
+static constexpr bool        UBX_NAV_STATUS_V0_FIXSTAT_DIFFCORR(const uint8_t fixStat)              { return (fixStat & 0x01) ==  0x01; } //!< @todo documentation
+static constexpr bool        UBX_NAV_STATUS_V0_FIXSTAT_CARRSOLNVALID(const uint8_t fixStat)         { return (fixStat & 0x02) ==  0x02; } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_CARRSOLN(const uint8_t flags2)                { return (flags2 >> 6) & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_CARRSOLN_NO                                   = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_CARRSOLN_FLOAT                                = 1;  //!< @todo documentation
@@ -2378,6 +2426,7 @@ static constexpr bool        UBX_RXM_RAWX_V1_TRKSTAT_PRVALID(const uint8_t trkSt
 static constexpr bool        UBX_RXM_RAWX_V1_TRKSTAT_CPVALID(const uint8_t trkStat)                 { return (trkStat & 0x02) == 0x02; }  //!< @todo documentation
 static constexpr bool        UBX_RXM_RAWX_V1_TRKSTAT_HALFCYC(const uint8_t trkStat)                 { return (trkStat & 0x04) == 0x04; }  //!< @todo documentation
 static constexpr bool        UBX_RXM_RAWX_V1_TRKSTAT_SUBHALFCYC(const uint8_t trkStat)              { return (trkStat & 0x08) == 0x08; }  //!< @todo documentation
+static constexpr int         UBX_RXM_RAWX_V1_GROUP1_FREQID_TO_SLOT(const uint8_t freqId)            { return (int)freqId - 7; }
 static constexpr std::size_t UBX_RXM_RAWX_V1_SIZE(const uint8_t *msg)                               { return
     ((sizeof(UBX_RXM_RAWX_V1_GROUP0) + UBX_FRAME_SIZE + (((uint8_t *)(msg))[UBX_HEAD_SIZE + 11] * sizeof(UBX_RXM_RAWX_V1_GROUP1)))); }  //!< @todo documentation
 
@@ -2447,6 +2496,7 @@ static_assert(sizeof(UBX_RXM_SFRBX_V2_GROUP1) == 4, "");
 static constexpr uint8_t     UBX_RXM_SFRBX_VERSION(const uint8_t* msg)                              { return msg[UBX_HEAD_SIZE + 6]; }  //!< @todo documentation
 static constexpr uint8_t     UBX_RXM_SFRBX_V2_VERSION                                               = 0x02;  //!< @todo documentation
 static constexpr std::size_t UBX_RXM_SFRBX_V2_MIN_SIZE                                              = sizeof(UBX_RXM_SFRBX_V2_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
+static constexpr int         UBX_RXM_SFRBX_V2_GROUP0_FREQID_TO_SLOT(const uint8_t freqId)           { return (int)freqId - 7; }
 // clang-format on
 
 ///@}
