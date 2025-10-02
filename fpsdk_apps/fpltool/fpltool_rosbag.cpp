@@ -172,6 +172,7 @@ bool DoRosbag(const FplToolOptions& opts)
                 }
                 break;
             }
+            case FplType::FILEDUMP:
             case FplType::BLOB:
             case FplType::UNSPECIFIED:
             case FplType::INT_D:

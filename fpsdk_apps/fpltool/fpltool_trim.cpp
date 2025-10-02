@@ -188,6 +188,7 @@ bool DoTrim(const FplToolOptions& opts)
                     }
                 }
                 break;
+            case FplType::FILEDUMP:
             case FplType::INT_F:
                 if (fpl.Write(log_msg.Raw())) {
                     n_used++;

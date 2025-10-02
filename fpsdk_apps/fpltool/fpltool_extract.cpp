@@ -137,6 +137,7 @@ bool DoExtract(const FplToolOptions& opts)
                 }
                 break;
             }
+            case FplType::FILEDUMP:
             case FplType::LOGMETA:
             case FplType::ROSMSGDEF:
             case FplType::ROSMSGBIN:
