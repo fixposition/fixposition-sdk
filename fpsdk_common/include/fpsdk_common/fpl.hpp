@@ -51,6 +51,7 @@ enum class FplType : uint16_t
     LOGMETA      = 0x0105,  //!< Logfile meta data
     STREAMMSG    = 0x0106,  //!< Stream message raw data with timestamp
     LOGSTATUS    = 0x0107,  //!< Logging status
+    FILEDUMP     = 0x0108,  //!< Dump of an entire (small, and text) file
     BLOB         = 0xbaad,  //!< Arbitrary data, not FplMessage framing
     INT_D        = 0xffaa,  //!< Fixposition internal use only
     INT_F        = 0xffbb,  //!< Fixposition internal use only
@@ -358,12 +359,11 @@ struct RosMsgBin
      * @param[in]  log_msg  .fpl log message
      */
     RosMsgBin(const FplMessage& log_msg);
-    using RosTime = fpsdk::common::time::RosTime;  //!< Shortcut
-    bool valid_;                                   //!< Data valid, successfully extracted from message
-    std::string info_;                             //!< Stringification of (some of the) data, for debugging
-    std::string topic_name_;                       //!< The topic name
-    RosTime rec_time_;                             //!< Recording timestamp
-    std::vector<uint8_t> msg_data_;                //!< Serialised ROS message data
+    bool valid_;                     //!< Data valid, successfully extracted from message
+    std::string info_;               //!< Stringification of (some of the) data, for debugging
+    std::string topic_name_;         //!< The topic name
+    time::RosTime rec_time_;         //!< Recording timestamp
+    std::vector<uint8_t> msg_data_;  //!< Serialised ROS message data
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -379,12 +379,31 @@ struct StreamMsg
      * @param[in]  log_msg  .fpl log message
      */
     StreamMsg(const FplMessage& log_msg);
-    using RosTime = fpsdk::common::time::RosTime;  //!< Shortcut
-    bool valid_;                                   //!< Data valid, successfully extracted from message
-    std::string info_;                             //!< Stringification of (some of the) data, for debugging
-    RosTime rec_time_;                             //!< Recording timestamp
-    std::string stream_name_;                      //!< Stream name
-    std::vector<uint8_t> msg_data_;                //!< Message data
+    bool valid_;                     //!< Data valid, successfully extracted from message
+    std::string info_;               //!< Stringification of (some of the) data, for debugging
+    time::RosTime rec_time_;         //!< Recording timestamp
+    std::string stream_name_;        //!< Stream name
+    std::vector<uint8_t> msg_data_;  //!< Message data
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Helper for extracting data of a stream message (NMEA, RTCM3, etc.)
+ */
+struct FileDump
+{
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  log_msg  .fpl log message
+     */
+    FileDump(const FplMessage& log_msg);
+    bool valid_;                 //!< Data valid, successfully extracted from message
+    std::string info_;           //!< Stringification of (some of the) data, for debugging
+    std::string filename_;       //!< Filename
+    time::Time mtime_;           //!< File modification time
+    std::vector<uint8_t> data_;  //!< File contents
 };
 
 /* ****************************************************************************************************************** */

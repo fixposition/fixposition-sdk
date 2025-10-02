@@ -44,6 +44,7 @@ const char* FplTypeStr(const FplType type)
         case FplType::LOGMETA:     return "LOGMETA";
         case FplType::STREAMMSG:   return "STREAMMSG";
         case FplType::LOGSTATUS:   return "LOGSTATUS";
+        case FplType::FILEDUMP:    return "FILEDUMP";
         case FplType::BLOB:        return "BLOB";
         case FplType::INT_D:       return "INT_D";
         case FplType::INT_F:       return "INT_F";
@@ -119,6 +120,7 @@ int FplMessage::Parse(const uint8_t* data, const uint32_t size)
         case FplType::LOGMETA:
         case FplType::STREAMMSG:
         case FplType::LOGSTATUS:
+        case FplType::FILEDUMP:
             payload_type_ = (FplType)payload_type;
             break;
         case FplType::BLOB:
@@ -302,22 +304,22 @@ bool FplFileReader::Open(const std::string& path)
 {
     path_.clear();
     fh_.reset();
-    is_gz_ = fpsdk::common::string::StrEndsWith(path, ".gz");
+    is_gz_ = string::StrEndsWith(path, ".gz");
     if (is_gz_) {
         fh_ = std::make_unique<gzifstream>(path.c_str());
     } else {
         fh_ = std::make_unique<std::ifstream>(path, std::ios::binary);
     }
     if (fh_->fail()) {
-        WARNING("FplFileReader: fail open %s: %s", path.c_str(), fpsdk::common::string::StrError(errno).c_str());
+        WARNING("FplFileReader: fail open %s: %s", path.c_str(), string::StrError(errno).c_str());
         fh_.reset();
         return false;
     }
     path_ = path;
-    size_ = fpsdk::common::path::FileSize(path);
+    size_ = path::FileSize(path);
     last_progress_ = -1.0;
     last_pos_ = 0;
-    last_secs_ = fpsdk::common::time::GetSecs();
+    last_secs_ = time::GetSecs();
     DEBUG("FplFileReader: %s (%.1f MiB)", path.c_str(), (double)size_ / 1024.0 / 1024.0);
     return true;
 }
@@ -361,7 +363,7 @@ bool FplFileReader::GetProgress(double& progress, double& rate)
     // Print at least every 5% or 50k messages
     if (((progress - last_progress_) >= 5.0f) || ((count_ % 50000) == 0)) {
         // Throughput
-        const double secs = fpsdk::common::time::GetSecs();
+        const double secs = time::GetSecs();
         const double dt = secs - last_secs_;
         const uint64_t dp = pos_ - last_pos_;
         rate = ((dt > 0.0) && (dp > 0.0) ? (double)dp / dt / 1024.0 / 1024.0 : 0.0);
@@ -385,7 +387,7 @@ LogMeta::LogMeta(const FplMessage& log_msg)
         const uint32_t yaml_len = strlen((const char*)payload);
         yaml_ = { (const char*)payload, std::min(payload_size, yaml_len) };
         YAML::Node meta;
-        if (fpsdk::common::yaml::StringToYaml(yaml_, meta)) {
+        if (yaml::StringToYaml(yaml_, meta)) {
             try {
                 const int meta_ver = meta["meta_ver"].as<int>();
                 if (meta_ver >= 1) {
@@ -440,7 +442,7 @@ LogStatus::LogStatus(const FplMessage& log_msg)
         const uint32_t yaml_len = strlen((const char*)payload);
         yaml_ = { (const char*)payload, std::min(payload_size, yaml_len) };
         YAML::Node status;
-        if (fpsdk::common::yaml::StringToYaml(yaml_, status)) {
+        if (yaml::StringToYaml(yaml_, status)) {
             try {
                 const int status_ver = status["status_ver"].as<int>();
                 if (status_ver >= 1) {  // clang-format off
@@ -474,14 +476,14 @@ LogStatus::LogStatus(const FplMessage& log_msg)
                     pos_lat_ = status["pos_lat"].as<double>();
                     pos_lon_ = status["pos_lon"].as<double>();
                     pos_height_ = status["pos_height"].as<double>();
-                    using FixType = fpsdk::common::gnss::FixType;
+                    using FixType = gnss::FixType;
                     const bool pos_avail =
                         ((pos_source_ > POS_SOURCE_UNKNOWN) && ((FixType)pos_fix_type_ > FixType::NOFIX));
                     const char* pos_source_str =
                         (pos_source_ == POS_SOURCE_GNSS ? "GNSS" : (pos_source_ == POS_SOURCE_FUSION ? "FUSION" : "?"));
                     info_ += " log_time=" + log_time_iso_ +
-                             fpsdk::common::string::Sprintf(" pos=%s/%s/%.6f/%.6f/%.0f", pos_source_str,
-                                 fpsdk::common::gnss::FixTypeStr((FixType)pos_fix_type_), pos_avail ? pos_lat_ : NAN,
+                             string::Sprintf(" pos=%s/%s/%.6f/%.6f/%.0f", pos_source_str,
+                                 gnss::FixTypeStr((FixType)pos_fix_type_), pos_avail ? pos_lat_ : NAN,
                                  pos_avail ? pos_lon_ : NAN, pos_avail ? pos_height_ : NAN);
                 }
                 if (status_ver >= 3) {
@@ -576,7 +578,7 @@ RosMsgBin::RosMsgBin(const FplMessage& log_msg)
         ok = false;
     }
     if (ok) {
-        info_ = fpsdk::common::string::Sprintf("rec_time=%.3f topic_name=%s msg_data=<%" PRIu64 ">", rec_time_.ToSec(),
+        info_ = string::Sprintf("rec_time=%.3f topic_name=%s msg_data=<%" PRIu64 ">", rec_time_.ToSec(),
             topic_name_.c_str(), msg_data_.size());
     } else {
         WARNING("RosMsgBin: invalid message");
@@ -628,10 +630,66 @@ StreamMsg::StreamMsg(const FplMessage& log_msg)
         ok = false;
     }
     if (ok) {
-        info_ = fpsdk::common::string::Sprintf("rec_time=%.3f stream_name=%s msg_data=<%" PRIu64 ">", rec_time_.ToSec(),
+        info_ = string::Sprintf("rec_time=%.3f stream_name=%s msg_data=<%" PRIu64 ">", rec_time_.ToSec(),
             stream_name_.c_str(), msg_data_.size());
     } else {
         WARNING("StreamMsg: invalid message");
+        info_ = "<invalid>";
+    }
+    valid_ = ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+FileDump::FileDump(const FplMessage& log_msg)
+{
+    bool ok = true;
+    if (log_msg.PayloadType() == FplType::FILEDUMP) {
+        const uint8_t* payload = log_msg.PayloadData();
+        const uint32_t payload_size = log_msg.PayloadSize();
+
+        // Filename
+        const char* filename = (const char*)&payload[0];
+        filename_ = std::string(filename);
+        if (filename_.size() > FplMessage::MAX_NAME_LEN) {
+            filename_.clear();
+            ok = false;
+        }
+
+        // Time
+        const uint32_t mtime_offs = filename_.size() + 1;
+        time::RosTime ts;
+        std::memcpy(&ts.sec_, &payload[mtime_offs], sizeof(ts.sec_));
+        std::memcpy(&ts.nsec_, &payload[mtime_offs + sizeof(uint32_t)], sizeof(ts.nsec_));
+        if (!mtime_.SetRosTime(ts)) {
+            ok = false;
+        }
+
+        // File size
+        const uint32_t size_offs = mtime_offs + (2 * sizeof(uint32_t));
+        uint32_t file_size = 0;
+        if (ok && (payload_size > (size_offs + sizeof(file_size)))) {
+            std::memcpy(&file_size, &payload[size_offs], sizeof(file_size));
+        } else {
+            ok = false;
+        }
+
+        // Data
+        const uint32_t data_offs = size_offs + sizeof(file_size);
+        if (ok && (payload_size >= (data_offs + file_size))) {
+            const uint8_t* data_bin = &payload[data_offs];
+            data_ = { data_bin, data_bin + file_size };
+        } else {
+            ok = false;
+        }
+    } else {
+        ok = false;
+    }
+    if (ok) {
+        info_ = string::Sprintf(
+            "filename=%s size=%" PRIuMAX " mtime=%s", filename_.c_str(), data_.size(), mtime_.StrUtcTime(0).c_str());
+    } else {
+        WARNING("LogFileDump: invalid message");
         info_ = "<invalid>";
     }
     valid_ = ok;

@@ -140,6 +140,11 @@ bool DoDump(const FplToolOptions& opts)
                 }
                 break;
             }
+            case FplType::FILEDUMP: {
+                const FileDump filedump(log_msg);
+                info = filedump.info_;
+                break;
+            }
             case FplType::BLOB:
             case FplType::UNSPECIFIED:
             case FplType::INT_D:
