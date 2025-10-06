@@ -440,13 +440,12 @@ std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* m
         UbxSigStr(head.gnssId, head.sigId));
 
     // Raw sub_frame words
-    uint32_t dwrd[30];
-    std::size_t n_dwrd = (msg_size - UBX_FRAME_SIZE - (sizeof(head)) / sizeof(*dwrd));
+    std::array<uint32_t, 50> dwrd;
+    std::size_t n_dwrd = (msg_size - UBX_FRAME_SIZE - sizeof(head)) / sizeof(uint32_t);
     if (n_dwrd == 0) {
         return std::snprintf(&info[len], size - len, "empty");
     }
-    std::memcpy(
-        &dwrd[0], &msg[UBX_HEAD_SIZE + sizeof(head)], std::min(sizeof(dwrd) / sizeof(*dwrd), n_dwrd) * sizeof(*dwrd));
+    std::memcpy(dwrd.data(), &msg[UBX_HEAD_SIZE + sizeof(head)], std::min(dwrd.size(), n_dwrd) * sizeof(uint32_t));
     len += std::snprintf(&info[len], size - len, "%2" PRIuMAX " ", n_dwrd);
 
     // Sources:
@@ -566,7 +565,7 @@ std::size_t UbxRxmSfrbxInfo(char* info, const std::size_t size, const uint8_t* m
 std::size_t UbxMonVerToVerStr(char* str, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
     if ((msg == NULL) || (str == NULL) || (size < 2) || (UbxClsId(msg) != UBX_MON_CLSID) ||
-        (UbxMsgId(msg) != UBX_MON_VER_MSGID) || (msg_size < (UBX_FRAME_SIZE + sizeof(UBX_MON_VER_V0_GROUP0)))) {
+        (UbxMsgId(msg) != UBX_MON_VER_MSGID) || (msg_size < UBX_MON_VER_V0_MIN_SIZE)) {
         return false;
     }
 
@@ -947,7 +946,7 @@ static std::size_t StrUbxRxmSfrbx(char* info, const std::size_t size, const uint
 static std::size_t StrUbxCfgValset(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
     using namespace fpsdk::common::math;
-    if (msg_size < sizeof(UBX_CFG_VALSET_V1_GROUP0)) {
+    if (msg_size < UBX_CFG_VALSET_V0_MIN_SIZE) {
         return 0;
     }
     UBX_CFG_VALSET_V1_GROUP0 /* (~= UBX_CFG_VALGET_V0_GROUP0) */ head;
@@ -1012,7 +1011,7 @@ static const char* _valgetLayerName(const uint8_t layer)
 
 static std::size_t StrUbxCfgValget(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
-    if (msg_size < sizeof(UBX_CFG_VALGET_V0_GROUP0)) {
+    if (msg_size < UBX_CFG_VALGET_V0_MIN_SIZE) {
         return 0;
     }
     UBX_CFG_VALGET_V0_GROUP0 head;
@@ -1037,7 +1036,7 @@ static std::size_t StrUbxCfgValget(char* info, const std::size_t size, const uin
 static std::size_t StrUbxAckAck(
     char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size, const bool ack)
 {
-    if (msg_size < sizeof(UBX_ACK_ACK_V0_GROUP0)) {
+    if (msg_size != UBX_ACK_ACK_V0_SIZE) {
         return 0;
     }
     UBX_ACK_ACK_V0_GROUP0 /* (= UBX_ACK_NAK_V0_GROUP0_t) */ acknak;

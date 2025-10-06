@@ -1463,17 +1463,18 @@ static_assert(sizeof(UBX_MON_SYS_V1_GROUP0) == 24, "");
 static constexpr uint8_t     UBX_MON_SYS_VERSION(const uint8_t* msg)                                { return msg[UBX_HEAD_SIZE]; }  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_SYS_V1_VERSION                                                 = 0x01;  //!< @todo documentation
 static constexpr std::size_t UBX_MON_SYS_V1_SIZE                                                    = sizeof(UBX_MON_SYS_V1_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_UNKNOWN                                        =  0;  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_COLDSTART                                      =  1;  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_WATCHDOG                                       =  2;  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_HWRESET                                        =  3;  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_HWBACKUP                                       =  4;  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_SWBACKUP                                       =  5;  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_SWRESET                                        =  6;  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VIOFAIL                                        =  7;  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VDDXFAIL                                       =  8;  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VDDRFFAIL                                      =  9;  //!< @todo documentation
-static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VCOREHIGHFAIL                                  = 10;  //!< @todo documentation
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_UNKNOWN                                        =  0;  //!< Boot type: unknown
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_COLDSTART                                      =  1;  //!< Boot type: cold Start
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_WATCHDOG                                       =  2;  //!< Boot type: watchdog
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_HWRESET                                        =  3;  //!< Boot type: hardware reset
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_HWBACKUP                                       =  4;  //!< Boot type: hardware backup
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_SWBACKUP                                       =  5;  //!< Boot type: software backup
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_SWRESET                                        =  6;  //!< Boot type: software reset
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VIOFAIL                                        =  7;  //!< Boot type: VIO fail
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VDDXFAIL                                       =  8;  //!< Boot type: VDD_X fail
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VDDRFFAIL                                      =  9;  //!< Boot type: VDD_RF fail
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VCOREHIGHFAIL                                  = 10;  //!< Boot type: V_CORE_HIGH fail
+static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_SYSTEMRESET                                    = 11;  //!< Boot type: system reset
 // clang-format on
 
 ///@}
