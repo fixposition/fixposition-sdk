@@ -26,7 +26,7 @@ else ifeq ($(ROS_VERSION),2)
 endif
 
 # A unique ID for this exact config we're using
-configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING) ${FPSDK_VERSION_STRING} $$(uname -a)" | md5sum | cut -d " " -f1)
+configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING) $(FPSDK_VERSION_STRING) $(CC) $(CXX) $$(uname -a)" | md5sum | cut -d " " -f1)
 
 .PHONY: help
 help:
