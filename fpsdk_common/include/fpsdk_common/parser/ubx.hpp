@@ -2125,9 +2125,9 @@ static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE_PWROPTTR         
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE_INACTIVE                             = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE(const uint8_t flags2)           { return (flags2 >> 6) & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_UNKNOWN                         = 0;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_NOSPOOF                         = 0;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_SPOOFING                        = 0;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_MULTISPOOFING                   = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_NOSPOOF                         = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_SPOOFING                        = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_MULTISPOOFING                   = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_CARRSOLN(const uint8_t flags2)                { return (flags2 >> 6) & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_CARRSOLN_NO                                   = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_CARRSOLN_FLOAT                                = 1;  //!< @todo documentation
