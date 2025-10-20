@@ -18,6 +18,7 @@ set -eEu
 packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.trixie      bison
     noetic.humble.jazzy.trixie      build-essential
+    ....................trixie      clang
     ....................trixie      clang-format
     noetic.humble.jazzy.trixie      cmake
     noetic.humble.jazzy.trixie      curl
@@ -29,6 +30,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.trixie      gnuplot
     ..............jazzy.trixie      googletest
     noetic.humble.jazzy.trixie      graphviz
+    ....................trixie      libbacktrace-dev                  # GCC has its own, but clang needs this
     noetic.humble.jazzy.trixie      libboost-all-dev                  # This is not small... :-/
     noetic.humble.jazzy.trixie      libclone-perl
     noetic.humble.jazzy.trixie      libcurl4-openssl-dev
