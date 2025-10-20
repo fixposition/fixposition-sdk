@@ -36,7 +36,7 @@ namespace fpsdk {
 
     For building the libraries and apps:
 
-    - **Linux**, GCC (C++-17), glibc, cmake, bash, etc. (tested with Ubuntu 20.04/22.04/24.04 and Debian Trixie)
+    - **Linux**, **GCC** (C++-17), glibc, cmake, bash, etc. (tested with Ubuntu 20.04/22.04/24.04 and Debian Trixie)
     - boost            (≥ 1.71.0)
     - curl             (≥ 7.68.0)
     - Eigen3           (≥ 3.3.7)
