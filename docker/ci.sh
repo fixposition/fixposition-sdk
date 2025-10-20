@@ -189,6 +189,38 @@ function doxygen_release_noros
         BUILD_DIR=build/${buildname} || return 1
 }
 
+# ----------------------------------------------------------------------------------------------------------------------
+
+TITLES["build_toplevel_release_clang"]="Build top-level project (release, clang instead of gcc)"
+function build_toplevel_release_clang
+{
+    local buildname=${FPSDK_IMAGE}_build_toplevel_release_clang
+
+    cd ${FPSDK_SRC_DIR}
+    rm -rf build/${buildname}
+    make install \
+        CC=clang CXX=clang++ \
+        INSTALL_PREFIX=install/${buildname} \
+        BUILD_TYPE=Release \
+        BUILD_DIR=build/${buildname} || return 1
+    install/${buildname}/bin/fpltool -V || return 1
+}
+
+TITLES["build_toplevel_debug_clang"]="Build top-level project (debug, clang instead of gcc)"
+function build_toplevel_debug_clang
+{
+    local buildname=${FPSDK_IMAGE}_build_toplevel_debug_clang
+
+    cd ${FPSDK_SRC_DIR}
+    rm -rf build/${buildname}
+    make install \
+        CC=clang CXX=clang++ \
+        INSTALL_PREFIX=install/${buildname} \
+        BUILD_TYPE=Debug \
+        BUILD_DIR=build/${buildname} || return 1
+    install/${buildname}/bin/fpltool -V || return 1
+}
+
 ########################################################################################################################
 
 TITLES["build_toplevel_release_noros_mindeps"]="Build top-level project (release, without ROS, minimal deps)"
@@ -515,6 +547,13 @@ do_step build_toplevel_release_noros_mindeps   || true # continue
 do_step build_projs_release_noros_mindeps      || true # continue
 
 do_step build_examples                 || true # continue
+
+# Some minimal checks with clang
+echo "===== clang ====="
+if [ "${FPSDK_IMAGE%-*}" = "trixie" ]; then
+    do_step build_toplevel_release_clang  || true # continue
+    do_step build_toplevel_debug_clang    || true # continue
+fi
 
 # Build ROS stuff resp. stuff with the ROS environment loaded last
 # - Either ROS 1

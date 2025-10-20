@@ -9,11 +9,11 @@
 #pragma GCC diagnostic ignored "-Wshadow"
 
 #if !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wclass-memaccess"  // NOLINT
-#if defined(__GNUC__) && (__GNUC__ >= 9)
-#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#  pragma GCC diagnostic ignored "-Wdeprecated-copy"
-#endif
+#  pragma GCC diagnostic ignored "-Wclass-memaccess"  // NOLINT
+#  if defined(__GNUC__) && (__GNUC__ >= 9)
+#    pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#    pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#  endif
 #endif
 
 #include <Eigen/Geometry>

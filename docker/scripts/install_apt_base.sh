@@ -18,6 +18,7 @@ set -eEu
 packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.trixie      bison
     noetic.humble.jazzy.trixie      build-essential
+    ....................trixie      clang
     ....................trixie      clang-format
     noetic.humble.jazzy.trixie      cmake
     noetic.humble.jazzy.trixie      curl
