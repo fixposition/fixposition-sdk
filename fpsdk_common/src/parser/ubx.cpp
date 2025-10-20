@@ -750,8 +750,8 @@ static std::size_t StrUbxNavStatus(char* info, const std::size_t size, const uin
 
     constexpr std::array<const char*, 4> spoofStrs = { { "UNKNOWN", "NOSPOOF", "SPOOFING", "MULTISPOOFING" } };
     const auto spoof = UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE(sta.flags2);
-    return std::snprintf(info, size, "%010.3f ttff=%.3f sss=%.3f spoof=%s", (double)sta.iTow * 1e-3, (double)sta.ttff * 1e-3,
-        (double)sta.msss * 1e-3, spoof < spoofStrs.size() ? spoofStrs[spoof] : "?");
+    return std::snprintf(info, size, "%010.3f ttff=%.3f sss=%.3f spoof=%s", (double)sta.iTow * 1e-3,
+        (double)sta.ttff * 1e-3, (double)sta.msss * 1e-3, spoof < spoofStrs.size() ? spoofStrs[spoof] : "?");
 }
 
 static std::size_t StrUbxNavTimegps(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
