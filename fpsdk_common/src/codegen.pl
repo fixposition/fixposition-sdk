@@ -420,10 +420,11 @@ my @RTCM3_MESSAGES =
     { type => 1136,  desc => "NavIC MSM6 (full C, full L, S)" },
     { type => 1137,  desc => "NavIC MSM7 (ext full C, ext full L, S, D)" },
     #
-    { type => 1019,  desc => "GPS ephemerides" },
-    { type => 1020,  desc => "GLONASS ephemerides" },
+    { type => 1019,  desc => "GPS ephemeris data" },
+    { type => 1020,  desc => "GLONASS ephemeris data" },
+    { type => 1041,  desc => "NavIC satellite ephemeris data" },
     { type => 1042,  desc => "BeiDou satellite ephemeris data" },
-    { type => 1044,  desc => "QZSS ephemerides" },
+    { type => 1044,  desc => "QZSS ephemeris data" },
     { type => 1045,  desc => "Galileo F/NAV satellite ephemeris data" },
     { type => 1046,  desc => "Galileo I/NAV satellite ephemeris data" },
     #

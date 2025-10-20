@@ -44,7 +44,7 @@ struct MsgInfo
 
 // clang-format off
 // @fp_codegen_begin{FPSDK_COMMON_PARSER_RTCM3_MSGINFO}
-static constexpr std::array<MsgInfo, 118> MSG_INFO =
+static constexpr std::array<MsgInfo, 119> MSG_INFO =
 {{
     { RTCM3_TYPE1001_MSGID, 0, RTCM3_TYPE1001_STRID, "L1-only GPS RTK observables" },
     { RTCM3_TYPE1002_MSGID, 0, RTCM3_TYPE1002_STRID, "Extended L1-only GPS RTK observables" },
@@ -112,10 +112,11 @@ static constexpr std::array<MsgInfo, 118> MSG_INFO =
     { RTCM3_TYPE1135_MSGID, 0, RTCM3_TYPE1135_STRID, "NavIC MSM5 (full C, full L, S, D)" },
     { RTCM3_TYPE1136_MSGID, 0, RTCM3_TYPE1136_STRID, "NavIC MSM6 (full C, full L, S)" },
     { RTCM3_TYPE1137_MSGID, 0, RTCM3_TYPE1137_STRID, "NavIC MSM7 (ext full C, ext full L, S, D)" },
-    { RTCM3_TYPE1019_MSGID, 0, RTCM3_TYPE1019_STRID, "GPS ephemerides" },
-    { RTCM3_TYPE1020_MSGID, 0, RTCM3_TYPE1020_STRID, "GLONASS ephemerides" },
+    { RTCM3_TYPE1019_MSGID, 0, RTCM3_TYPE1019_STRID, "GPS ephemeris data" },
+    { RTCM3_TYPE1020_MSGID, 0, RTCM3_TYPE1020_STRID, "GLONASS ephemeris data" },
+    { RTCM3_TYPE1041_MSGID, 0, RTCM3_TYPE1041_STRID, "NavIC satellite ephemeris data" },
     { RTCM3_TYPE1042_MSGID, 0, RTCM3_TYPE1042_STRID, "BeiDou satellite ephemeris data" },
-    { RTCM3_TYPE1044_MSGID, 0, RTCM3_TYPE1044_STRID, "QZSS ephemerides" },
+    { RTCM3_TYPE1044_MSGID, 0, RTCM3_TYPE1044_STRID, "QZSS ephemeris data" },
     { RTCM3_TYPE1045_MSGID, 0, RTCM3_TYPE1045_STRID, "Galileo F/NAV satellite ephemeris data" },
     { RTCM3_TYPE1046_MSGID, 0, RTCM3_TYPE1046_STRID, "Galileo I/NAV satellite ephemeris data" },
     { RTCM3_TYPE4050_MSGID, 0, RTCM3_TYPE4050_STRID, "STMicroelectronics proprietary" },
