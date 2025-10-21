@@ -2123,7 +2123,7 @@ static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE_ACQUISITION      
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE_TRACKING                             = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE_POWEROPT                             = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE_INACTIVE                             = 3;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE(const uint8_t flags2)           { return (flags2 >> 6) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE(const uint8_t flags2)           { return (flags2 >> 3) & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_UNKNOWN                         = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_NONE                            = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_INDICATED                       = 2;  //!< @todo documentation
