@@ -710,6 +710,7 @@ static bool GetSignalId(NmeaSignalId& signalid, const std::string& field, const 
                 case 0xff & types::EnumToVal(NmeaSignalId::BDS_B2ID):   signalid = NmeaSignalId::BDS_B2ID;   break;
                 case 0xff & types::EnumToVal(NmeaSignalId::BDS_B1C):    signalid = NmeaSignalId::BDS_B1C;    break;
                 case 0xff & types::EnumToVal(NmeaSignalId::BDS_B2A):    signalid = NmeaSignalId::BDS_B2A;    break;
+                case 0xff & types::EnumToVal(NmeaSignalId::BDS_B2B):    signalid = NmeaSignalId::BDS_B2B;    break;
                 default: ok = false; break;
             } break;
             case NmeaSystemId::QZSS: switch ((int)field[0]) {

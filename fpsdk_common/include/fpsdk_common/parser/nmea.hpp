@@ -365,6 +365,7 @@ enum class NmeaSignalId : int
     BDS_B2ID    = 0x400 + 'B',  //!< BeiDou B2I D
     BDS_B1C     = 0x400 + '3',  //!< BeiDou B1 C
     BDS_B2A     = 0x400 + '5',  //!< BeiDou B2 a
+    BDS_B2B     = 0x400 + '6',  //!< BeiDou B2 b
     QZSS_L1CA   = 0x500 + '1',  //!< QZSS L1 C/A
     QZSS_L1S    = 0x500 + '4',  //!< QZSS L1S
     QZSS_L2CM   = 0x500 + '5',  //!< QZSS L2 CM
