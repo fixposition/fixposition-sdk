@@ -86,25 +86,33 @@ const char* SignalStr(const Signal signal, const bool kurz)
 {
     switch (signal) {  // clang-format off
         case Signal::UNKNOWN:    return kurz ? "UNKN"  : "UNKNOWN";
+        //
         case Signal::GPS_L1CA:   return kurz ? "L1CA"  : "GPS_L1CA";
         case Signal::GPS_L2C:    return kurz ? "L2C"   : "GPS_L2C";
         case Signal::GPS_L5:     return kurz ? "L5"    : "GPS_L5";
+        //
         case Signal::SBAS_L1CA:  return kurz ? "L1CA"  : "SBAS_L1CA";
+        //
         case Signal::GAL_E1:     return kurz ? "E1"    : "GAL_E1";
+        case Signal::GAL_E6:     return kurz ? "E6"    : "GAL_E6";
         case Signal::GAL_E5A:    return kurz ? "E5A"   : "GAL_E5A";
         case Signal::GAL_E5B:    return kurz ? "E5B"   : "GAL_E5B";
-        case Signal::GAL_E6:     return kurz ? "E6"    : "GAL_E6";
+        //
         case Signal::BDS_B1C:    return kurz ? "B1C"   : "BDS_B1C";
         case Signal::BDS_B1I:    return kurz ? "B1I"   : "BDS_B1I";
-        case Signal::BDS_B2A:    return kurz ? "B2A"   : "BDS_B2A";
-        case Signal::BDS_B2I:    return kurz ? "B2I"   : "BDS_B2I";
         case Signal::BDS_B3I:    return kurz ? "B3I"   : "BDS_B3I";
+        case Signal::BDS_B2I:    return kurz ? "B2I"   : "BDS_B2I";
+        case Signal::BDS_B2B:    return kurz ? "B2B"   : "BDS_B2B";
+        case Signal::BDS_B2A:    return kurz ? "B2A"   : "BDS_B2A";
+        //
         case Signal::QZSS_L1CA:  return kurz ? "L1CA"  : "QZSS_L1CA";
         case Signal::QZSS_L1S:   return kurz ? "L1S"   : "QZSS_L1S";
         case Signal::QZSS_L2C:   return kurz ? "L2C"   : "QZSS_L2C";
         case Signal::QZSS_L5:    return kurz ? "L5"    : "QZSS_L5";
+        //
         case Signal::GLO_L1OF:   return kurz ? "L1OF"  : "GLO_L1OF";
         case Signal::GLO_L2OF:   return kurz ? "L2OF"  : "GLO_L2OF";
+        //
         case Signal::NAVIC_L5A:  return kurz ? "L5A"   : "NAVIC_L5A";
     }  // clang-format on
 
@@ -220,6 +228,7 @@ Band SignalToBand(const Signal signal)
         case Signal::GPS_L2C:    /* FALLTHROUGH */
         case Signal::GAL_E5B:    /* FALLTHROUGH */
         case Signal::BDS_B2I:    /* FALLTHROUGH */
+        case Signal::BDS_B2B:    /* FALLTHROUGH */
         case Signal::QZSS_L2C:   /* FALLTHROUGH */
         case Signal::GLO_L2OF:   return Band::L2;
         // L5 (E5)
@@ -241,23 +250,31 @@ Gnss SignalToGnss(const Signal signal)
         case Signal::GPS_L1CA:   /* FALLTHROUGH */
         case Signal::GPS_L2C:    /* FALLTHROUGH */
         case Signal::GPS_L5:     return Gnss::GPS;
+        //
         case Signal::SBAS_L1CA:  return Gnss::SBAS;
+        //
         case Signal::GAL_E1:     /* FALLTHROUGH */
-        case Signal::GAL_E5A:    /* FALLTHROUGH */
+        case Signal::GAL_E6:     /* FALLTHROUGH */
         case Signal::GAL_E5B:    /* FALLTHROUGH */
-        case Signal::GAL_E6:     return Gnss::GAL;
+        case Signal::GAL_E5A:    return Gnss::GAL;
+        //
         case Signal::BDS_B1C:    /* FALLTHROUGH */
         case Signal::BDS_B1I:    /* FALLTHROUGH */
-        case Signal::BDS_B2A:    /* FALLTHROUGH */
+        case Signal::BDS_B3I:    /* FALLTHROUGH */
         case Signal::BDS_B2I:    /* FALLTHROUGH */
-        case Signal::BDS_B3I:    return Gnss::BDS;
+        case Signal::BDS_B2B:    /* FALLTHROUGH */
+        case Signal::BDS_B2A:    return Gnss::BDS;
+        //
         case Signal::QZSS_L1CA:  /* FALLTHROUGH */
         case Signal::QZSS_L1S:   /* FALLTHROUGH */
         case Signal::QZSS_L2C:   /* FALLTHROUGH */
         case Signal::QZSS_L5:    return Gnss::QZSS;
+        //
         case Signal::GLO_L1OF:   /* FALLTHROUGH */
         case Signal::GLO_L2OF:   return Gnss::GLO;
+        //
         case Signal::NAVIC_L5A:  return Gnss::NAVIC;
+        //
         case Signal::UNKNOWN:    break;
     }  // clang-format on
     return Gnss::UNKNOWN;
@@ -654,6 +671,7 @@ Signal NmeaSignalIdToSignal(const parser::nmea::NmeaSignalId signalId)
         case NmeaSignalId::BDS_B2ID:      return Signal::BDS_B2I;
         case NmeaSignalId::BDS_B1C:       return Signal::BDS_B1C;
         case NmeaSignalId::BDS_B2A:       return Signal::BDS_B2A;
+        case NmeaSignalId::BDS_B2B:       return Signal::BDS_B2B;
         case NmeaSignalId::QZSS_L1CA:     return Signal::QZSS_L1CA;
         case NmeaSignalId::QZSS_L1S:      return Signal::QZSS_L1S;
         case NmeaSignalId::QZSS_L2CM:     /* FALLTHROUGH */

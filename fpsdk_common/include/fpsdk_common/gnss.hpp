@@ -105,32 +105,33 @@ enum class Signal : uint8_t
 {  // clang-format off
     UNKNOWN = 0,  //!< Unknown/unspecified signal
     // GPS
-    GPS_L1CA,     //!< [L1] GPS L1 C/A signal
-    GPS_L2C,      //!< [L2] GPS L2 C signal      (L2 CL and L2 CM)
-    GPS_L5,       //!< [L5] GPS L5 signal        (L5 I and L5 Q)
+    GPS_L1CA,     //!< [L1]  GPS L1 C/A signal
+    GPS_L2C,      //!< [L2]  GPS L2 C signal      (L2 CL and L2 CM)
+    GPS_L5,       //!< [L5]  GPS L5 signal        (L5 I and L5 Q)
     // SBAS
-    SBAS_L1CA,    //!< [L1] SBAS L1 C/A signal
+    SBAS_L1CA,    //!< [L1]  SBAS L1 C/A signal
     // GAL
-    GAL_E1,       //!< [L1] Galileo E1 signal    (E1 C and E1 B)
-    GAL_E6,       //!< [E6] Galileo E6 signal    (E6A, E6B, and E6C)
-    GAL_E5B,      //!< [L2] Galileo E5b signal   (E5 bI and E5 bQ)
-    GAL_E5A,      //!< [L5] Galileo E5a signal   (E5 aI and E5 aQ)
+    GAL_E1,       //!< [L1]  Galileo E1 signal    (E1 C and E1 B)
+    GAL_E6,       //!< [E6]  Galileo E6 signal    (E6A, E6B, and E6C)
+    GAL_E5B,      //!< [~L2] Galileo E5b signal   (E5 bI and E5 bQ)
+    GAL_E5A,      //!< [L5]  Galileo E5a signal   (E5 aI and E5 aQ)
     // BDS
-    BDS_B1C,      //!< [L1] BeiDou B1c signal    (B1 Cp and B1 Cd)
-    BDS_B1I,      //!< [L1] BeiDou B1I signal    (B1I D1 and B1I D2)
-    BDS_B3I,      //!< [E6] BeiDou B3I signal    (B3I D1 and B3I D2)
-    BDS_B2I,      //!< [L2] BeiDou B2I signal    (B2I D1 and B2I D2)
-    BDS_B2A,      //!< [L5] BeiDou B2a signal    (B2 ap and B2 ad)
+    BDS_B1C,      //!< [L1]  BeiDou B1c signal    (B1 Cp and B1 Cd)
+    BDS_B1I,      //!< [L1]  BeiDou B1I signal    (B1I D1 and B1I D2)
+    BDS_B3I,      //!< [E6]  BeiDou B3I signal    (B3I D1 and B3I D2)
+    BDS_B2I,      //!< [~L2] BeiDou B2I signal    (B2I D1 and B2I D2)
+    BDS_B2B,      //!< [~L2] BeiDou B2b signal
+    BDS_B2A,      //!< [L5]  BeiDou B2a signal    (B2 ap and B2 ad)
     // QZSS
-    QZSS_L1CA,    //!< [L1] QZSS L1 C/A signal
-    QZSS_L1S,     //!< [L1] QZSS L1 S (SAIF) signal
-    QZSS_L2C,     //!< [L2] QZSS L2 C signal     (L2 CL and L2 CM)
-    QZSS_L5,      //!< [L5] QZSS L5 signal       (L5 I and L5 Q)
+    QZSS_L1CA,    //!< [L1]  QZSS L1 C/A signal
+    QZSS_L1S,     //!< [L1]  QZSS L1 S (SAIF) signal
+    QZSS_L2C,     //!< [L2]  QZSS L2 C signal     (L2 CL and L2 CM)
+    QZSS_L5,      //!< [L5]  QZSS L5 signal       (L5 I and L5 Q)
     // GLO
-    GLO_L1OF,     //!< [L1] GLONASS L1 OF signal
-    GLO_L2OF,     //!< [L2] GLONASS L2 OF signal
+    GLO_L1OF,     //!< [L1]  GLONASS L1 OF signal
+    GLO_L2OF,     //!< [L2]  GLONASS L2 OF signal
     // NAVIC
-    NAVIC_L5A,    //!< [L5] NavIC L5 A
+    NAVIC_L5A,    //!< [L5]  NavIC L5 A
 };  // clang-format on
 
 /**
@@ -279,6 +280,9 @@ const char* SatOrbStr(const SatOrb orb);
 
 /**
  * @brief Get frequency band for a signal
+ *
+ * @note This mapping is in some cases a bit vague and subject to interpretation or preference. See the docu of the
+ *       Signal enum.
  *
  * @param[in]  signal  The signal
  *
