@@ -24,7 +24,7 @@ namespace timetool {
 /* ****************************************************************************************************************** */
 
 /*!
-    @page FPSDK_APPS_TIMETOOL Time conversion tool
+    @page FPSDK_APPS_TIMETOOL Time tool
 
     @section FPSDK_APPS_TIMETOOL_OVERVIEW Overview
 

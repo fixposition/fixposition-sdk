@@ -2437,7 +2437,7 @@ static constexpr bool        UBX_RXM_RAWX_V1_TRKSTAT_PRVALID(const uint8_t trkSt
 static constexpr bool        UBX_RXM_RAWX_V1_TRKSTAT_CPVALID(const uint8_t trkStat)                 { return (trkStat & 0x02) == 0x02; }  //!< @todo documentation
 static constexpr bool        UBX_RXM_RAWX_V1_TRKSTAT_HALFCYC(const uint8_t trkStat)                 { return (trkStat & 0x04) == 0x04; }  //!< @todo documentation
 static constexpr bool        UBX_RXM_RAWX_V1_TRKSTAT_SUBHALFCYC(const uint8_t trkStat)              { return (trkStat & 0x08) == 0x08; }  //!< @todo documentation
-static constexpr int         UBX_RXM_RAWX_V1_GROUP1_FREQID_TO_SLOT(const uint8_t freqId)            { return (int)freqId - 7; }
+static constexpr int         UBX_RXM_RAWX_V1_GROUP1_FREQID_TO_SLOT(const uint8_t freqId)            { return (int)freqId - 7; }  //!< @todo documentation
 static constexpr std::size_t UBX_RXM_RAWX_V1_SIZE(const uint8_t *msg)                               { return
     ((sizeof(UBX_RXM_RAWX_V1_GROUP0) + UBX_FRAME_SIZE + (((uint8_t *)(msg))[UBX_HEAD_SIZE + 11] * sizeof(UBX_RXM_RAWX_V1_GROUP1)))); }  //!< @todo documentation
 
@@ -2507,7 +2507,7 @@ static_assert(sizeof(UBX_RXM_SFRBX_V2_GROUP1) == 4, "");
 static constexpr uint8_t     UBX_RXM_SFRBX_VERSION(const uint8_t* msg)                              { return msg[UBX_HEAD_SIZE + 6]; }  //!< @todo documentation
 static constexpr uint8_t     UBX_RXM_SFRBX_V2_VERSION                                               = 0x02;  //!< @todo documentation
 static constexpr std::size_t UBX_RXM_SFRBX_V2_MIN_SIZE                                              = sizeof(UBX_RXM_SFRBX_V2_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
-static constexpr int         UBX_RXM_SFRBX_V2_GROUP0_FREQID_TO_SLOT(const uint8_t freqId)           { return (int)freqId - 7; }
+static constexpr int         UBX_RXM_SFRBX_V2_GROUP0_FREQID_TO_SLOT(const uint8_t freqId)           { return (int)freqId - 7; }  //!< @todo documentation
 // clang-format on
 
 ///@}
