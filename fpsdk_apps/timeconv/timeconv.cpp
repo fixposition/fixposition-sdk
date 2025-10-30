@@ -58,7 +58,7 @@ class TimeConvOptions : public ProgramOptions
         // clang-format off
         std::fputs(
             "\n"
-            "This tool can convert time between different time systems.\n"
+            "Convert time between different time systems\n"
             "\n"
             "Usage:\n"
             "\n"
