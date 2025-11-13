@@ -95,8 +95,8 @@ bool DoDump(const FplToolOptions& opts)
     while (!sig_int.ShouldAbort() && reader.Next(log_msg)) {
         // "extra" levels
         // - <= 0: report progress while scanning through the log
-        // - == 1: print message info
-        // - >= 2: add less or more hexdump
+        // - == 1: also print message info
+        // - >= 2: also add (partial) hexdump for each message
 
         // Report progress
         if (opts.progress_ > 0) {
@@ -158,7 +158,7 @@ bool DoDump(const FplToolOptions& opts)
 
         // Print summary of the message
         if (opts.extra_ > 0) {
-            std::printf("message %8" PRIu64 " 0x%08" PRIx64 " 0x%06" PRIx32 " %-15s %s\n", log_msg.file_seq_,
+            std::printf("data %8" PRIu64 " 0x%08" PRIx64 " 0x%06" PRIx32 " %-15s %s\n", log_msg.file_seq_,
                 log_msg.file_pos_, log_msg.RawSize(), FplTypeStr(log_type), info.c_str());
         }
 

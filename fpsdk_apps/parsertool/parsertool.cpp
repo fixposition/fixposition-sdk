@@ -77,6 +77,7 @@ class ParserToolOptions : public ProgramOptions
             "\n", stdout);
         std::fputs(COMMON_FLAGS_HELP, stdout);
         std::fputs(
+            "\n"
             "    -x, --hexdump  -- Print hexdump of each message, not with -c\n"
             "    -s, --save     -- Save each (!) message into a separate (!) file in the current directory, not with -c\n"
             "    -f <filter>, --filter <filter>\n"

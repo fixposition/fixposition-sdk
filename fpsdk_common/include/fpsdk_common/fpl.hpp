@@ -8,9 +8,9 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: .fpl logfile helpers
+ * @brief Fixposition SDK: .fpl utilities
  *
- * @page FPSDK_COMMON_FPL .fpl logfile utilities
+ * @page FPSDK_COMMON_FPL .fpl utilities
  *
  * **API**: fpsdk_common/fpl.hpp and fpsdk::common::fpl
  *
@@ -26,8 +26,6 @@
 #include <vector>
 
 /* EXTERNAL */
-#include <boost/iostreams/filtering_stream.hpp>
-#include <boost/iostreams/stream.hpp>
 
 /* PACKAGE */
 #include "time.hpp"
@@ -35,7 +33,7 @@
 namespace fpsdk {
 namespace common {
 /**
- * @brief .fpl logfile utilities
+ * @brief .fpl utilities
  */
 namespace fpl {
 /* ****************************************************************************************************************** */
@@ -51,7 +49,7 @@ enum class FplType : uint16_t
     LOGMETA      = 0x0105,  //!< Logfile meta data
     STREAMMSG    = 0x0106,  //!< Stream message raw data with timestamp
     LOGSTATUS    = 0x0107,  //!< Logging status
-    FILEDUMP     = 0x0108,  //!< Dump of an entire (small, and text) file
+    FILEDUMP     = 0x0108,  //!< Dump of an entire (small) file
     BLOB         = 0xbaad,  //!< Arbitrary data, not FplMessage framing
     INT_D        = 0xffaa,  //!< Fixposition internal use only
     INT_F        = 0xffbb,  //!< Fixposition internal use only
@@ -261,6 +259,8 @@ class FplFileReader
  */
 struct LogMeta
 {
+    LogMeta() = default;  //!< Default ctor
+
     /**
      * @brief Constructor
      *
@@ -287,6 +287,8 @@ struct LogMeta
  */
 struct LogStatus
 {
+    LogStatus() = default;  //!< Default ctor
+
     /**
      * @brief Constructor
      *
@@ -332,13 +334,15 @@ struct LogStatus
  */
 struct RosMsgDef
 {
+    RosMsgDef() = default;  //!< Default ctor
+
     /**
      * @brief Constructor
      *
      * @param[in]  log_msg  .fpl log message
      */
     RosMsgDef(const FplMessage& log_msg);
-    bool valid_;              //!< Data valid, successfully extracted from message
+    bool valid_ = false;      //!< Data valid, successfully extracted from message
     std::string info_;        //!< Stringification of (some of the) data, for debugging
     std::string topic_name_;  //!< The topic name
     std::string msg_name_;    //!< The message name (a.k.a. data type)
@@ -353,13 +357,15 @@ struct RosMsgDef
  */
 struct RosMsgBin
 {
+    RosMsgBin() = default;  //!< Default ctor
+
     /**
      * @brief Constructor
      *
      * @param[in]  log_msg  .fpl log message
      */
     RosMsgBin(const FplMessage& log_msg);
-    bool valid_;                     //!< Data valid, successfully extracted from message
+    bool valid_ = false;             //!< Data valid, successfully extracted from message
     std::string info_;               //!< Stringification of (some of the) data, for debugging
     std::string topic_name_;         //!< The topic name
     time::RosTime rec_time_;         //!< Recording timestamp
@@ -373,13 +379,15 @@ struct RosMsgBin
  */
 struct StreamMsg
 {
+    StreamMsg() = default;  //!< Default ctor
+
     /**
      * @brief Constructor
      *
      * @param[in]  log_msg  .fpl log message
      */
     StreamMsg(const FplMessage& log_msg);
-    bool valid_;                     //!< Data valid, successfully extracted from message
+    bool valid_ = false;             //!< Data valid, successfully extracted from message
     std::string info_;               //!< Stringification of (some of the) data, for debugging
     time::RosTime rec_time_;         //!< Recording timestamp
     std::string stream_name_;        //!< Stream name

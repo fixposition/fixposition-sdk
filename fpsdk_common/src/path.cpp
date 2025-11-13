@@ -14,6 +14,7 @@
 /* LIBC/STL */
 #include <cerrno>
 #include <cstring>
+#include <filesystem>
 #include <fstream>
 
 /* EXTERNAL */
@@ -93,6 +94,41 @@ std::size_t FileSize(const std::string& path)
     return size;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+static std::size_t DirSizeEx(const std::string& path, std::size_t depth)
+{
+    if (depth > 100) {
+        WARNING("DirSize() max depth exceeded");
+        return 0;
+    }
+    std::size_t size = 0;
+    for (const std::filesystem::directory_entry& entry : std::filesystem::directory_iterator(path)) {
+        if (entry.is_directory()) {
+            size += DirSizeEx(entry.path(), depth + 1);
+        } else {
+            size += entry.file_size();
+        }
+    }
+    return size;
+}
+
+std::size_t DirSize(const std::string& path)
+{
+    return DirSizeEx(path, 0);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+void RemoveAll(const std::string& path)
+{
+    std::error_code ec;
+    std::filesystem::remove_all(path, ec);
+    if (ec) {
+        WARNING("Failed to remove %s: %s", path.c_str(), ec.message().c_str());
+    }
+}
+
 /* ****************************************************************************************************************** */
 
 OutputFile::OutputFile()
@@ -161,6 +197,11 @@ bool OutputFile::Write(const uint8_t* data, const std::size_t size)
         ok = false;
     }
     return ok;
+}
+
+bool OutputFile::Write(const std::string& data)
+{
+    return Write((const uint8_t*)data.data(), data.size());
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

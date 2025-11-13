@@ -216,6 +216,199 @@ NmeaCoordinates::NmeaCoordinates(const double degs, const int digits)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const char* NmeaTalkerIdStr(const NmeaTalkerId talker)
+{
+    switch (talker) {  // clang-format off
+        case NmeaTalkerId::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaTalkerId::PROPRIETARY: return "PROPRIETARY";
+        case NmeaTalkerId::GPS_SBAS:    return "GPS_SBAS";
+        case NmeaTalkerId::GLO:         return "GLO";
+        case NmeaTalkerId::GAL:         return "GAL";
+        case NmeaTalkerId::BDS:         return "BDS";
+        case NmeaTalkerId::NAVIC:       return "NAVIC";
+        case NmeaTalkerId::QZSS:        return "QZSS";
+        case NmeaTalkerId::GNSS:        return "GNSS";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* NmeaFormatterStr(const NmeaFormatter formatter)
+{
+    switch (formatter) {  // clang-format off
+        case NmeaFormatter::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaFormatter::GGA:         return "GGA";
+        case NmeaFormatter::GLL:         return "GLL";
+        case NmeaFormatter::RMC:         return "RMC";
+        case NmeaFormatter::VTG:         return "VTG";
+        case NmeaFormatter::GST:         return "GST";
+        case NmeaFormatter::HDT:         return "HDT";
+        case NmeaFormatter::ZDA:         return "ZDA";
+        case NmeaFormatter::GSA:         return "GSA";
+        case NmeaFormatter::GSV:         return "GSV";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* NmeaQualityGgaStr(const NmeaQualityGga qual)
+{
+    switch (qual) {  // clang-format off
+        case NmeaQualityGga::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaQualityGga::NOFIX:       return "NOFIX";
+        case NmeaQualityGga::SPP:         return "SPP";
+        case NmeaQualityGga::DGNSS:       return "DGNSS";
+        case NmeaQualityGga::PPS:         return "PPS";
+        case NmeaQualityGga::RTK_FIXED:   return "RTK_FIXED";
+        case NmeaQualityGga::RTK_FLOAT:   return "RTK_FLOAT";
+        case NmeaQualityGga::ESTIMATED:   return "ESTIMATED";
+        case NmeaQualityGga::MANUAL:      return "MANUAL";
+        case NmeaQualityGga::SIM:         return "SIM";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* NmeaStatusGllRmcStr(const NmeaStatusGllRmc status)
+{
+    switch (status) {  // clang-format off
+        case NmeaStatusGllRmc::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaStatusGllRmc::INVALID:     return "INVALID";
+        case NmeaStatusGllRmc::VALID:       return "VALID";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* NmeaModeGllVtgStr(const NmeaModeGllVtg mode)
+{
+    switch (mode) {  // clang-format off
+        case NmeaModeGllVtg::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaModeGllVtg::INVALID:     return "INVALID";
+        case NmeaModeGllVtg::AUTONOMOUS:  return "AUTONOMOUS";
+        case NmeaModeGllVtg::DGNSS:       return "DGNSS";
+        case NmeaModeGllVtg::ESTIMATED:   return "ESTIMATED";
+        case NmeaModeGllVtg::MANUAL:      return "MANUAL";
+        case NmeaModeGllVtg::SIM:         return "SIM";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* NmeaModeRmcGnsStr(const NmeaModeRmcGns mode)
+{
+    switch (mode) {  // clang-format off
+        case NmeaModeRmcGns::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaModeRmcGns::INVALID:     return "INVALID";
+        case NmeaModeRmcGns::AUTONOMOUS:  return "AUTONOMOUS";
+        case NmeaModeRmcGns::DGNSS:       return "DGNSS";
+        case NmeaModeRmcGns::ESTIMATED:   return "ESTIMATED";
+        case NmeaModeRmcGns::RTK_FIXED:   return "RTK_FIXED";
+        case NmeaModeRmcGns::RTK_FLOAT:   return "RTK_FLOAT";
+        case NmeaModeRmcGns::PRECISE:     return "PRECISE";
+        case NmeaModeRmcGns::MANUAL:      return "MANUAL";
+        case NmeaModeRmcGns::SIM:         return "SIM";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* NmeaNavStatusRmcStr(const NmeaNavStatusRmc navstatus)
+{
+    switch (navstatus) {  // clang-format off
+        case NmeaNavStatusRmc::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaNavStatusRmc::SAFE:        return "SAFE";
+        case NmeaNavStatusRmc::CAUTION:     return "CAUTION";
+        case NmeaNavStatusRmc::UNSAFE:      return "UNSAFE";
+        case NmeaNavStatusRmc::NA:          return "NA";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* NmeaOpModeGsaStr(const NmeaOpModeGsa opmode)
+{
+    switch (opmode) {  // clang-format off
+        case NmeaOpModeGsa::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaOpModeGsa::MANUAL:      return "MANUAL";
+        case NmeaOpModeGsa::AUTO:        return "AUTO";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* NmeaNavModeGsaStr(const NmeaNavModeGsa navmode)
+{
+    switch (navmode) {  // clang-format off
+        case NmeaNavModeGsa::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaNavModeGsa::NOFIX:       return "NOFIX";
+        case NmeaNavModeGsa::FIX2D:       return "FIX2D";
+        case NmeaNavModeGsa::FIX3D:       return "FIX3D";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* NmeaSystemIdStr(const NmeaSystemId system)
+{
+    switch (system) {  // clang-format off
+        case NmeaSystemId::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaSystemId::GPS_SBAS:    return "GPS_SBAS";
+        case NmeaSystemId::GLO:         return "GLO";
+        case NmeaSystemId::GAL:         return "GAL";
+        case NmeaSystemId::BDS:         return "BDS";
+        case NmeaSystemId::QZSS:        return "QZSS";
+        case NmeaSystemId::NAVIC:       return "NAVIC";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* NmeaSignalIdStr(const NmeaSignalId signal)
+{
+    switch (signal) {  // clang-format off
+        case NmeaSignalId::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaSignalId::NONE:        return "NONE";
+        case NmeaSignalId::GPS_L1CA:    return "GPS_L1CA";
+        case NmeaSignalId::GPS_L2CL:    return "GPS_L2CL";
+        case NmeaSignalId::GPS_L2CM:    return "GPS_L2CM";
+        case NmeaSignalId::GPS_L5I:     return "GPS_L5I";
+        case NmeaSignalId::GPS_L5Q:     return "GPS_L5Q";
+        case NmeaSignalId::GAL_E1:      return "GAL_E1";
+        case NmeaSignalId::GAL_E5A:     return "GAL_E5A";
+        case NmeaSignalId::GAL_E5B:     return "GAL_E5B";
+        case NmeaSignalId::GAL_E6BC:    return "GAL_E6BC";
+        case NmeaSignalId::GAL_E6A:     return "GAL_E6A";
+        case NmeaSignalId::BDS_B1ID:    return "BDS_B1ID";
+        case NmeaSignalId::BDS_B2ID:    return "BDS_B2ID";
+        case NmeaSignalId::BDS_B1C:     return "BDS_B1C";
+        case NmeaSignalId::BDS_B2A:     return "BDS_B2A";
+        case NmeaSignalId::BDS_B2B:     return "BDS_B2B";
+        case NmeaSignalId::QZSS_L1CA:   return "QZSS_L1CA";
+        case NmeaSignalId::QZSS_L1S:    return "QZSS_L1S";
+        case NmeaSignalId::QZSS_L2CM:   return "QZSS_L2CM";
+        case NmeaSignalId::QZSS_L2CL:   return "QZSS_L2CL";
+        case NmeaSignalId::QZSS_L5I:    return "QZSS_L5I";
+        case NmeaSignalId::QZSS_L5Q:    return "QZSS_L5Q";
+        case NmeaSignalId::GLO_L1OF:    return "GLO_L1OF";
+        case NmeaSignalId::GLO_L2OF:    return "GLO_L2OF";
+        case NmeaSignalId::NAVIC_L5A:   return "NAVIC_L5A";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 // clang-format off
 //                                                         GPS      SBAS      GAL      BDS      GLO       QZSS       NavIC
 /*static*/ const NmeaVersion NmeaVersion::V410         = { 1, 32,   33, 64,   1, 36,   1, 63,   65, 96,    -1,  -1,   -1, -1 };

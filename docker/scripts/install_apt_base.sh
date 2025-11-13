@@ -30,6 +30,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.trixie      gnuplot
     ..............jazzy.trixie      googletest
     noetic.humble.jazzy.trixie      graphviz
+    noetic.humble.jazzy.trixie      jq
     ....................trixie      libbacktrace-dev                  # GCC has its own, but clang needs this
     noetic.humble.jazzy.trixie      libboost-all-dev                  # This is not small... :-/
     noetic.humble.jazzy.trixie      libclone-perl
@@ -55,6 +56,8 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.trixie      python3-osrf-pycommon
     noetic.humble.jazzy.trixie      python3-pip
     noetic.humble.jazzy.trixie      python3-venv
+    .......humble.............      ros-humble-rosbag2-storage-mcap
+    ..............jazzy.......      ros-jazzy-rosbag2-storage-mcap
     noetic....................      ros-noetic-eigen-conversions
     noetic....................      ros-noetic-tf
     noetic....................      ros-noetic-tf-conversions

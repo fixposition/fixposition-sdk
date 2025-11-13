@@ -62,14 +62,16 @@ class TimeConvOptions : public ProgramOptions
             "\n"
             "Usage:\n"
             "\n"
-            "    timeconv [flags] [<input>]\n"
+            "    timeconv [flags] [<input...>]\n"
             "\n"
             "Where:\n"
             "\n", stdout);
         std::fputs(COMMON_FLAGS_HELP, stdout);
         std::fputs(
+            "\n"
             "    -i, --ignore        -- Ignore errors in input (only from stdin, not for input on command line)\n"
             "    -p <n>, --prec <n>  -- Precision (number of fractional digits) for float outputs (default: 3)\n"
+            "    <input...>          -- Input data, see below\n"
             "\n"
             "A single <input> is either provided on the command line or on stdin, one <input> per line.\n"
             "The program converts the input to the desired output. One <input> has the following format:\n"

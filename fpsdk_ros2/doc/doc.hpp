@@ -31,7 +31,9 @@ namespace ros2 {
 
     @section FPSDK_ROS2_MODULES Modules
 
+    - @subpage FPSDK_ROS2_BAGWRITER
     - @subpage FPSDK_ROS2_UTILS
+    - @subpage FPSDK_ROS2_ROS1
 
     @section FPSDK_ROS2_LICENSE License
 

@@ -8,34 +8,25 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: fpltool rosbag
+ * @brief Fixposition SDK: ROS1 types and utils
  */
-#ifndef __FPSDK_APPS_FPLTOOL_FPLTOOL_ROSBAG_HPP__
-#define __FPSDK_APPS_FPLTOOL_FPLTOOL_ROSBAG_HPP__
 
 /* LIBC/STL */
 
 /* EXTERNAL */
 
-/* Fixposition SDK */
-
 /* PACKAGE */
-#include "fpltool_opts.hpp"
+#include "fpsdk_common/logging.hpp"
+#include "fpsdk_common/ros1.hpp"
 
 namespace fpsdk {
-namespace apps {
-namespace fpltool {
+namespace common {
+namespace ros1 {
 /* ****************************************************************************************************************** */
 
-/**
- * @brief Run FpltoolArgs::Command::ROSBAG
- *
- * @param[in]  opts  Options
- */
-bool DoRosbag(const FplToolOptions& opts);
+// ---------------------------------------------------------------------------------------------------------------------
 
 /* ****************************************************************************************************************** */
-}  // namespace fpltool
-}  // namespace apps
+}  // namespace ros1
+}  // namespace common
 }  // namespace fpsdk
-#endif  // __FPSDK_APPS_FPLTOOL_FPLTOOL_ROSBAG_HPP__

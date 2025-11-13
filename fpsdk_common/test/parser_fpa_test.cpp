@@ -361,7 +361,6 @@ TEST(ParserFpaTest, FpaRawimuPayload)
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_EQ(payload.msg_type_, FpaMessageType::RAWIMU);
-        EXPECT_EQ(payload.which, FpaImuPayload::Which::RAWIMU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2197);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -384,7 +383,6 @@ TEST(ParserFpaTest, FpaRawimuPayload)
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_EQ(payload.msg_type_, FpaMessageType::RAWIMU);
-        EXPECT_EQ(payload.which, FpaImuPayload::Which::RAWIMU);
         EXPECT_FALSE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 0);
         EXPECT_FALSE(payload.gps_time.tow.valid);
@@ -408,7 +406,6 @@ TEST(ParserFpaTest, FpaRawimuPayload)
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_EQ(payload.msg_type_, FpaMessageType::RAWIMU);
-        EXPECT_EQ(payload.which, FpaImuPayload::Which::RAWIMU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2368);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -438,7 +435,6 @@ TEST(ParserFpaTest, FpaCorrimuPayload)
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_EQ(payload.msg_type_, FpaMessageType::CORRIMU);
-        EXPECT_EQ(payload.which, FpaImuPayload::Which::CORRIMU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2197);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -459,7 +455,6 @@ TEST(ParserFpaTest, FpaCorrimuPayload)
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_EQ(payload.msg_type_, FpaMessageType::CORRIMU);
-        EXPECT_EQ(payload.which, FpaImuPayload::Which::CORRIMU);
         EXPECT_FALSE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 0);
         EXPECT_FALSE(payload.gps_time.tow.valid);
@@ -481,7 +476,6 @@ TEST(ParserFpaTest, FpaCorrimuPayload)
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_EQ(payload.msg_type_, FpaMessageType::CORRIMU);
-        EXPECT_EQ(payload.which, FpaImuPayload::Which::CORRIMU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2368);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -633,7 +627,6 @@ TEST(ParserFpaTest, FpaOdometryPayload)
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_EQ(payload.msg_type_, FpaMessageType::ODOMETRY);
-        EXPECT_EQ(payload.which, FpaOdomPayload::Which::ODOMETRY);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2231);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -703,7 +696,6 @@ TEST(ParserFpaTest, FpaOdomenuPayload)
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_EQ(payload.msg_type_, FpaMessageType::ODOMENU);
-        EXPECT_EQ(payload.which, FpaOdomPayload::Which::ODOMENU);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2180);
         EXPECT_TRUE(payload.gps_time.tow.valid);
@@ -726,7 +718,6 @@ TEST(ParserFpaTest, FpaOdomshPayload)
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_EQ(payload.msg_type_, FpaMessageType::ODOMSH);
-        EXPECT_EQ(payload.which, FpaOdomPayload::Which::ODOMSH);
         EXPECT_TRUE(payload.gps_time.week.valid);
         EXPECT_EQ(payload.gps_time.week.value, 2180);
         EXPECT_TRUE(payload.gps_time.tow.valid);

@@ -73,12 +73,13 @@ class YamlToShellOptions : public ProgramOptions
             "\n"
             "Usage:\n"
             "\n"
-            "    yaml2shell [flags] [<some.yaml]>\n"
+            "    yaml2shell [flags] [<some.yaml>]\n"
             "\n"
             "Where:\n"
             "\n", stdout);
         std::fputs(COMMON_FLAGS_HELP, stdout);
         std::fputs(
+            "\n"
             "    -p <str>  -- Prefix for variable names (default: none)\n"
             "    -o <file> -- Output to file instead of stdout\n"
             "    -u        -- Uppercase variable names\n"

@@ -1,4 +1,5 @@
 # GENERAL ==============================================================================================================
+message(STATUS "fpsdk: ----- ${CMAKE_CURRENT_SOURCE_DIR} -----")
 
 cmake_minimum_required(VERSION 3.16)
 include(../fpsdk_common/cmake/setup.cmake)
@@ -34,19 +35,12 @@ if(NOT TARGET fpsdk_common)
     find_package(fpsdk_common REQUIRED)
 endif()
 
-set(FP_ROS2_INCLUDE_DIRS "")
-set(FP_ROS2_LIBRARIES "")
-
 find_package(rclcpp REQUIRED)
-list(APPEND FP_ROS2_INCLUDE_DIRS ${rclcpp_INCLUDE_DIRS})
-list(APPEND FP_ROS2_LIBRARIES ${rclcpp_LIBRARIES})
-
-
-list(REMOVE_DUPLICATES FP_ROS2_INCLUDE_DIRS)
-list(REMOVE_DUPLICATES FP_ROS2_LIBRARIES)
-
-message(STATUS "fpsdk: FP_ROS2_INCLUDE_DIRS=${FP_ROS2_INCLUDE_DIRS}")
-message(STATUS "fpsdk: FP_ROS2_LIBRARIES=${FP_ROS2_LIBRARIES}")
+find_package(rosbag2_cpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
 
 
 # SHARED LIBRARY =======================================================================================================
@@ -58,13 +52,20 @@ target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-        ${FP_ROS2_INCLUDE_DIRS}
 )
+
+set(FPSDK_COMMON_TRANS_DEPS "fpsdk_common;${rclcpp_TARGETS};${rosbag2_cpp_TARGETS}")
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
         fpsdk_common
-        ${FP_ROS2_LIBRARIES}
+        ${rclcpp_TARGETS}
+        ${rosbag2_cpp_TARGETS}
+    PRIVATE
+        ${sensor_msgs_TARGETS}
+        ${geometry_msgs_TARGETS}
+        ${tf2_msgs_TARGETS}
+        ${nav_msgs_TARGETS}
 )
 
 set_target_properties(${PROJECT_NAME}
@@ -143,7 +144,9 @@ install(
 
 include(../fpsdk_common/cmake/testing.cmake)
 
-add_gtest(TARGET utils_test     SOURCES test/utils_test.cpp     LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET bagwriter_test SOURCES test/bagwriter_test.cpp  LINK_LIBS ${PROJECT_NAME} ${rclcpp_TARGETS} ${rosbag2_cpp_TARGETS})
+add_gtest(TARGET utils_test     SOURCES test/utils_test.cpp      LINK_LIBS ${PROJECT_NAME} ${rclcpp_TARGETS})
+add_gtest(TARGET ros1_test      SOURCES test/ros1_test.cpp       LINK_LIBS ${PROJECT_NAME} ${rclcpp_TARGETS} ${nav_msgs_TARGETS} ${sensor_msgs_TARGETS} ${tf2_msgs_TARGETS})
 
 
 # ======================================================================================================================

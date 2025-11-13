@@ -39,6 +39,7 @@ namespace common {
     - @subpage FPSDK_COMMON_MATH
     - @subpage FPSDK_COMMON_PARSER
     - @subpage FPSDK_COMMON_PATH
+    - @subpage FPSDK_COMMON_ROS1
     - @subpage FPSDK_COMMON_STRING
     - @subpage FPSDK_COMMON_TIME
     - @subpage FPSDK_COMMON_THREAD

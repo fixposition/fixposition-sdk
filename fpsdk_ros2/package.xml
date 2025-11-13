@@ -10,4 +10,9 @@
         <build_type>cmake</build_type>
     </export>
     <depend>fpsdk_common</depend>
+    <depend>std_msgs</depend>
+    <depend>sensor_msgs</depend>
+    <depend>geometry_msgs</depend>
+    <depend>tf2_msgs</depend>
+    <depend>rosbag2_cpp</depend>
 </package>

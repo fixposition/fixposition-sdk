@@ -1,7 +1,9 @@
 # GENERAL ==============================================================================================================
+message(STATUS "fpsdk: ----- ${CMAKE_CURRENT_SOURCE_DIR} -----")
 
 cmake_minimum_required(VERSION 3.16)
 include(../fpsdk_common/cmake/setup.cmake)
+include(../fpsdk_common/cmake/ros.cmake)
 
 project(fpsdk_ros1
     LANGUAGES CXX
@@ -34,35 +36,16 @@ if(NOT TARGET fpsdk_common)
     find_package(fpsdk_common REQUIRED)
 endif()
 
-set(FP_ROS1_INCLUDE_DIRS "")
-set(FP_ROS1_LIBRARIES "")
-
-find_package(roscpp REQUIRED)
-list(APPEND FP_ROS1_INCLUDE_DIRS ${roscpp_INCLUDE_DIRS})
-list(APPEND FP_ROS1_LIBRARIES ${roscpp_LIBRARIES})
-
-find_package(rosbag REQUIRED)
-list(APPEND FP_ROS1_INCLUDE_DIRS ${rosbag_INCLUDE_DIRS})
-list(APPEND FP_ROS1_LIBRARIES ${rosbag_LIBRARIES})
-
-find_package(std_msgs REQUIRED)
-list(APPEND FP_ROS1_INCLUDE_DIRS ${std_msgs_INCLUDE_DIRS})
-list(APPEND FP_ROS1_LIBRARIES ${std_msgs_LIBRARIES})
-
-find_package(topic_tools REQUIRED)
-list(APPEND FP_ROS1_INCLUDE_DIRS ${topic_tools_INCLUDE_DIRS})
-list(APPEND FP_ROS1_LIBRARIES ${topic_tools_LIBRARIES})
-
-find_package(genmsg REQUIRED)
-list(APPEND FP_ROS1_INCLUDE_DIRS ${genmsg_INCLUDE_DIRS})
-list(APPEND FP_ROS1_LIBRARIES ${genmsg_LIBRARIES})
-
-
-list(REMOVE_DUPLICATES FP_ROS1_INCLUDE_DIRS)
-list(REMOVE_DUPLICATES FP_ROS1_LIBRARIES)
-
-message(STATUS "fpsdk: FP_ROS1_INCLUDE_DIRS=${FP_ROS1_INCLUDE_DIRS}")
-message(STATUS "fpsdk: FP_ROS1_LIBRARIES=${FP_ROS1_LIBRARIES}")
+fpsdk_cmake_find_ros1_package(roscpp)
+fpsdk_cmake_find_ros1_package(rosconsole)
+fpsdk_cmake_find_ros1_package(rosbag)
+fpsdk_cmake_find_ros1_package(std_msgs)
+fpsdk_cmake_find_ros1_package(sensor_msgs)
+fpsdk_cmake_find_ros1_package(geometry_msgs)
+fpsdk_cmake_find_ros1_package(tf2_msgs)
+fpsdk_cmake_find_ros1_package(nav_msgs)
+fpsdk_cmake_find_ros1_package(topic_tools)
+fpsdk_cmake_find_ros1_package(genmsg)
 
 
 # MESSAGES =============================================================================================================
@@ -71,7 +54,7 @@ file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} msg/*.msg)
 
 # /opt/ros/noetic/share/genmsg/cmake/genmsg-extras.cmake
 add_message_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} FILES ${MSG_FILES})
-generate_messages(LANGS gencpp genpy DEPENDENCIES std_msgs)
+generate_messages(LANGS gencpp genpy) # DEPENDENCIES std_msgs sensor_msgs)
 
 
 # SHARED LIBRARY =======================================================================================================
@@ -86,14 +69,21 @@ target_include_directories(${PROJECT_NAME}
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../devel/include> # generate_message() puts them here
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../devel/include> # generate_message() puts them here
-        ${FP_ROS1_INCLUDE_DIRS}
 )
 
 target_link_libraries(${PROJECT_NAME}
     PUBLIC
         fpsdk_common
-        ${FP_ROS1_LIBRARIES}
+    PRIVATE
+        ros1::rosbag
+        ros1::roscpp
+        ros1::rosconsole
+        ros1::std_msgs
+        ros1::sensor_msgs
+        ros1::geometry_msgs
+        ros1::tf2_msgs
+        ros1::nav_msgs
+        ros1::topic_tools
 )
 
 set_target_properties(${PROJECT_NAME}
@@ -172,9 +162,9 @@ install(
 
 include(../fpsdk_common/cmake/testing.cmake)
 
-add_gtest(TARGET bagwriter_test SOURCES test/bagwriter_test.cpp LINK_LIBS ${PROJECT_NAME})
-add_gtest(TARGET msgs_test      SOURCES test/msgs_test.cpp      LINK_LIBS ${PROJECT_NAME})
-add_gtest(TARGET utils_test     SOURCES test/utils_test.cpp     LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET bagwriter_test SOURCES test/bagwriter_test.cpp LINK_LIBS ${PROJECT_NAME} ros1::rosconsole ros1::rosbag)
+add_gtest(TARGET msgs_test      SOURCES test/msgs_test.cpp      LINK_LIBS ${PROJECT_NAME} ros1::rosconsole)
+add_gtest(TARGET utils_test     SOURCES test/utils_test.cpp     LINK_LIBS ${PROJECT_NAME} ros1::rosconsole)
 
 
 # ======================================================================================================================

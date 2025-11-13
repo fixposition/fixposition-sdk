@@ -381,7 +381,7 @@ void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const std::si
           static uint32_t __repeat = 0;                                                    \
           const uint32_t __now = ::fpsdk::common::time::GetMillis();                       \
           __repeat++;                                                                      \
-          if ((__now - __last) >= (_millis_)) {                                            \
+          if ((__last == 0) || ((__now - __last) >= (_millis_))) {                         \
               __last = __now;                                                              \
               ::fpsdk::common::logging::LoggingPrint(                                      \
                   ::fpsdk::common::logging::LoggingLevel::_level_, __repeat, __VA_ARGS__); \

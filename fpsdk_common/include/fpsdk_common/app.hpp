@@ -226,8 +226,8 @@ class ProgramOptions
     static constexpr const char* COMMON_FLAGS_HELP = /* clang-format off */
         "    -h, --help     -- Print program help screen, and exit\n"
         "    -V, --version  -- Print program, version and license information, and exit\n"
-        "    -v, --verbose / -q, --quiet\n"
-        "                   -- Increase / decrease logging verbosity, multiple flags accumulate\n"
+        "    -v, --verbose  -- Increase logging verbosity, multiple flags accumulate\n"
+        "    -q, --quiet    -- Decrease logging verbosity, multiple flags accumulate\n"
         "    -J, --journal  -- Use systemd journal logging markers instead of colours\n";  // clang-format on
 
     std::string app_name_;                   //!< App name

@@ -10,10 +10,10 @@ sys.path.insert(0, '/home/fpsdk/fixposition-sdk/.devcontainer/.gdb')
 sys.path.insert(0, os.getcwd() + '/.devcontainer/.gdb')
 #/usr/share/gcc/python/libstdcxx
 
-# Natvis
-print('- loading natvis4gdb')
-import natvis4gdb
-natvis4gdb.register()
+# # Natvis
+# print('- loading natvis4gdb')
+# import natvis4gdb
+# natvis4gdb.register()
 
 # STL pretty printer
 print('- loading libstdcxx pretty printer')
@@ -24,7 +24,7 @@ register_libstdcxx_printers(None)
 # print('- loading GLM pretty printer')
 # import glm_pp
 
-# JSNO pretty printer
+# JSON pretty printer
 print('- loading json pretty printer')
 import nlohmann_json
 

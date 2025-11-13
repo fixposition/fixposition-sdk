@@ -26,7 +26,6 @@
 #include "fpltool_meta.hpp"
 #include "fpltool_opts.hpp"
 #include "fpltool_record.hpp"
-#include "fpltool_rosbag.hpp"
 #include "fpltool_trim.hpp"
 
 /* ****************************************************************************************************************** */
@@ -51,10 +50,15 @@ int main(int argc, char** argv)
         switch (opts.command_) { /* clang-format off */
             case FplToolOptions::Command::DUMP:        ok = DoDump(opts);    break;
             case FplToolOptions::Command::META:        ok = DoMeta(opts);    break;
-            case FplToolOptions::Command::ROSBAG:      ok = DoRosbag(opts);  break;
             case FplToolOptions::Command::TRIM:        ok = DoTrim(opts);    break;
-            case FplToolOptions::Command::RECORD:      ok = DoRecord(opts);  break;
             case FplToolOptions::Command::EXTRACT:     ok = DoExtract(opts); break;
+            // Aliases
+            case FplToolOptions::Command::ROSBAG:
+                opts.formats_.push_back(opts.FORMAT_ROS);
+                ok = DoExtract(opts);
+                break;
+            // Not implemented, invalid
+            case FplToolOptions::Command::RECORD:      ok = DoRecord(opts);  break;
             case FplToolOptions::Command::UNSPECIFIED: ok = false;           break;
         }  // clang-format on
     }

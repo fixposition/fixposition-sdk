@@ -22,10 +22,10 @@ RUN /tmp/unminimize_system.sh && rm -f /tmp/unminimize_system.sh
 COPY docker/scripts/adduser_fpsdk.sh /tmp
 RUN /tmp/adduser_fpsdk.sh && rm -f /tmp/adduser_fpsdk.sh
 
-# Install pre-commit hooks (fpsdk user)
-COPY .pre-commit-config.yaml /tmp
-COPY docker/scripts/install_precommithooks.sh /tmp
-RUN sudo -u fpsdk /tmp/install_precommithooks.sh && rm -f /tmp/install_precommithooks.sh /tmp/.pre-commit-config.yaml
+# # Install pre-commit hooks (fpsdk user)
+# COPY .pre-commit-config.yaml /tmp
+# COPY docker/scripts/install_precommithooks.sh /tmp
+# RUN sudo -u fpsdk /tmp/install_precommithooks.sh && rm -f /tmp/install_precommithooks.sh /tmp/.pre-commit-config.yaml
 
 # Install git-bash-prompt (fpsdk user)
 COPY .devcontainer/fpsdk.bgptheme /tmp
