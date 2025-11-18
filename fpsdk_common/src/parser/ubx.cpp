@@ -959,13 +959,13 @@ static std::size_t StrUbxCfgValset(char* info, const std::size_t size, const uin
     layers[0] = '\0';
     layers[1] = '\0';
     std::size_t len = 0;
-    if (CheckBitsAll(head.layers, UBX_CFG_VALSET_V1_LAYERS_RAM)) {
+    if (CheckBitsAll(head.layers, UBX_CFG_VALSET_V1_LAYER_RAM)) {
         len += std::snprintf(&layers[len], sizeof(layers) - len, ",RAM");
     }
-    if (CheckBitsAll(head.layers, UBX_CFG_VALSET_V1_LAYERS_BBR)) {
+    if (CheckBitsAll(head.layers, UBX_CFG_VALSET_V1_LAYER_BBR)) {
         len += std::snprintf(&layers[len], sizeof(layers) - len, ",BBR");
     }
-    if (CheckBitsAll(head.layers, UBX_CFG_VALSET_V1_LAYERS_FLASH)) {
+    if (CheckBitsAll(head.layers, UBX_CFG_VALSET_V1_LAYER_FLASH)) {
         /* len += */ std::snprintf(&layers[len], sizeof(layers) - len, ",Flash");
     }
     switch (head.version) {
@@ -995,6 +995,44 @@ static std::size_t StrUbxCfgValset(char* info, const std::size_t size, const uin
         }
     }
     return 0;
+}
+
+static std::size_t StrUbxCfgValdel(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
+{
+    using namespace fpsdk::common::math;
+    if ((msg_size < UBX_CFG_VALDEL_V1_MIN_SIZE) || (UBX_CFG_VALDEL_VERSION(msg) != UBX_CFG_VALDEL_V1_VERSION)) {
+        return 0;
+    }
+    UBX_CFG_VALDEL_V1_GROUP0 head;
+    std::memcpy(&head, &msg[UBX_HEAD_SIZE], sizeof(head));
+    const std::size_t nIds = (msg_size - UBX_FRAME_SIZE - sizeof(head)) / sizeof(uint32_t);
+    char layers[100];
+    layers[0] = '\0';
+    layers[1] = '\0';
+    std::size_t len = 0;
+    if (CheckBitsAll(head.layers, UBX_CFG_VALDEL_V1_LAYER_BBR)) {
+        len += std::snprintf(&layers[len], sizeof(layers) - len, "+BBR");
+    }
+    if (CheckBitsAll(head.layers, UBX_CFG_VALDEL_V1_LAYER_FLASH)) {
+        /* len += */ std::snprintf(&layers[len], sizeof(layers) - len, "+Flash");
+    }
+    const char* transaction = "?";
+    switch (head.transaction) {
+        case UBX_CFG_VALDEL_V1_TRANSACTION_NONE:
+            transaction = "NONE";
+            break;
+        case UBX_CFG_VALDEL_V1_TRANSACTION_BEGIN:
+            transaction = "BEGIN";
+            break;
+        case UBX_CFG_VALDEL_V1_TRANSACTION_CONTINUE:
+            transaction = "CONTINUE";
+            break;
+        case UBX_CFG_VALDEL_V1_TRANSACTION_END:
+            transaction = "END";
+            break;
+    }
+    return std::snprintf(
+        info, size, "del %" PRIuMAX " items, layers %s, transaction %s", nIds, &layers[1], transaction);
 }
 
 static const char* _valgetLayerName(const uint8_t layer)
@@ -1198,6 +1236,7 @@ bool UbxGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
         case UBX_MON_SYS_MSGID:          len = StrUbxMonSys(info, size, msg, msg_size);             break; } break;
         case UBX_CFG_CLSID:              switch (msg_id) {
         case UBX_CFG_VALSET_MSGID:       len = StrUbxCfgValset(info, size, msg, msg_size);          break;
+        case UBX_CFG_VALDEL_MSGID:       len = StrUbxCfgValdel(info, size, msg, msg_size);          break;
         case UBX_CFG_VALGET_MSGID:       len = StrUbxCfgValget(info, size, msg, msg_size);          break; } break;
         case UBX_ACK_CLSID:              switch (msg_id) {
         case UBX_ACK_ACK_MSGID:          len = StrUbxAckAck(info, size, msg, msg_size, true);       break;
