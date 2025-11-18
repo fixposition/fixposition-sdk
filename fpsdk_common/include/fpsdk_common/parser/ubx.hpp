@@ -800,9 +800,9 @@ static constexpr std::size_t UBX_CFG_VALSET_V0_MAX_SIZE                         
 
 static constexpr uint8_t     UBX_CFG_VALSET_V1_VERSION                                              = 0x01;  //!< UBX-CFG-VALSET.version value
 static constexpr std::size_t UBX_CFG_VALSET_V1_MIN_SIZE                                             = sizeof(UBX_CFG_VALSET_V1_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
-static constexpr uint8_t     UBX_CFG_VALSET_V1_LAYERS_RAM                                           = 0x01;  //!< UBX-CFG-VALSET.layers flag: layer RAM
-static constexpr uint8_t     UBX_CFG_VALSET_V1_LAYERS_BBR                                           = 0x02;  //!< UBX-CFG-VALSET.layers flag: layer BBR
-static constexpr uint8_t     UBX_CFG_VALSET_V1_LAYERS_FLASH                                         = 0x04;  //!< UBX-CFG-VALSET.layers flag: layer Flash
+static constexpr uint8_t     UBX_CFG_VALSET_V1_LAYER_RAM                                            = 0x01;  //!< UBX-CFG-VALSET.layers flag: layer RAM
+static constexpr uint8_t     UBX_CFG_VALSET_V1_LAYER_BBR                                            = 0x02;  //!< UBX-CFG-VALSET.layers flag: layer BBR
+static constexpr uint8_t     UBX_CFG_VALSET_V1_LAYER_FLASH                                          = 0x04;  //!< UBX-CFG-VALSET.layers flag: layer Flash
 static constexpr uint8_t     UBX_CFG_VALSET_V1_TRANSACTION_NONE                                     = 0;     //!< UBX-CFG-VALSET.transaction value: no transaction
 static constexpr uint8_t     UBX_CFG_VALSET_V1_TRANSACTION_BEGIN                                    = 1;     //!< UBX-CFG-VALSET.transaction value: transaction begin
 static constexpr uint8_t     UBX_CFG_VALSET_V1_TRANSACTION_CONTINUE                                 = 2;     //!< UBX-CFG-VALSET.transaction value: transaction continue
@@ -889,6 +889,7 @@ static_assert(sizeof(UBX_CFG_VALDEL_V1_GROUP0) == 4, "");
 // clang-format off
 static constexpr uint8_t     UBX_CFG_VALDEL_VERSION(const uint8_t* msg)                             { return msg[UBX_HEAD_SIZE]; }  //!< @todo documentation
 static constexpr uint8_t     UBX_CFG_VALDEL_V1_VERSION                                              = 0x01;      //!< UBX-CFG-VALDEL.version value
+static constexpr std::size_t UBX_CFG_VALDEL_V1_MIN_SIZE                                             = sizeof(UBX_CFG_VALDEL_V1_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr uint8_t     UBX_CFG_VALDEL_V1_LAYER_BBR                                            = 0x02;      //!< UBX-CFG-VALDEL.layers flag: layer BBR
 static constexpr uint8_t     UBX_CFG_VALDEL_V1_LAYER_FLASH                                          = 0x04;      //!< UBX-CFG-VALDEL.layers flag: layer Flash
 static constexpr uint8_t     UBX_CFG_VALDEL_V1_TRANSACTION_NONE                                     = 0;         //!< UBX-CFG-VALDEL.transaction value: no transaction
@@ -896,9 +897,9 @@ static constexpr uint8_t     UBX_CFG_VALDEL_V1_TRANSACTION_BEGIN                
 static constexpr uint8_t     UBX_CFG_VALDEL_V1_TRANSACTION_CONTINUE                                 = 2;         //!< UBX-CFG-VALDEL.transaction value: transaction continue
 static constexpr uint8_t     UBX_CFG_VALDEL_V1_TRANSACTION_END                                      = 3;         //!< UBX-CFG-VALDEL.transaction value: transaction: end
 static constexpr uint8_t     UBX_CFG_VALDEL_V1_RESERVED                                             = 0x00;      //!< UBX-CFG-VALDEL.reserved value
-static constexpr std::size_t UBX_CFG_VALDEL_V1_MAX_K                                                = 64;        //!< UBX-CFG-VALSET.cfgData maximum number of key IDs
+static constexpr std::size_t UBX_CFG_VALDEL_V1_MAX_K                                                = 64;        //!< UBX-CFG-VALDEL.cfgData maximum number of key IDs
 static constexpr std::size_t UBX_CFG_VALDEL_V1_KEYS_MAX_SIZE                                        = UBX_CFG_VALDEL_V1_MAX_K * 4; //!< UBX-CFG-VALDEL.keys maximum size
-static constexpr std::size_t UBX_CFG_VALDEL_V1_MAX_SIZE                                             = sizeof(UBX_CFG_VALDEL_V1_GROUP0) + UBX_CFG_VALDEL_V1_KEYS_MAX_SIZE + UBX_FRAME_SIZE;  //!< @todo documentation
+static constexpr std::size_t UBX_CFG_VALDEL_V1_MAX_SIZE                                             = UBX_CFG_VALDEL_V1_MIN_SIZE + UBX_CFG_VALDEL_V1_KEYS_MAX_SIZE;  //!< @todo documentation
 // clang-format on
 
 ///@}
