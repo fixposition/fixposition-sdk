@@ -484,6 +484,123 @@ my @RTCM3_SUBTYPES =
 
 ########################################################################################################################
 
+my @SBF_MESSAGES =
+(
+    # Measurement Blocks
+    { name => "MeasEpoch",             block => 4027,  desc => "Measurement set of one epoch" },
+    { name => "MeasExtra",             block => 4000,  desc => "Additional info such as observable variance" },
+    { name => "EndOfMeas",             block => 5922,  desc => "Measurement epoch marker" },
+    # Navigation Page Blocks
+    { name => "GPSRawCA",              block => 4017,  desc => "GPS CA navigation subframe" },
+    { name => "GPSRawL2C",             block => 4018,  desc => "GPS L2C navigation frame" },
+    { name => "GPSRawL5",              block => 4019,  desc => "GPS L5 navigation frame" },
+    { name => "GPSRawL1C",             block => 4221,  desc => "GPS L1C navigation frame" },
+    { name => "GLORawCA",              block => 4026,  desc => "GLONASS CA navigation string" },
+    { name => "GALRawFNAV",            block => 4022,  desc => "Galileo F/NAV navigation page" },
+    { name => "GALRawINAV",            block => 4023,  desc => "Galileo I/NAV navigation page" },
+    { name => "GALRawCNAV",            block => 4024,  desc => "Galileo C/NAV navigation page" },
+    { name => "GEORawL1",              block => 4020,  desc => "SBAS L1 navigation message" },
+    { name => "GEORawL5",              block => 4021,  desc => "SBAS L5 navigation message" },
+    { name => "BDSRaw",                block => 4047,  desc => "BeiDou navigation page" },
+    { name => "BDSRawB1C",             block => 4218,  desc => "BeiDou B1C navigation frame" },
+    { name => "BDSRawB2a",             block => 4219,  desc => "BeiDou B2a navigation frame" },
+    { name => "BDSRawB2b",             block => 4242,  desc => "BeiDou B2b navigation frame" },
+    { name => "QZSRawL1CA",            block => 4066,  desc => "QZSS L1C/A or L1C/B navigation frame" },
+    { name => "QZSRawL2C",             block => 4067,  desc => "QZSS L2C navigation frame" },
+    { name => "QZSRawL5",              block => 4068,  desc => "QZSS L5 navigation frame" },
+    { name => "QZSRawL6D",             block => 4270,  desc => "QZSS L6D navigation message" },
+    { name => "QZSRawL6E",             block => 4271,  desc => "QZSS L6E navigation message" },
+    { name => "QZSRawL1C",             block => 4227,  desc => "QZSS L1C navigation frame" },
+    { name => "QZSRawL1S",             block => 4228,  desc => "QZSS L1S navigation message" },
+    { name => "QZSRawL5S",             block => 4246,  desc => "QZSS L5S navigation message" },
+    { name => "NAVICRaw",              block => 4093,  desc => "NavIC/IRNSS L5 subframe" },
+    # GPS Decoded Message Blocks
+    { name => "GPSNav",                block => 5891,  desc => "GPS ephemeris and clock" },
+    { name => "GPSAlm",                block => 5892,  desc => "Almanac data for a GPS satellite" },
+    { name => "GPSIon",                block => 5893,  desc => "Ionosphere data from the GPS subframe 5" },
+    { name => "GPSUtc",                block => 5894,  desc => "GPS-UTC data from GPS subframe 5" },
+    { name => "GPSCNav",               block => 4042,  desc => "CNAV Ephemeris data for one GPS satellite" },
+    { name => "GLONav",                block => 4004,  desc => "GLONASS ephemeris and clock" },
+    { name => "GLOAlm",                block => 4005,  desc => "Almanac data for a GLONASS satellite" },
+    { name => "GLOTime",               block => 4036,  desc => "GLO-UTC, GLO-GPS and GLO-UT1 data" },
+    # Galileo Decoded Message Blocks
+    { name => "GALNav",                block => 4002,  desc => "Galileo ephemeris, clock, health and BGD" },
+    { name => "GALAlm",                block => 4003,  desc => "Almanac data for a Galileo satellite" },
+    { name => "GALIon",                block => 4030,  desc => "NeQuick Ionosphere model parameters" },
+    { name => "GALUtc",                block => 4031,  desc => "GST-UTC data" },
+    { name => "GALGstGps",             block => 4032,  desc => "GST-GPS data" },
+    { name => "GALSARRLM",             block => 4034,  desc => "Search-and-rescue return link message" },
+    # BeiDou Decoded Message Blocks
+    { name => "BDSNav",                block => 4081,  desc => "BeiDou ephemeris and clock" },
+    { name => "BDSCNav1",              block => 4251,  desc => "BeiDou B-CNAV1 ephemeris data for one satellite" },
+    { name => "BDSCNav2",              block => 4252,  desc => "BeiDou B-CNAV2 ephemeris data for one satellite" },
+    { name => "BDSCNav3",              block => 4253,  desc => "BeiDou B-CNAV3 ephemeris data for one satellite" },
+    { name => "BDSAlm",                block => 4119,  desc => "Almanac data for a BeiDou satellite" },
+    { name => "BDSIon",                block => 4120,  desc => "BeiDou Ionospheric delay model parameters" },
+    { name => "BDSUtc",                block => 4121,  desc => "BDT-UTC data" },
+    # QZSS Decoded Message Blocks
+    { name => "QZSNav",                block => 4095,  desc => "QZSS ephemeris and clock" },
+    { name => "QZSAlm",                block => 4116,  desc => "Almanac data for a QZSS satellite" },
+    # NavIC/IRNSS Decoded Message Blocks
+    { name => "NavICLNav",             block => 4254,  desc => "NavIC/IRNSS ephemeris and clock" },
+    # SBAS L1 Decoded Message Blocks
+    { name => "GEONav",                block => 5896,  desc => "MT09 : SBAS navigation message" },
+    { name => "GEOAlm",                block => 5897,  desc => "MT17 : SBAS satellite almanac" },
+    # GNSS Position, Velocity and Time Blocks
+    { name => "PVTCartesian",          block => 4006,  desc => "GNSS position, velocity, and time in Cartesian coordinates" },
+    { name => "PVTGeodetic",           block => 4007,  desc => "GNSS position, velocity, and time in geodetic coordinates" },
+    { name => "PosCovCartesian",       block => 5905,  desc => "Position covariance matrix (X,Y, Z)" },
+    { name => "PosCovGeodetic",        block => 5906,  desc => "Position covariance matrix (Lat, Lon, Alt)" },
+    { name => "VelCovCartesian",       block => 5907,  desc => "Velocity covariance matrix (X, Y, Z)" },
+    { name => "VelCovGeodetic",        block => 5908,  desc => "Velocity covariance matrix (North, East, Up)" },
+    { name => "DOP",                   block => 4001,  desc => "Dilution of precision" },
+    { name => "BaseVectorCart",        block => 4043,  desc => "XYZ relative position and velocity with respect to base(s)" },
+    { name => "BaseVectorGeod",        block => 4028,  desc => "ENU relative position and velocity with respect to base(s)" },
+    { name => "PVTSupport",            block => 4076,  desc => "Internal parameters for maintenance and support" },
+    { name => "PVTSupportA",           block => 4079,  desc => "Internal parameters for maintenance and support" },
+    { name => "EndOfPVT",              block => 5921,  desc => "PVT epoch marker" },
+    { name => "NavCart",               block => 4272,  desc => "Full GNSS position, velocity, attitude, DOP and UTC time in Cartesian coordinates." },
+    # GNSS Attitude Blocks
+    { name => "AttEuler",              block => 5938,  desc => "GNSS attitude expressed as Euler angles" },
+    { name => "AttCovEuler",           block => 5939,  desc => "Covariance matrix of attitude" },
+    { name => "AuxAntPositions",       block => 5942,  desc => "Relative position and velocity estimates of auxiliary antennas" },
+    { name => "EndOfAtt",              block => 5943,  desc => "GNSS attitude epoch marker" },
+    # Receiver Time Blocks
+    { name => "ReceiverTime",          block => 5914,  desc => "Current receiver and UTC time" },
+    { name => "xPPSOffset",            block => 5911,  desc => "Offset of the xPPS pulse with respect to GNSS time" },
+    # External Event Blocks
+    { name => "ExtEvent",              block => 5924,  desc => "Time at the instant of an external event" },
+    { name => "ExtEventPVTCartesian",  block => 4037,  desc => "Cartesian position at the instant of an event" },
+    { name => "ExtEventPVTGeodetic",   block => 4038,  desc => "Geodetic position at the instant of an event" },
+    { name => "ExtEventBaseVectGeod",  block => 4217,  desc => "ENU relative position with respect to base(s) at the instant of an event" },
+    { name => "ExtEventAttEuler",      block => 4237,  desc => "GNSS attitude expressed as Euler angles at the instant of an event" },
+    # Correction Blocks
+    { name => "DiffCorrIn",            block => 5919,  desc => "Incoming RTCM or CMR message" },
+    { name => "BaseStation",           block => 5949,  desc => "Base station coordinates" },
+    # L-Band Demodulator Blocks
+    { name => "LBandTrackerStatus",    block => 4201,  desc => "Status of the L-band signal tracking" },
+    { name => "LBandRaw",              block => 4212,  desc => "L-Band raw user data" },
+    # Status Blocks
+    { name => "ChannelStatus",         block => 4013,  desc => "Status of the tracking for all receiver channels" },
+    { name => "ReceiverStatus",        block => 4014,  desc => "Overall status information of the receiver" },
+    { name => "SatVisibility",         block => 4012,  desc => "Azimuth/elevation of visible satellites" },
+    { name => "InputLink",             block => 4090,  desc => "Statistics on input streams" },
+    { name => "OutputLink",            block => 4091,  desc => "Statistics on output streams" },
+    { name => "QualityInd",            block => 4082,  desc => "Quality indicators" },
+    { name => "DiskStatus",            block => 4059,  desc => "Internal logging status" },
+    { name => "RFStatus",              block => 4092,  desc => "Radio-frequency interference mitigation status" },
+    { name => "GALAuthStatus",         block => 4245,  desc => "Galileo OSNMA authentication status" },
+    # Miscellaneous Blocks
+    { name => "ReceiverSetup",         block => 5902,  desc => "General information about the receiver installation" },
+    { name => "RxMessage",             block => 4103,  desc => "Receiver message" },
+    { name => "Commands",              block => 4015,  desc => "Commands entered by the user" },
+    { name => "Comment",               block => 5936,  desc => "Comment entered by the user" },
+    { name => "BBSamples",             block => 4040,  desc => "Baseband samples" },
+    { name => "ASCIIIn",               block => 4075,  desc => "ASCII input from external sensor" },
+);
+
+########################################################################################################################
+
 my @SPARTN_MESSAGES =
 (
     { name => 'OCB',   type =>   0,  desc => 'Orbits, clock, bias (OCB)' },
@@ -608,6 +725,37 @@ do
         );
     }
     push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_UNIB_MSGINFO}},
+        "}};\n");
+};
+
+########################################################################################################################
+# Generate code for SBF
+do
+{
+    push(@CODEGEN_FILES,
+        path("$FPSDK_COMMON_DIR/include/fpsdk_common/parser/sbf.hpp"),
+        path("$FPSDK_COMMON_DIR/src/parser/sbf.cpp"));
+    $CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_SBF_MESSAGES} = [];
+    $CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_SBF_MSGINFO} =
+    [
+        "static constexpr std::array<MsgInfo, " . ($#SBF_MESSAGES + 1) . "> MSG_INFO =\n",
+        "{{\n",
+    ];
+    foreach my $entry (@SBF_MESSAGES)
+    {
+        my $ucName = uc($entry->{name});
+        my $name  = "SBF-$ucName";
+        my $msgid = "SBF_${ucName}_MSGID";
+        my $strid = "SBF_${ucName}_STRID";
+        push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_SBF_MESSAGES}},
+            sprintf("static constexpr uint16_t    %-32s = %5d;                         //!< $name message ID\n", $msgid, $entry->{block}),
+            sprintf("static constexpr const char* %-32s = %-30s //!< $name message name\n", $strid, "\"${name}\";"),
+        );
+        push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_SBF_MSGINFO}},
+            sprintf("    { %-32s %-32s \"%s\" },\n", "$msgid,", "$strid,", $entry->{desc}),
+        );
+    }
+    push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_SBF_MSGINFO}},
         "}};\n");
 };
 

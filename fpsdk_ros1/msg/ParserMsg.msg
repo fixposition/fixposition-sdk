@@ -16,6 +16,7 @@ int8    PROTOCOL_RTCM3       = 5
 int8    PROTOCOL_UNI_B       = 6
 int8    PROTOCOL_NOV_B       = 7
 int8    PROTOCOL_SPARTN      = 8
+int8    PROTOCOL_SBF         = 10
 int8    PROTOCOL_OTHER       = 9
 uint8[] data                      # Message data
 string  name                      # Message name

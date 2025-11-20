@@ -226,7 +226,7 @@ class FplToolOptions : public common::app::ProgramOptions
             "\n"
             "        rosbag info some.bag             # ROS 1\n"
             "        ros2 bag info some_bag           # ROS 2 (default, see above)\n"
-            "        mcap inof some_bag/some.mcap     # ROS 2 (with compression, see above)\n"
+            "        mcap info some_bag/some.mcap     # ROS 2 (with compression, see above)\n"
             "\n"
             "    Check what is in some_userio.raw obtained by 'extract some.fpl':\n"
             "\n"
