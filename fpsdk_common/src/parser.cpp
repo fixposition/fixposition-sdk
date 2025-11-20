@@ -30,6 +30,7 @@
 #include "fpsdk_common/parser/nmea.hpp"
 #include "fpsdk_common/parser/novb.hpp"
 #include "fpsdk_common/parser/rtcm3.hpp"
+#include "fpsdk_common/parser/sbf.hpp"
 #include "fpsdk_common/parser/spartn.hpp"
 #include "fpsdk_common/parser/ubx.hpp"
 #include "fpsdk_common/parser/unib.hpp"
@@ -45,6 +46,7 @@ using namespace fpsdk::common::parser::fpb;
 using namespace fpsdk::common::parser::nmea;
 using namespace fpsdk::common::parser::novb;
 using namespace fpsdk::common::parser::rtcm3;
+using namespace fpsdk::common::parser::sbf;
 using namespace fpsdk::common::parser::spartn;
 using namespace fpsdk::common::parser::ubx;
 using namespace fpsdk::common::parser::unib;
@@ -112,6 +114,8 @@ static int IsUbxMessage(const uint8_t* buf, const std::size_t size);
 static int IsNmeaMessage(const uint8_t* buf, const std::size_t size);
 //! Check for presence of a RTCM3 message in the buffer (see IsMessageFunc)
 static int IsRtcm3Message(const uint8_t* buf, const std::size_t size);
+//! Check for presence of a SBF message in the buffer (see IsMessageFunc)
+static int IsSbfMessage(const uint8_t* buf, const std::size_t size);
 //! Check for presence of a SPARTN message in the buffer (see IsMessageFunc)
 static int IsSpartnMessage(const uint8_t* buf, const std::size_t size);
 //! Check for presence of a NOV_B message in the buffer (see IsMessageFunc)
@@ -130,7 +134,7 @@ struct ParserFunc
 };
 
 //! List of different message frame detectors
-static const std::array<ParserFunc, 7> PARSER_FUNCS = { {
+static const std::array<ParserFunc, 8> PARSER_FUNCS = { {
     // clang-format off
     { IsFpbMessage,    Protocol::FP_B,   PROTOCOL_NAME_FP_B },
     { IsUbxMessage,    Protocol::UBX,    PROTOCOL_NAME_UBX },
@@ -138,6 +142,7 @@ static const std::array<ParserFunc, 7> PARSER_FUNCS = { {
     { IsRtcm3Message,  Protocol::RTCM3,  PROTOCOL_NAME_RTCM3 },
     { IsUnibMessage,   Protocol::UNI_B,  PROTOCOL_NAME_UNI_B },
     { IsNovbMessage,   Protocol::NOV_B,  PROTOCOL_NAME_NOV_B },
+    { IsSbfMessage,    Protocol::SBF,    PROTOCOL_NAME_SBF },
     { IsSpartnMessage, Protocol::SPARTN, PROTOCOL_NAME_SPARTN },
 }};  // clang-format on
 
@@ -292,6 +297,9 @@ void Parser::EmitMessage(ParserMsg& msg, const std::size_t size, const Protocol 
         case Protocol::NOV_B:
             msg.name_ = (NovbGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "NOV_B-?");                   // GCOVR_EXCL_LINE
             break;
+        case Protocol::SBF:
+            msg.name_ = (SbfGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "SBF-?");                      // GCOVR_EXCL_LINE
+            break;
         case Protocol::SPARTN:
             msg.name_ = (SpartnGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "SPARTN-?-?");              // GCOVR_EXCL_LINE
             break;
@@ -423,6 +431,11 @@ static int IsNmeaMessage(const uint8_t* buf, const std::size_t size)
 {
     // Start of sentence
     if (buf[0] != NMEA_PREAMBLE) {
+        return NADA;
+    }
+
+    // Don't mistake it for a SBF message
+    if ((size > 1) && (buf[1] == SBF_SYNC_1)) {
         return NADA;
     }
 
@@ -721,6 +734,46 @@ static int IsUnibMessage(const uint8_t* buf, const std::size_t size)
     const uint32_t crc = (buf[len - 1] << 24) | (buf[len - 2] << 16) | (buf[len - 3] << 8) | (buf[len - 4]);
     if (crc == Crc32novb(buf, len - sizeof(uint32_t))) {
         return len;
+    }
+
+    return NADA;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+static int IsSbfMessage(const uint8_t* buf, const std::size_t size)
+{
+    // We need the two sync chars
+    if (buf[0] != SBF_SYNC_1) {
+        return NADA;
+    }
+    if (size < 2) {
+        return WAIT;
+    }
+    if (buf[1] != SBF_SYNC_2) {
+        return NADA;
+    }
+
+    // Wait for full header
+    if (size < SBF_HEAD_SIZE) {
+        return WAIT;
+    }
+
+    // // Limit message size
+    const std::size_t message_size = ((uint16_t)buf[6] | ((uint16_t)buf[7] << 8));
+    if (message_size > MAX_SBF_SIZE) {
+        return NADA;
+    }
+
+    // Wait for entire message
+    if (size < message_size) {
+        return WAIT;
+    }
+
+    // Verify using checksum
+    const uint16_t ck = ((uint16_t)buf[2] | ((uint16_t)buf[3] << 8));
+    if (ck == Crc16sbf(&buf[4], message_size - 4)) {
+        return message_size;
     }
 
     return NADA;

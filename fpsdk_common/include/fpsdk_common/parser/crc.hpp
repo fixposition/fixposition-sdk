@@ -107,6 +107,16 @@ uint16_t Crc16spartn(const uint8_t* data, const std::size_t size);
 uint32_t Crc32spartn(const uint8_t* data, const std::size_t size);
 
 /**
+ * @brief Calculate 16-bit CRC as used by SBF
+ *
+ * @param[in]  data  Pointer to the data to calculate the CRC for
+ * @param[in]  size  Size of data
+ *
+ * @returns the CRC (result undefined if size <= 0 or data == NULL)
+ */
+uint16_t Crc16sbf(const uint8_t* data, const std::size_t size);
+
+/**
  * @brief Calculate 16-bit checksum as used by UBX
  *
  * @param[in]  data  Pointer to the data to calculate the CRC for
