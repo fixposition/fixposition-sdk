@@ -135,7 +135,7 @@ bool UnibGetMessageName(char* name, const std::size_t size, const uint8_t* msg, 
         }
     }
 
-    // If that failed, too, stringify the message ID
+    // If that failed, stringify the message ID
     return std::snprintf(name, size, "UNI_B-MSG%05" PRIu16, msg_id) < (int)size;
 }
 

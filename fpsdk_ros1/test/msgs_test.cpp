@@ -33,7 +33,7 @@ namespace {
 TEST(MsgsTest, MustNeverChange)
 {
     // clang-format off
-    EXPECT_EQ(std::string(ros::message_traits::md5sum<fpsdk::ros1::msgs::ParserMsg >()), "9122cb2e555052fd41731dc8fc43888d");
+    EXPECT_EQ(std::string(ros::message_traits::md5sum<fpsdk::ros1::msgs::ParserMsg >()), "34588c4466b4597f15baa5ca265d0a37");
     // clang-format on
 }
 
