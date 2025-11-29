@@ -6,7 +6,6 @@
  *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  *
- * Based on work by flipflip (https://github.com/phkehl)
  * The information on message structures, IDs, descriptions etc. in this file are from publicly available data, such as:
  * - mosaic-G5 Reference Guide, copyright 2000-2025 Septentrio NV/SA, part of HEXAGON
  * \endverbatim
@@ -24,6 +23,7 @@
 
 /* LIBC/STL */
 #include <cstdint>
+#include <limits>
 
 /* EXTERNAL */
 
@@ -117,6 +117,15 @@ bool SbfGetMessageName(char* name, const std::size_t size, const uint8_t* msg, c
  * @returns true if message info was generated (even if info is empty), false if \c name buffer was too small
  */
 bool SbfGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size);
+
+/**
+ * @brief Get description for a SBF message
+ *
+ * @param[in]  type     Message block type
+ *
+ * @return the description of the message type, if available, NULL otherwise
+ */
+const char* SbfGetTypeDesc(const uint16_t type);
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -336,6 +345,491 @@ struct SbfHeader
 };  // clang-format on
 
 static_assert(sizeof(SbfHeader) == SBF_HEAD_SIZE, "");
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Doxygen is easily confused.. :-/
+//! Message struct that must be packed
+#ifndef _DOXYGEN_
+#  define SFB_PACKED __attribute__((packed))
+#else
+#  define SFB_PACKED /* packed */
+#endif
+
+// clang-format off
+static constexpr int8_t   SBF_DONOTUSE_INT8   = std::numeric_limits<int8_t>::min();                                     //!< Do-not-use value for int8_t
+static constexpr int16_t  SBF_DONOTUSE_INT16  = std::numeric_limits<int16_t>::min();                                    //!< Do-not-use value for int16_t
+static constexpr int32_t  SBF_DONOTUSE_INT32  = std::numeric_limits<int32_t>::min();                                    //!< Do-not-use value for int32_t
+static constexpr int8_t   SBF_DONOTUSE_UINT8  = std::numeric_limits<uint8_t>::min();                                    //!< Do-not-use value for uint8_t
+static constexpr uint16_t SBF_DONOTUSE_UINT16 = std::numeric_limits<uint16_t>::max();                                   //!< Do-not-use value for uint16_t
+static constexpr uint32_t SBF_DONOTUSE_UINT32 = std::numeric_limits<uint32_t>::max();                                   //!< Do-not-use value for uint32_t
+static constexpr float    SBF_DONOTUSE_FLOAT  = -2e10f;                                                                 //!< Do-not-use value for float
+static constexpr double   SBF_DONOTUSE_DOUBLE = -2e10;                                                                  //!< Do-not-use value for double
+
+static constexpr bool SbfDoNotUse(const int8_t   val) { return val == SBF_DONOTUSE_INT8;   }                           //!< Check if value is do-not-use
+static constexpr bool SbfDoNotUse(const int16_t  val) { return val == SBF_DONOTUSE_INT16;  }                           //!< Check if value is do-not-use
+static constexpr bool SbfDoNotUse(const int32_t  val) { return val == SBF_DONOTUSE_INT32;  }                           //!< Check if value is do-not-use
+static constexpr bool SbfDoNotUse(const uint8_t  val) { return val == SBF_DONOTUSE_UINT8;  }                           //!< Check if value is do-not-use
+static constexpr bool SbfDoNotUse(const uint16_t val) { return val == SBF_DONOTUSE_UINT16; }                           //!< Check if value is do-not-use
+static constexpr bool SbfDoNotUse(const uint32_t val) { return val == SBF_DONOTUSE_UINT32; }                           //!< Check if value is do-not-use
+static constexpr bool SbfDoNotUse(const double   val) { return val == SBF_DONOTUSE_FLOAT;  }                           //!< Check if value is do-not-use
+static constexpr bool SbfDoNotUse(const float    val) { return val == SBF_DONOTUSE_DOUBLE; }                           //!< Check if value is do-not-use
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// clang-format off
+static constexpr uint8_t  SBF_MODEPVT_SOL(const uint8_t mode)                   { return mode & 0x0f; }                 //!< GNSS PVT mode
+static constexpr uint8_t  SBF_MODEPVT_SOL_NO_GNSS_PVT                           =  0;                                   //!< No GNSS PVT available (the Error field indicates the cause of the absence of the PVT solution)
+static constexpr uint8_t  SBF_MODEPVT_SOL_STANDALONE_PVT                        =  1;                                   //!< Stand-Alone PVT
+static constexpr uint8_t  SBF_MODEPVT_SOL_DIFFERENTIAL_PVT                      =  2;                                   //!< Differential PVT
+static constexpr uint8_t  SBF_MODEPVT_SOL_FIXED_LOCATION                        =  3;                                   //!< Fixed location
+static constexpr uint8_t  SBF_MODEPVT_SOL_RTK_FIXED                             =  4;                                   //!< RTK with fixed ambiguities
+static constexpr uint8_t  SBF_MODEPVT_SOL_RTK_FLOAT                             =  5;                                   //!< RTK with float ambiguities
+static constexpr uint8_t  SBF_MODEPVT_SOL_SBAS_AIDED_PVT                        =  6;                                   //!< SBAS aided PVT
+static constexpr uint8_t  SBF_MODEPVT_SOL_MOVINGBASE_RTK_FIXED                  =  7;                                   //!< moving-base RTK with fixed ambiguities
+static constexpr uint8_t  SBF_MODEPVT_SOL_MOVINGBASE_RTK_FLOAT                  =  8;                                   //!< moving-base RTK with float ambiguities
+static constexpr uint8_t  SBF_MODEPVT_SOL_RESERVED0                             =  9;                                   //!< Reserved
+static constexpr uint8_t  SBF_MODEPVT_SOL_PPP                                   = 10;                                   //!< Precise point positioning (PPP)
+static constexpr uint8_t  SBF_MODEPVT_SOL_RESERVED1                             = 12;                                   //!< Reserved
+static constexpr bool     SBF_MODEPVT_IS2D(const uint8_t mode)                  { return (mode & 0x80) == 0x80; }       //!< true = 2D mode, false = 3D mode
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// clang-format off
+static constexpr uint8_t  SBF_ERRORPVT_NO_ERROR                                 =  0;                                   //!< No Error
+static constexpr uint8_t  SBF_ERRORPVT_NOT_ENOUGH_MEAS                          =  1;                                   //!< Not enough measurements
+static constexpr uint8_t  SBF_ERRORPVT_NOT_ENOUGH_EPH                           =  2;                                   //!< Not enough ephemerides available
+static constexpr uint8_t  SBF_ERRORPVT_DOP_TOO_LARGE                            =  3;                                   //!< DOP too large (larger than 15)
+static constexpr uint8_t  SBF_ERRORPVT_RESIDUALS_TOO_LARGE                      =  4;                                   //!< Sum of squared residuals too large
+static constexpr uint8_t  SBF_ERRORPVT_NO_CONVERGENCE                           =  5;                                   //!< No convergence
+static constexpr uint8_t  SBF_ERRORPVT_TOO_MANY_OUTLIERS                        =  6;                                   //!< Not enough measurements after outlier rejection
+static constexpr uint8_t  SBF_ERRORPVT_POS_OUTPUT_PROHIB                        =  7;                                   //!< Position output prohibited due to export laws
+static constexpr uint8_t  SBF_ERRORPVT_NOT_ENOUGH_CORR                          =  8;                                   //!< Not enough differential corrections available
+static constexpr uint8_t  SBF_ERRORPVT_NO_BASE_COORD                            =  9;                                   //!< Base station coordinates unavailable
+static constexpr uint8_t  SBF_ERRORPVT_AMBIGUITIES_UNFIXED                      = 10;                                   //!< Ambiguities not fixed and user requested to only output RTK-fixed positions
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// clang-format off
+static constexpr uint8_t  SBF_TIMESYSTEM_GPS                                    =   0;                                  //!< GPS time
+static constexpr uint8_t  SBF_TIMESYSTEM_GAL                                    =   1;                                  //!< Galileo time
+static constexpr uint8_t  SBF_TIMESYSTEM_GLO                                    =   3;                                  //!< GLONASS time
+static constexpr uint8_t  SBF_TIMESYSTEM_BDS                                    =   4;                                  //!< BeiDou time
+static constexpr uint8_t  SBF_TIMESYSTEM_QZSS                                   =   5;                                  //!< QZSS time
+static constexpr uint8_t  SBF_TIMESYSTEM_FUGRO                                  = 100;                                  //!< Fugro AtomiChron time
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// clang-format off
+static constexpr uint8_t  SBF_DATUM_WGS84_ITRS                                  =   0;                                  //!< WGS84/ITRS
+static constexpr uint8_t  SBF_DATUM_DGNSS_BASE                                  =  19;                                  //!< Datum equal to that used by the DGNSS/RTK base station
+static constexpr uint8_t  SBF_DATUM_ETRS89                                      =  30;                                  //!< ETRS89 (ETRF2000 realization)
+static constexpr uint8_t  SBF_DATUM_NAD83                                       =  31;                                  //!< NAD83(2011), North American Datum (2011)
+static constexpr uint8_t  SBF_DATUM_NAD83_PA11                                  =  32;                                  //!< NAD83(PA11), North American Datum, Pacific plate (2011)
+static constexpr uint8_t  SBF_DATUM_NAD83_MA11                                  =  33;                                  //!< NAD83(MA11), North American Datum, Marianas plate (2011)
+static constexpr uint8_t  SBF_DATUM_QDA94                                       =  34;                                  //!< GDA94(2010), Geocentric Datum of Australia (2010)
+static constexpr uint8_t  SBF_DATUM_QDA2020                                     =  35;                                  //!< GDA2020, Geocentric Datum of Australia 2020
+static constexpr uint8_t  SBF_DATUM_JGD2011                                     =  36;                                  //!< JGD2011, Japanese Geodetic Datum 2011
+static constexpr uint8_t  SBF_DATUM_USER1                                       = 250;                                  //!< First user-defined datum
+static constexpr uint8_t  SBF_DATUM_USER2                                       = 251;                                  //!< Second user-defined datum
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// clang-format off
+static constexpr bool     SBF_WACORRINFO_ORBCLK_USED(const uint8_t info)        { return (info & 0x01) == 0x01; }       //!< Set if orbit and satellite clock correction information is used
+static constexpr bool     SBF_WACORRINFO_RANGECORR_USED(const uint8_t info)     { return (info & 0x02) == 0x02; }       //!< Set if range correction information is used
+static constexpr bool     SBF_WACORRINFO_IONO_USED(const uint8_t info)          { return (info & 0x04) == 0x04; }       //!< Set if ionospheric information is used
+static constexpr bool     SBF_WACORRINFO_ORBACC_USED(const uint8_t info)        { return (info & 0x08) == 0x08; }       //!< Set if orbit accuracy information is used (UERE/SISA)
+static constexpr bool     SBF_WACORRINFO_DO229_USED(const uint8_t info)         { return (info & 0x10) == 0x10; }       //!< Set if DO229 Precision Approach mode is active
+static constexpr uint8_t  SBF_WACORRINFO_CORRTYPE(const uint8_t info)           { return (info >> 4) & 0x03; }          //!< Which corrections have been applied
+static constexpr uint8_t  SBF_WACORRINFO_CORRTYPE_UNKNOWN                       = 0;                                    //!< Unknown or not in differential positioning mode
+static constexpr uint8_t  SBF_WACORRINFO_CORRTYPE_CORS                          = 1;                                    //!< Corrections from a physical base
+static constexpr uint8_t  SBF_WACORRINFO_CORRTYPE_VRS                           = 2;                                    //!< Corrections from a virtual base (VRS)
+static constexpr uint8_t  SBF_WACORRINFO_CORRTYPE_SSR                           = 3;                                    //!< SSR corrections
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// clang-format off
+static constexpr uint8_t  SBF_ALERTFLAG_RAIM(const uint8_t flag)                { return flag & 0x03; }                 //!< RAIM integrity flag
+static constexpr uint8_t  SBF_ALERTFLAG_RAIM_NOTACTIVE                          = 0;                                    //!< RAIM not active
+static constexpr uint8_t  SBF_ALERTFLAG_RAIM_SUCESSFUL                          = 1;                                    //!< RAIM integrity test successful
+static constexpr uint8_t  SBF_ALERTFLAG_RAIM_FAILED                             = 2;                                    //!< RAIM integrity test failed
+static constexpr bool     SBF_ALERTFLAG_GALHPCAFAIL(const uint8_t flag)         { return (flag & 0x04) == 0x04; }       //!< Galileo GPCA failed
+static constexpr bool     SBF_ALERTFLAG_GALIONOSTORM(const uint8_t flag)        { return (flag & 0x08) == 0x04; }       //!< Galileo ionospheric storm flag
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// clang-format off
+static constexpr uint16_t SBF_PPPINFO_AGEOFLASTSEED(const uint16_t flag)        { return flag & 0x0fff; }               //!< Age of last seed [s]
+static constexpr uint8_t  SBF_PPPINFO_TYPEOFLASTSEED(const uint16_t flag)       { return (flag >> 13) & 0x03; }         //!< Type of last seed
+static constexpr uint8_t  SBF_PPPINFO_TYPEOFLASTSEED_NONE                       = 0;                                    //!< Not seeded
+static constexpr uint8_t  SBF_PPPINFO_TYPEOFLASTSEED_MANUAL                     = 1;                                    //!< Manual seed
+static constexpr uint8_t  SBF_PPPINFO_TYPEOFLASTSEED_DGNSS                      = 2;                                    //!< Seeded from DGNSS
+static constexpr uint8_t  SBF_PPPINFO_TYPEOFLASTSEED_RTKFIXED                   = 3;                                    //!< Seeded from RTK fixed
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// clang-format off
+static constexpr bool     SBF_MISC_BASELINEARP(const uint8_t flag)              { return (flag & 0x01) == 0x01; }       //!< Baseline points to base station ARP
+static constexpr bool     SBF_MISC_ROVERBASEOFFS(const uint8_t flag)            { return (flag & 0x02) == 0x02; }       //!< Rover phase center offset compensated
+static constexpr uint8_t  SBF_MISC_MARKER(const uint8_t flag)                   { return (flag >> 6) & 0x03; }          //!< Marker position
+static constexpr uint8_t  SBF_MISC_MARKER_UNKNOWN                               = 0;                                    //!< Unknown
+static constexpr uint8_t  SBF_MISC_MARKER_ARPZERO                               = 1;                                    //!< ARP-to-marker offset is zero
+static constexpr uint8_t  SBF_MISC_MARKER_ARPNONZERO                            = 2;                                    //!< ARP-to-marker offset is not zero
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// clang-format off
+static constexpr uint8_t  SBF_MODEATT_NO_ATT                                    =  0;                                   //!< No attitude
+static constexpr uint8_t  SBF_MODEATT_HDG_PITCH_FLOAT                           =  1;                                   //!< Heading and pitch from float ambiguities
+static constexpr uint8_t  SBF_MODEATT_HDG_PITCH_FIXED                           =  2;                                   //!< Heading and pitch from fixed ambiguities
+static constexpr uint8_t  SBF_MODEATT_HDG_PITCH_ROLL_FLOAT                      =  3;                                   //!< Heading, pitch and roll from float ambiguities
+static constexpr uint8_t  SBF_MODEATT_HDG_PITCH_ROLL_FIXED                      =  4;                                   //!< Heading, pitch and roll from fixed ambiguities
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// clang-format off
+static constexpr uint8_t  SBF_ERRORATT_AUX1(const uint8_t mode)                 { return mode & 0x03; }                 //!< Error code for Main-Aux1 baseline
+static constexpr uint8_t  SBF_ERRORATT_AUX1_NO_ERROR                            =  0;                                   //!< No error
+static constexpr uint8_t  SBF_ERRORATT_AUX1_NOT_ENOUGH_MEAS                     =  1;                                   //!< Not enough measurements
+static constexpr uint8_t  SBF_ERRORATT_AUX1_RESERVED0                           =  2;                                   //!< Reserved
+static constexpr uint8_t  SBF_ERRORATT_AUX1_RESERVED1                           =  3;                                   //!< Reserved
+static constexpr uint8_t  SBF_ERRORATT_AUX2(const uint8_t mode)                 { return (mode >> 2) & 0x03; }          //!< Error code for Main-Aux2 baseline
+static constexpr uint8_t  SBF_ERRORATT_AUX2_NO_ERROR                            =  0;                                   //!< No error
+static constexpr uint8_t  SBF_ERRORATT_AUX2_NOT_ENOUGH_MEAS                     =  1;                                   //!< Not enough measurements
+static constexpr uint8_t  SBF_ERRORATT_AUX2_RESERVED0                           =  2;                                   //!< Reserved
+static constexpr uint8_t  SBF_ERRORATT_AUX2_RESERVED1                           =  3;                                   //!< Reserved
+static constexpr bool     SBF_ERRORATT_NO_ATT(const uint8_t mode)               { return (mode & 0x80) == 0x80; }       //!< GNSS-based attitude not requested by user
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief SBF PVTGeodetic payload (rev 2)
+ */
+struct SFB_PACKED SbfPvtGeodeticRev2
+{  // clang-format off
+    uint32_t TOW;            //!< GPS time of week [ms]
+    uint16_t WNc;            //!< GPS week number
+    uint8_t  Mode;           //!< -> SBF_MODEPVT_...
+    uint8_t  Error;          //!< -> SBF_ERRORPVT_...
+    double   Latitude;       //!< Latitude [rad]
+    double   Longitude;      //!< Longitude [rad]
+    double   Height;         //!< Ellips. height [m]
+    float    Undulation;     //!< Geoid undilation [m]
+    float    Vn;             //!< Velocity north [m/s]
+    float    Ve;             //!< Velocity east [m/s]
+    float    Vu;             //!< Velocity up [m/s]
+    float    COG;            //!< Course over ground [deg]
+    double   RxClkBias;      //!< Receiver clock bias [ms]
+    float    RxClkDrift;     //!< Receiver clock drift [ppm]
+    uint8_t  TimeSystem;     //!< -> SBF_TIMESYSTEM_...
+    uint8_t  Datum;          //!< -> SBF_DATUM_...
+    uint8_t  NrSV;           //!< Number of satellites used
+    uint8_t  WACorrInfo;     //!< Applied corrections (bitfield)
+    uint16_t ReferenceID;    //!< Reference station ID
+    uint16_t MeanCorrAge;    //!< Mean age of corrections [0.01s]
+    uint32_t SignalInfo;     //!< Used signals (bitmask)
+    uint8_t  AlertFlag;      //!< -> SBF_ALERTFLAG_...
+    // Rev 1
+    uint8_t  NrBases;        //!< Number of basestations used
+    uint16_t PPPInfo;        //!< -> SBF_PPPINFO_...
+    // Rev 2
+    uint16_t Latency;        //!< Latency [0.0001s]
+    uint16_t HAccuracy;      //!< 2DRMS horizontal accuracy estimate [0.01m]
+    uint16_t VAccuracy;      //!< 2-sigma vertical accuracy estimate [0.01m]
+    uint8_t  Misc;           //!< -> SBF_MISC_...
+    uint8_t  padding[1];     //!< Padding
+};  // clang-format on
+
+static_assert(sizeof(SbfPvtGeodeticRev2) == 88, "");
+
+// clang-format off
+static constexpr std::size_t SBF_PVTGEODETIC_REV2_SIZE = sizeof(SbfPvtGeodeticRev2) + SBF_HEAD_SIZE;  //!< Size of PVTGeodetic rev 2 message
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief SBF PVTCartesian payload (rev 2)
+ */
+struct SFB_PACKED SbfPvtCartesianRev2
+{  // clang-format off
+    uint32_t TOW;            //!< GPS time of week [ms]
+    uint16_t WNc;            //!< GPS week number
+    uint8_t  Mode;           //!< -> SBF_MODEPVT_...
+    uint8_t  Error;          //!< -> SBF_ERRORPVT_...
+    double   X;              //!< X coordinate in coordinate frame specified by Datum [m]
+    double   Y;              //!< Y coordinate in coordinate frame specified by Datum [m]
+    double   Z;              //!< Z coordinate in coordinate frame specified by Datum [m]
+    float    Undulation;     //!< Geoid undilation [m]
+    float    Vx;             //!< Velocity X [m/s]
+    float    Vy;             //!< Velocity Y [m/s]
+    float    Vz;             //!< Velocity Z [m/s]
+    float    COG;            //!< Course over ground [deg]
+    double   RxClkBias;      //!< Receiver clock bias [ms]
+    float    RxClkDrift;     //!< Receiver clock drift [ppm]
+    uint8_t  TimeSystem;     //!< -> SBF_TIMESYSTEM_...
+    uint8_t  Datum;          //!< -> SBF_DATUM_...
+    uint8_t  NrSV;           //!< Number of satellites used
+    uint8_t  WACorrInfo;     //!< Applied corrections (bitfield)
+    uint16_t ReferenceID;    //!< Reference station ID
+    uint16_t MeanCorrAge;    //!< Mean age of corrections [0.01s]
+    uint32_t SignalInfo;     //!< Used signals (bitmask)
+    uint8_t  AlertFlag;      //!< -> SBF_ALERTFLAG_...
+    // Rev 1
+    uint8_t  NrBases;        //!< Number of basestations used
+    uint16_t PPPInfo;        //!< -> SBF_PPPINFO_...
+    // Rev 2
+    uint16_t Latency;        //!< Latency [0.0001s]
+    uint16_t HAccuracy;      //!< 2DRMS horizontal accuracy estimate [0.01m]
+    uint16_t VAccuracy;      //!< 2-sigma vertical accuracy estimate [0.01m]
+    uint8_t  Misc;           //!< -> SBF_MISC_...
+    uint8_t  padding[1];     //!< Padding
+};  // clang-format on
+
+static_assert(sizeof(SbfPvtCartesianRev2) == 88, "");
+
+// clang-format off
+static constexpr std::size_t SBF_PVTCARTESIAN_REV2_SIZE = sizeof(SbfPvtCartesianRev2) + SBF_HEAD_SIZE;  //!< Size of PVTCartesian rev 2 message
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief SBF NavCart payload (rev 0)
+ */
+struct SFB_PACKED SbfNavCartRev0
+{  // clang-format off
+    uint32_t TOW;            //!< GPS time of week [ms]
+    uint16_t WNc;            //!< GPS week number
+    uint8_t  Mode;           //!< -> SBF_PVTMODE_...
+    uint8_t  Error;          //!< -> SBF_PVTERROR_
+    double   X;              //!< X coordinate in coordinate frame specified by Datum [m]
+    double   Y;              //!< Y coordinate in coordinate frame specified by Datum [m]
+    double   Z;              //!< Z coordinate in coordinate frame specified by Datum [m]
+    float    Undulation;     //!< Geoid undilation [m]
+    float    Vx;             //!< Velocity X [m/s]
+    float    Vy;             //!< Velocity Y [m/s]
+    float    Vz;             //!< Velocity Z [m/s]
+    float    COG;            //!< Course over ground [deg]
+    double   RxClkBias;      //!< Receiver clock bias [ms]
+    float    RxClkDrift;     //!< Receiver clock drift [ppm]
+    uint8_t  TimeSystem;     //!< -> SBF_TIMESYSTEM_...
+    uint8_t  Datum;          //!< -> SBF_DATUM_...
+    uint8_t  NrSV;           //!< Number of satellites used
+    uint8_t  WACorrInfo;     //!< Applied corrections (bitfield)
+    uint16_t ReferenceID;    //!< Reference station ID
+    uint16_t MeanCorrAge;    //!< Mean age of corrections [0.01s]
+    uint64_t SignalInfo;     //!< Used signals (bitmask)
+    uint8_t  AlertFlag;      //!< -> SBF_ALERTFLAG_...
+    uint8_t  NrBases;        //!< Number of basestations used
+    uint16_t PPPInfo;        //!< -> SBF_PPPINFO_...
+    uint16_t Latency;        //!< Latency [0.0001s]
+    uint16_t PosHAcc;        //!< 2DRMS horizontal position accuracy estimate [0.01m]
+    uint16_t PosVAcc;        //!< 2-sigma vertical position accuracy estimate [0.01m]
+    uint16_t VelHAcc;        //!< 2DRMS horizontal velocity accuracy estimate [0.01m]
+    uint16_t VelVacc;        //!< 2-sigma vertical velocity accuracy estimate [0.01m]
+    uint8_t  Misc;           //!< -> SBF_MISC_...
+    uint8_t  Reserved;       //!< Reserved
+    uint16_t ModeAtt;        //!< -> SBF_MODEATT_...
+    uint8_t  ErrorAtt;       //!< -> SBF_ERRORATT_...
+    uint8_t  NrSVAtt;        //!< Number of satellites used for attitude
+    float    Heading;        //!< Heading [deg]
+    float    Pitch;          //!< Pitch [deg]
+    float    Roll;           //!< Roll [deg]
+    uint16_t HeadingAcc;     //!< 2-sigma heading accuracy estimate [0.001deg]
+    uint16_t PitchAcc;       //!< 2-sigma pitch accuracy estimate [0.001deg]
+    uint16_t RollAcc;        //!< 2-sigma roll accuracy estimate [0.001deg]
+    uint16_t PDOP;           //!< PDOP [0.01]
+    int8_t   UTCHour;        //!< UTC hours
+    int8_t   UTCMin;         //!< UTC minutes
+    int16_t  UTCmsec;        //!< UTC seconds [0.001s]
+    int8_t   UTCYear;        //!< UTC hours
+    int8_t   UTCMonth;       //!< UTC hours
+    int8_t   UTCDay;         //!< UTC day
+    uint8_t  Padding[1];     //!< Padding
+};  // clang-format on
+
+static_assert(sizeof(SbfNavCartRev0) == 128, "");
+
+// clang-format off
+static constexpr std::size_t SBF_NAVCART_REV0_SIZE = sizeof(SbfNavCartRev0) + SBF_HEAD_SIZE;  //!< Size of NavCart rev 0 message
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief SBF MeasEpoch payload (rev 1)
+ */
+struct SFB_PACKED MeasEpochRev1
+{  // clang-format off
+    uint32_t TOW;            //!< GPS time of week [ms]
+    uint16_t WNc;            //!< GPS week number
+    uint8_t  N1;             //!< Number of MeasEpochChannelType1Rev0 sub-blocks in this MeasEpoch block
+    uint8_t  SB1Length;      //!< Length of a MeasEpochChannelType1 sub-block, excluding the nested MeasEpochChannelType2Rev0 sub-blocks
+    uint8_t  SB2Length;      //!< Length of a MeasEpochChannelType2 sub-block
+    uint8_t  CommonFlags;    //!< Bit field containing flags common to all measurements
+    uint8_t  CumClkJumps;    //!< Cumulative millisecond clock jumps since start-up
+    uint8_t  Reserved;       //!< Reserved
+};  // clang-format on
+
+static_assert(sizeof(MeasEpochRev1) == 12, "");
+
+/**
+ * @brief SBF MeasEpochChannelType1Rev0 (rev 0) sub-block
+ */
+struct MeasEpochChannelType1Rev0
+{  // clang-format off
+    uint8_t  RxChannel;      //!< Receiver channel
+    uint8_t  Type;           //!< -> MEASEPOCH_CHANNEL_TYPE_...
+    uint8_t  SVID;           //!< Satellite ID
+    uint8_t  Misc;           //!< @todo document
+    uint32_t CodeLSB;        //!< @todo document
+    int32_t  Doppler;        //!< @todo document
+    uint16_t CarrierLSB;     //!< @todo document
+    int8_t   CarrierMSB;     //!< @todo document
+    uint8_t  CN0;            //!< C/N0 [0.25dBHz]
+    uint16_t LockTime;       //!< Lock time [s]
+    uint8_t  ObsInfo;        //!< -> MEASEPOCH_CHANNEL_OBSINFO_...
+    uint8_t  N2;             //!< Number of MeasEpochChannelType2 sub-blocks contained in this MeasEpochChannelType1 sub-block
+};  // clang-format on
+
+static_assert(sizeof(MeasEpochChannelType1Rev0) == 20, "");
+
+/**
+ * @brief SBF MeasEpochChannelType2Rev0 sub-block
+ */
+struct MeasEpochChannelType2Rev0
+{  // clang-format off
+    uint8_t  Type;           //!< -> MEASEPOCH_CHANNEL_TYPE_...
+    uint8_t  LockTime;       //!< Lock time [s]
+    uint8_t  CN0;            //!< C/N0 [0.25dBHz]
+    uint8_t  OffsetsMSB;     //!< @todo document
+    int8_t   CarrierMSB;     //!< @todo document
+    uint8_t  ObsInfo;        //!< -> MEASEPOCH_CHANNEL_OBSINFO_...
+    uint16_t CodeOffsetLSB;  //!< @todo document
+    uint16_t CarrierLSB;     //!< @todo document
+    uint16_t DopplerOffsetLSB; //!< @todo document
+};  // clang-format on
+
+static_assert(sizeof(MeasEpochChannelType2Rev0) == 12, "");
+
+// clang-format off
+static constexpr std::size_t SBF_MEASEPOCH_REV1_MIN_SIZE = sizeof(MeasEpochRev1) + SBF_HEAD_SIZE;  //!< Minimal size of MeasEpoch message
+// clang-format on
+
+// clang-format off
+static constexpr uint8_t  MEASEPOCH_CHANNEL_TYPE_SIGIDXLO(const uint8_t type)   { return type & 0x1f; }                 //!< Signal number (part 1)
+static constexpr uint8_t  MEASEPOCH_CHANNEL_TYPE_ANTID(const uint8_t type)      { return (type >> 5) & 0x07; }          //!< Antenna ID
+static constexpr uint8_t  MEASEPOCH_CHANNEL_TYPE_ANTID_MAIN                     =  0;                                   //!< Main antenna
+static constexpr uint8_t  MEASEPOCH_CHANNEL_TYPE_ANTID_AUX1                     =  1;                                   //!< Aux1 antenna
+static constexpr uint8_t  MEASEPOCH_CHANNEL_TYPE_ANTID_AUX2                     =  2;                                   //!< Aux2 antenna
+static constexpr uint8_t  MEASEPOCH_CHANNEL_OBSINFO_SIGIDXHI(const uint8_t info){ return (info >> 3) & 0x1f; }          //!< Signal number (part 2)
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief SBF ChannelStatus payload (rev 0)
+ */
+struct SFB_PACKED ChannelStatusRev0
+{  // clang-format off
+    uint32_t TOW;            //!< GPS time of week [ms]
+    uint16_t WNc;            //!< GPS week number
+    uint8_t  N;              //!< Number of ChannelSatInfo sub-blocks
+    uint8_t  SB1Length;      //!< Length of a ChannelSatInfo sub-block, excluding the nested ChannelStatusChannelType2 sub-blocks
+    uint8_t  SB2Length;      //!< Length of a ChannelStateInfo sub-block
+    uint8_t  Reserved[3];    //!< Reserved
+};  // clang-format on
+
+static_assert(sizeof(ChannelStatusRev0) == 12, "");
+
+/**
+ * @brief SBF ChannelSatInfo payload (rev 0)
+ */
+struct SFB_PACKED ChannelSatInfoRev0
+{  // clang-format off
+    uint8_t  SVID;           //!< Satellite ID
+    uint8_t  FreqNr;         //!< GLONASS frequency number
+    uint16_t SVIDFull;       //!< If the SVID field is zero, this field contains the satellite ID
+    uint16_t AzimuthRiseSet; //!< -> CHANNELSTATUS_SI_AZRS_...
+    uint16_t HealthStatus;   //!< -> CHANNELSTATUS_SI_HEALTH_...
+    int8_t   Elevation;      //!< Elevation [deg]
+    uint8_t  N2;             //!< Number of ChannelStateInfo blocks following this ChannelSatInfo block.
+    uint8_t  RxChannel;      //!< Channel number
+    uint8_t  Reserved;       //!< Reserved
+};  // clang-format on
+
+static_assert(sizeof(ChannelSatInfoRev0) == 12, "");
+
+/**
+ * @brief SBF ChannelStateInfo payload (rev 0)
+ */
+struct SFB_PACKED ChannelStateInfoRev0
+{  // clang-format off
+    uint8_t  Antenna;        //!< Anntena number (0 = main antenna)
+    uint8_t  Reserved;       //!< Reserved
+    uint16_t TrackingStatus; //!< -> CHANNELSTATE_TRKSTA_...
+    uint16_t PVTStatus;      //!< -> CHANNELSTATE_PVTSTA_...
+    uint16_t PVTInfo;        //!< Internal info
+};  // clang-format on
+
+static_assert(sizeof(ChannelStateInfoRev0) == 8, "");
+
+// clang-format off
+static constexpr std::size_t SBF_CHANNELSTATUS_REV0_MIN_SIZE = sizeof(ChannelStatusRev0) + SBF_HEAD_SIZE;  //!< Minimal size of ChannelStatus message
+// clang-format on
+
+// clang-format off
+static constexpr uint16_t CHANNELSTATUS_SI_AZRS_AZIMUTH(const uint16_t azrs)    { return azrs & 0x1ff; }                //!< Azimuth [deg]
+static constexpr uint8_t  CHANNELSTATUS_SI_AZRS_RISESET(const uint16_t azrs)    { return (azrs >> 14) & 0x0007; }       //!< Rise/set indicator
+static constexpr uint8_t  CHANNELSTATUS_SI_AZRS_RISESET_SETTING                 = 0;                                    //!< SV is setting
+static constexpr uint8_t  CHANNELSTATUS_SI_AZRS_RISESET_RISING                  = 1;                                    //!< SV is rising
+static constexpr uint8_t  CHANNELSTATUS_SI_AZRS_RISESET_UNKNOWN                 = 2;                                    //!< Elevation rate unknown
+static constexpr uint8_t  CHANNELSTATUS_SI_HEALTH_SIG(const uint16_t health, const std::size_t sigIx) { return (health >> (sigIx * 2)) & 0x07; }                                                                            //!< Signal health
+static constexpr uint8_t  CHANNELSTATUS_SI_HEALTH_SIG_UNKNOWN                   = 0;                                    //!< Health unknown
+static constexpr uint8_t  CHANNELSTATUS_SI_HEALTH_SIG_HEALTHY                   = 1;                                    //!< Healthy
+static constexpr uint8_t  CHANNELSTATUS_SI_HEALTH_SIG_UNHEALTHY                 = 2;                                    //!< Unhealthy
+static constexpr uint8_t  CHANNELSTATE_TRKSTA_SIG(const uint16_t status, const std::size_t sigIx) { return (status >> (sigIx * 2)) & 0x07; }                                                                            //!< Signal health
+static constexpr uint8_t  CHANNELSTATE_TRKSTA_SIG_IDLE                          = 0;                                    //!< Idle
+static constexpr uint8_t  CHANNELSTATE_TRKSTA_SIG_SEARCH                        = 1;                                    //!< Search
+static constexpr uint8_t  CHANNELSTATE_TRKSTA_SIG_SYNC                          = 2;                                    //!< Sync
+static constexpr uint8_t  CHANNELSTATE_TRKSTA_SIG_TRACKING                      = 3;                                    //!< Tracking
+static constexpr uint8_t  CHANNELSTATE_PVTSTA_SIG(const uint16_t status, const std::size_t sigIx) { return (status >> (sigIx * 2)) & 0x07; }                                                                            //!< Signal health
+static constexpr uint8_t  CHANNELSTATE_PVTSTA_SIG_UNUSED                        = 0;                                    //!< Not used
+static constexpr uint8_t  CHANNELSTATE_PVTSTA_SIG_NOEPH                         = 1;                                    //!< No ephemeris
+static constexpr uint8_t  CHANNELSTATE_PVTSTA_SIG_USED                          = 2;                                    //!< Used
+static constexpr uint8_t  CHANNELSTATE_PVTSTA_SIG_REJECTED                      = 3;                                    //!< Rejected
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief SBF EndOfPvt/EndOfAtt/EndOfMeas payload (rev 0)
+ */
+struct SbfEndOfAnyRev0
+{  // clang-format off
+    uint32_t TOW;          //!< GPS time of week [ms]
+    uint16_t WNc;          //!< GPS week number
+    uint8_t  padding[2];   //!< Padding
+};  // clang-format on
+
+static_assert(sizeof(SbfEndOfAnyRev0) == 8, "");
+
+// clang-format off
+static constexpr std::size_t SBF_ENDOFANY_REV0_SIZE = sizeof(SbfEndOfAnyRev0) + SBF_HEAD_SIZE;  //!< Size of EndOfPvt/EndOfAtt/EndOfMeas message
+// clang-format on
 
 /* ****************************************************************************************************************** */
 }  // namespace sbf

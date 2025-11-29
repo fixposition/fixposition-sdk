@@ -268,6 +268,46 @@ enum class SatOrb : uint8_t  // clang-format off
 };  // clang-format on
 
 /**
+ * @brief OR-operator for SatOrb bits
+ *
+ * @param[in]  a  Operand 1
+ * @param[in]  b  Operand 2
+ *
+ * @returns a OR b
+ */
+inline SatOrb operator|(const SatOrb a, const SatOrb b)
+{
+    return static_cast<SatOrb>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
+}
+
+/**
+ * @brief OR assignment operator for SatOrb bits
+ *
+ * @param[in]  lhs  Left-hand side
+ * @param[in]  rhs  Right-hand side
+ *
+ * @returns lhs ORed by b
+ */
+inline SatOrb& operator|=(SatOrb& lhs, const SatOrb rhs)
+{
+    lhs = static_cast<SatOrb>(static_cast<uint8_t>(lhs) | static_cast<uint8_t>(rhs));
+    return lhs;
+}
+
+/**
+ * @brief AND-operator for SatOrb bits
+ *
+ * @param[in]  a  Operand 1
+ * @param[in]  b  Operand 2
+ *
+ * @returns a AND b
+ */
+inline SatOrb operator&(const SatOrb a, const SatOrb b)
+{
+    return static_cast<SatOrb>(static_cast<uint8_t>(a) & static_cast<uint8_t>(b));
+}
+
+/**
  * @brief Stringify satellite orbit source
  *
  * @param[in]  orb  The satellite orbit source
@@ -552,6 +592,17 @@ Sat NmeaSystemIdSvIdToSat(const parser::nmea::NmeaSystemId systemId, const uint8
  * @returns the signal
  */
 Signal NmeaSignalIdToSignal(const parser::nmea::NmeaSignalId signalId);
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Convert SBF SVID to Satellite
+ *
+ * @param[in]  SVID  SBF SVID
+ *
+ * @returns the satellite, INVALID_SAT for invalid SVID
+ */
+Sat SbfSvidToSat(const uint16_t SVID);
 
 /* ****************************************************************************************************************** */
 }  // namespace gnss
