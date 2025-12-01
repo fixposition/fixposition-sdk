@@ -1358,9 +1358,9 @@ struct UBX_MON_RF_V0_GROUP1  // clang-format off
     uint16_t agcCnt;         //!< @todo documentation
     uint8_t  jamInd;         //!< @todo documentation
     int8_t   ofsI;           //!< @todo documentation
-    int8_t   magI;           //!< @todo documentation
+    uint8_t  magI;           //!< @todo documentation
     int8_t   ofsQ;           //!< @todo documentation
-    int8_t   magQ;           //!< @todo documentation
+    uint8_t  magQ;           //!< @todo documentation
     uint8_t  reserved2[3];   //!< @todo documentation
 };  // clang-format on
 
