@@ -47,8 +47,8 @@ uint64_t GetMillis()
     static uint64_t t0 = 0;
     uint64_t t = (tp.tv_sec * 1000) + (tp.tv_nsec / 1000000);
     if (t0 == 0) {
-        t0 = t;
-        return 0;
+        t0 = t - 1;
+        return 1;
     }
     return t - t0;
 }

@@ -90,7 +90,7 @@ static constexpr uint64_t SecToNsec(const double sec)
  *
  * Time is monotonic time since first call to GetMillis() or GetSecs().
  *
- * @returns the number of milliseconds
+ * @returns the number of milliseconds (> 0)
  */
 uint64_t GetMillis();
 
