@@ -334,9 +334,10 @@ class Thread
  *
  * Sets the thread name, which shows in htop etc.
  *
- * @param[in]  name  The thread name (1-6 characters, longer \c name is clipped at 6 chars)
+ * @param[in]  name  The thread name (too long name is clipped )
+ * @param[in]  curr  How many characters of the original thread name to keep
  */
-void SetThreadName(const std::string& name);
+void SetThreadName(const std::string& name, const std::size_t curr = 6);
 
 /**
  * @brief Get numeric thread ID

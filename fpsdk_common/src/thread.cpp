@@ -12,6 +12,7 @@
  */
 
 /* LIBC/STL */
+#include <algorithm>
 #include <chrono>
 #include <cstring>
 #include <functional>
@@ -188,7 +189,7 @@ void Thread::_Thread(const bool try_catch)
 
 /* ****************************************************************************************************************** */
 
-void SetThreadName(const std::string& name)
+void SetThreadName(const std::string& name, const std::size_t curr)
 {
     if (name.empty()) {
         return;
@@ -197,8 +198,13 @@ void SetThreadName(const std::string& name)
     char thread_name[32];  // max 16 cf. prctl(2)
     curr_name[0] = '\0';
     if (prctl(PR_GET_NAME, curr_name, 0, 0, 0) == 0) {
-        curr_name[7] = '\0';  // limit original (main process) name to 6 chars
-        std::snprintf(thread_name, sizeof(thread_name), "%s:%s", curr_name, name.c_str());
+        const std::size_t clip = std::clamp<std::size_t>(curr, 0, 10);
+        if (clip > 0) {
+            curr_name[clip] = '\0';  // limit original (main process) name to 6 chars
+            std::snprintf(thread_name, sizeof(thread_name), "%s:%s", curr_name, name.c_str());
+        } else {
+            std::snprintf(thread_name, sizeof(thread_name), "%s", name.c_str());
+        }
         prctl(PR_SET_NAME, thread_name, 0, 0, 0);  // This clips thread_name at the max size (typically, 12 chars)
     }
 }
