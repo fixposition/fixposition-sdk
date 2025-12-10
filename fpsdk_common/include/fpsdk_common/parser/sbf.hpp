@@ -121,7 +121,7 @@ bool SbfGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
 // ---------------------------------------------------------------------------------------------------------------------
 
 /**
- * @name UNI_B messages (names and IDs)
+ * @name SBF messages (names and IDs)
  *
  * @{
  */

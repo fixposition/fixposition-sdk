@@ -235,6 +235,7 @@ add_gtest(TARGET parser_fpa_test      SOURCES test/parser_fpa_test.cpp      LINK
 add_gtest(TARGET parser_fpb_test      SOURCES test/parser_fpb_test.cpp      LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET parser_nmea_test     SOURCES test/parser_nmea_test.cpp     LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET parser_novb_test     SOURCES test/parser_novb_test.cpp     LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET parser_qgc_test      SOURCES test/parser_qgc_test.cpp      LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET parser_rtcm3_test    SOURCES test/parser_rtcm3_test.cpp    LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET parser_sbf_test      SOURCES test/parser_sbf_test.cpp      LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET parser_spartn_test   SOURCES test/parser_spartn_test.cpp   LINK_LIBS ${PROJECT_NAME})

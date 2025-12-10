@@ -29,6 +29,7 @@
 #include "fpsdk_common/parser/fpb.hpp"
 #include "fpsdk_common/parser/nmea.hpp"
 #include "fpsdk_common/parser/novb.hpp"
+#include "fpsdk_common/parser/qgc.hpp"
 #include "fpsdk_common/parser/rtcm3.hpp"
 #include "fpsdk_common/parser/sbf.hpp"
 #include "fpsdk_common/parser/spartn.hpp"
@@ -45,6 +46,7 @@ using namespace fpsdk::common::parser::fpa;
 using namespace fpsdk::common::parser::fpb;
 using namespace fpsdk::common::parser::nmea;
 using namespace fpsdk::common::parser::novb;
+using namespace fpsdk::common::parser::qgc;
 using namespace fpsdk::common::parser::rtcm3;
 using namespace fpsdk::common::parser::sbf;
 using namespace fpsdk::common::parser::spartn;
@@ -114,8 +116,6 @@ static int IsUbxMessage(const uint8_t* buf, const std::size_t size);
 static int IsNmeaMessage(const uint8_t* buf, const std::size_t size);
 //! Check for presence of a RTCM3 message in the buffer (see IsMessageFunc)
 static int IsRtcm3Message(const uint8_t* buf, const std::size_t size);
-//! Check for presence of a SBF message in the buffer (see IsMessageFunc)
-static int IsSbfMessage(const uint8_t* buf, const std::size_t size);
 //! Check for presence of a SPARTN message in the buffer (see IsMessageFunc)
 static int IsSpartnMessage(const uint8_t* buf, const std::size_t size);
 //! Check for presence of a NOV_B message in the buffer (see IsMessageFunc)
@@ -124,6 +124,10 @@ static int IsNovbMessage(const uint8_t* buf, const std::size_t size);
 static int IsFpbMessage(const uint8_t* buf, const std::size_t size);
 //! Check for presence of a UNI_B message in the buffer (see IsMessageFunc)
 static int IsUnibMessage(const uint8_t* buf, const std::size_t size);
+//! Check for presence of a SBF message in the buffer (see IsMessageFunc)
+static int IsSbfMessage(const uint8_t* buf, const std::size_t size);
+//! Check for presence of a QGC message in the buffer (see IsMessageFunc)
+static int IsQgcMessage(const uint8_t* buf, const std::size_t size);
 
 //! Helper for iterating through the different message frame detectors
 struct ParserFunc
@@ -134,7 +138,7 @@ struct ParserFunc
 };
 
 //! List of different message frame detectors
-static const std::array<ParserFunc, 8> PARSER_FUNCS = { {
+static const std::array<ParserFunc, 9> PARSER_FUNCS = { {
     // clang-format off
     { IsFpbMessage,    Protocol::FP_B,   PROTOCOL_NAME_FP_B },
     { IsUbxMessage,    Protocol::UBX,    PROTOCOL_NAME_UBX },
@@ -143,6 +147,7 @@ static const std::array<ParserFunc, 8> PARSER_FUNCS = { {
     { IsUnibMessage,   Protocol::UNI_B,  PROTOCOL_NAME_UNI_B },
     { IsNovbMessage,   Protocol::NOV_B,  PROTOCOL_NAME_NOV_B },
     { IsSbfMessage,    Protocol::SBF,    PROTOCOL_NAME_SBF },
+    { IsQgcMessage,    Protocol::QGC,    PROTOCOL_NAME_QGC },
     { IsSpartnMessage, Protocol::SPARTN, PROTOCOL_NAME_SPARTN },
 }};  // clang-format on
 
@@ -299,6 +304,9 @@ void Parser::EmitMessage(ParserMsg& msg, const std::size_t size, const Protocol 
             break;
         case Protocol::SBF:
             msg.name_ = (SbfGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "SBF-?");                      // GCOVR_EXCL_LINE
+            break;
+        case Protocol::QGC:
+            msg.name_ = (QgcGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "Qgc-?");                      // GCOVR_EXCL_LINE
             break;
         case Protocol::SPARTN:
             msg.name_ = (SpartnGetMessageName(sname, sizeof(sname), mdata, msize) ? sname : "SPARTN-?-?");              // GCOVR_EXCL_LINE
@@ -774,6 +782,47 @@ static int IsSbfMessage(const uint8_t* buf, const std::size_t size)
     const uint16_t ck = ((uint16_t)buf[2] | ((uint16_t)buf[3] << 8));
     if (ck == Crc16sbf(&buf[4], message_size - 4)) {
         return message_size;
+    }
+
+    return NADA;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Like IsUbxMessage(), but with different sync chars
+static int IsQgcMessage(const uint8_t* buf, const std::size_t size)
+{
+    // We need the two sync chars
+    if (buf[0] != QGC_SYNC_1) {
+        return NADA;
+    }
+    if (size < 2) {
+        return WAIT;
+    }
+    if (buf[1] != QGC_SYNC_2) {
+        return NADA;
+    }
+
+    // Wait for full header
+    if (size < QGC_HEAD_SIZE) {
+        return WAIT;
+    }
+
+    // Limit payload size
+    const std::size_t payload_size = ((uint16_t)buf[4] | ((uint16_t)buf[5] << 8));
+    if (payload_size > (MAX_QGC_SIZE - QGC_FRAME_SIZE)) {
+        return NADA;
+    }
+
+    // Wait for entire message
+    if (size < (payload_size + QGC_FRAME_SIZE)) {
+        return WAIT;
+    }
+
+    // Verify using checksum
+    const uint16_t ck = *((uint16_t*)&buf[payload_size + QGC_HEAD_SIZE]);
+    if (ck == ChecksumUbx(&buf[2], payload_size + (QGC_HEAD_SIZE - 2))) {
+        return payload_size + QGC_FRAME_SIZE;
     }
 
     return NADA;

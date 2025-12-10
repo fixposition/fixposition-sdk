@@ -28,7 +28,6 @@ using namespace fpsdk::common::parser::sbf;
 
 TEST(ParserSbfTest, Macros)
 {
-    ASSERT_TRUE(true);
     {
         const uint8_t msg[] = { 0x55, 0x55, 0x55, 0x55, 0x34, 0x12, 0xaa, 0xaa, 0xaa };
         ASSERT_EQ(SbfBlockType(msg), 0x1234);
@@ -52,10 +51,8 @@ TEST(ParserSbfTest, Macros)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ParserSbfTest, UnibGetMessageName)
+TEST(ParserSbfTest, SbfGetMessageName)
 {
-    ASSERT_TRUE(true);
-    // NavCart 4272
     // Known message
     {
         const uint8_t msg[] = { // clang-format off

@@ -49,6 +49,7 @@ enum class Protocol : int
     UNI_B,     //!< UNI_B (Unicore proprietary binary)                                           (#PROTOCOL_NAME_UNI_B)
     NOV_B,     //!< NOV_B (NovAtel proprietary binary, long or short header)                     (#PROTOCOL_NAME_NOV_B)
     SBF,       //!< SBF (Septentrio binary format)                                               (#PROTOCOL_NAME_SBF)
+    QGC,       //!< QGC (Quectel proprietary binary)                                             (#PROTOCOL_NAME_QGC)
     SPARTN,    //!< SPARTN                                                                       (#PROTOCOL_NAME_SPARTN)
     OTHER,     //!< Other "message" (unknown or corrupt message, spurious data, line noise, ...) (#PROTOCOL_NAME_OTHER)
 };
@@ -67,6 +68,7 @@ static constexpr const char* PROTOCOL_NAME_RTCM3  = "RTCM3";   //!< Name (label)
 static constexpr const char* PROTOCOL_NAME_UNI_B  = "UNI_B";   //!< Name (label) for Protocol::UNI_B
 static constexpr const char* PROTOCOL_NAME_NOV_B  = "NOV_B";   //!< Name (label) for Protocol::NOV_B
 static constexpr const char* PROTOCOL_NAME_SBF    = "SBF";     //!< Name (label) for Protocol::SBF
+static constexpr const char* PROTOCOL_NAME_QGC    = "QGC";     //!< Name (label) for Protocol::QGC
 static constexpr const char* PROTOCOL_NAME_SPARTN = "SPARTN";  //!< Name (label) for Protocol::SPARTN
 static constexpr const char* PROTOCOL_NAME_OTHER  = "OTHER";   //!< Name (label) for Protocol::OTHER
 // clang-format on
@@ -150,6 +152,8 @@ struct ParserStats
     uint64_t s_novb_ = 0;    //!< Total size of Protocol::NOV_B messages
     uint64_t n_sbf_ = 0;     //!< Number of Protocol::SBF messages
     uint64_t s_sbf_ = 0;     //!< Total size of Protocol::SBF messages
+    uint64_t n_qgc_ = 0;     //!< Number of Protocol::QGC messages
+    uint64_t s_qgc_ = 0;     //!< Total size of Protocol::QGC messages
     uint64_t n_spartn_ = 0;  //!< Number of Protocol::SPARTN messages
     uint64_t s_spartn_ = 0;  //!< Total size of Protocol::SPARTN messages
     uint64_t n_other_ = 0;   //!< Number of Protocol::OTHER messages
@@ -180,11 +184,12 @@ static constexpr std::size_t MAX_SPARTN_SIZE   =  1110;  //!< Maximum SPARTN mes
 static constexpr std::size_t MAX_NOV_B_SIZE    =  4096;  //!< Maximum NOV_B message size
 static constexpr std::size_t MAX_UNI_B_SIZE    =  4096;  //!< Maximum UNI_B message size
 static constexpr std::size_t MAX_SBF_SIZE      =  4608;  //!< Maximum SBF message size
+static constexpr std::size_t MAX_QGC_SIZE      =  4608;  //!< Maximum QGC message size
 static constexpr std::size_t MAX_OTHER_SIZE    =   256;  //!< Maximum OTHER message size
 static constexpr std::size_t MAX_ANY_SIZE      =  std::max({ MAX_NMEA_SIZE, MAX_FP_A_SIZE, MAX_FP_B_SIZE, MAX_UBX_SIZE,
-        MAX_RTCM3_SIZE, MAX_SPARTN_SIZE, MAX_NOV_B_SIZE, MAX_UNI_B_SIZE, MAX_SBF_SIZE, MAX_OTHER_SIZE });  //!< The largest of the above
+        MAX_RTCM3_SIZE, MAX_SPARTN_SIZE, MAX_NOV_B_SIZE, MAX_UNI_B_SIZE, MAX_SBF_SIZE, MAX_QGC_SIZE, MAX_OTHER_SIZE });  //!< The largest of the above
 static constexpr std::size_t MIN_ANY_SIZE      =  std::min({ MAX_NMEA_SIZE, MAX_FP_A_SIZE, MAX_FP_B_SIZE, MAX_UBX_SIZE,
-        MAX_RTCM3_SIZE, MAX_SPARTN_SIZE, MAX_NOV_B_SIZE, MAX_UNI_B_SIZE, MAX_SBF_SIZE, MAX_OTHER_SIZE });  //!< The smallest of the above
+        MAX_RTCM3_SIZE, MAX_SPARTN_SIZE, MAX_NOV_B_SIZE, MAX_UNI_B_SIZE, MAX_SBF_SIZE, MAX_QGC_SIZE, MAX_OTHER_SIZE });  //!< The smallest of the above
 // clang-format on
 ///@}
 
