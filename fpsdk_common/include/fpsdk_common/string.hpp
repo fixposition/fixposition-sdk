@@ -114,13 +114,17 @@ void StrTrim(std::string& str);
 /**
  * @brief Split string
  *
- * Splits a string using a separator string. All parts, including empty ones, are returned. An empty separator
- * leads to only one part, that is equal to the input string.
+ * Splits a string using a separator string. All parts, including empty ones, are returned. An empty separator leads to
+ * only one part, that is equal to the input string, unless that is empty, in which case an empty vector is returned.
  *
  * Examples:
+ *
  *    "foo,bar,baz" separated by ","         --> [ "foo", "bar", "baz" ]
  *    "foo,bar,baz" separated by "," (max=2) --> [ "foo", "bar,baz" ]
  *    "foo,,baz,,," separated by ","         --> [ "foo", "", "baz", "", "", "" ]
+ *    "foo,bar,baz" separated by ""          --> [ "foo,bar,baz" ]
+ *    ""            separated by "something" --> [ ]
+ *    ""            separated by ""          --> [ ]
  *
  * @param[in]  str    The string
  * @param[in]  sep    The separator, empty string is allowed

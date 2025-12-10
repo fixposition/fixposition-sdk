@@ -95,23 +95,20 @@ TEST(StringTest, StrTrim)
 TEST(StringTest, StrSplit)
 {
     {
-        const std::string str = "foo,bar,baz";
-        const auto split = StrSplit(str, ",");
+        const auto split = StrSplit("foo,bar,baz", ",");
         EXPECT_EQ(split.size(), (std::size_t)3);
         EXPECT_EQ(split.at(0), "foo");
         EXPECT_EQ(split.at(1), "bar");
         EXPECT_EQ(split.at(2), "baz");
     }
     {
-        const std::string str = "foo,bar,baz";
-        const auto split = StrSplit(str, ",", 2);
+        const auto split = StrSplit("foo,bar,baz", ",", 2);
         EXPECT_EQ(split.size(), (std::size_t)2);
         EXPECT_EQ(split.at(0), "foo");
         EXPECT_EQ(split.at(1), "bar,baz");
     }
     {
-        const std::string str = "foo,,baz,,,";
-        const auto split = StrSplit(str, ",");
+        const auto split = StrSplit("foo,,baz,,,", ",");
         EXPECT_EQ(split.size(), (std::size_t)6);
         EXPECT_EQ(split.at(0), "foo");
         EXPECT_EQ(split.at(1), "");
@@ -119,6 +116,19 @@ TEST(StringTest, StrSplit)
         EXPECT_EQ(split.at(3), "");
         EXPECT_EQ(split.at(4), "");
         EXPECT_EQ(split.at(5), "");
+    }
+    {
+        const auto split = StrSplit("foo,bar,baz", "");
+        EXPECT_EQ(split.size(), (std::size_t)1);
+        EXPECT_EQ(split.at(0), "foo,bar,baz");
+    }
+    {
+        const auto split = StrSplit("", "something");
+        EXPECT_EQ(split.size(), (std::size_t)0);
+    }
+    {
+        const auto split = StrSplit("", "");
+        EXPECT_EQ(split.size(), (std::size_t)0);
     }
 }
 
