@@ -154,8 +154,6 @@ my @UBX_CLASSES =
     { name => 'RTCM3',  clsid => 0xf5 },
 );
 
-########################################################################################################################
-
 my @UBX_MESSAGES =
 (
     { class => 'ACK',    name => 'ACK',            msgid => 0x01 },
@@ -634,6 +632,20 @@ my @SPARTN_SUBTYPES =
 
 ########################################################################################################################
 
+my @QGC_GROUPS =
+(
+    { name => 'RAW',    grpid => 0x0a },
+);
+
+my @QGC_MESSAGES =
+(
+    { class => 'RAW',    name => 'PPPB2B',         msgid => 0xb2 },
+    { class => 'RAW',    name => 'QZSSL6',         msgid => 0xb6 },
+    { class => 'RAW',    name => 'HASE6',          msgid => 0xe6 },
+);
+
+########################################################################################################################
+
 my $FPSDK_COMMON_DIR = path("$FindBin::Bin/..")->canonpath();
 my @CODEGEN_FILES = ();
 my %CODEGEN_SECTIONS = ();
@@ -916,6 +928,62 @@ do
     }
     push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_SPARTN_MSGINFO}},
         "}};\n");
+};
+
+########################################################################################################################
+# Generate code for QGC
+do
+{
+    push(@CODEGEN_FILES,
+        path("$FPSDK_COMMON_DIR/include/fpsdk_common/parser/qgc.hpp"),
+        path("$FPSDK_COMMON_DIR/src/parser/qgc.cpp"));
+    $CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_QGC_GROUPS} = [];
+    $CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_QGC_MSGINFO} = [
+        "static constexpr std::array<MsgInfo, " . ($#QGC_GROUPS + 1) . "> GRP_INFO =\n",
+        "{{\n",
+    ];
+    foreach my $entry (@QGC_GROUPS)
+    {
+        my $name = "QGC-$entry->{name}";
+        my $grpid = "QGC_$entry->{name}_GRPID";
+        my $strid = "QGC_$entry->{name}_STRID";
+        # print(Dumper($entry);)
+        push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_QGC_GROUPS}},
+            sprintf("static constexpr uint8_t     %-30s = 0x%02x;                     //!< $name group ID\n", $grpid, $entry->{grpid}),
+            sprintf("static constexpr const char* %-30s = %-25s //!< $name group name\n", $strid, "\"${name}\";"),
+        );
+        push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_QGC_MSGINFO}},
+             sprintf("    { %-30s 0x00,                          %-30s },\n", "$grpid,", $strid),
+        );
+    }
+    push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_QGC_MSGINFO}},
+        "}};\n",
+    );
+
+    push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_QGC_MSGINFO}},
+        "static constexpr std::array<MsgInfo, " . ($#QGC_MESSAGES + 1) . "> MSG_INFO =\n",
+        "{{\n",
+    );
+    foreach my $entry (@QGC_MESSAGES)
+    {
+        my $name = "QGC-$entry->{class}-$entry->{name}";
+        my $grpid = "QGC_$entry->{class}_GRPID";
+        my $msgid = "QGC_$entry->{class}_$entry->{name}_MSGID";
+        my $strid = "QGC_$entry->{class}_$entry->{name}_STRID";
+        push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_QGC_MESSAGES}},
+            ($entry->{msgid} =~ m{^QGC} ?
+                sprintf("static constexpr uint8_t     %-30s = %-24s  //!< $name message ID\n", $msgid, "$entry->{msgid};") :
+                sprintf("static constexpr uint8_t     %-30s = 0x%02x;                     //!< $name message ID\n", $msgid, $entry->{msgid})
+            ),
+            sprintf("static constexpr const char* %-30s = %-25s //!< $name message name\n", "QGC_$entry->{class}_$entry->{name}_STRID", "\"${name}\";"),
+        );
+        push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_QGC_MSGINFO}},
+             sprintf("    { %-30s %-30s %-30s },\n", "$grpid,", "$msgid,", $strid),
+     );
+    }
+    push(@{$CODEGEN_SECTIONS{FPSDK_COMMON_PARSER_QGC_MSGINFO}},
+        "}};\n",
+    );
 };
 
 ########################################################################################################################

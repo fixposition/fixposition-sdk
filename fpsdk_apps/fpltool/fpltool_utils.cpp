@@ -171,9 +171,11 @@ void ParserMsgHelper::UpdateParserMsg(const common::fpl::StreamMsg& streammsg)
         case Protocol::RTCM3:  rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_RTCM3;  break;
         case Protocol::UNI_B:  rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_UNI_B;  break;
         case Protocol::NOV_B:  rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_NOV_B;  break;
-        case Protocol::SBF:    rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_SBF;    break;
         case Protocol::SPARTN: rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_SPARTN; break;
-        case Protocol::OTHER:  rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_OTHER;  break;
+        case Protocol::SBF:    rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_SBF;    break;
+        case Protocol::QGC:    rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_QGC;    break;
+        case Protocol::OTHER:
+        default:               rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_OTHER;  break;
     }  // clang-format on
 #elif defined(FPSDK_USE_ROS2)
     // @todo implement for ROS2
