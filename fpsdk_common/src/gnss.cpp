@@ -685,6 +685,27 @@ Signal NmeaSignalIdToSignal(const parser::nmea::NmeaSignalId signalId)
     return Signal::UNKNOWN;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+Sat SbfSvidToSat(const uint16_t SVID)
+{
+    // clang-format off
+    if      ( (SVID >=   1) && (SVID <=  37) ) { return Sat(Gnss::GPS,   SVID       ); }
+    else if ( (SVID >=  38) && (SVID <=  61) ) { return Sat(Gnss::GLO,   SVID -  37 ); }
+    else if (  SVID ==  62                   ) { return Sat(Gnss::GLO,   0          ); }
+    else if ( (SVID >=  62) && (SVID <=  68) ) { return Sat(Gnss::GLO,   SVID -  38 ); }
+    else if ( (SVID >=  71) && (SVID <= 106) ) { return Sat(Gnss::GAL,   SVID -  70 ); }
+    else if ( (SVID >= 120) && (SVID <= 140) ) { return Sat(Gnss::SBAS,  SVID - 100 ); }
+    else if ( (SVID >= 141) && (SVID <= 180) ) { return Sat(Gnss::BDS,   SVID - 140 ); }
+    else if ( (SVID >= 181) && (SVID <= 190) ) { return Sat(Gnss::QZSS,  SVID - 180 ); }
+    else if ( (SVID >= 191) && (SVID <= 197) ) { return Sat(Gnss::NAVIC, SVID - 190 ); }
+    else if ( (SVID >= 198) && (SVID <= 215) ) { return Sat(Gnss::SBAS,  SVID - 157 ); }
+    else if ( (SVID >= 216) && (SVID <= 222) ) { return Sat(Gnss::NAVIC, SVID - 208 ); }
+    else if ( (SVID >= 223) && (SVID <= 245) ) { return Sat(Gnss::BDS,   SVID - 182 ); }
+    // clang-format on
+    return INVALID_SAT;
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace gnss
 }  // namespace common

@@ -17,10 +17,13 @@
 #include <array>
 #include <cinttypes>
 #include <cstdio>
+#include <cstring>
 
 /* EXTERNAL */
 
 /* PACKAGE */
+#include "fpsdk_common/logging.hpp"
+#include "fpsdk_common/math.hpp"
 #include "fpsdk_common/parser/sbf.hpp"
 
 namespace fpsdk {
@@ -170,6 +173,74 @@ bool SbfGetMessageName(char* name, const std::size_t size, const uint8_t* msg, c
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const char* SbfGetTypeDesc(const uint16_t type)
+{
+    for (auto& cand : MSG_INFO) {
+        if (cand.block == type) {
+            return cand.desc;
+        }
+    }
+    return nullptr;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+inline std::size_t StrWnoTow(char* info, const std::size_t size, const uint8_t* data)
+{
+    const uint16_t wno = *((const uint16_t*)&data[sizeof(uint32_t)]);
+    const uint32_t tow = *((const uint32_t*)data);
+    return std::snprintf(info, size, "%04" PRIu16 ":%010.3f", wno, (double)tow * 1e-3);
+}
+
+static std::size_t StrEndOfAny(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
+{
+    if ((msg_size < SBF_ENDOFANY_REV0_SIZE) || (SbfBlockRev(msg) != 0)) {
+        return 0;
+    }
+    return StrWnoTow(info, size, &msg[SBF_HEAD_SIZE]);
+}
+
+static std::size_t StrPvtGeodetic(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
+{
+    using namespace fpsdk::common::math;
+
+    if ((msg_size < SBF_PVTGEODETIC_REV2_SIZE) || (SbfBlockRev(msg) != 2)) {
+        return 0;
+    }
+    SbfPvtGeodeticRev2 pvt;
+    std::memcpy(&pvt, &msg[SBF_HEAD_SIZE], sizeof(pvt));
+
+    std::size_t len = StrWnoTow(info, size, &msg[SBF_HEAD_SIZE]);
+
+    len += std::snprintf(&info[len], size - len, " %+11.7f %+12.7f (%5.1f) %+6.0f (%5.1f)",
+        SbfDoNotUse(pvt.Latitude) ? NAN : RadToDeg(pvt.Latitude),
+        SbfDoNotUse(pvt.Longitude) ? NAN : RadToDeg(pvt.Longitude),
+        SbfDoNotUse(pvt.HAccuracy) ? NAN : (double)pvt.HAccuracy * 1e-2, SbfDoNotUse(pvt.Height) ? NAN : pvt.Height,
+        SbfDoNotUse(pvt.VAccuracy) ? NAN : (double)pvt.VAccuracy * 1e-2);
+
+    return len;
+}
+
+static std::size_t StrPvtCartesian(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
+{
+    using namespace fpsdk::common::math;
+
+    if ((msg_size < SBF_PVTCARTESIAN_REV2_SIZE) || (SbfBlockRev(msg) != 2)) {
+        return 0;
+    }
+    SbfPvtCartesianRev2 xyz;
+    std::memcpy(&xyz, &msg[SBF_HEAD_SIZE], sizeof(xyz));
+
+    std::size_t len = StrWnoTow(info, size, &msg[SBF_HEAD_SIZE]);
+
+    len += std::snprintf(&info[len], size - len, " %+11.3f %+11.3f %+11.3f (%5.1f, %5.1f)",
+        SbfDoNotUse(xyz.X) ? NAN : xyz.X, SbfDoNotUse(xyz.Y) ? NAN : xyz.Y, SbfDoNotUse(xyz.Z) ? NAN : xyz.Z,
+        SbfDoNotUse(xyz.HAccuracy) ? NAN : (double)xyz.HAccuracy * 1e-2,
+        SbfDoNotUse(xyz.VAccuracy) ? NAN : (double)xyz.VAccuracy * 1e-2);
+
+    return len;
+}
+
 bool SbfGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
     if ((info == NULL) || (size < 1) || (msg == NULL) || (msg_size < SBF_HEAD_SIZE)) {
@@ -184,14 +255,37 @@ bool SbfGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
 
     const uint16_t block = SbfBlockType(msg);
 
-    // Try the message name lookup table
-    for (auto& mi : MSG_INFO) {
-        if (mi.block == block) {
-            return std::snprintf(info, size, "%s", mi.desc) < (int)size;
-        }
+    std::size_t len = 0;
+
+    // Stringify message
+    if (size > 50) {
+        switch (block) {  // clang-format off
+            case SBF_PVTGEODETIC_MSGID:          len = StrPvtGeodetic(info, size, msg, msg_size);   break;
+            case SBF_PVTCARTESIAN_MSGID:         len = StrPvtCartesian(info, size, msg, msg_size);  break;
+            case SBF_ENDOFMEAS_MSGID:            /* FALLTHROUGH */
+            case SBF_ENDOFATT_MSGID:             /* FALLTHROUGH */
+            case SBF_ENDOFPVT_MSGID:             len = StrEndOfAny(info, size, msg, msg_size);      break;
+            case SBF_MEASEPOCH_MSGID:            /* FALLTHROUGH */
+            case SBF_MEASEXTRA_MSGID:            /* FALLTHROUGH */
+            case SBF_CHANNELSTATUS_MSGID:        /* FALLTHROUGH */
+            case SBF_POSCOVCARTESIAN_MSGID:      /* FALLTHROUGH */
+            case SBF_POSCOVGEODETIC_MSGID:       /* FALLTHROUGH */
+            case SBF_VELCOVCARTESIAN_MSGID:      /* FALLTHROUGH */
+            case SBF_VELCOVGEODETIC_MSGID:       /* FALLTHROUGH */
+            case SBF_DOP_MSGID:                  /* FALLTHROUGH */
+            case SBF_BASEVECTORCART_MSGID:       /* FALLTHROUGH */
+            case SBF_BASEVECTORGEOD_MSGID:       /* FALLTHROUGH */
+            case SBF_PVTSUPPORT_MSGID:           /* FALLTHROUGH */
+            case SBF_PVTSUPPORTA_MSGID:          /* FALLTHROUGH */
+            case SBF_NAVCART_MSGID:              /* FALLTHROUGH */
+            case SBF_ATTEULER_MSGID:             /* FALLTHROUGH */
+            case SBF_ATTCOVEULER_MSGID:          /* FALLTHROUGH */
+            case SBF_AUXANTPOSITIONS_MSGID:      /* FALLTHROUGH */
+            case SBF_RECEIVERTIME_MSGID:         len = StrWnoTow(info, size, &msg[SBF_HEAD_SIZE]);  break;
+        }  // clang-format on
     }
 
-    return false;
+    return (len > 0) && (len < size);
 }
 
 /* ****************************************************************************************************************** */
