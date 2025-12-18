@@ -461,7 +461,7 @@ static constexpr uint8_t  SBF_ALERTFLAG_RAIM_NOTACTIVE                          
 static constexpr uint8_t  SBF_ALERTFLAG_RAIM_SUCESSFUL                          = 1;                                    //!< RAIM integrity test successful
 static constexpr uint8_t  SBF_ALERTFLAG_RAIM_FAILED                             = 2;                                    //!< RAIM integrity test failed
 static constexpr bool     SBF_ALERTFLAG_GALHPCAFAIL(const uint8_t flag)         { return (flag & 0x04) == 0x04; }       //!< Galileo GPCA failed
-static constexpr bool     SBF_ALERTFLAG_GALIONOSTORM(const uint8_t flag)        { return (flag & 0x08) == 0x04; }       //!< Galileo ionospheric storm flag
+static constexpr bool     SBF_ALERTFLAG_GALIONOSTORM(const uint8_t flag)        { return (flag & 0x08) == 0x08; }       //!< Galileo ionospheric storm flag
 // clang-format on
 
 // ---------------------------------------------------------------------------------------------------------------------
