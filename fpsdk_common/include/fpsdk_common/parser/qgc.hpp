@@ -76,8 +76,8 @@ constexpr uint8_t QgcMsgId(const uint8_t* msg)
 /**
  * @brief Get QGC message name
  *
- * Generates a name (string) in the form "QGC-GRPID-MSGID", where GRPID and MSGID are suitable stringifications of the
- * class ID and message ID if known (for example, "QGC-RAW-HASE6", respectively %02X formatted IDs if unknown (for
+ * Generates a name (string) in the form "QGC-GROUP-MESSAGE", where GROUP and MESSAGE are suitable stringifications of
+ * the group ID and message ID if known (for example, "QGC-RAW-HASE6", respectively %02X formatted IDs if unknown (for
  * example, "QGC-0A-FF").
  *
  * @param[out] name      String to write the name to
