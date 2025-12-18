@@ -131,13 +131,6 @@
  *
  * @image html parser.drawio.svg ""
  *
- * The parser implementation does not use any STL containers, templates or other c++ conveniences. Instead, low-level
- * c-like types are used, in order to prevent any expensive heap (re)allocation and too much copying of data. For
- * example, the returned ParserMsg contains a pointer to message rather than a std::vector<uint8_t>, and a const
- * char* message name instead of a std::string. Applications can convert (copy) these easily to std::vector resp.
- * std::string for further processing. Some of the utilities, such as fpsdk::common::parser::ubx::UbxMakeMessage(), do
- * use STL containers for convenience.
- *
  * The maximum message size for each protocol is limited. For example, while the FP_B frame meta data would allow for
  * messages up to 65'536 bytes, the parser discards any message larger than #fpsdk::common::parser::MAX_FP_B_SIZE.
  * Messages larger than this are not practical and they do not (should not) exist. For example, it would take 5.6
