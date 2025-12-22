@@ -305,6 +305,36 @@ void Rtcm3SetSigned(uint8_t* data, const std::size_t offs, const std::size_t siz
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+const char* Rtcm3MsmGnssStr(const Rtcm3MsmGnss gnss)
+{
+    switch (gnss) {  // clang-format off
+        case Rtcm3MsmGnss::GPS:    return "GPS";
+        case Rtcm3MsmGnss::GLO:    return "GLO";
+        case Rtcm3MsmGnss::GAL:    return "GAL";
+        case Rtcm3MsmGnss::SBAS:   return "SBAS";
+        case Rtcm3MsmGnss::QZSS:   return "QZSS";
+        case Rtcm3MsmGnss::BDS:    return "BDS";
+        case Rtcm3MsmGnss::NAVIC:  return "NAVIC";
+    }  // clang-format on
+    return "?";
+}
+
+const char* Rtcm3MsmTypeStr(const Rtcm3MsmType gnss)
+{
+    switch (gnss) {  // clang-format off
+        case Rtcm3MsmType::MSM1: return "MSM1";
+        case Rtcm3MsmType::MSM2: return "MSM2";
+        case Rtcm3MsmType::MSM3: return "MSM3";
+        case Rtcm3MsmType::MSM4: return "MSM4";
+        case Rtcm3MsmType::MSM5: return "MSM5";
+        case Rtcm3MsmType::MSM6: return "MSM6";
+        case Rtcm3MsmType::MSM7: return "MSM7";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 bool Rtcm3GetArp(const uint8_t* msg, Rtcm3Arp& arp)
 {
     bool ok = false;
@@ -446,17 +476,17 @@ bool Rtcm3GetMsmHeader(const uint8_t* msg, Rtcm3MsmHeader& header)
     // clang-format off
     header.multi_msg_bit_ = Rtcm3GetUnsigned(data,  54,  1);    // DF393
     header.iods_          = Rtcm3GetUnsigned(data,  55,  3);    // DF409
-    // bit(7) reserved // DF001
+    // bit(7) reserved                                          // DF001
     header.clk_steering_  = Rtcm3GetUnsigned(data,  65,  2);    // DF411
     header.ext_clock_     = Rtcm3GetUnsigned(data,  67,  2);    // DF412
     header.smooth_        = Rtcm3GetUnsigned(data,  69,  1);    // DF417
     header.smooth_int_    = Rtcm3GetUnsigned(data,  70,  3);    // DF418
     header.sat_mask_      = Rtcm3GetUnsigned(data,  73,  64);   // DF394
-    header.sig_mask_      = Rtcm3GetUnsigned(data, 137, 32);    // DF395
+    header.sig_mask_      = Rtcm3GetUnsigned(data, 137,  32);   // DF395
     header.num_sat_       = Rtcm3CountBits(header.sat_mask_);
     header.num_sig_       = Rtcm3CountBits(header.sig_mask_);
-    header.num_cell_      = header.num_sat_ * header.num_sig_;
-    header.cell_mask_     = Rtcm3GetUnsigned(data, 169, header.num_cell_);  // DF396
+    header.cell_mask_     = Rtcm3GetUnsigned(data, 169, header.num_sat_ * header.num_sig_);  // DF396
+    header.num_cell_      = Rtcm3CountBits(header.cell_mask_);
     // clang-format on
 
     return true;
@@ -493,12 +523,27 @@ bool Rtcm3GetMessageInfo(char* info, const std::size_t size, const uint8_t* msg,
 
     Rtcm3MsmHeader msm;
     if ((len < size) && Rtcm3GetMsmHeader(msg, msm)) {
-        len = snprintf(info, size, "(#%d) %010.3f (%d * %d, %s)", msm.ref_sta_id_, msm.any_tow_, msm.num_sat_,
-            msm.num_sig_, msm.multi_msg_bit_ ? "more" : "last");
+        // Calculate expected message size.
+        // clang-format off
+        std::size_t exp_size = (RTCM3_FRAME_SIZE * 8) + /* header: */ 169 + msm.num_cell_;  // + sat data + sig data
+        switch (msm.msm_) {
+            case Rtcm3MsmType::MSM1: exp_size += (msm.num_sat_ * 10) + (msm.num_cell_ * 15); break;
+            case Rtcm3MsmType::MSM2: exp_size += (msm.num_sat_ * 10) + (msm.num_cell_ * 27); break;
+            case Rtcm3MsmType::MSM3: exp_size += (msm.num_sat_ * 10) + (msm.num_cell_ * 42); break;
+            case Rtcm3MsmType::MSM4: exp_size += (msm.num_sat_ * 18) + (msm.num_cell_ * 48); break;
+            case Rtcm3MsmType::MSM5: exp_size += (msm.num_sat_ * 36) + (msm.num_cell_ * 63); break;
+            case Rtcm3MsmType::MSM6: exp_size += (msm.num_sat_ * 18) + (msm.num_cell_ * 65); break;
+            case Rtcm3MsmType::MSM7: exp_size += (msm.num_sat_ * 36) + (msm.num_cell_ * 80); break;  // clang-format on
+        }
+        exp_size = (exp_size + 7) / 8;  // bytes
+
+        len = snprintf(info, size, "(#%d) %010.3f %s %s: %d sat, %d sig, %d cell, %s, exps %" PRIuMAX, msm.ref_sta_id_,
+            msm.any_tow_, Rtcm3MsmGnssStr(msm.gnss_), Rtcm3MsmTypeStr(msm.msm_), msm.num_sat_, msm.num_sig_,
+            msm.num_cell_, msm.multi_msg_bit_ ? "more" : "last", exp_size);
     }
 
     const char* type_desc = Rtcm3GetTypeDesc(Rtcm3Type(msg));
-    if ((len < size) && (type_desc != NULL)) {
+    if ((len == 0) && (len < size) && (type_desc != NULL)) {
         len += snprintf(&info[len], size - len, "%s%s", len > 0 ? " - " : "", type_desc);
     }
 

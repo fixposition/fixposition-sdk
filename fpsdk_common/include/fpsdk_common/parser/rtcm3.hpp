@@ -238,6 +238,15 @@ enum class Rtcm3MsmGnss : uint16_t
 };  // clang-format on
 
 /**
+ * @brief Stringify RTCM3 MSM GNSS type
+ *
+ * @param[in]  gnss  The GNSS
+ *
+ * @returns a concise and unique string for the GNSS type, "?" for bad value
+ */
+const char* Rtcm3MsmGnssStr(const Rtcm3MsmGnss gnss);
+
+/**
  * @brief RTCM3 MSM messages type
  */
 enum class Rtcm3MsmType : uint16_t
@@ -250,6 +259,15 @@ enum class Rtcm3MsmType : uint16_t
     MSM6 = 6,  //!< Type 6 (ext full C, ext full L, S)
     MSM7 = 7,  //!< Type 7 (ext full C, ext full L, S, D)
 };
+
+/**
+ * @brief Stringify RTCM3 MSM type
+ *
+ * @param[in]  msm  The MSM type
+ *
+ * @returns a concise and unique string for the MSM type, "?" for bad value
+ */
+const char* Rtcm3MsmTypeStr(const Rtcm3MsmType gnss);
 
 /**
  * @brief RTMC3 message type to MSM GNSS and type
@@ -289,12 +307,12 @@ struct Rtcm3MsmHeader
     bool smooth_;           //!< GNSS divergence-free smoothing indicator (DF417, bit(1))
     uint8_t smooth_int_;    //!< GNSS smoothing interval (DF418, bit(3))
     uint64_t sat_mask_;     //!< GNSS satellite mask (DF394, bit(64))
-    uint64_t sig_mask_;     //!< GNSS signal mask (DF395, bit(64))
+    uint32_t sig_mask_;     //!< GNSS signal mask (DF395, bit(32))
     uint64_t cell_mask_;    //!< GNSS cell mask (DF396, bit(64))
 
-    int num_sat_;   //!< Number of satellites (in satMask)
-    int num_sig_;   //!< Number of signals (in sigMask)
-    int num_cell_;  //!< Number of cells (in cellMask)
+    int num_sat_;   //!< Number of satellites (1-bits in sat_mask_), "Nsat"
+    int num_sig_;   //!< Number of signals (1-bits in sig_mask_),    "Nsig"
+    int num_cell_;  //!< Number of cells (1-bits in cell_mask_),     "Ncell"
 };
 
 /**
