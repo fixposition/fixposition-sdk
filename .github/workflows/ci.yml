@@ -115,11 +115,12 @@ jobs:
                   cd ${GITHUB_WORKSPACE}/docker
                   COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-run build-noetic-run build-humble-run build-jazzy-run
             - name: Push
-              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/115/merge' }}
+              if: ${{ github.ref == 'refs/heads/main' }}
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
                   docker compose push build-trixie-run build-noetic-run build-humble-run build-jazzy-run
             - name: Expire old images
+              if: ${{ github.ref == 'refs/heads/main' }}
               uses: actions/delete-package-versions@v5
               with:
                   package-name:                  ${{ github.event.repository.name }}

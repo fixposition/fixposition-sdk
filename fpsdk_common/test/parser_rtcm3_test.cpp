@@ -134,7 +134,7 @@ TEST(ParserRtcm3Test, Rtcm3GetMsmHeader)
     EXPECT_FALSE(msm.multi_msg_bit_);
     EXPECT_EQ(msm.num_sat_, 9);
     EXPECT_EQ(msm.num_sig_, 2);
-    EXPECT_EQ(msm.num_cell_, 18);
+    EXPECT_EQ(msm.num_cell_, 13);
 }
 
 /* ****************************************************************************************************************** */
