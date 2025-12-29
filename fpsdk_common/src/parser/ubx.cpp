@@ -1097,35 +1097,62 @@ static std::size_t StrUbxTimTm2(char* info, const std::size_t size, const uint8_
 
     const uint8_t timeBase = UBX_TIM_TM2_V0_FLAGS_TIMEBASE(tm.flags);
     constexpr std::array<const char*, 3> timeBaseStr = { { "RX", "GNSS", "UTC" } };
-    const double towR =
-        ((double)tm.towMsR * UBX_TIM_TM2_V0_TOW_SCALE) + ((double)tm.towSubMsR * UBX_TIM_TM2_V0_SUBMS_SCALE);
-    const double towF =
-        ((double)tm.towMsF * UBX_TIM_TM2_V0_TOW_SCALE) + ((double)tm.towSubMsF * UBX_TIM_TM2_V0_SUBMS_SCALE);
 
-    return std::snprintf(info, size, "%04u:%013.6f %04u:%013.6f INT%u %c %c %s %s %s %s %s %u %.6g", tm.wnR, towR,
-        tm.wnF, towF, tm.ch, UBX_TIM_TM2_V0_FLAGS_NEWRISINGEDGE(tm.flags) ? 'R' : '-',
-        UBX_TIM_TM2_V0_FLAGS_NEWFALLINGEDGE(tm.flags) ? 'F' : '-',
+    std::size_t len = 0;
+
+    len += std::snprintf(&info[len], size - len, "INT%" PRIu8 " %s %s %s %s %s", tm.ch,
         UBX_TIM_TM2_V0_FLAGS_MODE(tm.flags) == UBX_TIM_TM2_V0_FLAGS_MODE_SINGLE ? "single" : "running",
         UBX_TIM_TM2_V0_FLAGS_RUN(tm.flags) == UBX_TIM_TM2_V0_FLAGS_RUN_ARMED ? "armed" : "stopped",
         timeBase < timeBaseStr.size() ? timeBaseStr[timeBase] : "?",
-        UBX_TIM_TM2_V0_FLAGS_UTCACAVAIL(tm.flags) ? "UTC" : "n/a",
-        UBX_TIM_TM2_V0_FLAGS_TIMEVALID(tm.flags) ? "valid" : "invalid", tm.count,
-        (double)tm.accEst * UBX_TIM_TM2_V0_ACCEST_SCALE);
+        UBX_TIM_TM2_V0_FLAGS_UTCACAVAIL(tm.flags) ? "avail" : "n/a",
+        UBX_TIM_TM2_V0_FLAGS_TIMEVALID(tm.flags) ? "valid" : "invalid");
+
+    char sR[64] = "-";
+    if (UBX_TIM_TM2_V0_FLAGS_NEWRISINGEDGE(tm.flags)) {
+        const double towR =
+            ((double)tm.towMsR * UBX_TIM_TM2_V0_TOW_SCALE) + ((double)tm.towSubMsR * UBX_TIM_TM2_V0_SUBMS_SCALE);
+        std::snprintf(sR, sizeof(sR), "%04" PRIu16 ":%016.9f", tm.wnR, towR);
+    }
+    char sF[64] = "-";
+    if (UBX_TIM_TM2_V0_FLAGS_NEWFALLINGEDGE(tm.flags)) {
+        const double towF =
+            ((double)tm.towMsF * UBX_TIM_TM2_V0_TOW_SCALE) + ((double)tm.towSubMsF * UBX_TIM_TM2_V0_SUBMS_SCALE);
+        std::snprintf(sF, sizeof(sF), "%04" PRIu16 ":%016.9f", tm.wnF, towF);
+    }
+
+    if (len < size) {
+        len += std::snprintf(&info[len], size - len, " %5" PRIu16 " R %-21s F %-21s %g", tm.count, sR, sF,
+            (double)tm.accEst * UBX_TIM_TM2_V0_ACCEST_SCALE);
+    }
+
+    // Examples:
+    //
+    // INT0 running armed UTC avail valid 6725 R 2399:150006.452263174 F 2399:150006.552263195 2.9e-08
+    // INT0 running armed UTC avail valid 6726 R 2399:150007.452263519 F 2399:150007.552263547 2.9e-08
+    // INT0 running armed UTC avail valid 6727 R 2399:150008.452263872 F 2399:150008.552263892 2.9e-08
+    // INT0 running armed UTC avail valid 6728 R 2399:150009.452264216 F 2399:150009.552264237 2.9e-08
+    // INT0 running armed UTC avail valid 6729 R 2399:150010.452264561 F 2399:150010.552264589 2.9e-08
+    // INT0 running armed UTC avail valid 6730 R 2399:150011.452264914 F 2399:150011.552264934 2.9e-08
+    // INT0 running armed UTC avail valid 6731 R 2399:150012.452265258 F 2399:150012.552265286 2.9e-08
+    // INT0 running armed UTC avail valid 6732 R 2399:150013.452265611 F 2399:150013.552265631 2.9e-08
+    // INT0 running armed UTC avail valid 6733 R 2399:150014.452265956 F 2399:150014.552265984 2.9e-08
+    //
+    // INT0 running armed UTC avail valid  7767 R 2399:150910.485040602 F -                     2.9e-08
+    // INT0 running armed UTC avail valid     0 R -                     F 2399:150910.585040630 2.9e-08
+    // INT0 running armed UTC avail valid  7768 R 2399:150911.485040954 F -                     2.9e-08
+    // INT0 running armed UTC avail valid     0 R -                     F 2399:150911.585040975 2.9e-08
+    // INT0 running armed UTC avail valid  7769 R 2399:150912.485041299 F -                     2.9e-08
+    // INT0 running armed UTC avail valid     0 R -                     F 2399:150912.585041327 2.9e-08
+    // INT0 running armed UTC avail valid  7770 R 2399:150913.485041651 F -                     2.9e-08
+    // INT0 running armed UTC avail valid     0 R -                     F 2399:150913.585041672 2.9e-08
+    // INT0 running armed UTC avail valid  7771 R 2399:150914.485042004 F -                     2.9e-08
+    //
+
+    return len;
 }
+
 static std::size_t StrUbxTimTp(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
-    // clang-format off
-    // message   11, dt   63, size   36, UBX      UBX-TIM-TM2          2253:061563.388047 2253:061563.588086 INT0 - F running armed GNSS n/a valid 46887 1.3e-08
-    // message   43, dt  558, size   36, UBX      UBX-TIM-TM2          2253:061564.387529 2253:061563.588086 INT0 R - running armed GNSS n/a valid 46888 1.3e-08
-    // message   67, dt   64, size   36, UBX      UBX-TIM-TM2          2253:061564.387529 2253:061564.588060 INT0 - F running armed GNSS n/a valid 46888 1.3e-08
-    // message   91, dt  556, size   36, UBX      UBX-TIM-TM2          2253:061565.387023 2253:061564.588060 INT0 R - running armed GNSS n/a valid 46889 1.3e-08
-    // message  115, dt   67, size   36, UBX      UBX-TIM-TM2          2253:061565.387023 2253:061565.587034 INT0 - F running armed GNSS n/a valid 46889 1.3e-08
-    // message  154, dt  558, size   36, UBX      UBX-TIM-TM2          2253:061566.386456 2253:061565.587034 INT0 R - running armed GNSS n/a valid 46890 1.3e-08
-    // message  173, dt   66, size   36, UBX      UBX-TIM-TM2          2253:061566.386456 2253:061566.587008 INT0 - F running armed GNSS n/a valid 46890 1.3e-08
-    // message  202, dt  569, size   36, UBX      UBX-TIM-TM2          2253:061567.385907 2253:061566.587008 INT0 R - running armed GNSS n/a valid 46891 1.3e-08
-    // message  226, dt   59, size   36, UBX      UBX-TIM-TM2          2253:061567.385907 2253:061567.585982 INT0 - F running armed GNSS n/a valid 46891 1.3e-08
-    // message  263, dt  566, size   36, UBX      UBX-TIM-TM2          2253:061568.385365 2253:061567.585982 INT0 R - running armed GNSS n/a valid 46892 1.3e-08
-    // clang-format on
     if (msg_size != UBX_TIM_TP_V0_SIZE) {
         return 0;
     }
@@ -1141,29 +1168,35 @@ static std::size_t StrUbxTimTp(char* info, const std::size_t size, const uint8_t
     constexpr std::array<const char*, 9> utcStandardStr = { { "NA", "CRL", "NIST", "USNO", "BIPM", "EU", "SU", "NTSC",
         "NPLI" } };
 
-    std::size_t ret = 0;
+    std::size_t len = 0;
     switch (timeBase) {
         case UBX_TIM_TP_V0_FLAGS_TIMEBASE_GNSS:
-            ret = std::snprintf(info, size, "%019.12f GNSS %s", tow,
+            len = std::snprintf(info, size, "%019.12f GNSS %s", tow,
                 timeRefGnss < timeRefGnssStr.size() ? timeRefGnssStr[timeRefGnss] : "?");
             break;
         case UBX_TIM_TP_V0_FLAGS_TIMEBASE_UTC:
-            ret = std::snprintf(info, size, "%019.12f UTC %s %s", tow,
+            len = std::snprintf(info, size, "%019.12f UTC %s %s", tow,
                 UBX_TIM_TP_V0_FLAGS_UTC(tp.flags) ? "avail" : "n/a",
                 utcStandard < utcStandardStr.size() ? utcStandardStr[utcStandard] : "?");
             break;
         default:
-            ret = std::snprintf(info, size, "%019.12f", tow);
+            len = std::snprintf(info, size, "%019.12f", tow);
             break;
     }
 
-    if (ret < size) {
-        ret += std::snprintf(&info[ret], size - ret, " %d %c %c", tp.qErr,
-            UBX_TIM_TP_V0_FLAGS_QERRINVALID(tp.flags) ? 'Y' : 'N',
-            UBX_TIM_TP_V0_FLAGS_TPNOTLOCKED(tp.flags) ? 'U' : 'L');
+    if (len < size) {
+        len += std::snprintf(&info[len], size - len, " %s", UBX_TIM_TP_V0_FLAGS_TPNOTLOCKED(tp.flags) ? "-" : "locked");
     }
 
-    return ret;
+    if (len < size) {
+        if (!UBX_TIM_TP_V0_FLAGS_QERRINVALID(tp.flags)) {
+            len += std::snprintf(&info[len], size - len, " %d", tp.qErr);
+        } else {
+            len += std::snprintf(&info[len], size - len, " -");
+        }
+    }
+
+    return len;
 }
 
 static std::size_t StrUbxRxmRawx(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
