@@ -241,6 +241,34 @@ static std::size_t StrPvtCartesian(char* info, const std::size_t size, const uin
     return len;
 }
 
+static std::size_t StrBbSamples(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
+{
+    using namespace fpsdk::common::math;
+
+    if ((msg_size < SBF_BBSAMPLES_REV0_MIN_SIZE) || (SbfBlockRev(msg) != 0)) {
+        return 0;
+    }
+    std::size_t len = StrWnoTow(info, size, &msg[SBF_HEAD_SIZE]);
+
+    SbfBBSamplesHeadRev0 head;
+    std::memcpy(&head, &msg[SBF_HEAD_SIZE], sizeof(head));
+    const std::size_t exp_size =
+        SBF_BBSAMPLES_REV0_MIN_SIZE + (head.N * sizeof(SbfBBSamplesSampleRev0)) + sizeof(SbfBBSamplesTailRev0);
+    if (msg_size < exp_size) {
+        return len;
+    }
+    SbfBBSamplesTailRev0 tail;
+    std::memcpy(&tail, &msg[exp_size - sizeof(tail)], sizeof(tail));
+
+    std::array<const char*, 3> antIdStrs = { { "MAIN", "AUX1", "AUX2" } };
+    const std::size_t antId = SBF_BBSAMPLES_INFO_ANTID(head.info);
+    len += std::snprintf(&info[len], size - len, " %s %.6f %.6f %" PRIu16 " %g",
+        antId < antIdStrs.size() ? antIdStrs[antId] : "ANT?", (double)head.SampleFreq * 1e-6,
+        (double)head.LOFreq * 1e-6, head.N, tail.TOWDelta);
+
+    return len;
+}
+
 bool SbfGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
     if ((info == NULL) || (size < 1) || (msg == NULL) || (msg_size < SBF_HEAD_SIZE)) {
@@ -262,6 +290,7 @@ bool SbfGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
         switch (block) {  // clang-format off
             case SBF_PVTGEODETIC_MSGID:          len = StrPvtGeodetic(info, size, msg, msg_size);   break;
             case SBF_PVTCARTESIAN_MSGID:         len = StrPvtCartesian(info, size, msg, msg_size);  break;
+            case SBF_BBSAMPLES_MSGID:            len = StrBbSamples(info, size, msg, msg_size);     break;
             case SBF_ENDOFMEAS_MSGID:            /* FALLTHROUGH */
             case SBF_ENDOFATT_MSGID:             /* FALLTHROUGH */
             case SBF_ENDOFPVT_MSGID:             len = StrEndOfAny(info, size, msg, msg_size);      break;
