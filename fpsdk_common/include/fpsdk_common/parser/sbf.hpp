@@ -8,6 +8,10 @@
  *
  * The information on message structures, IDs, descriptions etc. in this file are from publicly available data, such as:
  * - mosaic-G5 Reference Guide, copyright 2000-2025 Septentrio NV/SA, part of HEXAGON
+ *   (direct download link from https://www.ardusimple.com/how-to-configure-septentrio-mosaic-g5/#documentation)
+ * - sbf2asc source code, (c) Copyright 2002-2015 Septentrio NV/SA
+ * - https://github.com/septentrio-gnss/septentrio_gnss_driver
+ * - https://github.com/rtklibexplorer/RTKLIB
  * \endverbatim
  *
  * @file
@@ -712,12 +716,12 @@ static_assert(sizeof(MeasEpochChannelType1Rev0) == 20, "");
  */
 struct MeasEpochChannelType2Rev0
 {  // clang-format off
-    uint8_t  Type;           //!< -> MEASEPOCH_CHANNEL_TYPE_...
+    uint8_t  Type;           //!< -> SBF_MEASEPOCH_CHANNEL_TYPE_...
     uint8_t  LockTime;       //!< Lock time [s]
     uint8_t  CN0;            //!< C/N0 [0.25dBHz]
     uint8_t  OffsetsMSB;     //!< @todo document
     int8_t   CarrierMSB;     //!< @todo document
-    uint8_t  ObsInfo;        //!< -> MEASEPOCH_CHANNEL_OBSINFO_...
+    uint8_t  ObsInfo;        //!< -> SBF_MEASEPOCH_CHANNEL_OBSINFO_...
     uint16_t CodeOffsetLSB;  //!< @todo document
     uint16_t CarrierLSB;     //!< @todo document
     uint16_t DopplerOffsetLSB; //!< @todo document
@@ -730,12 +734,12 @@ static constexpr std::size_t SBF_MEASEPOCH_REV1_MIN_SIZE = sizeof(MeasEpochRev1)
 // clang-format on
 
 // clang-format off
-static constexpr uint8_t  MEASEPOCH_CHANNEL_TYPE_SIGIDXLO(const uint8_t type)   { return type & 0x1f; }                 //!< Signal number (part 1)
-static constexpr uint8_t  MEASEPOCH_CHANNEL_TYPE_ANTID(const uint8_t type)      { return (type >> 5) & 0x07; }          //!< Antenna ID
-static constexpr uint8_t  MEASEPOCH_CHANNEL_TYPE_ANTID_MAIN                     =  0;                                   //!< Main antenna
-static constexpr uint8_t  MEASEPOCH_CHANNEL_TYPE_ANTID_AUX1                     =  1;                                   //!< Aux1 antenna
-static constexpr uint8_t  MEASEPOCH_CHANNEL_TYPE_ANTID_AUX2                     =  2;                                   //!< Aux2 antenna
-static constexpr uint8_t  MEASEPOCH_CHANNEL_OBSINFO_SIGIDXHI(const uint8_t info){ return (info >> 3) & 0x1f; }          //!< Signal number (part 2)
+static constexpr uint8_t  SBF_MEASEPOCH_CHANNEL_TYPE_SIGIDXLO(const uint8_t type) { return type & 0x1f; }               //!< Signal number (part 1)
+static constexpr uint8_t  SBF_MEASEPOCH_CHANNEL_TYPE_ANTID(const uint8_t type)  { return (type >> 5) & 0x07; }          //!< Antenna ID
+static constexpr uint8_t  SBF_MEASEPOCH_CHANNEL_TYPE_ANTID_MAIN                 =  0;                                   //!< Main antenna
+static constexpr uint8_t  SBF_MEASEPOCH_CHANNEL_TYPE_ANTID_AUX1                 =  1;                                   //!< Aux1 antenna
+static constexpr uint8_t  SBF_MEASEPOCH_CHANNEL_TYPE_ANTID_AUX2                 =  2;                                   //!< Aux2 antenna
+static constexpr uint8_t  SBF_MEASEPOCH_CHANNEL_OBSINFO_SIGIDXHI(const uint8_t info){ return (info >> 3) & 0x1f; }      //!< Signal number (part 2)
 // clang-format on
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -763,8 +767,8 @@ struct SFB_PACKED ChannelSatInfoRev0
     uint8_t  SVID;           //!< Satellite ID
     uint8_t  FreqNr;         //!< GLONASS frequency number
     uint16_t SVIDFull;       //!< If the SVID field is zero, this field contains the satellite ID
-    uint16_t AzimuthRiseSet; //!< -> CHANNELSTATUS_SI_AZRS_...
-    uint16_t HealthStatus;   //!< -> CHANNELSTATUS_SI_HEALTH_...
+    uint16_t AzimuthRiseSet; //!< -> SBF_CHANNELSTATUS_SI_AZRS_...
+    uint16_t HealthStatus;   //!< -> SBF_CHANNELSTATUS_SI_HEALTH_...
     int8_t   Elevation;      //!< Elevation [deg]
     uint8_t  N2;             //!< Number of ChannelStateInfo blocks following this ChannelSatInfo block.
     uint8_t  RxChannel;      //!< Channel number
@@ -780,8 +784,8 @@ struct SFB_PACKED ChannelStateInfoRev0
 {  // clang-format off
     uint8_t  Antenna;        //!< Anntena number (0 = main antenna)
     uint8_t  Reserved;       //!< Reserved
-    uint16_t TrackingStatus; //!< -> CHANNELSTATE_TRKSTA_...
-    uint16_t PVTStatus;      //!< -> CHANNELSTATE_PVTSTA_...
+    uint16_t TrackingStatus; //!< -> SBF_CHANNELSTATE_TRKSTA_...
+    uint16_t PVTStatus;      //!< -> SBF_CHANNELSTATE_PVTSTA_...
     uint16_t PVTInfo;        //!< Internal info
 };  // clang-format on
 
@@ -792,25 +796,25 @@ static constexpr std::size_t SBF_CHANNELSTATUS_REV0_MIN_SIZE = sizeof(ChannelSta
 // clang-format on
 
 // clang-format off
-static constexpr uint16_t CHANNELSTATUS_SI_AZRS_AZIMUTH(const uint16_t azrs)    { return azrs & 0x1ff; }                //!< Azimuth [deg]
-static constexpr uint8_t  CHANNELSTATUS_SI_AZRS_RISESET(const uint16_t azrs)    { return (azrs >> 14) & 0x0007; }       //!< Rise/set indicator
-static constexpr uint8_t  CHANNELSTATUS_SI_AZRS_RISESET_SETTING                 = 0;                                    //!< SV is setting
-static constexpr uint8_t  CHANNELSTATUS_SI_AZRS_RISESET_RISING                  = 1;                                    //!< SV is rising
-static constexpr uint8_t  CHANNELSTATUS_SI_AZRS_RISESET_UNKNOWN                 = 2;                                    //!< Elevation rate unknown
-static constexpr uint8_t  CHANNELSTATUS_SI_HEALTH_SIG(const uint16_t health, const std::size_t sigIx) { return (health >> (sigIx * 2)) & 0x07; }                                                                            //!< Signal health
-static constexpr uint8_t  CHANNELSTATUS_SI_HEALTH_SIG_UNKNOWN                   = 0;                                    //!< Health unknown
-static constexpr uint8_t  CHANNELSTATUS_SI_HEALTH_SIG_HEALTHY                   = 1;                                    //!< Healthy
-static constexpr uint8_t  CHANNELSTATUS_SI_HEALTH_SIG_UNHEALTHY                 = 2;                                    //!< Unhealthy
-static constexpr uint8_t  CHANNELSTATE_TRKSTA_SIG(const uint16_t status, const std::size_t sigIx) { return (status >> (sigIx * 2)) & 0x07; }                                                                            //!< Signal health
-static constexpr uint8_t  CHANNELSTATE_TRKSTA_SIG_IDLE                          = 0;                                    //!< Idle
-static constexpr uint8_t  CHANNELSTATE_TRKSTA_SIG_SEARCH                        = 1;                                    //!< Search
-static constexpr uint8_t  CHANNELSTATE_TRKSTA_SIG_SYNC                          = 2;                                    //!< Sync
-static constexpr uint8_t  CHANNELSTATE_TRKSTA_SIG_TRACKING                      = 3;                                    //!< Tracking
-static constexpr uint8_t  CHANNELSTATE_PVTSTA_SIG(const uint16_t status, const std::size_t sigIx) { return (status >> (sigIx * 2)) & 0x07; }                                                                            //!< Signal health
-static constexpr uint8_t  CHANNELSTATE_PVTSTA_SIG_UNUSED                        = 0;                                    //!< Not used
-static constexpr uint8_t  CHANNELSTATE_PVTSTA_SIG_NOEPH                         = 1;                                    //!< No ephemeris
-static constexpr uint8_t  CHANNELSTATE_PVTSTA_SIG_USED                          = 2;                                    //!< Used
-static constexpr uint8_t  CHANNELSTATE_PVTSTA_SIG_REJECTED                      = 3;                                    //!< Rejected
+static constexpr uint16_t SBF_CHANNELSTATUS_SI_AZRS_AZIMUTH(const uint16_t azrs){ return azrs & 0x1ff; }                //!< Azimuth [deg]
+static constexpr uint8_t  SBF_CHANNELSTATUS_SI_AZRS_RISESET(const uint16_t azrs){ return (azrs >> 14) & 0x0007; }       //!< Rise/set indicator
+static constexpr uint8_t  SBF_CHANNELSTATUS_SI_AZRS_RISESET_SETTING             = 0;                                    //!< SV is setting
+static constexpr uint8_t  SBF_CHANNELSTATUS_SI_AZRS_RISESET_RISING              = 1;                                    //!< SV is rising
+static constexpr uint8_t  SBF_CHANNELSTATUS_SI_AZRS_RISESET_UNKNOWN             = 2;                                    //!< Elevation rate unknown
+static constexpr uint8_t  SBF_CHANNELSTATUS_SI_HEALTH_SIG(const uint16_t health, const std::size_t sigIx) { return (health >> (sigIx * 2)) & 0x07; }  //!< Signal health
+static constexpr uint8_t  SBF_CHANNELSTATUS_SI_HEALTH_SIG_UNKNOWN               = 0;                                    //!< Health unknown
+static constexpr uint8_t  SBF_CHANNELSTATUS_SI_HEALTH_SIG_HEALTHY               = 1;                                    //!< Healthy
+static constexpr uint8_t  SBF_CHANNELSTATUS_SI_HEALTH_SIG_UNHEALTHY             = 2;                                    //!< Unhealthy
+static constexpr uint8_t  SBF_CHANNELSTATE_TRKSTA_SIG(const uint16_t status, const std::size_t sigIx) { return (status >> (sigIx * 2)) & 0x07; }  //!< Signal health
+static constexpr uint8_t  SBF_CHANNELSTATE_TRKSTA_SIG_IDLE                      = 0;                                    //!< Idle
+static constexpr uint8_t  SBF_CHANNELSTATE_TRKSTA_SIG_SEARCH                    = 1;                                    //!< Search
+static constexpr uint8_t  SBF_CHANNELSTATE_TRKSTA_SIG_SYNC                      = 2;                                    //!< Sync
+static constexpr uint8_t  SBF_CHANNELSTATE_TRKSTA_SIG_TRACKING                  = 3;                                    //!< Tracking
+static constexpr uint8_t  SBF_CHANNELSTATE_PVTSTA_SIG(const uint16_t status, const std::size_t sigIx) { return (status >> (sigIx * 2)) & 0x07; }  //!< Signal health
+static constexpr uint8_t  SBF_CHANNELSTATE_PVTSTA_SIG_UNUSED                    = 0;                                    //!< Not used
+static constexpr uint8_t  SBF_CHANNELSTATE_PVTSTA_SIG_NOEPH                     = 1;                                    //!< No ephemeris
+static constexpr uint8_t  SBF_CHANNELSTATE_PVTSTA_SIG_USED                      = 2;                                    //!< Used
+static constexpr uint8_t  SBF_CHANNELSTATE_PVTSTA_SIG_REJECTED                  = 3;                                    //!< Rejected
 // clang-format on
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -829,6 +833,54 @@ static_assert(sizeof(SbfEndOfAnyRev0) == 8, "");
 
 // clang-format off
 static constexpr std::size_t SBF_ENDOFANY_REV0_SIZE = sizeof(SbfEndOfAnyRev0) + SBF_HEAD_SIZE;  //!< Size of EndOfPvt/EndOfAtt/EndOfMeas message
+// clang-format on
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief SBF BBSamples payload head (rev 0)
+ */
+struct SbfBBSamplesHeadRev0
+{  // clang-format off
+    uint32_t TOW;          //!< GPS time of week [ms]
+    uint16_t WNc;          //!< GPS week number
+    uint16_t N;            //!< Number of samples
+    uint8_t  info;         //!< -> SBF_BBSAMPLES_INFO_...
+    uint8_t  reserved[3];  //!< Reserved
+    uint32_t SampleFreq;   //!< Sampling frequency [Hz]          FIXME: looks like this is the span (bandwidth)
+    uint32_t LOFreq;       //!< Local oscillator frequency [Hz]  FIXME: looks like this is the centre frequency
+};  // clang-format on
+
+/**
+ * @brief SBF BBSamples payload sample (rev 0)
+ */
+struct SbfBBSamplesSampleRev0
+{  // clang-format off
+    int8_t   I;            //!< I component
+    int8_t   Q;            //!< Q component
+};  // clang-format on
+
+static_assert(sizeof(SbfBBSamplesSampleRev0) == 2, "");
+
+/**
+ * @brief SBF BBSamples payload tail (rev 0)
+ */
+struct SbfBBSamplesTailRev0
+{  // clang-format off
+    float    TOWDelta;     //!< Time offset [s]
+};  // clang-format on
+
+static_assert(sizeof(SbfBBSamplesTailRev0) == 4, "");
+
+// clang-format off
+static constexpr std::size_t SBF_BBSAMPLES_REV0_MIN_SIZE = sizeof(SbfBBSamplesHeadRev0) + sizeof(SbfBBSamplesTailRev0) + SBF_HEAD_SIZE;  //!< Minimal size of BBSamples message
+// clang-format on
+
+// clang-format off
+static constexpr uint8_t  SBF_BBSAMPLES_INFO_ANTID(const uint8_t type)          { return type & 0x07; }                 //!< Antenna ID
+static constexpr uint8_t  SBF_BBSAMPLES_INFO_ANTID_MAIN                         =  0;                                   //!< Main antenna
+static constexpr uint8_t  SBF_BBSAMPLES_INFO_ANTID_AUX1                         =  1;                                   //!< Aux1 antenna
+static constexpr uint8_t  SBF_BBSAMPLES_INFO_ANTID_AUX2                         =  2;                                   //!< Aux2 antenna
 // clang-format on
 
 /* ****************************************************************************************************************** */
