@@ -33,7 +33,7 @@ namespace logging {
 
 static LoggingParams g_params;
 std::mutex g_mutex;
-static char g_line[0x1fff];
+static char g_line[0x1fff];  // 8 KiB
 static struct timespec g_time0 = { 0, 0 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -281,16 +281,27 @@ void LoggingPrint(const LoggingLevel level, const std::size_t repeat, const char
     }
     std::unique_lock<std::mutex> lock(g_mutex);
 
+    // Render log line
     va_list args;
     va_start(args, fmt);
-    int len = std::vsnprintf(g_line, sizeof(g_line), fmt, args);
+    std::size_t len = std::vsnprintf(g_line, sizeof(g_line), fmt, args);
     va_end(args);
 
+    constexpr std::size_t repeat_str_len = 20;
+    constexpr std::size_t trunc_str_len = 15;
+
+    // Ellipsis (line is longer than buffer size)
+    if (len > (sizeof(g_line) - trunc_str_len - repeat_str_len)) {
+        len = sizeof(g_line) - trunc_str_len - repeat_str_len;
+        len += std::snprintf(&g_line[len], sizeof(g_line) - len, "...<truncated>");
+    }
+
+    // Append repeat (truncate if there's no space left)
     if (repeat > 0) {
-        if (len > (int)(sizeof(g_line) - 10)) {
-            len -= 10;
+        if (len > (sizeof(g_line) - repeat_str_len)) {
+            len = sizeof(g_line) - repeat_str_len;
         }
-        std::snprintf(&g_line[len], sizeof(g_line) - len, " [%" PRIuMAX "x]", repeat);
+        len += std::snprintf(&g_line[len], sizeof(g_line) - len, " [%" PRIuMAX "x]", repeat);
     }
 
     g_params.fn_(g_params, level, g_line);
