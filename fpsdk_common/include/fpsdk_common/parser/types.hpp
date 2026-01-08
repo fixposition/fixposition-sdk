@@ -22,6 +22,7 @@
 
 /* LIBC/STL */
 #include <algorithm>
+#include <array>
 #include <cstdint>
 #include <string>
 #include <vector>
@@ -53,6 +54,13 @@ enum class Protocol : int
     SPARTN,    //!< SPARTN                                                                       (#PROTOCOL_NAME_SPARTN)
     OTHER,     //!< Other "message" (unknown or corrupt message, spurious data, line noise, ...) (#PROTOCOL_NAME_OTHER)
 };
+
+/**
+ * @brief List of all protocols
+ */
+static constexpr std::array<Protocol, 11> ALL_PROTOCOLS = { { Protocol::FP_A, Protocol::FP_B, Protocol::NMEA,
+    Protocol::UBX, Protocol::RTCM3, Protocol::UNI_B, Protocol::NOV_B, Protocol::SBF, Protocol::QGC, Protocol::SPARTN,
+    Protocol::OTHER } };
 
 /**
  * @name Protocol names
