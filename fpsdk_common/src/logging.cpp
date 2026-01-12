@@ -193,6 +193,7 @@ void LoggingDefaultWriteFn(const LoggingParams& params, const LoggingLevel level
         }
     }
 
+    // Colours come after the timestamp (unlike the journal markers, see above)
     if ((params.colour_ != LoggingColour::JOURNAL) && (prefix != NULL)) {
         len += std::snprintf(&output[len], sizeof(output) - len, "%s", prefix);
     }
