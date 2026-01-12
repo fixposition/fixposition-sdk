@@ -193,6 +193,7 @@ void LoggingDefaultWriteFn(const LoggingParams& params, const LoggingLevel level
         }
     }
 
+    // Colours come after the timestamp (unlike the journal markers, see above)
     if ((params.colour_ != LoggingColour::JOURNAL) && (prefix != NULL)) {
         len += std::snprintf(&output[len], sizeof(output) - len, "%s", prefix);
     }
@@ -250,9 +251,10 @@ LoggingParams::LoggingParams(
         s_defaults_init = true;
     }
 
-    // User wants us to decide...
+    // User wants us to decide. INVOCATION_ID is set by systemd and part of every unit's environment.
     if (colour_ == LoggingColour::AUTO) {
-        colour_ = (isatty(fileno(stderr)) == 1 ? LoggingColour::YES : LoggingColour::NO);
+        colour_ = (isatty(fileno(stderr)) == 1 ? LoggingColour::YES :  // clang-format off
+            (std::getenv("INVOCATION_ID") != nullptr ? LoggingColour::JOURNAL : LoggingColour::NO));  // clang-format on
     }
 }
 

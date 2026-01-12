@@ -748,11 +748,11 @@ static constexpr int TAI_OFFS = 10;  // offset of CLOCK_TAI to our atomic time
 // TODO: consider making some CI that uses the IERS bulletins or https://data.iana.org/time-zones/data/leap-seconds.list
 //       to check, and possibly update, this table.
 
-// See IERS "Bulletin C" #70 July 2025 (https://hpiers.obspm.fr/iers/bul/bulc/bulletinc.dat)
+// See IERS "Bulletin C" #71 January 2026 (https://hpiers.obspm.fr/iers/bul/bulc/bulletinc.dat)
 // See also https://data.iana.org/time-zones/data/leap-seconds.list
 // See also /usr/share/zoneinfo/{leapseconds,leap-seconds.list}
 // The earliest time there can be a change is approximately:
-static constexpr uint32_t max_ts = 1782820800;  // TZ=UTC date --date "2026-06-30 12:00:00" +%s
+static constexpr uint32_t max_ts = 1798718400;  // TZ=UTC date --date "2026-12-31 12:00:00" +%s
 static constexpr uint32_t NUM_LEAPS = 27;
 static constexpr std::array<std::array<uint32_t, 2>, NUM_LEAPS> LEAPSECONDS = { {
     // clang-format off

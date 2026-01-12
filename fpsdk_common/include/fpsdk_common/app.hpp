@@ -228,7 +228,7 @@ class ProgramOptions
         "    -V, --version  -- Print program, version and license information, and exit\n"
         "    -v, --verbose  -- Increase logging verbosity, multiple flags accumulate\n"
         "    -q, --quiet    -- Decrease logging verbosity, multiple flags accumulate\n"
-        "    -J, --journal  -- Use systemd journal logging markers instead of colours\n";  // clang-format on
+        "    -J, --journal  -- Use systemd journal logging markers instead of colours (default: auto)\n";  // clang-format on
 
     std::string app_name_;                   //!< App name
     logging::LoggingParams logging_params_;  //!< Logging params
