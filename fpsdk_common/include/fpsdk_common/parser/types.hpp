@@ -142,7 +142,7 @@ struct ParserMsg
  */
 struct ParserStats
 {
-    uint64_t n_msgs_ = 0;    //!< Number of messages parsed
+    uint64_t n_msgs_ = 0;    //!< Total number of messages parsed
     uint64_t s_msgs_ = 0;    //!< Total size of messages parsed
     uint64_t n_fpa_ = 0;     //!< Number of Protocol::FP_A messages
     uint64_t s_fpa_ = 0;     //!< Total size of Protocol::FP_A messages

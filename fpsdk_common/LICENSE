@@ -23,7 +23,7 @@ SOFTWARE.
 
 --------------------------------------------------------------------------------
 
-Parts of fpcommon are based on ROS code (see the source files for details):
+Parts of fpsdk_common are based on ROS code (see the source files for details):
 
 Copyright (c) 2008, Willow Garage, Inc.
 All rights reserved.
@@ -58,7 +58,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 --------------------------------------------------------------------------------
 
-Parts of fpcommon are based on NovAtel code:
+Parts of fpsdk_common are based on NovAtel code:
 
 Copyright (c) 2020 NovAtel Inc.
 

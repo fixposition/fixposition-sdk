@@ -47,6 +47,38 @@ inline void to_json(nlohmann::json& j, const ParserMsg& m)
     }
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+inline void to_json(nlohmann::json& j, const ParserStats s)
+{
+    j = nlohmann::json::object({
+        { "n_msgs", s.n_msgs_ },
+        { "s_msgs", s.s_msgs_ },
+        { "n_fpa", s.n_fpa_ },
+        { "s_fpa", s.s_fpa_ },
+        { "n_fpb", s.n_fpb_ },
+        { "s_fpb", s.s_fpb_ },
+        { "n_nmea", s.n_nmea_ },
+        { "s_nmea", s.s_nmea_ },
+        { "n_ubx", s.n_ubx_ },
+        { "s_ubx", s.s_ubx_ },
+        { "n_rtcm3", s.n_rtcm3_ },
+        { "s_rtcm3", s.s_rtcm3_ },
+        { "n_unib", s.n_unib_ },
+        { "s_unib", s.s_unib_ },
+        { "n_novb", s.n_novb_ },
+        { "s_novb", s.s_novb_ },
+        { "n_sbf", s.n_sbf_ },
+        { "s_sbf", s.s_sbf_ },
+        { "n_qgc", s.n_qgc_ },
+        { "s_qgc", s.s_qgc_ },
+        { "n_spartn", s.n_spartn_ },
+        { "s_spartn", s.s_spartn_ },
+        { "n_other", s.n_other_ },
+        { "s_other", s.s_other_ },
+    });
+}
+
 }  // namespace fpsdk::common::parser
 /* ****************************************************************************************************************** */
 #endif  // !_DOXYGEN_
