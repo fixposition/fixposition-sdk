@@ -359,6 +359,50 @@ void LoggingPrint(const LoggingLevel level, const std::size_t repeat, const char
 void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const std::size_t size, const char* prefix,
     const char* fmt, ...) PRINTF_ATTR(5);
 
+/**
+ * @brief Utility to create a std::ostream that prints through the logging system
+ *
+ * For example:
+ *
+ * @code{cpp}
+ * auto w = LoggingOstream(LoggingLevel::WARNING);
+ * *w << "Hello world!" << std::endl;  // This should print: Warning: Hello world!
+ * @endcode
+ *
+ * @note Flusing the stream is required for the log message to be printed. Typically, std::endl flushes. Otherwise
+ *       explicitly flush using std::flush when appropriate.
+ */
+class LoggingOstream
+{
+   public:
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  level  The logging level to use
+     */
+    LoggingOstream(const LoggingLevel level);
+
+    /**
+     * @brief Get stream handle
+     *
+     * @returns the stream handle
+     */
+    std::ostream& operator*()
+    {
+        return str_;
+    }
+
+   private:
+    //! Helper buffer that prints through logging
+    struct StrBuf : public std::stringbuf
+    {
+        virtual int sync();   //!< Print function implementation
+        LoggingLevel level_;  //!< Logging level
+    };
+    StrBuf buf_;        //!< Helper buffer
+    std::ostream str_;  //!< Stream handle
+};
+
 // Helper macros
 #ifndef _DOXYGEN_
 #  define _FPSDK_LOGGING_LOG(_level_, ...) \
