@@ -369,7 +369,7 @@ void LoggingHexdump(const LoggingLevel level, const uint8_t* data, const std::si
  * *w << "Hello world!" << std::endl;  // This should print: Warning: Hello world!
  * @endcode
  *
- * @note Flusing the stream is required for the log message to be printed. Typically, std::endl flushes. Otherwise
+ * @note Flushing the stream is required for the log message to be printed. Typically, std::endl flushes. Otherwise
  *       explicitly flush using std::flush when appropriate.
  */
 class LoggingOstream
