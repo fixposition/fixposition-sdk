@@ -375,13 +375,13 @@ int LoggingOstream::StrBuf::sync()
     std::size_t pos = 0;
     while ((pos = s.find("\n", offs)) != std::string::npos) {
         switch (level_) {  // clang-format off
-            case LoggingLevel::FATAL:   FATAL("%s", s.substr(offs, pos).c_str()); break;
-            case LoggingLevel::ERROR:   ERROR("%s", s.substr(offs, pos).c_str()); break;
+            case LoggingLevel::FATAL:   FATAL(  "%s", s.substr(offs, pos).c_str()); break;
+            case LoggingLevel::ERROR:   ERROR(  "%s", s.substr(offs, pos).c_str()); break;
             case LoggingLevel::WARNING: WARNING("%s", s.substr(offs, pos).c_str()); break;
-            case LoggingLevel::NOTICE:  NOTICE("%s", s.substr(offs, pos).c_str()); break;
-            case LoggingLevel::INFO:    INFO("%s", s.substr(offs, pos).c_str()); break;
-            case LoggingLevel::DEBUG:   DEBUG("%s", s.substr(offs, pos).c_str()); break;
-            case LoggingLevel::TRACE:   TRACE("%s", s.substr(offs, pos).c_str()); break;
+            case LoggingLevel::NOTICE:  NOTICE( "%s", s.substr(offs, pos).c_str()); break;
+            case LoggingLevel::INFO:    INFO(   "%s", s.substr(offs, pos).c_str()); break;
+            case LoggingLevel::DEBUG:   DEBUG(  "%s", s.substr(offs, pos).c_str()); break;
+            case LoggingLevel::TRACE:   TRACE(  "%s", s.substr(offs, pos).c_str()); break;
             }  // clang-format on
         offs = pos + 1;
     }
