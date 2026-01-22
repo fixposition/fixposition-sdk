@@ -142,7 +142,7 @@ function main
 	else
 		warning "Sanity checks bypassed. You're on your own!"
 	fi
-	
+
     local res=0
 
     # The image (see docker/docker-compose.yaml, which we're not using to let this script to run stand-alone)
