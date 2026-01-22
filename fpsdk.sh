@@ -26,7 +26,8 @@ function main
     local update=0
     local volume_args=
     local docker_args=
-    while getopts ":hduti:v:" opt; do
+	local dochecks=1
+    while getopts ":hduxti:v:" opt; do
         case $opt in
             h)
                 echo
@@ -34,11 +35,12 @@ function main
                 echo
                 echo "This uses Docker images with pre-built binaries of the Fixposition SDK apps."
                 echo
-                echo "Usage: $0 [-d] [-u] [-i <image>] [-v <volume> ...] <command> ..."
+                echo "Usage: $0 [-d] [-u] [-x] [-i <image>] [-v <volume> ...] <command> ..."
                 echo
                 echo "Where:"
                 echo
                 echo "    -d          Enable debug output (of this script)"
+				echo "    -x          Bypass checks (check for running in Docker, running as root, ...)"
                 echo "    -u          Update (pull) the necessary Docker <image>"
                 echo "    -t          Executes <command> with docker run --tty"
                 echo "    -i <image>  Specifies which Docker image to use (default: trixie). Available images are:"
@@ -82,6 +84,9 @@ function main
             u)
                 update=1
                 ;;
+			x)
+				dochecks=0
+				;;
             t)
                 docker_args="--tty"
                 ;;
@@ -106,23 +111,37 @@ function main
 
     debug "SCRIPTDIR=${SCRIPTDIR} image=${image} docker_args=${docker_args} volume_args=${volume_args} have_command=${have_command} command=$@"
 
-    # Check if we're running inside a container
-    # PID 2 will be kthreadd on host Linux, and no kthreadd will be visible in a container
-    if ! grep -q kthreadd /proc/2/status 2>/dev/null; then
-        error "You cannot run this in a container"
-        exit 1
-    fi
-
     # Check for common issues
-    if ! command -v docker >/dev/null ]; then
-        warning "Docker does not seem to be installed, this probably doesn't work"
-    fi
-    if [ $(id -u) -eq 0 ]; then
-        warning "You probably should not run this as root"
-    fi
-    if ! id -nG | grep -qw docker; then
-        echo "You're not in the docker group, this may not work"
-    fi
+	if [ ${dochecks} -eq 1 ]; then
+
+		# Check if we're running inside a container
+		if [[ $(uname -r) =~ WSL ]]; then
+			# We don't know how to check that in WSL... :-/ And we do not know if this stuff works in WSL at all...
+            # How to check in WSL2? What about Docker in Windows (vs. Docker in Linux)?
+			true
+		else
+			# PID 2 will be kthreadd on host Linux, and no kthreadd will be visible in a container
+			if ! grep -q kthreadd /proc/2/status 2>/dev/null; then
+				error "You cannot run this in a container"
+				exit 1
+			fi
+		fi
+
+		if ! command -v docker >/dev/null ]; then
+			error "Docker does not seem to be installed, this probably doesn't work"
+			exit 1
+		fi
+		if [ $(id -u) -eq 0 ]; then
+			error "You should not run this as root"
+			exit 1
+		fi
+		if ! id -nG | grep -qw docker; then
+			error "You're not in the docker group, this may not work"
+			exit 1
+		fi
+	else
+		warning "Sanity checks bypassed. You're on your own!"
+	fi
 
     local res=0
 
