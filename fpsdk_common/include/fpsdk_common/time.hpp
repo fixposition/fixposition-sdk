@@ -719,6 +719,8 @@ class Time
     /**
      * @brief From GNSS time (atomic)
      *
+     * See SetWnoTow() for details.
+     *
      * @param[in]  wnotow  GNSS time
      *
      * @returns the Time object
