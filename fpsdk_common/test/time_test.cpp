@@ -1626,6 +1626,169 @@ TEST(TimeTest, SecNsec)
     EXPECT_NEAR(NsecToSec(n2), s2, 1e-9);
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(TimeTest, SetWnoTow)
+{
+    {
+        Time t;
+        EXPECT_TRUE(t.SetWnoTow({ 1000, SEC_IN_WEEK_D }));
+        const auto wt = t.GetWnoTow();
+        EXPECT_EQ(wt.wno_, 1001);
+        EXPECT_NEAR(wt.tow_, 0.0, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetWnoTow({ 1000, SEC_IN_WEEK_D + 123.456789012 }));
+        const auto wt = t.GetWnoTow();
+        EXPECT_EQ(wt.wno_, 1001);
+        EXPECT_NEAR(wt.tow_, 123.456789012, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetWnoTow({ 1000, 2 * SEC_IN_WEEK_D }));
+        const auto wt = t.GetWnoTow();
+        EXPECT_EQ(wt.wno_, 1002);
+        EXPECT_NEAR(wt.tow_, 0.0, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetWnoTow({ 1000, -123.456789012 }));
+        const auto wt = t.GetWnoTow();
+        EXPECT_EQ(wt.wno_, 999);
+        EXPECT_NEAR(wt.tow_, SEC_IN_WEEK_D - 123.456789012, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetWnoTow({ 1000, -SEC_IN_WEEK_D }));
+        const auto wt = t.GetWnoTow();
+        EXPECT_EQ(wt.wno_, 999);
+        EXPECT_NEAR(wt.tow_, 0.0, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetWnoTow({ 1000, -2 * SEC_IN_WEEK_D }));
+        const auto wt = t.GetWnoTow();
+        EXPECT_EQ(wt.wno_, 998);
+        EXPECT_NEAR(wt.tow_, 0.0, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetWnoTow({ 1000, SEC_IN_WEEK_D - 1e-9 }));
+        const auto wt = t.GetWnoTow();
+        EXPECT_EQ(wt.wno_, 1000);
+        EXPECT_NEAR(wt.tow_, SEC_IN_WEEK_D - 1e-9, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetWnoTow({ 1000, SEC_IN_WEEK_D + 1e-9 }));
+        const auto wt = t.GetWnoTow();
+        EXPECT_EQ(wt.wno_, 1001);
+        EXPECT_NEAR(wt.tow_, 1e-9, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetWnoTow({ 1000, -1e-9 }));
+        const auto wt = t.GetWnoTow();
+        EXPECT_EQ(wt.wno_, 999);
+        EXPECT_NEAR(wt.tow_, SEC_IN_WEEK_D - 1e-9, 1e-10);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(TimeTest, SetUtcTime)
+{
+    {
+        Time t;
+        EXPECT_TRUE(t.SetUtcTime({ 2000, 2, 15, 12, 30, -0.1 }));
+        const auto utc = t.GetUtcTime();
+        EXPECT_EQ(utc.year_, 2000);
+        EXPECT_EQ(utc.month_, 2);
+        EXPECT_EQ(utc.day_, 15);
+        EXPECT_EQ(utc.hour_, 12);
+        EXPECT_EQ(utc.min_, 29);
+        EXPECT_NEAR(utc.sec_, 59.9, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetUtcTime({ 2000, 2, 15, 12, 0, -0.1 }));
+        const auto utc = t.GetUtcTime();
+        EXPECT_EQ(utc.year_, 2000);
+        EXPECT_EQ(utc.month_, 2);
+        EXPECT_EQ(utc.day_, 15);
+        EXPECT_EQ(utc.hour_, 11);
+        EXPECT_EQ(utc.min_, 59);
+        EXPECT_NEAR(utc.sec_, 59.9, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetUtcTime({ 2000, 2, 15, 0, 0, -0.1 }));
+        const auto utc = t.GetUtcTime();
+        EXPECT_EQ(utc.year_, 2000);
+        EXPECT_EQ(utc.month_, 2);
+        EXPECT_EQ(utc.day_, 14);
+        EXPECT_EQ(utc.hour_, 23);
+        EXPECT_EQ(utc.min_, 59);
+        EXPECT_NEAR(utc.sec_, 59.9, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetUtcTime({ 2000, 2, 1, 0, 0, -0.1 }));
+        const auto utc = t.GetUtcTime();
+        EXPECT_EQ(utc.year_, 2000);
+        EXPECT_EQ(utc.month_, 1);
+        EXPECT_EQ(utc.day_, 31);
+        EXPECT_EQ(utc.hour_, 23);
+        EXPECT_EQ(utc.min_, 59);
+        EXPECT_NEAR(utc.sec_, 59.9, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetUtcTime({ 2000, 2, 15, 12, -1, 30.0 }));
+        const auto utc = t.GetUtcTime();
+        EXPECT_EQ(utc.year_, 2000);
+        EXPECT_EQ(utc.month_, 2);
+        EXPECT_EQ(utc.day_, 15);
+        EXPECT_EQ(utc.hour_, 11);
+        EXPECT_EQ(utc.min_, 59);
+        EXPECT_NEAR(utc.sec_, 30.0, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetUtcTime({ 2000, 2, 15, -1, 30, 30.0 }));
+        const auto utc = t.GetUtcTime();
+        EXPECT_EQ(utc.year_, 2000);
+        EXPECT_EQ(utc.month_, 2);
+        EXPECT_EQ(utc.day_, 14);
+        EXPECT_EQ(utc.hour_, 23);
+        EXPECT_EQ(utc.min_, 30);
+        EXPECT_NEAR(utc.sec_, 30.0, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetUtcTime({ 2000, 2, 1, -1, 30, 30.0 }));
+        const auto utc = t.GetUtcTime();
+        EXPECT_EQ(utc.year_, 2000);
+        EXPECT_EQ(utc.month_, 1);
+        EXPECT_EQ(utc.day_, 31);
+        EXPECT_EQ(utc.hour_, 23);
+        EXPECT_EQ(utc.min_, 30);
+        EXPECT_NEAR(utc.sec_, 30.0, 1e-10);
+    }
+    {
+        Time t;
+        EXPECT_TRUE(t.SetUtcTime({ 2000, 2, 15, 12, -1, -0.1 }));
+        const auto utc = t.GetUtcTime();
+        EXPECT_EQ(utc.year_, 2000);
+        EXPECT_EQ(utc.month_, 2);
+        EXPECT_EQ(utc.day_, 15);
+        EXPECT_EQ(utc.hour_, 11);
+        EXPECT_EQ(utc.min_, 58);
+        EXPECT_NEAR(utc.sec_, 59.9, 1e-10);
+    }
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace
 

@@ -1136,11 +1136,19 @@ bool Time::SetRosTime(const RosTime& rostime)
 
 bool Time::SetWnoTow(const WnoTow& wnotow)
 {
+    // Normalise
+    int wno = wnotow.wno_;
+    double dtow = wnotow.tow_;
+    while (dtow < 0) {
+        dtow += SEC_IN_WEEK_D;
+        wno--;
+    }
+
     // @todo could probably use timeSecToIsecNsec()...
     double itow = 0.0;
-    double ftow = std::modf(math::RoundToFracDigits(wnotow.tow_, 9), &itow);
+    double ftow = std::modf(math::RoundToFracDigits(dtow, 9), &itow);
+
     int tow = static_cast<int>(itow);
-    int wno = wnotow.wno_;
 
     switch (wnotow.sys_) {
         case WnoTow::Sys::GPS:
@@ -1191,23 +1199,33 @@ bool Time::SetGloTime(const GloTime& glotime)
 bool Time::SetUtcTime(const UtcTime& utctime)
 {
     // The algorithm
-    const int days = days_from_civil<int>(utctime.year_, utctime.month_, utctime.day_);
+    int days = days_from_civil<int>(utctime.year_, utctime.month_, utctime.day_);
 
     // Now we know the days since epoch
     if ((days < 0) || (days > (static_cast<int>(std::numeric_limits<uint32_t>::max() / SEC_IN_DAY_I) - 1))) {
         return false;
     }
-    uint32_t sec = days * SEC_IN_DAY_I;
 
     // Time of day
     // @todo could probably use timeSecToIsecNsec()...
     double isec = 0.0;
-    const double fsec = std::modf(math::RoundToFracDigits(utctime.sec_, 9), &isec);
-    int tod = (utctime.hour_ * SEC_IN_HOUR_I) + (utctime.min_ * SEC_IN_MIN_I) + static_cast<int>(isec);
-    if ((tod < 0) || (tod > SEC_IN_DAY_I)) {  // >, not >=, as it can be 86400 on leapsecond event
-        return false;
+    double fsec = std::modf(math::RoundToFracDigits(utctime.sec_, 9), &isec);
+    if (fsec < 0.0) {
+        fsec += 1.0;
+        isec -= 1.0;
     }
-    sec += tod;
+
+    int tod = (utctime.hour_ * SEC_IN_HOUR_I) + (utctime.min_ * SEC_IN_MIN_I) + static_cast<int>(isec);
+    while (tod < 0) {
+        tod += SEC_IN_DAY_I;
+        days--;
+    }
+    while (tod > SEC_IN_DAY_I) {  // >, not >=, as it can be 86400 on leapsecond event
+        tod -= SEC_IN_DAY_I;
+        days++;
+    }
+
+    uint32_t sec = (days * SEC_IN_DAY_I) + tod;
 
     // Leapseconds
     const auto lsinfo = getLeapSecInfo(sec, true);
@@ -1671,8 +1689,15 @@ Time& Time::operator+=(const double sec)
 
 bool Time::Diff(const Time& other, Duration& diff) const
 {
+#  if 1
     const bool sign = (*this > other);
     const uint64_t value = (sign ? GetNSec() - other.GetNSec() : other.GetNSec() - GetNSec());
+#  else  // maybe better?
+    const uint64_t this_nsec = GetNSec();
+    const uint64_t other_nsec = other.GetNSec();
+    const bool sign = (this_nsec > other_nsec);
+    const uint64_t value = (sign ? (this_nsec - other_nsec) : (other_nsec - this_nsec));
+#  endif
     if (value < (uint64_t)std::numeric_limits<int64_t>::max()) {
         return diff.SetNSec(sign ? value : -value);
     } else {
