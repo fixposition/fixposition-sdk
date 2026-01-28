@@ -100,7 +100,7 @@ class SigIntHelper
  */
 class SigTermHelper
 {
-  public:
+   public:
     /**
      * @brief Constructor
      *
