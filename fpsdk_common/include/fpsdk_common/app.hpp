@@ -93,9 +93,47 @@ class SigIntHelper
 };
 
 /**
+ * @brief Helper to catch SIGTERM
+ *
+ * On construction this installs a handler for SIGTERM. On destruction it sets the handler back to its previous state.
+ * Note that signal handlers are global and therefore you can only use one SigTermHelper in a app.
+ */
+class SigTermHelper
+{
+   public:
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  warn  Print a WARNING() (true, default) or a DEBUG() (false) on signal
+     */
+    SigTermHelper(const bool warn = true);
+
+    /**
+     * @brief Destructor
+     */
+    ~SigTermHelper();
+
+    /**
+     * @brief Check if signal was raised and we should abort
+     *
+     * @returns true if signal was raised and we should abort, false otherwise
+     */
+    bool ShouldAbort();
+
+    /**
+     * @brief Wait (block) until signal is raised and we should abort
+     *
+     * @param[in]  millis  Wait at most this long [ms], 0 = forever
+     *
+     * @returns true if the signal was raised, false if timeout expired
+     */
+    bool WaitAbort(const uint32_t millis = 0);
+};
+
+/**
  * @brief Helper to catch SIGPIPE
  *
- * On construction this installs a handler for SIGPIE. On destruction it sets the handler back to its previous state.
+ * On construction this installs a handler for SIGPIPE. On destruction it sets the handler back to its previous state.
  * Note that signal handlers are global and therefore you can only use one SigPipeHelper in a app.
  */
 class SigPipeHelper
