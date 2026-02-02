@@ -58,6 +58,12 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.trixie      python3-venv
     .......humble.............      ros-humble-rosbag2-storage-mcap
     ..............jazzy.......      ros-jazzy-rosbag2-storage-mcap
+    .......humble.............      ros-humble-lifecycle
+    .......humble.............      ros-humble-diagnostic-msgs
+    .......humble.............      ros-humble-diagnostic-updater
+    .............jazzy........      ros-jazzy-lifecycle
+    .............jazzy........      ros-jazzy-diagnostic-msgs
+    .............jazzy........      ros-jazzy-diagnostic-updater
     noetic....................      ros-noetic-eigen-conversions
     noetic....................      ros-noetic-tf
     noetic....................      ros-noetic-tf-conversions
