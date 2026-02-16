@@ -325,8 +325,8 @@ bool ProgramOptions::LoadFromArgv(int argc, char** argv)
         }
     }
 
-    // Setup debugging
-    if (logging_params_.level_ >= LoggingLevel::DEBUG) {
+    // Setup debugging. Set timestamps only if not yet set by user (through env variable)
+    if ((logging_params_.level_ >= LoggingLevel::DEBUG) && (logging_params_.timestamps_ == LoggingTimestamps::NONE)) {
         logging_params_.timestamps_ = LoggingTimestamps::RELATIVE;
     }
     LoggingSetParams(logging_params_);
