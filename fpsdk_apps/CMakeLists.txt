@@ -108,6 +108,12 @@ target_link_libraries(yaml2shell
         fpsdk_common
 )
 
+file(GLOB FINDSENSOR_CPP_FILES findsensor/*.cpp)
+add_executable(findsensor ${FINDSENSOR_CPP_FILES} ${COMMON_CPP_FILES})
+target_link_libraries(findsensor
+    PRIVATE
+        fpsdk_common
+)
 
 # INSTALL ==============================================================================================================
 
@@ -117,7 +123,7 @@ set(PROJECT_LIBRARY_DIR ${CMAKE_INSTALL_FULL_LIBDIR})
 set(PROJECT_INCLUDE_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME})
 set(PROJECT_DATA_DIR    ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME})
 
-install(TARGETS fpltool parsertool timeconv timetool yaml2shell
+install(TARGETS fpltool parsertool timeconv timetool yaml2shell findsensor
     EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION ${PROJECT_LIBRARY_DIR}
     RUNTIME DESTINATION ${PROJECT_RUNTIME_DIR}

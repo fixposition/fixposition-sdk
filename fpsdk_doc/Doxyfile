@@ -996,7 +996,8 @@ INPUT                  = fpsdk_doc \
                          fpsdk_apps/parsertool/parsertool_doc.hpp \
                          fpsdk_apps/timeconv/timeconv_doc.hpp \
                          fpsdk_apps/timetool/timetool_doc.hpp \
-                         fpsdk_apps/yaml2shell/yaml2shell_doc.hpp
+                         fpsdk_apps/yaml2shell/yaml2shell_doc.hpp \
+                         fpsdk_apps/findsensor/findsensor_doc.hpp
 
 # This tag can be used to specify the character encoding of the source files
 # that Doxygen parses. Internally Doxygen uses the UTF-8 encoding. Doxygen uses

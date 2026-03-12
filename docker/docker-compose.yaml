@@ -51,8 +51,10 @@ services:
             # Workspace
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
-          - SYS_PTRACE # Set kernel.yama.ptrace_scope = 0 in /etc/sysctl.d/10-ptrace.conf
+            - SYS_PTRACE # Set kernel.yama.ptrace_scope = 0 in /etc/sysctl.d/10-ptrace.conf
         hostname: fpsdk-trixie-dev-${USER}
+        ports:
+          - "8952:8952/udp"  # for findsensor
         # Apparently required... (so that the container doesn't kill itself?)
         command: tail -f
 
@@ -96,7 +98,7 @@ services:
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
-          - SYS_PTRACE
+            - SYS_PTRACE
         hostname: fpsdk-noetic-dev-${USER}
         command: tail -f
 
@@ -140,7 +142,7 @@ services:
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
-          - SYS_PTRACE
+            - SYS_PTRACE
         hostname: fpsdk-humble-dev-${USER}
         command: tail -f
 
@@ -182,7 +184,7 @@ services:
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
-          - SYS_PTRACE
+            - SYS_PTRACE
         hostname: fpsdk-jazzy-dev-${USER}
         command: tail -f
 
