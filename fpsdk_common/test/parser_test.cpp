@@ -35,9 +35,9 @@ using namespace fpsdk::common::parser;
 #include "data/test_data_nmea.cpp"
 #include "data/test_data_novb.cpp"
 #include "data/test_data_rtcm3.cpp"
+#include "data/test_data_sbf.cpp"
 #include "data/test_data_spartn.cpp"
 #include "data/test_data_ubx.cpp"
-#include "data/test_data_sbf.cpp"
 
 // ---------------------------------------------------------------------------------------------------------------------
 
