@@ -767,9 +767,9 @@ static int IsSbfMessage(const uint8_t* buf, const std::size_t size)
         return WAIT;
     }
 
-    // // Limit message size
+    // Limit message size, check constraints
     const std::size_t message_size = ((uint16_t)buf[6] | ((uint16_t)buf[7] << 8));
-    if (message_size > MAX_SBF_SIZE) {
+    if ((message_size > MAX_SBF_SIZE) || (message_size < SBF_HEAD_SIZE) || ((message_size % 4) != 0)) {
         return NADA;
     }
 

@@ -19,13 +19,13 @@ jobs:
                 shell: bash
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
             - name: Build
               run: |
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
             - name: Artefacts
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                   name: fpsdk_common_versions_trixie
                   path: build/trixie-ci_build_toplevel_release_noros/*/*_versions.txt
@@ -39,13 +39,13 @@ jobs:
                 shell: bash
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
             - name: Build
               run: |
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
             - name: Artefacts
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                   name: fpsdk_common_versions_noetic
                   path: build/noetic-ci_build_toplevel_release_ros1/*/*_versions.txt
@@ -59,13 +59,13 @@ jobs:
                 shell: bash
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
             - name: CI
               run: |
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
             - name: Artefacts
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                   name: fpsdk_common_versions_humble
                   path: build/humble-ci_build_toplevel_release_ros2/*/*_versions.txt
@@ -79,13 +79,13 @@ jobs:
                 shell: bash
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
             - name: CI
               run: |
                   git config --global --add safe.directory ${GITHUB_WORKSPACE}
                   ./docker/ci.sh
             - name: Artefacts
-              uses: actions/upload-artifact@v4
+              uses: actions/upload-artifact@v6
               with:
                   name: fpsdk_common_versions_jazzy
                   path: build/jazzy-ci_build_toplevel_release_ros2/*/*_versions.txt
@@ -99,7 +99,7 @@ jobs:
             - ci-fpsdk-jazzy
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
             - name: Login
               uses: docker/login-action@v3
               with:
@@ -142,12 +142,12 @@ jobs:
             id-token: write
         steps:
             - name: Checkout
-              uses: actions/checkout@v4
+              uses: actions/checkout@v6
 
             ##### Get artefacts from build jobs
 
             - name: Get build artefacts
-              uses: actions/download-artifact@v5
+              uses: actions/download-artifact@v8
               with:
                   path: build-artefacts  # See Doxyfile and Makefile
               # We'll get:
@@ -176,7 +176,7 @@ jobs:
             # https://github.com/actions/upload-pages-artifact (This, not actions/upload-artifact, which doesn't work
             # for pages deployment. Both actions make the artefact show up as a job artefact.
             - name: Upload pages artefact
-              uses: actions/upload-pages-artifact@v3
+              uses: actions/upload-pages-artifact@v4
               with:
                   path: github-pages
 
