@@ -176,7 +176,7 @@ jobs:
             # https://github.com/actions/upload-pages-artifact (This, not actions/upload-artifact, which doesn't work
             # for pages deployment. Both actions make the artefact show up as a job artefact.
             - name: Upload pages artefact
-              uses: actions/upload-pages-artifact@v3
+              uses: actions/upload-pages-artifact@v4
               with:
                   path: github-pages
 
