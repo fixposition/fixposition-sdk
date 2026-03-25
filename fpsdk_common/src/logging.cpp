@@ -197,7 +197,13 @@ void LoggingDefaultWriteFn(const LoggingParams& params, const LoggingLevel level
     if ((params.colour_ != LoggingColour::JOURNAL) && (prefix != NULL)) {
         len += std::snprintf(&output[len], sizeof(output) - len, "%s", prefix);
     }
+
+    // Up to this point len should surely be <<< sizeof(output).
+    // Add the actual log message.
     len += std::snprintf(&output[len], sizeof(output) - len, "%s", str);
+    // Now len may be > sizeof(output) (snprintf returns the number of bytes that would have been written if there was
+    // enough space).
+
     if (suffix != NULL) {
         // Truncate to accommodate suffix
         if (len >= sizeof(output)) {
@@ -226,7 +232,7 @@ LoggingParams::LoggingParams(
         const char* env_logging = std::getenv("FPSDK_LOGGING");
         if ((env_logging != nullptr) && (env_logging[0] != '\0')) {
             // Copy string and lower-case it
-            char words[1000];
+            char words[1000];  // FPSDK_LOGGING value up to this size. A value this large or larger is silly.
             std::snprintf(words, sizeof(words), "%s,", env_logging);
             std::transform(words, &words[std::strlen(words)], words, [](const char c) { return std::tolower(c); });
             for (char* word = std::strtok(words, ","); word != nullptr; word = std::strtok(nullptr, ",")) {
@@ -352,7 +358,7 @@ void LoggingHexdump(
             // clang-format on
             str[pos2] = isprint((int)c) ? c : '.';
         }
-        std::snprintf(
+        std::snprintf(  // This may truncate user data if e.g. prefix is extremely long, which would be silly.
             g_line, sizeof(g_line), "%s0x%04" PRIx64 " %05" PRIu64 "  %s", prefix != NULL ? prefix : "", ix, ix, str);
         g_params.fn_(g_params, level, g_line);
 
