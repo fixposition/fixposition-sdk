@@ -87,7 +87,7 @@ Duration TicToc::Toc(const bool reset)
 
 double TicToc::TocMs(const bool reset)
 {
-    return Toc(reset).GetSec() * 1e-3;
+    return Toc(reset).GetSec() * 1e3;
 }
 
 #endif
