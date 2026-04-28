@@ -126,6 +126,8 @@ class TimeTool
 
     bool Run()
     {
+        opts_.LogVersion();
+
         bool ok = false;
 
         // Set/get TAI offset

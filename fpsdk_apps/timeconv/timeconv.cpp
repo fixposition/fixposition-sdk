@@ -177,6 +177,8 @@ class TimeConv
 
     bool Run()
     {
+        opts_.LogVersion();
+
         bool ok = true;
 
         // Input from command line

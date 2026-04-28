@@ -179,6 +179,10 @@ class ParserTool
 
     bool Run()
     {
+        opts_.LogVersion();
+
+        bool ok = true;
+
         // Print header
         if (!opts_.stdout_) {
             PrintMessageHeader();
@@ -192,7 +196,6 @@ class ParserTool
         }
 
         // Process all input files
-        bool ok = true;
         for (const auto& input_file : opts_.inputs_) {
             INFO("Reading from %s", input_file.c_str());
             std::ifstream input(input_file, std::ios::binary);

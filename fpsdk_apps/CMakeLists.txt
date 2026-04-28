@@ -94,8 +94,8 @@ target_link_libraries(timeconv
         fpsdk_common
 )
 
-file(GLOB TIMECONV_CPP_FILES timetool/*.cpp)
-add_executable(timetool ${TIMECONV_CPP_FILES} ${COMMON_CPP_FILES})
+file(GLOB TIMETOOL_CPP_FILES timetool/*.cpp)
+add_executable(timetool ${TIMETOOL_CPP_FILES} ${COMMON_CPP_FILES})
 target_link_libraries(timetool
     PRIVATE
         fpsdk_common

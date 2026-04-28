@@ -236,9 +236,14 @@ class ProgramOptions
     virtual void PrintHelp() = 0;
 
     /**
-     * @brief Print version information
+     * @brief Print version information (to stdout, for -h, -V)
      */
-    virtual void PrintVersion();
+    void PrintVersion() const;
+
+    /**
+     * @brief Log (INFO) version information (for apps)
+     */
+    void LogVersion() const;
 
     /**
      * @brief Handle a command-line flag argument
@@ -269,6 +274,9 @@ class ProgramOptions
         "    -J, --journal  -- Use systemd journal logging markers instead of colours (default: auto)\n";  // clang-format on
 
     std::string app_name_;                   //!< App name
+    std::string version_str_;                //!< Version string, default empty
+    std::string copy_str_;                   //!< Copyright string, defaults to utils::GetCopyrightString()
+    std::string lic_str_;                    //!< License string, defaults to utils::GetLicenseString());
     logging::LoggingParams logging_params_;  //!< Logging params
     std::vector<std::string> argv_;          //!< argv[] of program
 
