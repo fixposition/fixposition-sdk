@@ -47,6 +47,7 @@ int main(int argc, char** argv)
 
     // Run command
     if (ok) {
+        opts.LogVersion();
         switch (opts.command_) { /* clang-format off */
             case FplToolOptions::Command::DUMP:        ok = DoDump(opts);    break;
             case FplToolOptions::Command::META:        ok = DoMeta(opts);    break;

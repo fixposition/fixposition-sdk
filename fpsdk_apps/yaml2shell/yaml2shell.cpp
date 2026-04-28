@@ -179,6 +179,8 @@ class YamlToShell
 
     bool Run()
     {
+        opts_.LogVersion();
+
         // Have filter?
         if (!opts_.filter_.empty()) {
             try {
