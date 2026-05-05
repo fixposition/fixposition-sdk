@@ -83,7 +83,7 @@ class FindSensorOptions : public ProgramOptions
     std::string multi_addr_ =
         "239.255.89.52";  // organization-local scope, https://en.wikipedia.org/wiki/Multicast_address
     int ttl_ = 32;        // same site/organization
-    double timeout_ = 3.0;
+    double timeout_ = 1.5;
     bool json_ = false;
 
     void PrintHelp() override final
@@ -103,13 +103,40 @@ class FindSensorOptions : public ProgramOptions
         std::fputs(
             "    -p <port>, --port <port>  -- Port number to use (default: 8952)\n"
             "    -u <uid>, --uid <uid>     -- Look for a particular sensor (default: report all found sensors)\n"
-            "    -t <dur>, --timeout <dur> -- Timeout waiting for response [s] (default: 3.0)\n"
-            "    -j, --json                -- Output JSON object response (single line to stdout)\n"
+            "    -t <dur>, --timeout <dur> -- Timeout waiting for response [s] (default: 1.5)\n"
+            "    -j, --json                -- Output JSON object response (to stdout, one line per response)\n"
+            "\n"
+            "Notes:\n"
+            "\n"
+            "    - The sensor discovery functionality is not available for all Fixposition sensors and/or\n"
+            "      software versions\n"
+            "    - The sensor discovery uses IPv4 UDP multicast. As such the functionality is subject to"
+            "      your local network setup and your system configuration (router and network configuratuion,\n"
+            "      firewall configuration, etc.).\n"
             "\n"
             "Examples:\n"
             "\n"
+            "    Look for any sensor in the network and print the information about the found sensors:\n"
             "\n"
+            "        $ findsensor\n"
             "\n"
+            "        Querying (timeout 1.5s) ...\n"
+            "        Found fp-6d9d2c\n"
+            "            - Interface eth0\n"
+            "                - Address 172.22.1.60/20\n"
+            "            - Interface wlan0\n"
+            "                - Address 192.168.43.156/24\n"
+            "            - Interface wlan1\n"
+            "                - Address 10.0.1.1/24\n"
+            "        Found 1 sensor\n"
+
+            "\n"
+            "    Quietly look for a particular sensor and print the information as JSON:\n"
+            "\n"
+            "        $ findsensor --quiet --uid xf-a0d2d8 --json\n"
+            "\n"
+            "        {\"ifs\":{\"eth0\":[\"172.22.1.60/20\"],\"wlan0\":[\"192.168.43.156/24\"],\\\n"
+            "        \"wlan1\":[\"10.0.1.1/24\"]},\"uid\":\"fp-6d9d2c\"}\n"
             "\n"
             "\n", stdout);
         // clang-format on
@@ -117,6 +144,11 @@ class FindSensorOptions : public ProgramOptions
         // And undocumented server code for testing:
         //
         //     findsensor -i eth0 -i wlan0 -p 8952 -s -u someuid -vv
+        //
+        // Testing:
+        //
+        //     perl -e 'print(pack("NN", 0x66703f3f, 0x71756572))' | socat - udp4-sendto:239.255.89.52:8952
+        //     http://www.dest-unreach.org/socat/doc/socat-multicast.html
         //
     }
 
@@ -254,13 +286,14 @@ class FindSensor
 
     io_context ctx_;
     std::vector<std::unique_ptr<Socket>> socks_;
-    std::vector<Data> idents_;
+    std::vector<Data> idents_;  // @todo check for duplicates (perhaps we want to retry the QUERY?)
 
     bool SendPacket(Socket* sock, const OpCode opcode, const json& payload = {});
     void HandlePacket(const uint8_t* data, const std::size_t size, Socket* sock);
 
     Data GetIdent() const;
     void PrintIdent(const Data& data) const;
+    bool HaveIdent(const std::string& uid) const;
 
     void DoRead(Socket* sock);
     void OnRead(const boost::system::error_code& ec, std::size_t bytes_transferred, Socket* sock);
@@ -472,10 +505,10 @@ bool FindSensor::Run()
                 ok = false;
             }
         }
-        // TODO
-        // if (!opts_.uid_.empty() && (idents_.count(opts_.uid_) > 0)) {
-        //     break;
-        // }
+        // We found what we were looking for
+        if (!opts_.server_ && !opts_.uid_.empty() && HaveIdent(opts_.uid_)) {
+            break;
+        }
     }
 
     // Shutdown
@@ -485,10 +518,24 @@ bool FindSensor::Run()
     }
     socks_.clear();
 
-    // TODO
-    // if (idents_.empty() || (!opts_.uid_.empty() && (idents_.count(opts_.uid_) == 0))) {
-    //     ok = false;
-    // }
+    // We haven't found what we were looking for
+    if (!opts_.server_) {
+        if (opts_.uid_.empty()) {
+            if (!idents_.empty()) {
+                INFO("Found %" PRIuMAX " sensor%s", idents_.size(), idents_.size() > 1 ? "s" : "");
+            } else {
+                WARNING("Could not find any sensors");
+                ok = false;
+            }
+        } else {
+            if (HaveIdent(opts_.uid_)) {
+                INFO("Found sensor %s", opts_.uid_.c_str());
+            } else {
+                WARNING("Could not find sensor %s", opts_.uid_.c_str());
+                ok = false;
+            }
+        }
+    }
 
     return ok;
 }
@@ -569,9 +616,8 @@ void FindSensor::HandlePacket(const uint8_t* data, const std::size_t size, Socke
             try {
                 payload = json::parse(BufToStr({ &data[HEADER_SIZE], &data[HEADER_SIZE] + size - HEADER_SIZE }));
             } catch (const std::exception& ex) {
-                WARNING("%s < %s bad %s: %s", sock->name_.c_str(), HostPortStr(sock->sender_).c_str(),
-                    OpCodeToStr(opcode), ex.what());
-                DEBUG("got: %s", json(payload).dump().c_str());
+                WARNING("%s < %s bad %s: %s (got: %s)", sock->name_.c_str(), HostPortStr(sock->sender_).c_str(),
+                    OpCodeToStr(opcode), ex.what(), json(payload).dump().c_str());
                 return;
             }
         }
@@ -709,6 +755,14 @@ void FindSensor::PrintIdent(const Data& data) const
             INFO("        - Address %s", addr.c_str());
         }
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool FindSensor::HaveIdent(const std::string& uid) const
+{
+    return std::find_if(idents_.begin(), idents_.end(), [&uid](const auto& cand) { return cand.uid == uid; }) !=
+           idents_.end();
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
