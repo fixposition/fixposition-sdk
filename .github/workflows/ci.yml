@@ -101,7 +101,7 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v6
             - name: Login
-              uses: docker/login-action@v3
+              uses: docker/login-action@v4 # https://github.com/docker/login-action
               with:
                   registry: ghcr.io
                   username: ${{ github.actor }}
@@ -173,25 +173,22 @@ jobs:
 
             ##### Archive generated HTML as artefacts
 
-            # https://github.com/actions/upload-pages-artifact (This, not actions/upload-artifact, which doesn't work
             # for pages deployment. Both actions make the artefact show up as a job artefact.
             - name: Upload pages artefact
-              uses: actions/upload-pages-artifact@v4
+              uses: actions/upload-pages-artifact@v5 # https://github.com/actions/upload-pages-artifact (This, not actions/upload-artifact, which doesn't work)
               with:
                   path: github-pages
 
             ##### Deploy to fixposition.github.io/fixposition-sdk (only on main branch)
 
-            # https://github.com/actions/configure-pages
             - name: Configure pages
-              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/153/merge' }}
-              uses: actions/configure-pages@v5
+              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/193/merge' }}
+              uses: actions/configure-pages@v6 # https://github.com/actions/configure-pages
 
-            # https://github.com/actions/deploy-pages
             - name: Deploy pages
-              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/153/merge' }}
-              uses: actions/deploy-pages@v4
+              if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/pull/193/merge' }}
+              uses: actions/deploy-pages@v5
               with:
-                  artifact_name: github-pages
+                  artifact_name: github-pages # https://github.com/actions/deploy-pages
 
 # eof

@@ -252,6 +252,7 @@ $(BUILD_DIR)/.make-doc: $(BUILD_DIR)/.make-build fpsdk_doc/Doxyfile
 	$(V)$(BUILD_DIR)/fpsdk_apps/timeconv   -h > $(BUILD_DIR)/helpscreens/timeconv_helpscreen.txt
 	$(V)$(BUILD_DIR)/fpsdk_apps/timetool   -h > $(BUILD_DIR)/helpscreens/timetool_helpscreen.txt
 	$(V)$(BUILD_DIR)/fpsdk_apps/yaml2shell -h > $(BUILD_DIR)/helpscreens/yaml2shell_helpscreen.txt
+	$(V)$(BUILD_DIR)/fpsdk_apps/findsensor -h > $(BUILD_DIR)/helpscreens/findsensor_helpscreen.txt
 	$(V)./fpsdk.sh -h                         > $(BUILD_DIR)/helpscreens/fpsdk_helpscreen.txt
 	$(V)( \
             cat fpsdk_doc/Doxyfile; \

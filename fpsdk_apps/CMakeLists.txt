@@ -52,6 +52,10 @@ else()
     message(STATUS "fpsdk_apps: No ROS available")
 endif()
 
+find_package(Threads REQUIRED)
+find_package(nlohmann_json REQUIRED)
+
+
 # SHARED LIBRARY =======================================================================================================
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#recommendations
@@ -108,6 +112,14 @@ target_link_libraries(yaml2shell
         fpsdk_common
 )
 
+file(GLOB FINDSENSOR_CPP_FILES findsensor/*.cpp)
+add_executable(findsensor ${FINDSENSOR_CPP_FILES} ${COMMON_CPP_FILES})
+target_link_libraries(findsensor
+    PRIVATE
+        fpsdk_common
+        Threads::Threads
+        nlohmann_json::nlohmann_json
+)
 
 # INSTALL ==============================================================================================================
 
@@ -117,7 +129,7 @@ set(PROJECT_LIBRARY_DIR ${CMAKE_INSTALL_FULL_LIBDIR})
 set(PROJECT_INCLUDE_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME})
 set(PROJECT_DATA_DIR    ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME})
 
-install(TARGETS fpltool parsertool timeconv timetool yaml2shell
+install(TARGETS fpltool parsertool timeconv timetool yaml2shell findsensor
     EXPORT ${PROJECT_NAME}-targets
     LIBRARY DESTINATION ${PROJECT_LIBRARY_DIR}
     RUNTIME DESTINATION ${PROJECT_RUNTIME_DIR}

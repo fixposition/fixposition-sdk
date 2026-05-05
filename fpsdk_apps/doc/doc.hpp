@@ -39,6 +39,7 @@ namespace apps {
     - @subpage FPSDK_APPS_TIMECONV
     - @subpage FPSDK_APPS_TIMETOOL
     - @subpage FPSDK_APPS_YAML2SHELL
+    - @subpage FPSDK_APPS_FINDSENSOR
 
     @section FPSDK_APPS_LICENSE License
 
