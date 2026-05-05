@@ -132,7 +132,7 @@ class FindSensorOptions : public ProgramOptions
             "        $ findsensor\n"
             "\n"
             "        Querying (timeout 1.5s) ...\n"
-            "        Found fp-6d9d2c (product_model=VRTK2_STK)\n"
+            "        Found fp-6d9d2c (VRTK2_STK)\n"
             "            - Interface eth0\n"
             "                - Address 172.22.1.60/20\n"
             "            - Interface wlan0\n"
@@ -800,11 +800,11 @@ void FindSensor::PrintIdent(const Data& data) const
         return;
     }
 
-    if (data.props.empty()) {
-        NOTICE("Found %s", data.uid.c_str());
-    } else {
-        NOTICE("Found %s (%s)", data.uid.c_str(), PropsToStr(data.props).c_str());
-    }
+    const auto product_model_entry = data.props.find("product_model");
+
+    NOTICE("Found %s (%s)", data.uid.c_str(),
+        product_model_entry == data.props.end() ? "unknown model" : product_model_entry->second.c_str());
+
     for (auto& [name, addrs] : data.ifs) {
         INFO("    - Interface %s", name.c_str());
         for (auto& addr : addrs) {
