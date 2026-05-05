@@ -52,6 +52,10 @@ else()
     message(STATUS "fpsdk_apps: No ROS available")
 endif()
 
+find_package(Threads REQUIRED)
+find_package(nlohmann_json REQUIRED)
+
+
 # SHARED LIBRARY =======================================================================================================
 
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#recommendations
@@ -113,6 +117,8 @@ add_executable(findsensor ${FINDSENSOR_CPP_FILES} ${COMMON_CPP_FILES})
 target_link_libraries(findsensor
     PRIVATE
         fpsdk_common
+        Threads::Threads
+        nlohmann_json::nlohmann_json
 )
 
 # INSTALL ==============================================================================================================
