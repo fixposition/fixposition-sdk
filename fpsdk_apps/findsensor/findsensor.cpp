@@ -76,13 +76,14 @@ class FindSensorOptions : public ProgramOptions
     FindSensorOptions()  // clang-format off
         : ProgramOptions("findsensor", {
             { 'p', true,  "port"       },
-            { 's', false, "server"     },
-            { 'u', true,  "uid"        },
-            { 'i', true,  "interface"  },
-            { 'm', true,  "multi-addr" },
+            { 'm', true,  "addr"       },
             { 't', true,  "timeout"    },
             { 'j', false, "json"       },
+            { 'u', true,  "uid"        },
             { 'T', true,  "ttl"        },
+            // Testing server
+            { 's', false, "server"     },
+            { 'i', true,  "interface"  },
             { 'P', true,  "prop"       },
          }) {};  // clang-format on
 
@@ -113,17 +114,19 @@ class FindSensorOptions : public ProgramOptions
         std::fputs(COMMON_FLAGS_HELP, stdout);
         std::fputs(
             "    -p <port>, --port <port>  -- Port number to use (default: 8952)\n"
+            "    -a <addr>, --addr <addr>  -- Multicast address to use (default: 239.255.89.52)\n"
             "    -u <uid>, --uid <uid>     -- Look for a particular sensor (default: report all found sensors)\n"
             "    -t <dur>, --timeout <dur> -- Timeout waiting for response [s] (default: 1.5)\n"
+            "    -T <ttl>, --ttl <ttl>     -- TTL (hops) to use for sent UDP packets (default: 32)\n"
             "    -j, --json                -- Output JSON object response (to stdout, one line per response)\n"
             "\n"
             "Notes:\n"
             "\n"
             "    - The sensor discovery functionality is not available for all Fixposition sensors and/or\n"
             "      software versions\n"
-            "    - The sensor discovery uses IPv4 UDP multicast. As such the functionality is subject to\n"
-            "      your local network setup and your system configuration (router and network configuratuion,\n"
-            "      firewall configuration, etc.).\n"
+            "    - The sensor discovery uses IPv4 UDP multicast (to 239.255.89.52:8952). As such the functionality\n"
+            "      is subject to your local network setup and your system configuration (router and network\n"
+            "      configuration, firewall configuration, etc.).\n"
             "\n"
             "Examples:\n"
             "\n"
