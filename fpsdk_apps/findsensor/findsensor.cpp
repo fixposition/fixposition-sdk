@@ -121,7 +121,7 @@ class FindSensorOptions : public ProgramOptions
             "\n"
             "    - The sensor discovery functionality is not available for all Fixposition sensors and/or\n"
             "      software versions\n"
-            "    - The sensor discovery uses IPv4 UDP multicast. As such the functionality is subject to"
+            "    - The sensor discovery uses IPv4 UDP multicast. As such the functionality is subject to\n"
             "      your local network setup and your system configuration (router and network configuratuion,\n"
             "      firewall configuration, etc.).\n"
             "\n"
