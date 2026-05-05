@@ -132,7 +132,7 @@ class FindSensorOptions : public ProgramOptions
             "        $ findsensor\n"
             "\n"
             "        Querying (timeout 1.5s) ...\n"
-            "        Found fp-6d9d2c\n"
+            "        Found fp-6d9d2c (product_model=VRTK2_STK)\n"
             "            - Interface eth0\n"
             "                - Address 172.22.1.60/20\n"
             "            - Interface wlan0\n"
@@ -145,8 +145,8 @@ class FindSensorOptions : public ProgramOptions
             "\n"
             "        $ findsensor --quiet --uid xf-a0d2d8 --json\n"
             "\n"
-            "        {\"ifs\":{\"eth0\":[\"172.22.1.60/20\"],\"wlan0\":[\"192.168.43.156/24\"],\\\n"
-            "        \"wlan1\":[\"10.0.1.1/24\"]},\"uid\":\"fp-6d9d2c\"}\n"
+            "        {\"ifs\":{\"eth0\":[\"172.22.1.60/20\"],\"wlan0\":[\"192.168.43.156/24\"],\"wlan1\":[\"10.0.1.1/24\"]},\\\n"
+            "         \"props\":{\"product_model\":\"VRTK2_STK\"},\"uid\":\"fp-6d9d2c\"}\n"
             "\n"
             "\n", stdout);
         // clang-format on
