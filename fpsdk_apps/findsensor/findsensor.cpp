@@ -129,7 +129,6 @@ class FindSensorOptions : public ProgramOptions
             "            - Interface wlan1\n"
             "                - Address 10.0.1.1/24\n"
             "        Found 1 sensor\n"
-
             "\n"
             "    Quietly look for a particular sensor and print the information as JSON:\n"
             "\n"
@@ -149,6 +148,7 @@ class FindSensorOptions : public ProgramOptions
         //
         //     perl -e 'print(pack("NN", 0x66703f3f, 0x71756572))' | socat - udp4-sendto:239.255.89.52:8952
         //     http://www.dest-unreach.org/socat/doc/socat-multicast.html
+        //     sudo tcpdump -nnvvvXX udp port 8952
         //
     }
 
