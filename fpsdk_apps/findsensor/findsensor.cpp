@@ -60,6 +60,15 @@ using namespace boost::asio;
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+static std::string PropsToStr(const std::map<std::string, std::string>& props)
+{
+    std::string str;
+    for (auto& [k, v] : props) {
+        str += ", " + k + "=" + v;
+    }
+    return str.size() > 2 ? str.substr(2) : str;
+}
+
 // Program options
 class FindSensorOptions : public ProgramOptions
 {
@@ -74,6 +83,7 @@ class FindSensorOptions : public ProgramOptions
             { 't', true,  "timeout"    },
             { 'j', false, "json"       },
             { 'T', true,  "ttl"        },
+            { 'P', true,  "prop"       },
          }) {};  // clang-format on
 
     uint16_t port_ = 8952;
@@ -85,6 +95,7 @@ class FindSensorOptions : public ProgramOptions
     int ttl_ = 32;        // same site/organization
     double timeout_ = 1.5;
     bool json_ = false;
+    std::map<std::string, std::string> props_;
 
     void PrintHelp() override final
     {
@@ -142,7 +153,7 @@ class FindSensorOptions : public ProgramOptions
 
         // And undocumented server code for testing:
         //
-        //     findsensor -i eth0 -i wlan0 -p 8952 -s -u someuid -vv
+        //     findsensor -i eth0 -i wlan0 -p 8952 -s -u someuid -vv -P key=val
         //
         // Testing:
         //
@@ -189,6 +200,16 @@ class FindSensorOptions : public ProgramOptions
                     ok = false;
                 }
                 break;
+            case 'P': {
+                const auto kv = StrSplit(argument, "=", 2);
+                if (kv.size() == 2) {
+                    props_[kv[0]] = kv[1];
+                } else {
+                    WARNING("Bad --prop %s", argument.c_str());
+                    ok = false;
+                }
+                break;
+            }
             default:
                 ok = false;
                 break;
@@ -228,6 +249,7 @@ class FindSensorOptions : public ProgramOptions
         DEBUG("ttl        = %d", ttl_);
         DEBUG("timeout    = %.1f", timeout_);
         DEBUG("json       = %s", ToStr(json_));
+        DEBUG("props      = %s", PropsToStr(props_).c_str());
 
         return ok;
     }
@@ -241,6 +263,17 @@ class FindSensor
     FindSensor(const FindSensorOptions& opts);
 
     bool Run();
+
+    struct Data
+    {
+        Data() = default;
+        std::string uid;
+        std::map<std::string, std::vector<std::string>> ifs;
+        std::map<std::string, std::string> props;
+    };
+    // Cannot use the helper macro, as the version in noetic does not have this feature yet. Instead, we have to
+    // manually define to_json() and from_json(), see below, and for this the type has to be public. :-/
+    // NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(Data, uid, ifs, props)
 
    private:
     FindSensorOptions opts_;  //!< Program options
@@ -277,13 +310,6 @@ class FindSensor
         FindSensorOptions opts_;
     };
 
-    struct Data
-    {
-        std::string uid;
-        std::map<std::string, std::vector<std::string>> ifs;
-    };
-    NLOHMANN_DEFINE_TYPE_INTRUSIVE_WITH_DEFAULT(Data, uid, ifs)
-
     io_context ctx_;
     std::vector<std::unique_ptr<Socket>> socks_;
     std::vector<Data> idents_;  // @todo check for duplicates (perhaps we want to retry the QUERY?)
@@ -298,6 +324,31 @@ class FindSensor
     void DoRead(Socket* sock);
     void OnRead(const boost::system::error_code& ec, std::size_t bytes_transferred, Socket* sock);
 };
+
+inline void from_json(const json& j, FindSensor::Data& d)
+{
+    j.at("uid").get_to(d.uid);
+    j.at("props").get_to(d.props);
+    for (auto& [k, v] : j.at("ifs").items()) {
+        d.ifs[k] = {};
+        for (auto& vv : v) {
+            d.ifs[k].push_back(vv);
+        }
+    }
+}
+
+inline void to_json(json& j, const FindSensor::Data& d)
+{
+    auto ji = json::object();
+    for (auto& [k, v] : d.ifs) {
+        auto ja = json::array();
+        for (auto& vv : v) {
+            ja.push_back(vv);
+        }
+        ji[k] = ja;
+    }
+    j = json::object({ { "uid", d.uid }, { "ifs", ji }, { "props", d.props } });
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 
@@ -614,10 +665,11 @@ void FindSensor::HandlePacket(const uint8_t* data, const std::size_t size, Socke
         Data payload;
         if (size > HEADER_SIZE) {
             try {
-                payload = json::parse(BufToStr({ &data[HEADER_SIZE], &data[HEADER_SIZE] + size - HEADER_SIZE }));
+                payload = json::parse(BufToStr({ &data[HEADER_SIZE], &data[HEADER_SIZE] + size - HEADER_SIZE }))
+                              .get<fpsdk::apps::findsensor::FindSensor::Data>();
             } catch (const std::exception& ex) {
-                WARNING("%s < %s bad %s: %s (got: %s)", sock->name_.c_str(), HostPortStr(sock->sender_).c_str(),
-                    OpCodeToStr(opcode), ex.what(), json(payload).dump().c_str());
+                // WARNING("%s < %s bad %s: %s (got: %s)", sock->name_.c_str(), HostPortStr(sock->sender_).c_str(),
+                //     OpCodeToStr(opcode), ex.what(), json(payload).dump().c_str());
                 return;
             }
         }
@@ -628,7 +680,6 @@ void FindSensor::HandlePacket(const uint8_t* data, const std::size_t size, Socke
         if (opts_.server_) {
             // QUERY: respond to wildcard query (empty uid) and query for our uid
             if ((opcode == OpCode::QUERY) && (payload.uid.empty() || (payload.uid == opts_.uid_))) {
-                ;
                 if (!SendPacket(sock, OpCode::IDENT, GetIdent())) {
                     sock->ok_ = false;
                 }
@@ -689,6 +740,7 @@ FindSensor::Data FindSensor::GetIdent() const
 {
     Data ident;
     ident.uid = opts_.uid_;
+    ident.props = opts_.props_;
 
     // Get all addresses of all interfaces
     struct ifaddrs* ifaddr;
@@ -748,7 +800,11 @@ void FindSensor::PrintIdent(const Data& data) const
         return;
     }
 
-    NOTICE("Found %s", data.uid.c_str());
+    if (data.props.empty()) {
+        NOTICE("Found %s", data.uid.c_str());
+    } else {
+        NOTICE("Found %s (%s)", data.uid.c_str(), PropsToStr(data.props).c_str());
+    }
     for (auto& [name, addrs] : data.ifs) {
         INFO("    - Interface %s", name.c_str());
         for (auto& addr : addrs) {
