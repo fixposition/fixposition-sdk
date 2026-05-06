@@ -121,7 +121,7 @@ jobs:
                   docker compose push build-trixie-run build-noetic-run build-humble-run build-jazzy-run
             - name: Expire old images
               if: ${{ github.ref == 'refs/heads/main' }}
-              uses: actions/delete-package-versions@v5
+              uses: actions/delete-package-versions@v5 # https://github.com/actions/delete-package-versions
               with:
                   package-name:                  ${{ github.event.repository.name }}
                   package-type:                  container
