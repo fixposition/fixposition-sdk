@@ -53,8 +53,6 @@ services:
         cap_add:
             - SYS_PTRACE # Set kernel.yama.ptrace_scope = 0 in /etc/sysctl.d/10-ptrace.conf
         hostname: fpsdk-trixie-dev-${USER}
-        ports:
-          - "8952:8952/udp"  # for findsensor
         # Apparently required... (so that the container doesn't kill itself?)
         command: tail -f
 
