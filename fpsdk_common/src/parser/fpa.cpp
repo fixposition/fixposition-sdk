@@ -283,13 +283,13 @@ const char* FpaBaselineStatusStr(const FpaBaselineStatus status)
 const char* FpaCamStatusStr(const FpaCamStatus status)
 {
     switch (status) {  // clang-format off
-        case FpaCamStatus::UNSPECIFIED: return "UNSPECIFIED";
-        case FpaCamStatus::CAM_UNAVL:   return "CAM_UNAVL";
-        case FpaCamStatus::BAD_FEAT:    return "BAD_FEAT";
-        case FpaCamStatus::RESERVED2:   return "RESERVED2";
-        case FpaCamStatus::RESERVED3:   return "RESERVED3";
-        case FpaCamStatus::RESERVED4:   return "RESERVED4";
-        case FpaCamStatus::GOOD:        return "GOOD";
+        case FpaCamStatus::UNSPECIFIED:    return "UNSPECIFIED";
+        case FpaCamStatus::CAM_UNAVL:      return "CAM_UNAVL";
+        case FpaCamStatus::BAD_FEAT:       return "BAD_FEAT";
+        case FpaCamStatus::NOT_CONVERGED:  return "NOT_CONVERGED";
+        case FpaCamStatus::WARMSTARTED:    return "WARMSTARTED";
+        case FpaCamStatus::RESERVED4:      return "RESERVED4";
+        case FpaCamStatus::GOOD:           return "GOOD";
     }  // clang-format on
     return "?";
 }
@@ -784,12 +784,12 @@ static bool GetCamStatus(FpaCamStatus& status, const std::string& field)
     status = FpaCamStatus::UNSPECIFIED;
     if (!field.empty()) {
         switch ((FpaCamStatus)field[0]) {  // clang-format off
-            case FpaCamStatus::CAM_UNAVL:    status = FpaCamStatus::CAM_UNAVL; ok = true; break;
-            case FpaCamStatus::BAD_FEAT:     status = FpaCamStatus::BAD_FEAT;  ok = true; break;
-            case FpaCamStatus::RESERVED2:    status = FpaCamStatus::RESERVED2; ok = true; break;
-            case FpaCamStatus::RESERVED3:    status = FpaCamStatus::RESERVED3; ok = true; break;
-            case FpaCamStatus::RESERVED4:    status = FpaCamStatus::RESERVED4; ok = true; break;
-            case FpaCamStatus::GOOD:         status = FpaCamStatus::GOOD;      ok = true; break;
+            case FpaCamStatus::CAM_UNAVL:      status = FpaCamStatus::CAM_UNAVL;      ok = true; break;
+            case FpaCamStatus::BAD_FEAT:       status = FpaCamStatus::BAD_FEAT;       ok = true; break;
+            case FpaCamStatus::NOT_CONVERGED:  status = FpaCamStatus::NOT_CONVERGED;  ok = true; break;
+            case FpaCamStatus::WARMSTARTED:    status = FpaCamStatus::WARMSTARTED;    ok = true; break;
+            case FpaCamStatus::RESERVED4:      status = FpaCamStatus::RESERVED4;      ok = true; break;
+            case FpaCamStatus::GOOD:           status = FpaCamStatus::GOOD;           ok = true; break;
             case FpaCamStatus::UNSPECIFIED:  break;
         }  // clang-format on
     } else {
@@ -1433,12 +1433,13 @@ bool FpaOdomstatusPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_
         ok = (GetGpsTime(gps_time, m.fields_, 0, false) && GetInitStatus(init_status, m.fields_[2]) &&
               GetMeasStatus(fusion_imu, m.fields_[3]) && GetMeasStatus(fusion_gnss1, m.fields_[4]) &&
               GetMeasStatus(fusion_gnss2, m.fields_[5]) && GetMeasStatus(fusion_corr, m.fields_[6]) &&
-              GetMeasStatus(fusion_cam1, m.fields_[7]) && GetMeasStatus(fusion_ws, m.fields_[9]) &&
-              GetMeasStatus(fusion_markers, m.fields_[10]) && GetImuStatus(imu_status, m.fields_[15]) &&
-              GetImuNoise(imu_noise, m.fields_[16]) && GetImuConv(imu_conv, m.fields_[17]) &&
-              GetGnssStatus(gnss1_status, m.fields_[18]) && GetGnssStatus(gnss2_status, m.fields_[19]) &&
-              GetBaselineStatus(baseline_status, m.fields_[20]) && GetCorrStatus(corr_status, m.fields_[21]) &&
-              GetCamStatus(cam1_status, m.fields_[22]) && GetWsStatus(ws_status, m.fields_[24]) &&
+              GetMeasStatus(fusion_cam1, m.fields_[7]) && GetMeasStatus(fusion_cam2, m.fields_[8]) &&
+              GetMeasStatus(fusion_ws, m.fields_[9]) && GetMeasStatus(fusion_markers, m.fields_[10]) &&
+              GetImuStatus(imu_status, m.fields_[15]) && GetImuNoise(imu_noise, m.fields_[16]) &&
+              GetImuConv(imu_conv, m.fields_[17]) && GetGnssStatus(gnss1_status, m.fields_[18]) &&
+              GetGnssStatus(gnss2_status, m.fields_[19]) && GetBaselineStatus(baseline_status, m.fields_[20]) &&
+              GetCorrStatus(corr_status, m.fields_[21]) && GetCamStatus(cam1_status, m.fields_[22]) &&
+              GetCamStatus(cam2_status, m.fields_[23]) && GetWsStatus(ws_status, m.fields_[24]) &&
               GetWsConv(ws_conv, m.fields_[25]) && GetMarkersStatus(markers_status, m.fields_[26]) &&
               GetMarkersConv(markers_conv, m.fields_[27]));
     }

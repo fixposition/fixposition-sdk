@@ -747,6 +747,7 @@ TEST(ParserFpaTest, FpaOdomstatusPayload)
         EXPECT_EQ(payload.fusion_gnss2, FpaMeasStatus::USED);
         EXPECT_EQ(payload.fusion_corr, FpaMeasStatus::USED);
         EXPECT_EQ(payload.fusion_cam1, FpaMeasStatus::USED);
+        EXPECT_EQ(payload.fusion_cam2, FpaMeasStatus::UNSPECIFIED);
         EXPECT_EQ(payload.fusion_ws, FpaMeasStatus::NOT_USED);
         EXPECT_EQ(payload.fusion_markers, FpaMeasStatus::UNSPECIFIED);
         EXPECT_EQ(payload.imu_status, FpaImuStatus::WARMSTARTED);
@@ -757,6 +758,7 @@ TEST(ParserFpaTest, FpaOdomstatusPayload)
         EXPECT_EQ(payload.baseline_status, FpaBaselineStatus::PASSING);
         EXPECT_EQ(payload.corr_status, FpaCorrStatus::GOOD_CORR);
         EXPECT_EQ(payload.cam1_status, FpaCamStatus::GOOD);
+        EXPECT_EQ(payload.cam2_status, FpaCamStatus::UNSPECIFIED);
         EXPECT_EQ(payload.ws_status, FpaWsStatus::NOT_ENABLED);
         EXPECT_EQ(payload.ws_conv, FpaWsConv::IDLE);
         EXPECT_EQ(payload.markers_status, FpaMarkersStatus::UNSPECIFIED);
@@ -778,6 +780,7 @@ TEST(ParserFpaTest, FpaOdomstatusPayload)
         EXPECT_EQ(payload.fusion_gnss2, FpaMeasStatus::UNSPECIFIED);
         EXPECT_EQ(payload.fusion_corr, FpaMeasStatus::UNSPECIFIED);
         EXPECT_EQ(payload.fusion_cam1, FpaMeasStatus::UNSPECIFIED);
+        EXPECT_EQ(payload.fusion_cam2, FpaMeasStatus::UNSPECIFIED);
         EXPECT_EQ(payload.fusion_ws, FpaMeasStatus::UNSPECIFIED);
         EXPECT_EQ(payload.fusion_markers, FpaMeasStatus::UNSPECIFIED);
         EXPECT_EQ(payload.imu_status, FpaImuStatus::UNSPECIFIED);
@@ -788,8 +791,43 @@ TEST(ParserFpaTest, FpaOdomstatusPayload)
         EXPECT_EQ(payload.baseline_status, FpaBaselineStatus::UNSPECIFIED);
         EXPECT_EQ(payload.corr_status, FpaCorrStatus::UNSPECIFIED);
         EXPECT_EQ(payload.cam1_status, FpaCamStatus::UNSPECIFIED);
+        EXPECT_EQ(payload.cam2_status, FpaCamStatus::UNSPECIFIED);
         EXPECT_EQ(payload.ws_status, FpaWsStatus::UNSPECIFIED);
         EXPECT_EQ(payload.ws_conv, FpaWsConv::UNSPECIFIED);
+        EXPECT_EQ(payload.markers_status, FpaMarkersStatus::UNSPECIFIED);
+        EXPECT_EQ(payload.markers_conv, FpaMarkersConv::UNSPECIFIED);
+    }
+    {
+        FpaOdomstatusPayload payload;
+        const char* msg =  // clang-format off
+            "$FP,ODOMSTATUS,1,2421,199196.400000,2,2,0,0,0,1,0,0,,,,,,1,1,3,0,0,1,1,5,0,0,6,,,,,,,,,,,,*2B\r\n";  // clang-format on
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
+        EXPECT_EQ(payload.msg_type_, FpaMessageType::ODOMSTATUS);
+        EXPECT_TRUE(payload.valid_);
+        EXPECT_TRUE(payload.gps_time.week.valid);
+        EXPECT_EQ(payload.gps_time.week.value, 2421);
+        EXPECT_TRUE(payload.gps_time.tow.valid);
+        EXPECT_NEAR(payload.gps_time.tow.value, 199196.400000, 1e-9);
+        EXPECT_EQ(payload.init_status, FpaInitStatus::GLOBAL_INIT);
+        EXPECT_EQ(payload.fusion_imu, FpaMeasStatus::DEGRADED);
+        EXPECT_EQ(payload.fusion_gnss1, FpaMeasStatus::NOT_USED);
+        EXPECT_EQ(payload.fusion_gnss2, FpaMeasStatus::NOT_USED);
+        EXPECT_EQ(payload.fusion_corr, FpaMeasStatus::NOT_USED);
+        EXPECT_EQ(payload.fusion_cam1, FpaMeasStatus::USED);
+        EXPECT_EQ(payload.fusion_cam2, FpaMeasStatus::NOT_USED);
+        EXPECT_EQ(payload.fusion_ws, FpaMeasStatus::NOT_USED);
+        EXPECT_EQ(payload.fusion_markers, FpaMeasStatus::UNSPECIFIED);
+        EXPECT_EQ(payload.imu_status, FpaImuStatus::WARMSTARTED);
+        EXPECT_EQ(payload.imu_noise, FpaImuNoise::LOW_NOISE);
+        EXPECT_EQ(payload.imu_conv, FpaImuConv::WAIT_MOTION);
+        EXPECT_EQ(payload.gnss1_status, FpaGnssStatus::NO_FIX);
+        EXPECT_EQ(payload.gnss2_status, FpaGnssStatus::NO_FIX);
+        EXPECT_EQ(payload.baseline_status, FpaBaselineStatus::NO_FIX);
+        EXPECT_EQ(payload.corr_status, FpaCorrStatus::NO_GNSS);
+        EXPECT_EQ(payload.cam1_status, FpaCamStatus::GOOD);
+        EXPECT_EQ(payload.cam2_status, FpaCamStatus::CAM_UNAVL);
+        EXPECT_EQ(payload.ws_status, FpaWsStatus::NOT_ENABLED);
+        EXPECT_EQ(payload.ws_conv, FpaWsConv::IDLE);
         EXPECT_EQ(payload.markers_status, FpaMarkersStatus::UNSPECIFIED);
         EXPECT_EQ(payload.markers_conv, FpaMarkersConv::UNSPECIFIED);
     }

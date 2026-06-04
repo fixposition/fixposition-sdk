@@ -389,8 +389,8 @@ enum class FpaCamStatus : int
     UNSPECIFIED              = '!',  //!< Unspecified
     CAM_UNAVL                = '0',  //!< Camera not available
     BAD_FEAT                 = '1',  //!< Camera available, but not usable  (e.g. too dark)
-    RESERVED2                = '2',  //!< Reserved
-    RESERVED3                = '3',  //!< Reserved
+    NOT_CONVERGED            = '2',  //!< Camera not converged
+    WARMSTARTED              = '3',  //!< Camera warmstarted (previously converged)
     RESERVED4                = '4',  //!< Reserved
     GOOD                     = '5',  //!< Camera working and available
 };  // clang-format on
@@ -984,7 +984,8 @@ struct FpaOdomstatusPayload : public FpaPayload
     FpaMeasStatus      fusion_gnss1;     //!< Fusion measurement status: GNSS 1
     FpaMeasStatus      fusion_gnss2;     //!< Fusion measurement status: GNSS 2
     FpaMeasStatus      fusion_corr;      //!< Fusion measurement status: GNSS corrections
-    FpaMeasStatus      fusion_cam1;      //!< Fusion measurement status: camera
+    FpaMeasStatus      fusion_cam1;      //!< Fusion measurement status: camera 1
+    FpaMeasStatus      fusion_cam2;      //!< Fusion measurement status: camera 2
     FpaMeasStatus      fusion_ws;        //!< Fusion measurement status: wheelspeed
     FpaMeasStatus      fusion_markers;   //!< Fusion measurement status: markers
     FpaImuStatus       imu_status;       //!< IMU bias status
@@ -995,10 +996,11 @@ struct FpaOdomstatusPayload : public FpaPayload
     FpaBaselineStatus  baseline_status;  //!< Baseline status
     FpaCorrStatus      corr_status;      //!< GNSS correction status
     FpaCamStatus       cam1_status;      //!< Camera 1 status
+    FpaCamStatus       cam2_status;      //!< Camera 2 status
     FpaWsStatus        ws_status;        //!< Wheelspeed status
     FpaWsConv          ws_conv;          //!< Wheelspeed convergence status
-    FpaMarkersStatus   markers_status;   //!< Marker status
-    FpaMarkersConv     markers_conv;     //!< Marker convergence status
+    FpaMarkersStatus   markers_status;   //!< Markers status
+    FpaMarkersConv     markers_conv;     //!< Markers convergence status
     // clang-format on
 
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
