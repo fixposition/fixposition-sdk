@@ -14,6 +14,7 @@
 /* LIBC/STL */
 #include <array>
 #include <atomic>
+#include <cerrno>
 #include <cstdint>
 #include <cstring>
 #include <exception>
@@ -25,14 +26,16 @@
 /* EXTERNAL */
 #include <boost/asio/buffer.hpp>
 #include <boost/asio/io_context.hpp>
-#include <boost/asio/ip/multicast.hpp>
 #include <boost/asio/ip/udp.hpp>
+#include <boost/asio/ip/unicast.hpp>
 #include <boost/asio/ip/v6_only.hpp>
 #include <boost/asio/post.hpp>
 #include <boost/asio/steady_timer.hpp>
 #include <boost/system/error_code.hpp>
 #include <ifaddrs.h>
+#include <net/if.h>
 #include <nlohmann/json.hpp>
+#include <sys/socket.h>
 #include <sys/types.h>
 
 /* Fixposition SDK */
@@ -75,27 +78,30 @@ class FindSensorOptions : public ProgramOptions
    public:
     FindSensorOptions()  // clang-format off
         : ProgramOptions("findsensor", {
+            { 'b', true,  "bcast"      },
             { 'p', true,  "port"       },
-            { 'm', true,  "addr"       },
+            { 'i', true,  "iface"      },
             { 't', true,  "timeout"    },
+            { 'T', true,  "ttl"        },
             { 'j', false, "json"       },
             { 'u', true,  "uid"        },
-            { 'T', true,  "ttl"        },
-            // Testing server
+            // Server
             { 's', false, "server"     },
-            { 'i', true,  "interface"  },
+            { 'I', true,  "if"         },
             { 'P', true,  "prop"       },
          }) {};  // clang-format on
 
+    // Limited (local link) broadcast address, https://en.wikipedia.org/wiki/Broadcast_address
+    std::string bcast_addr_ = "255.255.255.255";
     uint16_t port_ = 8952;
-    bool server_ = false;
-    std::string uid_;
-    std::vector<std::string> ifs_;  //  = { "eth0", "wlan0", "wlan1" };
-    std::string multi_addr_ =
-        "239.255.89.52";  // organization-local scope, https://en.wikipedia.org/wiki/Multicast_address
-    int ttl_ = 32;        // same site/organization
+    std::string iface_;  // Network interface to bind to (SO_BINDTODEVICE), empty = none
     double timeout_ = 1.5;
+    int ttl_ = 32;  // Same site/organization
     bool json_ = false;
+    std::string uid_;
+    // Server
+    bool server_ = false;
+    std::vector<std::string> ifs_;  //  = { "eth0", "wlan0", "wlan1" };
     std::map<std::string, std::string> props_;
 
     void PrintHelp() override final
@@ -113,20 +119,26 @@ class FindSensorOptions : public ProgramOptions
             "\n", stdout);
         std::fputs(COMMON_FLAGS_HELP, stdout);
         std::fputs(
+            "    -b <addr>, --bcast <addr> -- Broadcast address to use (default: 255.255.255.255)\n"
             "    -p <port>, --port <port>  -- Port number to use (default: 8952)\n"
-            "    -a <addr>, --addr <addr>  -- Multicast address to use (default: 239.255.89.52)\n"
-            "    -u <uid>, --uid <uid>     -- Look for a particular sensor (default: report all found sensors)\n"
+            "    -i <if>, --iface <if>     -- Network interface to bind to, for multi-homed hosts (default: none)\n"
             "    -t <dur>, --timeout <dur> -- Timeout waiting for response [s] (default: 1.5)\n"
             "    -T <ttl>, --ttl <ttl>     -- TTL (hops) to use for sent UDP packets (default: 32)\n"
             "    -j, --json                -- Output JSON object response (to stdout, one line per response)\n"
+            "    -u <uid>, --uid <uid>     -- Look for a particular sensor (default: report all found sensors)\n"
             "\n"
             "Notes:\n"
             "\n"
             "    - The sensor discovery functionality is not available for all Fixposition sensors and/or\n"
             "      software versions\n"
-            "    - The sensor discovery uses IPv4 UDP multicast (to 239.255.89.52:8952). As such the functionality\n"
+            "    - The sensor discovery uses IPv4 UDP broadcast (to 255.255.255.255:8952). As such the functionality\n"
             "      is subject to your local network setup and your system configuration (router and network\n"
             "      configuration, firewall configuration, etc.).\n"
+            "    - Discovery of sensors may be further limited by sensor configuration. For example, a sensor configured\n"
+            "      as DHCP server, cannot be discovered in most cases.\n"
+            "    - On a multi-homed host the limited broadcast may leave through the wrong interface (and replies\n"
+            "      may arrive on an interface the socket does not listen on). Use -i/--iface to bind to the\n"
+            "      interface facing the sensor. This may require running with elevated privileges (root).\n"
             "\n"
             "Examples:\n"
             "\n"
@@ -174,13 +186,19 @@ class FindSensorOptions : public ProgramOptions
 
         // And undocumented server code for testing:
         //
-        //     findsensor -i eth0 -i wlan0 -p 8952 -s -u someuid -vv -P key=val
+        //     findsensor -vv -s -i eth0 -u someuid -P key=val -I eth0 -I wlan0
         //
         // Testing:
         //
-        //     perl -e 'print(pack("NN", 0x66703f3f, 0x71756572))' | socat - udp4-sendto:239.255.89.52:8952
-        //     http://www.dest-unreach.org/socat/doc/socat-multicast.html
+        //     perl -e 'print(pack("NN", 0x66703f3f, 0x71756572))' | socat -
+        //     udp4-datagram:255.255.255.255:8952,broadcast
+        //
         //     sudo tcpdump -nnvvvXX udp port 8952
+        //
+        //     socat -u UDP4-RECVFROM:8953,reuseaddr,fork,so-bindtodevice=eth0 STDOUT
+        //     date | socat -u - UDP4-DATAGRAM:255.255.255.255:8953,broadcast,so-bindtodevice=eth0
+        //
+        //     sysctl -w net.ipv4.conf.eth0.rp_filter=0 net.ipv4.conf.all.rp_filter=0
         //
     }
 
@@ -188,23 +206,17 @@ class FindSensorOptions : public ProgramOptions
     {
         bool ok = true;
         switch (option.flag) {
+            case 'b':
+                bcast_addr_ = argument;
+                break;
             case 'p':
                 if ((port_ != 0) || !StrToValue(argument, port_) || (port_ < 1024)) {
                     WARNING("Bad --port %s", argument.c_str());
                     ok = false;
                 }
                 break;
-            case 'u':
-                uid_ = argument;
-                break;
-            case 's':
-                server_ = true;
-                break;
             case 'i':
-                ifs_.push_back(argument);
-                break;
-            case 'm':
-                multi_addr_ = argument;
+                iface_ = argument;
                 break;
             case 't':
                 if (!StrToValue(argument, timeout_) || (timeout_ < 0.1) || (timeout_ > 60.0)) {
@@ -212,14 +224,23 @@ class FindSensorOptions : public ProgramOptions
                     ok = false;
                 }
                 break;
-            case 'j':
-                json_ = true;
-                break;
             case 'T':
                 if (!StrToValue(argument, ttl_) || (ttl_ < 1) || (ttl_ > 255)) {
                     WARNING("Bad --ttl %s", argument.c_str());
                     ok = false;
                 }
+                break;
+            case 'j':
+                json_ = true;
+                break;
+            case 'u':
+                uid_ = argument;
+                break;
+            case 's':
+                server_ = true;
+                break;
+            case 'I':
+                ifs_.push_back(argument);
                 break;
             case 'P': {
                 const auto kv = StrSplit(argument, "=", 2);
@@ -256,20 +277,26 @@ class FindSensorOptions : public ProgramOptions
         }
 
         boost::system::error_code ec;
-        ip::make_address(multi_addr_, ec);
+        ip::make_address(bcast_addr_, ec);
         if (ec) {
-            WARNING("Bad multicast address %s: %s", multi_addr_.c_str(), ec.message().c_str());
+            WARNING("Bad broadcast address %s: %s", bcast_addr_.c_str(), ec.message().c_str());
             ok = false;
         }
 
-        DEBUG("server     = %s", ToStr(server_));
+        if (!iface_.empty() && (if_nametoindex(iface_.c_str()) == 0)) {
+            WARNING("Bad interface %s: %s", iface_.c_str(), StrError(errno).c_str());
+            ok = false;
+        }
+
+        DEBUG("bcast_addr = %s", bcast_addr_.c_str());
         DEBUG("port       = %" PRIu16, port_);
-        DEBUG("uid        = %s", uid_.c_str());
-        DEBUG("interfaces = %s", StrJoin(ifs_, ", ").c_str());
-        DEBUG("multi_addr = %s", multi_addr_.c_str());
-        DEBUG("ttl        = %d", ttl_);
+        DEBUG("iface      = %s", iface_.c_str());
         DEBUG("timeout    = %.1f", timeout_);
+        DEBUG("ttl        = %d", ttl_);
         DEBUG("json       = %s", ToStr(json_));
+        DEBUG("uid        = %s", uid_.c_str());
+        DEBUG("server     = %s", ToStr(server_));
+        DEBUG("ifs        = %s", StrJoin(ifs_, ", ").c_str());
         DEBUG("props      = %s", PropsToStr(props_).c_str());
 
         return ok;
@@ -312,7 +339,7 @@ class FindSensor
 
     struct Socket : private NoCopyNoMove
     {
-        Socket(const ip::udp::endpoint& local_endpoint, const ip::udp::endpoint& multi_endpoint, io_context& ctx,
+        Socket(const ip::udp::endpoint& local_endpoint, const ip::udp::endpoint& bcast_endpoint, io_context& ctx,
             const FindSensorOptions& opts);
         ~Socket();
         bool Start();
@@ -323,7 +350,7 @@ class FindSensor
         std::atomic<bool> ok_ = true;
         std::string name_;
         ip::udp::endpoint local_endpoint_;
-        ip::udp::endpoint multi_endpoint_;
+        ip::udp::endpoint bcast_endpoint_;
         ip::udp::socket socket_;
         ip::udp::endpoint sender_;
         uint8_t rx_buf_data_[MAX_SIZE];
@@ -388,11 +415,11 @@ static std::string HostPortStr(const ip::udp::endpoint& endpoint)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-FindSensor::Socket::Socket(const ip::udp::endpoint& local_endpoint, const ip::udp::endpoint& multi_endpoint,
+FindSensor::Socket::Socket(const ip::udp::endpoint& local_endpoint, const ip::udp::endpoint& bcast_endpoint,
     io_context& ctx, const FindSensorOptions& opts) /* clang-format off */ :
-    name_             { HostPortStr(local_endpoint) + "/" + HostPortStr(multi_endpoint) },
+    name_             { HostPortStr(local_endpoint) + "/" + HostPortStr(bcast_endpoint) },
     local_endpoint_   { local_endpoint },
-    multi_endpoint_   { multi_endpoint },
+    bcast_endpoint_   { bcast_endpoint },
     socket_           { ctx },
     rx_buf_           { buffer(rx_buf_data_) },
     opts_             { opts }  // clang-format on
@@ -435,33 +462,23 @@ bool FindSensor::Socket::Start()
         return false;
     }
 
-    socket_.set_option(ip::multicast::hops(opts_.ttl_), ec);
+    socket_.set_option(ip::unicast::hops(opts_.ttl_), ec);
     if (ec) {
         WARNING("Socket(%s) set_option(hops) fail: %s", name_.c_str(), ec.message().c_str());
         return false;
     }
 
-    socket_.set_option(ip::multicast::enable_loopback(true), ec);
-    if (ec) {
-        WARNING("Socket(%s) set_option(enable_loopback) fail: %s", name_.c_str(), ec.message().c_str());
-        return false;
+    // No boost::asio equivalent of this... :-/
+    if (!opts_.iface_.empty()) {  // clang-format off
+        if (setsockopt(socket_.native_handle(), SOL_SOCKET, SO_BINDTODEVICE, opts_.iface_.c_str(), opts_.iface_.size()) != 0) {
+            WARNING("Socket(%s) set SO_BINDTODEVICE(%s) fail: %s (need root?)", name_.c_str(), opts_.iface_.c_str(), StrError(errno).c_str());
+            return false;  // clang-format on
+        }
     }
 
     socket_.bind(local_endpoint_, ec);
     if (ec) {
         WARNING("Socket(%s) bind fail: %s", name_.c_str(), ec.message().c_str());
-        return false;
-    }
-
-    socket_.set_option(ip::multicast::outbound_interface(ip::address_v4::any()), ec);
-    if (ec) {
-        WARNING("Socket(%s) set_option(outbound_interface) fail: %s", name_.c_str(), ec.message().c_str());
-        return false;
-    }
-
-    socket_.set_option(ip::multicast::join_group(multi_endpoint_.address()), ec);
-    if (ec) {
-        WARNING("Socket(%s) set_option(join_group) fail: %s", name_.c_str(), ec.message().c_str());
         return false;
     }
 
@@ -498,7 +515,7 @@ bool FindSensor::Socket::Send(const uint8_t* data, const std::size_t size)
 {
     TRACE_HEXDUMP(data, size, "    ", "Socket(%s) send", name_.c_str());
     boost::system::error_code ec;
-    const std::size_t size_sent = socket_.send_to(buffer(data, size), multi_endpoint_, 0, ec);
+    const std::size_t size_sent = socket_.send_to(buffer(data, size), bcast_endpoint_, 0, ec);
     if (ec || (size_sent != size)) {
         WARNING("Socket(%s) send fail (%" PRIuMAX ", %" PRIuMAX "): %s", name_.c_str(), size, size_sent,
             ec.message().c_str());
@@ -526,7 +543,7 @@ bool FindSensor::Run()
     opts_.LogVersion();
 
     socks_.push_back(std::make_unique<Socket>(ip::udp::endpoint(ip::address_v4::any(), opts_.port_),
-        ip::udp::endpoint(ip::make_address(opts_.multi_addr_), opts_.port_), ctx_, opts_));
+        ip::udp::endpoint(ip::make_address(opts_.bcast_addr_), opts_.port_), ctx_, opts_));
 
     for (auto& sock : socks_) {
         if (!sock || !sock->Start()) {
