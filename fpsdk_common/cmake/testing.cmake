@@ -7,7 +7,7 @@ endif()
 # User requested to build testing (-DBUILD_TESTING=ON), abort if no suitable version available
 if (BUILD_TESTING STREQUAL "ON")
 
-    find_package(GTest 1.12.0 REQUIRED)
+    find_package(GTest REQUIRED)
     # GTest doesn't seem to have a normal cmake config file, so we have to check and abort ourselves.. :-/
     if ("${GTest_VERSION}" STREQUAL "")
         message(FATAL_ERROR "Unsupported GTest version")
@@ -24,7 +24,7 @@ elseif(BUILD_TESTING STREQUAL "OFF")
 # Automatically detect if a suitable GTest library is available
 else()
 
-    find_package(GTest 1.12.0 QUIET)
+    find_package(GTest QUIET)
     if ("${GTest_VERSION}" STREQUAL "")
         message(STATUS "fpsdk: No GTest found, disable testing")
         set(BUILD_TESTING OFF)
