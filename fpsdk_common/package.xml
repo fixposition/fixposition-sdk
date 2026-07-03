@@ -5,6 +5,15 @@
     <description>Fixposition SDK: Common Library</description>
     <maintainer email="support@fixposition.com">Fixposition Support</maintainer>
     <license>MIT</license>
+
+    <build_depend>eigen</build_depend>
+    <build_depend>nlohmann-json-dev</build_depend>
+    <build_depend>pkg-config</build_depend>
+    <depend>libboost-dev</depend>
+    <depend>libssl-dev</depend>
+    <depend>yaml-cpp</depend>
+    <depend>zlib</depend>
+
     <export>
         <build_type>cmake</build_type>
     </export>
