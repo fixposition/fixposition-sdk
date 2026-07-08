@@ -55,7 +55,7 @@ namespace fpsdk {
 
     - clang-format (≥ 19, tested with 19)
     - Doxygen      (≥ 1.11.0, tested with 1.14.0)
-    - GTest        (≥ 1.12.0)
+    - GTest        (≥ 1.13.0)
 
     Note that the list above may be incomplete or wrong. See @ref FPSDK_BUILD_CIVERSIONS for the versions used in the CI
     builds.
