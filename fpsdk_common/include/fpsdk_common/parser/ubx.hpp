@@ -33,6 +33,7 @@
 #include <array>
 #include <cmath>
 #include <cstdint>
+#include <cstring>
 #include <string>
 #include <vector>
 
@@ -1026,9 +1027,9 @@ static constexpr std::size_t UBX_ESF_MEAS_V0_FLAGS_NUMMEAS(const uint16_t flags)
 static constexpr uint32_t    UBX_ESF_MEAS_V0_DATA_DATAFIELD(const uint32_t data)                    { return data & 0x00ffffff; }  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_MEAS_V0_DATA_DATATYPE(const uint32_t data)                     { return (data >> 24) & 0x0000003f; } //!< same enum as UBX-ESF-STATUS.type it seems
 static constexpr double      UBX_ESF_MEAS_V0_CALIBTTAG_SCALE                                        = 1e-3;  //!< @todo documentation
-static constexpr std::size_t UBX_ESF_MEAS_V0_SIZE(const uint8_t* msg)                               { return /* argh.. nice message design! */ \
-    sizeof(UBX_ESF_MEAS_V0_GROUP0) + UBX_FRAME_SIZE + (UBX_ESF_MEAS_V0_FLAGS_NUMMEAS(*((uint16_t *)&((uint8_t *)(msg))[UBX_HEAD_SIZE + 4])) * sizeof(UBX_ESF_MEAS_V0_GROUP1)) +
-    (UBX_ESF_MEAS_V0_FLAGS_CALIBTTAGVALID(*((uint16_t *)&((uint8_t *)(msg))[UBX_HEAD_SIZE + 4])) ? sizeof(UBX_ESF_MEAS_V0_GROUP2) : 0); }  //!< @todo documentation
+static inline    std::size_t UBX_ESF_MEAS_V0_SIZE(const uint8_t* msg)                               {  /* argh.. nice message design! */ \
+    uint16_t flags; std::memcpy(&flags, &msg[UBX_HEAD_SIZE + 4], sizeof(flags)); return sizeof(UBX_ESF_MEAS_V0_GROUP0) + UBX_FRAME_SIZE +
+    (UBX_ESF_MEAS_V0_FLAGS_NUMMEAS(flags) * sizeof(UBX_ESF_MEAS_V0_GROUP1)) + (UBX_ESF_MEAS_V0_FLAGS_CALIBTTAGVALID(flags) ? sizeof(UBX_ESF_MEAS_V0_GROUP2) : 0); } //!< @todo documentation
 // clang-format on
 
 ///@}
@@ -1069,7 +1070,7 @@ static constexpr uint8_t     UBX_ESF_STATUS_VERSION(const uint8_t* msg)         
 static constexpr uint8_t     UBX_ESF_STATUS_V2_VERSION                                              = 0x02;  //!< @todo documentation
 static constexpr std::size_t UBX_ESF_STATUS_V2_MIN_SIZE                                             = sizeof(UBX_ESF_STATUS_V2_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr std::size_t UBX_ESF_STATUS_V2_SIZE(const uint8_t* msg)                             { return  //!< @todo documentation
-    sizeof(UBX_ESF_STATUS_V2_GROUP0) + UBX_FRAME_SIZE + (((uint8_t *)(msg))[UBX_HEAD_SIZE + 15] * sizeof(UBX_ESF_STATUS_V2_GROUP1)); }  //!< @todo documentation
+    sizeof(UBX_ESF_STATUS_V2_GROUP0) + UBX_FRAME_SIZE + (((const uint8_t *)(msg))[UBX_HEAD_SIZE + 15] * sizeof(UBX_ESF_STATUS_V2_GROUP1)); }  //!< @todo documentation
 static constexpr double      UBX_ESF_STATUS_V2_ITOW_SCALE                                           = 1e-3;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS(const uint8_t initStatus1)  { return initStatus1 & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS_OFF                         = 0;  //!< @todo documentation
@@ -1161,7 +1162,7 @@ static constexpr uint8_t     UBX_MON_COMMS_VERSION(const uint8_t* msg)          
 static constexpr uint8_t     UBX_MON_COMMS_V0_VERSION                                               = 0x00;  //!< @todo documentation
 static constexpr std::size_t UBX_MON_COMMS_V0_MIN_SIZE                                              = sizeof(UBX_MON_COMMS_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr std::size_t UBX_MON_COMMS_V0_SIZE(const uint8_t* msg)                              { return  //!< @todo documentation
-    sizeof(UBX_MON_COMMS_V0_GROUP0) + UBX_FRAME_SIZE + (((uint8_t *)(msg))[UBX_HEAD_SIZE + 1] * sizeof(UBX_MON_COMMS_V0_GROUP1)); }  //!< @todo documentation
+    sizeof(UBX_MON_COMMS_V0_GROUP0) + UBX_FRAME_SIZE + (((const uint8_t *)(msg))[UBX_HEAD_SIZE + 1] * sizeof(UBX_MON_COMMS_V0_GROUP1)); }  //!< @todo documentation
 static constexpr bool        UBX_MON_COMMS_V0_TXERRORS_MEM(const uint8_t txErrors)                  { return (txErrors & 0x01) == 0x01; }  //!< @todo documentation
 static constexpr bool        UBX_MON_COMMS_V0_TXERRORS_ALLOC(const uint8_t txErrors)                { return (txErrors & 0x02) == 0x02; }  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_COMMS_V0_TXERRORS_OUTPUTPORT(const uint8_t txErrors)           { return (txErrors >> 3) & 0x7; }  //!< @todo documentation
@@ -1371,7 +1372,7 @@ static constexpr uint8_t     UBX_MON_RF_VERSION(const uint8_t* msg)             
 static constexpr uint8_t     UBX_MON_RF_V0_VERSION                                                  = 0x00;  //!< @todo documentation
 static constexpr std::size_t UBX_MON_RF_V0_MIN_SIZE                                                 = sizeof(UBX_MON_RF_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr std::size_t UBX_MON_RF_V0_SIZE(const uint8_t* msg)                                 { return
-    sizeof(UBX_MON_RF_V0_GROUP0) + UBX_FRAME_SIZE + (((uint8_t *)(msg))[UBX_HEAD_SIZE + 1] * sizeof(UBX_MON_RF_V0_GROUP1)); }  //!< @todo documentation
+    sizeof(UBX_MON_RF_V0_GROUP0) + UBX_FRAME_SIZE + (((const uint8_t *)(msg))[UBX_HEAD_SIZE + 1] * sizeof(UBX_MON_RF_V0_GROUP1)); }  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_FLAGS_JAMMINGSTATE(const uint8_t flags)                  { return flags & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_FLAGS_JAMMINGSTATE_UNKN                                  = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_FLAGS_JAMMINGSTATE_OK                                    = 1;  //!< @todo documentation
@@ -1428,7 +1429,7 @@ static constexpr uint8_t     UBX_MON_SPAN_VERSION(const uint8_t* msg)           
 static constexpr uint8_t     UBX_MON_SPAN_V0_VERSION                                                = 0x00;  //!< @todo documentation
 static constexpr std::size_t UBX_MON_SPAN_V0_MIN_SIZE                                               = sizeof(UBX_MON_SPAN_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr std::size_t UBX_MON_SPAN_V0_SIZE(const uint8_t* msg)                               { return
-    sizeof(UBX_MON_SPAN_V0_GROUP0) + UBX_FRAME_SIZE + (((uint8_t *)(msg))[UBX_HEAD_SIZE + 1] * sizeof(UBX_MON_SPAN_V0_GROUP1)); }  //!< @todo documentation
+    sizeof(UBX_MON_SPAN_V0_GROUP0) + UBX_FRAME_SIZE + (((const uint8_t *)(msg))[UBX_HEAD_SIZE + 1] * sizeof(UBX_MON_SPAN_V0_GROUP1)); }  //!< @todo documentation
 static constexpr double      UBX_MON_SPAN_BIN_CENT_FREQ(const uint32_t center, const uint32_t span, const int ix)  { return
     (double)center + ((double)span * (((double)(ix) - 128.0) / 256.0)); }  //!< @todo documentation
 // clang-format on
@@ -2440,7 +2441,7 @@ static constexpr bool        UBX_RXM_RAWX_V1_TRKSTAT_HALFCYC(const uint8_t trkSt
 static constexpr bool        UBX_RXM_RAWX_V1_TRKSTAT_SUBHALFCYC(const uint8_t trkStat)              { return (trkStat & 0x08) == 0x08; }  //!< @todo documentation
 static constexpr int         UBX_RXM_RAWX_V1_GROUP1_FREQID_TO_SLOT(const uint8_t freqId)            { return (int)freqId - 7; }  //!< @todo documentation
 static constexpr std::size_t UBX_RXM_RAWX_V1_SIZE(const uint8_t *msg)                               { return
-    ((sizeof(UBX_RXM_RAWX_V1_GROUP0) + UBX_FRAME_SIZE + (((uint8_t *)(msg))[UBX_HEAD_SIZE + 11] * sizeof(UBX_RXM_RAWX_V1_GROUP1)))); }  //!< @todo documentation
+    ((sizeof(UBX_RXM_RAWX_V1_GROUP0) + UBX_FRAME_SIZE + (((const uint8_t *)(msg))[UBX_HEAD_SIZE + 11] * sizeof(UBX_RXM_RAWX_V1_GROUP1)))); }  //!< @todo documentation
 
 // clang-format on
 
