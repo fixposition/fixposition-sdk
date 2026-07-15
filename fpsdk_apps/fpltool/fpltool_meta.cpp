@@ -80,6 +80,7 @@ bool DoMeta(const FplToolOptions& opts)
             case FplType::STREAMMSG:
             case FplType::LOGSTATUS:
             case FplType::FILEDUMP:
+            case FplType::CAMDATA:
             case FplType::BLOB:
             case FplType::UNSPECIFIED:
             case FplType::INT_D:

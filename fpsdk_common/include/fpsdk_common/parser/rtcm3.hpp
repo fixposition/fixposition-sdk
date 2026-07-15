@@ -267,7 +267,7 @@ enum class Rtcm3MsmType : uint16_t
  *
  * @returns a concise and unique string for the MSM type, "?" for bad value
  */
-const char* Rtcm3MsmTypeStr(const Rtcm3MsmType gnss);
+const char* Rtcm3MsmTypeStr(const Rtcm3MsmType msm);
 
 /**
  * @brief RTMC3 message type to MSM GNSS and type
@@ -356,6 +356,8 @@ static constexpr uint16_t    RTCM3_TYPE1011_MSGID           = 1011;             
 static constexpr const char* RTCM3_TYPE1011_STRID           = "RTCM3-TYPE1011";         //!< RTCM3-TYPE1011 message name
 static constexpr uint16_t    RTCM3_TYPE1012_MSGID           = 1012;                     //!< RTCM3-TYPE1012 message ID
 static constexpr const char* RTCM3_TYPE1012_STRID           = "RTCM3-TYPE1012";         //!< RTCM3-TYPE1012 message name
+static constexpr uint16_t    RTCM3_TYPE1029_MSGID           = 1029;                     //!< RTCM3-TYPE1029 message ID
+static constexpr const char* RTCM3_TYPE1029_STRID           = "RTCM3-TYPE1029";         //!< RTCM3-TYPE1029 message name
 static constexpr uint16_t    RTCM3_TYPE1030_MSGID           = 1030;                     //!< RTCM3-TYPE1030 message ID
 static constexpr const char* RTCM3_TYPE1030_STRID           = "RTCM3-TYPE1030";         //!< RTCM3-TYPE1030 message name
 static constexpr uint16_t    RTCM3_TYPE1031_MSGID           = 1031;                     //!< RTCM3-TYPE1031 message ID

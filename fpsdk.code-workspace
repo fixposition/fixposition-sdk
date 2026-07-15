@@ -225,6 +225,7 @@
         "peacock.remoteColor": "#f9e64f",
         "workbench.colorCustomizations": {
             "commandCenter.border": "#15202b99",
+            "commandCenter.foreground": "#15202b",
             "titleBar.activeBackground": "#f9e64f",
             "titleBar.activeForeground": "#15202b",
             "titleBar.inactiveBackground": "#f9e64f99",
@@ -335,6 +336,22 @@
                 "program": "${workspaceFolder}/build/Debug/fpsdk_common/fpsdk_common_time_test",
                 "args": [ // "--gtest_filter=TimeTest.SetUtcTime",
                     "-v", "-v", "-v", "-v" ],
+                "cwd": "${workspaceFolder}",
+                "setupCommands": [
+                    { "text": "set auto-load safe-path ${workspaceFolder}", "description": "", "ignoreFailures": true },
+                    { "text": "-enable-pretty-printing", "description": "enable pretty printing", "ignoreFailures": true },
+                    { "text": "handle SIGPIPE nostop noprint pass", "description": "ignore SIGPIPE", "ignoreFailures": true },
+                    { "text": "source ${workspaceFolder}/.devcontainer/.gdb/gdbinit", "description": "load local gdbinit", "ignoreFailures": false }
+                ]
+            },
+            {
+                "name": "Fixposition SDK: debug fpltool extract",
+                "type": "cppdbg", "request": "launch", "MIMode": "gdb", "miDebuggerPath" : "gdb",
+                "stopAtEntry": false,
+                "preLaunchTask" : "Fixposition SDK: build",
+                "program": "${workspaceFolder}/build/Debug/fpsdk_apps/fpltool",
+                "args": [
+                    "extract", "-f", "test.fpl", "-v", "-v", "-v", "-v" ],
                 "cwd": "${workspaceFolder}",
                 "setupCommands": [
                     { "text": "set auto-load safe-path ${workspaceFolder}", "description": "", "ignoreFailures": true },

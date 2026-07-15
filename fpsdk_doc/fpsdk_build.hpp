@@ -46,10 +46,14 @@ namespace fpsdk {
     - nlohmann-json3   (≥ 3.7.3)
     - Various Linux tools, including Bash, CMake, make, xxd, sed, awk, ...
     - PROJ         (*) (≥ 9.4.x)
+    - FFmpeg (libavcodec, libavutil, ...) (**) (= 7.1.x)
     - ROS1         (*) (Noetic), or
     - ROS2         (*) (Humble or Jazzy)
 
     (*) Optional dependencies. Without these some functionality in the libraries and apps is unavailable (compiled out).
+
+    (**) Optional. The FFmpeg libraries must be configured with --disable-gpl and --disable-nonfree in order to comply
+         with the Fixposition SDK license. See *Configure* below for related build configuration options.
 
     For development additionally:
 
@@ -57,8 +61,7 @@ namespace fpsdk {
     - Doxygen      (≥ 1.11.0, tested with 1.14.0)
     - GTest        (≥ 1.13.0)
 
-    Note that the list above may be incomplete or wrong. See @ref FPSDK_BUILD_CIVERSIONS for the versions used in the CI
-    builds.
+    See @ref FPSDK_BUILD_CIVERSIONS for the versions used in the CI builds.
 
     <!-- trick doxygen -->
 
@@ -147,12 +150,13 @@ namespace fpsdk {
 
         - Build type: `-DCMAKE_BUILD_TYPE=Debug` or `-DCMAKE_BUILD_TYPE=Release` (default)
         - Force ROS1 package path: `-DROS_PACKAGE_PATH=/path/to/ros` (default: auto-detect)
-        - Explicitly enable or disable testing: `-DBUILD_TESTING=OFF` or `-DBUILD_TESTING=ON`.
+        - Explicitly enable or disable testing: `-DFPSDK_BUILD_TESTING=ON` or `-DFPSDK_BUILD_TESTING=OFF`.
           The default is to automatically enable testing if a suitable GTest library is found.
-          Note that the instead of the standard BUILD_TESTING variable the variable `FPSDK_BUILD_TESTING=...`
-          can be used.
         - Explicitly enable or disable use of the PROJ library: `-DFPSDK_USE_PROJ=ON` or `-DFPSDK_USE_PROJ=OFF`.
-          The default is to automatically use the PROJ library if a suitable version is found
+          The default is to automatically use the PROJ library if a suitable version is found.
+        - Explicitly enable or disable use of the FFmpeg libraries: `-DFPSDK_USE_FFMPEG=ON` or `-DFPSDK_USE_FFMPEG=OFF`.
+          The default is to automatically use the FFmpeg libraries if suitable versions are found.
+        - Add `-DCMAKE_PREFIX_PATH=...` to hint at non-standard installation paths, such as `/path/to/ffmpeg-lgpl`.
 
     4. Build
 

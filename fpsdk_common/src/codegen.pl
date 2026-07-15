@@ -362,6 +362,8 @@ my @RTCM3_MESSAGES =
     { type => 1011,  desc => "L1/L2 GLONASS RTK observables" },
     { type => 1012,  desc => "Extended L1/L2 GLONASS RTK observables" },
     #
+    { type => 1029,  desc => "Unicode text string" },
+    #
     { type => 1030,  desc => "GPS network RTK residual message" },
     { type => 1031,  desc => "GLONASS network RTK residual message" },
     { type => 1032,  desc => "Physical reference station position message" },

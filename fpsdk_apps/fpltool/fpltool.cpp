@@ -52,11 +52,12 @@ int main(int argc, char** argv)
             case FplToolOptions::Command::DUMP:        ok = DoDump(opts);    break;
             case FplToolOptions::Command::META:        ok = DoMeta(opts);    break;
             case FplToolOptions::Command::TRIM:        ok = DoTrim(opts);    break;
-            case FplToolOptions::Command::EXTRACT:     ok = DoExtract(opts); break;
+            case FplToolOptions::Command::EXTRACT:     ok = FplToolExtract(opts).Run(); break;
             // Aliases
             case FplToolOptions::Command::ROSBAG:
                 opts.formats_.push_back(opts.FORMAT_ROS);
-                ok = DoExtract(opts);
+                opts.formats_.push_back(opts.FORMAT_CAM);
+                ok = FplToolExtract(opts).Run();
                 break;
             // Not implemented, invalid
             case FplToolOptions::Command::RECORD:      ok = DoRecord(opts);  break;

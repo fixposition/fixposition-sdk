@@ -145,6 +145,11 @@ bool DoDump(const FplToolOptions& opts)
                 info = filedump.info_;
                 break;
             }
+            case FplType::CAMDATA: {
+                const CamData camdata(log_msg);
+                info = camdata.info_;
+                break;
+            }
             case FplType::BLOB:
             case FplType::UNSPECIFIED:
             case FplType::INT_D:

@@ -3,10 +3,10 @@ message(STATUS "fpsdk: ----- ${CMAKE_CURRENT_SOURCE_DIR} -----")
 
 cmake_minimum_required(VERSION 3.16)
 include(cmake/setup.cmake)
-include(cmake/ros.cmake)
+include(cmake/utils.cmake)
 
 project(fpsdk_common
-    LANGUAGES CXX
+    LANGUAGES CXX C
     VERSION ${FPSDK_VERSION_NUMBER}
     DESCRIPTION "Fixposition SDK: Common Library"
 )
@@ -58,23 +58,8 @@ find_package(nlohmann_json REQUIRED)
 find_package(Threads REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(OpenSSL REQUIRED IMPORTED_TARGET openssl)
-
-# PROJ is optional, unless explicitly requested with -DFPSDK_USE_PROJ=ON
-if(FPSDK_USE_PROJ STREQUAL "ON")
-    find_package(PROJ 9.4 REQUIRED CONFIG)
-    message(STATUS "fpsdk: Using PROJ (${PROJ_VERSION})")
-elseif(FPSDK_USE_PROJ STREQUAL "OFF")
-    message(STATUS "fpsdk: Not using PROJ")
-else()
-    find_package(PROJ 9.4 CONFIG QUIET)
-    if(${PROJ_FOUND})
-        message(STATUS "fpsdk: Using PROJ (${PROJ_VERSION})")
-        set(FP_FPSDK_USE_PROJ ON)
-    else()
-        message(STATUS "fpsdk: No PROJ found")
-        set(FP_FPSDK_USE_PROJ OFF)
-    endif()
-endif()
+fpsdk_find_package_proj()
+fpsdk_find_package_ffmpeg()
 
 if(FPSDK_USE_ROS1)
     fpsdk_cmake_find_ros1_package(std_msgs)
@@ -95,7 +80,7 @@ else()
 endif()
 
 fpsdk_save_versions(FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_versions.txt
-    PACKAGES CMAKE Boost yaml-cpp ZLIB Eigen3 nlohmann_json OpenSSL PROJ)
+    PACKAGES CMAKE Boost yaml-cpp ZLIB Eigen3 nlohmann_json OpenSSL PROJ libavcodec libavutil libavfilter libswscale)
 
 # SHARED LIBRARY =======================================================================================================
 
@@ -106,6 +91,12 @@ if(FPSDK_USE_PROJ)
     target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_PROJ=1)
 else()
     target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_PROJ=0)
+endif()
+
+if(FPSDK_USE_FFMPEG)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_FFMPEG=1)
+else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_FFMPEG=0)
 endif()
 
 target_include_directories(${PROJECT_NAME}
@@ -141,6 +132,10 @@ target_link_libraries(${PROJECT_NAME}
         Threads::Threads
         nlohmann_json::nlohmann_json
         $<$<BOOL:${FPSDK_USE_PROJ}>:PROJ::proj>
+        $<$<BOOL:${FPSDK_USE_FFMPEG}>:PkgConfig::libavcodec>
+        $<$<BOOL:${FPSDK_USE_FFMPEG}>:PkgConfig::libavutil>
+        $<$<BOOL:${FPSDK_USE_FFMPEG}>:PkgConfig::libavfilter>
+        $<$<BOOL:${FPSDK_USE_FFMPEG}>:PkgConfig::libswscale>
 )
 
 set_target_properties(${PROJECT_NAME}
@@ -156,6 +151,7 @@ set(PROJECT_RUNTIME_DIR ${CMAKE_INSTALL_FULL_BINDIR})
 set(PROJECT_LIBRARY_DIR ${CMAKE_INSTALL_FULL_LIBDIR})
 set(PROJECT_INCLUDE_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME})
 set(PROJECT_DATA_DIR    ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME})
+set(PROJECT_DOC_DIR     ${CMAKE_INSTALL_FULL_DOCDIR})
 
 # Headers
 install(DIRECTORY include/${PROJECT_NAME}/
@@ -218,6 +214,14 @@ install(
     DESTINATION lib/pkgconfig
 )
 
+# Documentation
+install(
+    FILES
+        ${PROJECT_SOURCE_DIR}/README.md
+        ${PROJECT_SOURCE_DIR}/LICENSE
+    DESTINATION ${PROJECT_DOC_DIR}
+)
+
 
 # TESTS ================================================================================================================
 
@@ -225,6 +229,7 @@ include(cmake/testing.cmake)
 
 add_gtest(TARGET app_test             SOURCES test/app_test.cpp             LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET can_test             SOURCES test/can_test.cpp             LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET cam_test             SOURCES test/cam_test.cpp             LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET fpl_test             SOURCES test/fpl_test.cpp             LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET logging_test         SOURCES test/logging_test.cpp         LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET gnss_test            SOURCES test/gnss_test.cpp            LINK_LIBS ${PROJECT_NAME})
@@ -250,6 +255,7 @@ add_gtest(TARGET thread_test          SOURCES test/thread_test.cpp          LINK
 add_gtest(TARGET trafo_test           SOURCES test/trafo_test.cpp           LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET types_test           SOURCES test/types_test.cpp           LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET utils_test           SOURCES test/utils_test.cpp           LINK_LIBS ${PROJECT_NAME})
+add_gtest(TARGET video_test           SOURCES test/video_test.cpp           LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET yaml_test            SOURCES test/yaml_test.cpp            LINK_LIBS ${PROJECT_NAME})
 
 # ======================================================================================================================

@@ -10,7 +10,7 @@
  * @file
  * @brief Fixposition SDK: Utilities for apps
  *
- * @page FPSDK_COMMON_APPS Utilities for apps
+ * @page FPSDK_COMMON_APP Utilities for apps
  *
  * **API**: fpsdk_common/app.hpp and fpsdk::common::app
  *

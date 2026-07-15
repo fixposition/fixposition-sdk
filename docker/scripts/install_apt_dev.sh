@@ -43,6 +43,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.trixie      gdb
     noetic.humble.jazzy.trixie      git-lfs
     noetic.humble.jazzy.trixie      htop
+    noetic.humble.jazzy.trixie      imagemagick
     noetic.humble.jazzy.trixie      iproute2
     noetic.humble.jazzy.trixie      iputils-ping
     noetic.humble.jazzy.trixie      less
@@ -77,6 +78,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.trixie      systemd-journal-remote
     noetic.humble.jazzy.trixie      tcpdump
     noetic.humble.jazzy.trixie      tig
+    noetic.humble.jazzy.trixie      va-driver-all
     noetic.humble.jazzy.trixie      valgrind
     noetic.humble.jazzy.trixie      vim
     noetic.humble.jazzy.trixie      wget

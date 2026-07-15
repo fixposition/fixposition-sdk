@@ -45,7 +45,9 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.trixie      libssl-dev
     noetic.humble.jazzy.trixie      libsqlite3-dev
     noetic.humble.jazzy.trixie      libtiff-dev
+    noetic.humble.jazzy.trixie      libva-dev                         # automatically installs va-driver-all?
     noetic.humble.jazzy.trixie      libyaml-cpp-dev
+    noetic.humble.jazzy.trixie      nasm
     noetic.humble.jazzy.trixie      netbase
     noetic.humble.jazzy.trixie      nlohmann-json3-dev
     .......humble.jazzy.trixie      pre-commit

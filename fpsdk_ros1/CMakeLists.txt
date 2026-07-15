@@ -3,7 +3,7 @@ message(STATUS "fpsdk: ----- ${CMAKE_CURRENT_SOURCE_DIR} -----")
 
 cmake_minimum_required(VERSION 3.16)
 include(../fpsdk_common/cmake/setup.cmake)
-include(../fpsdk_common/cmake/ros.cmake)
+include(../fpsdk_common/cmake/utils.cmake)
 
 project(fpsdk_ros1
     LANGUAGES CXX
@@ -86,6 +86,7 @@ set(PROJECT_RUNTIME_DIR ${CMAKE_INSTALL_FULL_BINDIR})
 set(PROJECT_LIBRARY_DIR ${CMAKE_INSTALL_FULL_LIBDIR})
 set(PROJECT_INCLUDE_DIR ${CMAKE_INSTALL_FULL_INCLUDEDIR}/${PROJECT_NAME})
 set(PROJECT_DATA_DIR    ${CMAKE_INSTALL_FULL_DATAROOTDIR}/${PROJECT_NAME})
+set(PROJECT_DOC_DIR     ${CMAKE_INSTALL_FULL_DOCDIR})
 
 # Headers
 install(DIRECTORY include/${PROJECT_NAME}/
@@ -142,6 +143,14 @@ install(
     FILES
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.pc
     DESTINATION lib/pkgconfig
+)
+
+# Documentation
+install(
+    FILES
+        ${PROJECT_SOURCE_DIR}/README.md
+        ${PROJECT_SOURCE_DIR}/LICENSE
+    DESTINATION ${PROJECT_DOC_DIR}
 )
 
 

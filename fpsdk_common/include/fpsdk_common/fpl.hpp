@@ -28,6 +28,7 @@
 /* EXTERNAL */
 
 /* PACKAGE */
+#include "cam.hpp"
 #include "time.hpp"
 
 namespace fpsdk {
@@ -50,6 +51,7 @@ enum class FplType : uint16_t
     STREAMMSG    = 0x0106,  //!< Stream message raw data with timestamp
     LOGSTATUS    = 0x0107,  //!< Logging status
     FILEDUMP     = 0x0108,  //!< Dump of an entire (small) file
+    CAMDATA      = 0x0109,  //!< Camera data (image, video, ...)
     BLOB         = 0xbaad,  //!< Arbitrary data, not FplMessage framing
     INT_D        = 0xffaa,  //!< Fixposition internal use only
     INT_F        = 0xffbb,  //!< Fixposition internal use only
@@ -412,6 +414,51 @@ struct FileDump
     std::string filename_;       //!< Filename
     time::Time mtime_;           //!< File modification time
     std::vector<uint8_t> data_;  //!< File contents
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+/**
+ * @brief Meta data for a FplType::CAMDATA message
+ */
+struct CamDataMeta
+{  // clang-format off
+    uint8_t  cam_id_        = 0;     //!< Camera                  (fpsdk::common::cam::CamId)
+    uint8_t  type_          = 0;     //!< Data type               (fpsdk::common::cam::CamDataType)
+    uint8_t  fmt_           = 0;     //!< Data format             (fpsdk::common::cam::CamDataFmt)
+    uint8_t  frm_           = 0;     //!< Frame type              (fpsdk::common::cam::CamDataFrm)
+    uint8_t  reserved0_[4]  = { 0 }; //!< Reserved for future use, set to 0
+    uint64_t seq_           = 0;     //!< Sequence number
+    uint64_t ts_            = 0;     //!< Camera image time (middle of exposure) [CLOCK_REALTIME ns] (0 = invalid)
+    uint32_t dt_            = 0;     //!< Exposure time (duration) [ns] (0 = not available)
+    uint32_t width_         = 0;     //!< Width of the frame [px]
+    uint32_t height_        = 0;     //!< Height of the fram [px]
+    uint32_t size_          = 0;     //!< Size of the data (see LogMessage)
+    uint64_t rec_time_      = 0;     //!< Recording time [CLOCK_REALTIME ns] (for debugging)
+    uint8_t  reserved1_[16] = { 0 }; //!< Reserved for future use, set to 0
+};  // clang-format on
+
+static_assert(sizeof(CamDataMeta) == 64, "");
+
+/**
+ * @brief Helper for extracting camera data (image, video, ...)
+ */
+struct CamData
+{
+    /**
+     * @brief Constructor
+     *
+     * @param[in]  log_msg  .fpl log message
+     */
+    CamData(const FplMessage& log_msg);
+    bool valid_;                                             //!< Data valid, successfully extracted from message
+    std::string info_;                                       //!< Stringification of (some of the) data, for debugging
+    CamDataMeta meta_;                                       //!< Meta data
+    cam::CamId cam_id_ = cam::CamId::UNSPECIFIED;            //!< = meta_.cam_id_ as enum (if value in range)
+    cam::CamDataType type_ = cam::CamDataType::UNSPECIFIED;  //!< = meta_.type_ as enum (if value in range)
+    cam::CamDataFmt fmt_ = cam::CamDataFmt::UNSPECIFIED;     //!< = meta_.fmt_ as enum (if value in range)
+    cam::CamDataFrm frm_ = cam::CamDataFrm::UNSPECIFIED;     //!< = meta_.frm_ as enum (if value in range)
+    std::vector<uint8_t> data_;                              //!< Data
 };
 
 /* ****************************************************************************************************************** */
