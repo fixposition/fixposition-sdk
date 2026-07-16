@@ -45,16 +45,6 @@ fpsdk_cmake_find_ros1_package(geometry_msgs)
 fpsdk_cmake_find_ros1_package(tf2_msgs)
 fpsdk_cmake_find_ros1_package(nav_msgs)
 fpsdk_cmake_find_ros1_package(topic_tools)
-fpsdk_cmake_find_ros1_package(genmsg)
-
-
-# MESSAGES =============================================================================================================
-
-file(GLOB MSG_FILES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} msg/*.msg)
-
-# /opt/ros/noetic/share/genmsg/cmake/genmsg-extras.cmake
-add_message_files(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} FILES ${MSG_FILES})
-generate_messages(LANGS gencpp genpy) # DEPENDENCIES std_msgs sensor_msgs)
 
 
 # SHARED LIBRARY =======================================================================================================
@@ -62,13 +52,10 @@ generate_messages(LANGS gencpp genpy) # DEPENDENCIES std_msgs sensor_msgs)
 file(GLOB CPP_FILES src/*.cpp)
 add_library(${PROJECT_NAME} SHARED ${CPP_FILES})
 
-add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_messages)
-
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         $<INSTALL_INTERFACE:include>
         $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/../devel/include> # generate_message() puts them here
 )
 
 target_link_libraries(${PROJECT_NAME}
@@ -163,7 +150,6 @@ install(
 include(../fpsdk_common/cmake/testing.cmake)
 
 add_gtest(TARGET bagwriter_test SOURCES test/bagwriter_test.cpp LINK_LIBS ${PROJECT_NAME} ros1::rosconsole ros1::rosbag)
-add_gtest(TARGET msgs_test      SOURCES test/msgs_test.cpp      LINK_LIBS ${PROJECT_NAME} ros1::rosconsole)
 add_gtest(TARGET utils_test     SOURCES test/utils_test.cpp     LINK_LIBS ${PROJECT_NAME} ros1::rosconsole)
 
 

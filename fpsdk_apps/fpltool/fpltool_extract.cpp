@@ -218,10 +218,10 @@ bool DoExtract(const FplToolOptions& opts)
                             !output.WriteStreamMsg(JSONL_NAME, streammsg, parsermsg_helper.GetParserMsg(true))) {
                             ok = false;
                         }
-#if defined(FPSDK_USE_ROS1)  // || defined(FPSDK_USE_ROS2)  // @todo implement for ROS2, s.a. fpltools_utils.hpp
+#if defined(FPSDK_USE_ROS1) || defined(FPSDK_USE_ROS2)
                         if (doRos) {
                             bag.WriteMessage(parsermsg_helper.GetRosMsg(), "/" + streammsg.stream_name_ + "/raw",
-                                streammsg.rec_time_);
+                                parsermsg_helper.GetRosStamp());
                         }
 #endif
                     } else {

@@ -34,9 +34,6 @@
 #include <fpsdk_common/to_json/ros1.hpp>
 #include <fpsdk_common/to_json/time.hpp>
 #include <fpsdk_common/types.hpp>
-#if defined(FPSDK_USE_ROS1)
-#  include <fpsdk_ros1/msgs.hpp>
-#endif
 
 /* PACKAGE */
 #include "fpltool_utils.hpp"
@@ -137,6 +134,9 @@ OutputFile* OutputFileHelper::GetOutputFile(const std::string& name)
 
 ParserMsgHelper::ParserMsgHelper()
 {
+#if defined(FPSDK_USE_ROS1) || defined(FPSDK_USE_ROS2)
+    rosmsg_.layout.dim.resize(1);
+#endif
 }
 ParserMsgHelper::~ParserMsgHelper()
 {
@@ -158,27 +158,16 @@ void ParserMsgHelper::UpdateParserMsg(const common::fpl::StreamMsg& streammsg)
     }
     msg_.seq_ = seq->second++;
 
-#if defined(FPSDK_USE_ROS1)
-    rosmsg_.stamp = { streammsg.rec_time_.sec_, streammsg.rec_time_.nsec_ };
-    rosmsg_.name = msg_.name_;
-    rosmsg_.seq++;
-    rosmsg_.data = msg_.data_;
-    switch (msg_.proto_) {  // clang-format off
-        case Protocol::FP_A:   rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_FP_A;   break;
-        case Protocol::FP_B:   rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_FP_B;   break;
-        case Protocol::NMEA:   rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_NMEA;   break;
-        case Protocol::UBX:    rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_UBX;    break;
-        case Protocol::RTCM3:  rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_RTCM3;  break;
-        case Protocol::UNI_B:  rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_UNI_B;  break;
-        case Protocol::NOV_B:  rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_NOV_B;  break;
-        case Protocol::SPARTN: rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_SPARTN; break;
-        case Protocol::SBF:    rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_SBF;    break;
-        case Protocol::QGC:    rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_QGC;    break;
-        case Protocol::OTHER:
-        default:               rosmsg_.protocol = fpsdk_ros1::ParserMsg::PROTOCOL_OTHER;  break;
-    }  // clang-format on
-#elif defined(FPSDK_USE_ROS2)
-    // @todo implement for ROS2
+#if defined(FPSDK_USE_ROS1) || defined(FPSDK_USE_ROS2)
+    rosmsg_.layout.dim[0].label = msg_.name_;
+    rosmsg_.layout.dim[0].size = msg_.data_.size();
+    rosmsg_.layout.dim[0].stride = msg_.data_.size();
+    rosmsg_.data = { msg_.data_.data(), msg_.data_.data() + msg_.data_.size() };
+#  if defined(FPSDK_USE_ROS1)
+    stamp_ = { streammsg.rec_time_.sec_, streammsg.rec_time_.nsec_ };
+#  else
+    stamp_ = { (int)streammsg.rec_time_.sec_, streammsg.rec_time_.nsec_, RCL_ROS_TIME };
+#  endif
 #endif
 }
 
@@ -189,17 +178,6 @@ const ParserMsg& ParserMsgHelper::GetParserMsg(const bool make_info) const
     }
     return msg_;
 }
-
-#if defined(FPSDK_USE_ROS1)
-const fpsdk_ros1::ParserMsg& ParserMsgHelper::GetRosMsg()
-{
-    msg_.MakeInfo();
-    rosmsg_.info = msg_.info_;
-    return rosmsg_;
-}
-#elif defined(FPSDK_USE_ROS2)
-// @todo implement for ROS2
-#endif
 
 // ---------------------------------------------------------------------------------------------------------------------
 

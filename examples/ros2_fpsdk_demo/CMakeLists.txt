@@ -34,6 +34,11 @@ find_package(std_msgs REQUIRED)
 find_package(fpsdk_common REQUIRED)
 find_package(fpsdk_ros2 REQUIRED)
 find_package(rosbag2_cpp REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(tf2_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+
 
 # include_directories(include ${rclcpp_INCLUDE_DIRS} ${rmw_INCLUDE_DIRS} ${fpsdk_common_INCLUDE_DIRS})
 

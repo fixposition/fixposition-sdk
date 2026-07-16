@@ -37,6 +37,7 @@ endif()
 
 find_package(rclcpp REQUIRED)
 find_package(rosbag2_cpp REQUIRED)
+find_package(std_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(tf2_msgs REQUIRED)
@@ -61,11 +62,18 @@ target_link_libraries(${PROJECT_NAME}
         fpsdk_common
         ${rclcpp_TARGETS}
         ${rosbag2_cpp_TARGETS}
-    PRIVATE
+        ${std_msgs_TARGETS}
         ${sensor_msgs_TARGETS}
         ${geometry_msgs_TARGETS}
         ${tf2_msgs_TARGETS}
         ${nav_msgs_TARGETS}
+        # Shouldn't this work? (see fpsdk_apps/CMakeLists.txt, examples/ros2_fpsdk_demo/CMakeLists.txt)
+        # std_msgs::std_msgs
+        # sensor_msgs::sensor_msgs
+        # geometry_msgs::geometry_msgs
+        # tf2_msgs::tf2_msgs
+        # nav_msgs::nav_msgs
+    PRIVATE
 )
 
 set_target_properties(${PROJECT_NAME}
@@ -146,7 +154,7 @@ include(../fpsdk_common/cmake/testing.cmake)
 
 add_gtest(TARGET bagwriter_test SOURCES test/bagwriter_test.cpp  LINK_LIBS ${PROJECT_NAME} ${rclcpp_TARGETS} ${rosbag2_cpp_TARGETS})
 add_gtest(TARGET utils_test     SOURCES test/utils_test.cpp      LINK_LIBS ${PROJECT_NAME} ${rclcpp_TARGETS})
-add_gtest(TARGET ros1_test      SOURCES test/ros1_test.cpp       LINK_LIBS ${PROJECT_NAME} ${rclcpp_TARGETS} ${nav_msgs_TARGETS} ${sensor_msgs_TARGETS} ${tf2_msgs_TARGETS})
+add_gtest(TARGET ros1_test      SOURCES test/ros1_test.cpp       LINK_LIBS ${PROJECT_NAME} ${rclcpp_TARGETS} ${nav_msgs_TARGETS} ${sensor_msgs_TARGETS} ${tf2_msgs_TARGETS} ${std_msgs_TARGETS})
 
 
 # ======================================================================================================================
