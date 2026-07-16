@@ -10,6 +10,7 @@
 #include <sensor_msgs/msg/image.hpp>
 #include <sensor_msgs/msg/imu.hpp>
 #include <sensor_msgs/msg/temperature.hpp>
+#include <std_msgs/msg/byte_multi_array.hpp>
 #include <tf2_msgs/msg/tf_message.hpp>
 
 #pragma GCC diagnostic pop

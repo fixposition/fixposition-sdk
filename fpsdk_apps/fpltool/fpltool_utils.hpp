@@ -20,15 +20,18 @@
 
 /* EXTERNAL */
 #include <nlohmann/json.hpp>
+#if defined(FPSDK_USE_ROS1)
+#  include <fpsdk_ros1/ext/ros_msgs.hpp>
+#elif defined(FPSDK_USE_ROS2)
+#  include <fpsdk_ros2/ext/msgs.hpp>
+#  include <fpsdk_ros2/ext/rclcpp.hpp>
+#endif
 
 /* Fixposition SDK */
 #include <fpsdk_common/fpl.hpp>
 #include <fpsdk_common/parser.hpp>
 #include <fpsdk_common/path.hpp>
 #include <fpsdk_common/time.hpp>
-#if defined(FPSDK_USE_ROS1)
-#  include <fpsdk_ros1/msgs.hpp>
-#endif
 
 /* PACKAGE */
 #include "fpltool_opts.hpp"
@@ -66,16 +69,36 @@ class ParserMsgHelper
     ~ParserMsgHelper();
     void UpdateParserMsg(const common::fpl::StreamMsg& streammsg);
     const common::parser::ParserMsg& GetParserMsg(const bool make_info = false) const;
-#if defined(FPSDK_USE_ROS1)  // || defined(FPSDK_USE_ROS2)  // @todo implement for ROS2
-    const fpsdk_ros1::ParserMsg& GetRosMsg();
+#if defined(FPSDK_USE_ROS1)
+    const std_msgs::ByteMultiArray& GetRosMsg() const
+    {
+        return rosmsg_;
+    }
+    const ros::Time& GetRosStamp() const
+    {
+        return stamp_;
+    }
+#elif defined(FPSDK_USE_ROS2)
+    const std_msgs::msg::ByteMultiArray& GetRosMsg() const
+    {
+        return rosmsg_;
+    }
+    const rclcpp::Time& GetRosStamp() const
+    {
+        return stamp_;
+    }
 #endif
 
    private:
     common::parser::Parser parser_;
     common::parser::ParserMsg msg_;
     std::map<std::string, uint64_t> seq_;
-#if defined(FPSDK_USE_ROS1)  // || defined(FPSDK_USE_ROS2)  // @todo implement for ROS2
-    fpsdk_ros1::ParserMsg rosmsg_;
+#if defined(FPSDK_USE_ROS1)
+    std_msgs::ByteMultiArray rosmsg_;
+    ros::Time stamp_;
+#elif defined(FPSDK_USE_ROS2)
+    std_msgs::msg::ByteMultiArray rosmsg_;
+    rclcpp::Time stamp_;
 #endif
 };
 
