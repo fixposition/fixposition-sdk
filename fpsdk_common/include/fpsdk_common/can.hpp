@@ -12,7 +12,7 @@
  *
  * @page FPSDK_COMMON_CAN CAN bus utilities
  *
- * **API**: fpsdk_common/can.hpp and fpsdk::common::utils
+ * **API**: fpsdk_common/can.hpp and fpsdk::common::can
  *
  * @section FPSDK_COMMON_CAN_FRAMES CAN frames (messages)
  *

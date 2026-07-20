@@ -172,6 +172,7 @@ bool DoTrim(const FplToolOptions& opts)
                 break;
             }
             case FplType::STREAMMSG:
+            case FplType::CAMDATA:
             case FplType::INT_X:
                 if (use1) {
                     if (fpl.Write(log_msg.Raw())) {

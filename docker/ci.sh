@@ -233,7 +233,7 @@ function build_toplevel_release_noros_mindeps
     cmake -B build/${buildname} -S . \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release \
-        -DFPSDK_USE_PROJ=OFF || return 1
+        -DFPSDK_USE_PROJ=OFF -DFPSDK_USE_FFMPEG=OFF || return 1
     cmake --build build/${buildname} ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname} || return 1
 
@@ -253,7 +253,7 @@ function build_projs_release_noros_mindeps
     cmake -B build/${buildname}/fpsdk_common -S fpsdk_common \
         -DCMAKE_INSTALL_PREFIX=install/${buildname} \
         -DCMAKE_BUILD_TYPE=Release \
-        -DFPSDK_USE_PROJ=OFF || return 1
+        -DFPSDK_USE_PROJ=OFF -DFPSDK_USE_FFMPEG=OFF || return 1
     cmake --build build/${buildname}/fpsdk_common ${CMAKE_BUILD_ARGS} || return 1
     cmake --install build/${buildname}/fpsdk_common || return 1
 

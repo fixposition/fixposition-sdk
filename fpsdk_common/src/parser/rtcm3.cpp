@@ -44,7 +44,7 @@ struct MsgInfo
 
 // clang-format off
 // @fp_codegen_begin{FPSDK_COMMON_PARSER_RTCM3_MSGINFO}
-static constexpr std::array<MsgInfo, 119> MSG_INFO =
+static constexpr std::array<MsgInfo, 120> MSG_INFO =
 {{
     { RTCM3_TYPE1001_MSGID, 0, RTCM3_TYPE1001_STRID, "L1-only GPS RTK observables" },
     { RTCM3_TYPE1002_MSGID, 0, RTCM3_TYPE1002_STRID, "Extended L1-only GPS RTK observables" },
@@ -58,6 +58,7 @@ static constexpr std::array<MsgInfo, 119> MSG_INFO =
     { RTCM3_TYPE1010_MSGID, 0, RTCM3_TYPE1010_STRID, "Extended L1-only GLONASS RTK observables" },
     { RTCM3_TYPE1011_MSGID, 0, RTCM3_TYPE1011_STRID, "L1/L2 GLONASS RTK observables" },
     { RTCM3_TYPE1012_MSGID, 0, RTCM3_TYPE1012_STRID, "Extended L1/L2 GLONASS RTK observables" },
+    { RTCM3_TYPE1029_MSGID, 0, RTCM3_TYPE1029_STRID, "Unicode text string" },
     { RTCM3_TYPE1030_MSGID, 0, RTCM3_TYPE1030_STRID, "GPS network RTK residual message" },
     { RTCM3_TYPE1031_MSGID, 0, RTCM3_TYPE1031_STRID, "GLONASS network RTK residual message" },
     { RTCM3_TYPE1032_MSGID, 0, RTCM3_TYPE1032_STRID, "Physical reference station position message" },
@@ -319,9 +320,9 @@ const char* Rtcm3MsmGnssStr(const Rtcm3MsmGnss gnss)
     return "?";
 }
 
-const char* Rtcm3MsmTypeStr(const Rtcm3MsmType gnss)
+const char* Rtcm3MsmTypeStr(const Rtcm3MsmType msm)
 {
-    switch (gnss) {  // clang-format off
+    switch (msm) {  // clang-format off
         case Rtcm3MsmType::MSM1: return "MSM1";
         case Rtcm3MsmType::MSM2: return "MSM2";
         case Rtcm3MsmType::MSM3: return "MSM3";
@@ -542,7 +543,23 @@ bool Rtcm3GetMessageInfo(char* info, const std::size_t size, const uint8_t* msg,
             msm.num_cell_, msm.multi_msg_bit_ ? "more" : "last", exp_size);
     }
 
-    const char* type_desc = Rtcm3GetTypeDesc(Rtcm3Type(msg));
+    const uint16_t type = Rtcm3Type(msg);
+    const uint8_t* data = &msg[RTCM3_HEAD_SIZE];
+
+    if (type == RTCM3_TYPE1029_MSGID) {  // clang-format off
+        const uint16_t sta = Rtcm3GetUnsigned(data,  12, 12);  // DF003
+        const uint16_t mjd = Rtcm3GetUnsigned(data,  24, 16);  // DF051
+        const uint32_t sod = Rtcm3GetUnsigned(data,  40, 17);  // DF052
+        const uint8_t  nu  = Rtcm3GetUnsigned(data,  64,  8);  // DF139
+        // clang-format off
+        char str[1000];
+        const auto sl = std::min<std::size_t>({nu, msg_size - RTCM3_FRAME_SIZE - (72 / 8), sizeof(str) - 1});
+        std::memcpy(str, &msg[RTCM3_HEAD_SIZE + (72 / 8)], sl);
+        str[sl] = '\0';
+        len += snprintf(info, size, "(#%" PRIu16 ") %" PRIu16 ":%06" PRIu32 " %s", sta, mjd, sod, str);
+    }
+
+    const char* type_desc = Rtcm3GetTypeDesc(type);
     if ((len == 0) && (len < size) && (type_desc != NULL)) {
         len += snprintf(&info[len], size - len, "%s%s", len > 0 ? " - " : "", type_desc);
     }

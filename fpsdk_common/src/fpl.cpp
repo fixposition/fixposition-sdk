@@ -45,6 +45,7 @@ const char* FplTypeStr(const FplType type)
         case FplType::STREAMMSG:   return "STREAMMSG";
         case FplType::LOGSTATUS:   return "LOGSTATUS";
         case FplType::FILEDUMP:    return "FILEDUMP";
+        case FplType::CAMDATA:     return "CAMDATA";
         case FplType::BLOB:        return "BLOB";
         case FplType::INT_D:       return "INT_D";
         case FplType::INT_F:       return "INT_F";
@@ -121,6 +122,7 @@ int FplMessage::Parse(const uint8_t* data, const uint32_t size)
         case FplType::STREAMMSG:
         case FplType::LOGSTATUS:
         case FplType::FILEDUMP:
+        case FplType::CAMDATA:
             payload_type_ = (FplType)payload_type;
             break;
         case FplType::BLOB:
@@ -689,7 +691,46 @@ FileDump::FileDump(const FplMessage& log_msg)
         info_ = string::Sprintf(
             "filename=%s size=%" PRIuMAX " mtime=%s", filename_.c_str(), data_.size(), mtime_.StrUtcTime(0).c_str());
     } else {
-        WARNING("LogFileDump: invalid message");
+        WARNING("FileDump: invalid message");
+        info_ = "<invalid>";
+    }
+    valid_ = ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+CamData::CamData(const FplMessage& log_msg)
+{
+    bool ok = true;
+    if (log_msg.PayloadType() == FplType::CAMDATA) {
+        const uint8_t* payload = log_msg.PayloadData();
+        const uint32_t payload_size = log_msg.PayloadSize();
+
+        if (payload_size >= sizeof(meta_)) {
+            std::memcpy(&meta_, payload, sizeof(meta_));
+        } else {
+            ok = false;
+        }
+
+        if (ok && (payload_size >= (sizeof(meta_) + meta_.size_))) {
+            data_ = { &payload[sizeof(meta_)], &payload[sizeof(meta_)] + meta_.size_ };
+        } else {
+            ok = false;
+        }
+    } else {
+        ok = false;
+    }
+    if (ok) {
+        cam_id_ = CamIdFromValOr(meta_.cam_id_, cam::CamId::UNSPECIFIED);
+        type_ = CamDataTypeFromValOr(meta_.type_, cam::CamDataType::UNSPECIFIED);
+        fmt_ = CamDataFmtFromValOr(meta_.fmt_, cam::CamDataFmt::UNSPECIFIED);
+        frm_ = CamDataFrmFromValOr(meta_.frm_, cam::CamDataFrm::UNSPECIFIED);
+        info_ = string::Sprintf("rec_time=%.3f cam_id=%s type=%s fmt=%s frm=%s %" PRIu32 "x%" PRIu32 " seq=%" PRIuMAX
+                                " ts=%.3f size=%" PRIuMAX,
+            (double)meta_.rec_time_ * 1e-9, CamIdToStr(cam_id_), CamDataTypeToStr(type_), CamDataFmtToStr(fmt_),
+            CamDataFrmToStr(frm_), meta_.width_, meta_.height_, meta_.seq_, (double)meta_.ts_ * 1e-9, data_.size());
+    } else {
+        WARNING("CamData: invalid message");
         info_ = "<invalid>";
     }
     valid_ = ok;

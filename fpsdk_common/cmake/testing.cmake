@@ -1,42 +1,30 @@
-# Override the standard BUILD_TESTING variable
-if (DEFINED FPSDK_BUILD_TESTING)
-    message(STATUS "fpsdk: FPSDK_BUILD_TESTING=${FPSDK_BUILD_TESTING}")
-    set(BUILD_TESTING ${FPSDK_BUILD_TESTING})
-endif()
-
-# User requested to build testing (-DBUILD_TESTING=ON), abort if no suitable version available
-if (BUILD_TESTING STREQUAL "ON")
-
-    find_package(GTest 1.12.0 REQUIRED)
+# Explicitly requested by user to build tests (-DFPSDK_BUILD_TESTING=ON)
+if(FPSDK_BUILD_TESTING STREQUAL "ON")
+    find_package(GTest 1.11.0 REQUIRED)
     # GTest doesn't seem to have a normal cmake config file, so we have to check and abort ourselves.. :-/
     if ("${GTest_VERSION}" STREQUAL "")
         message(FATAL_ERROR "Unsupported GTest version")
     endif()
-    message(STATUS "fpsdk: Using GTest (${GTest_VERSION})")
-    set(BUILD_TESTING ON)
 
-# User requested no testing (-DBUILD_TESTING=OFF)
-elseif(BUILD_TESTING STREQUAL "OFF")
+    # Explicitly requested by user to not build tests (-DFPSDK_BUILD_TESTING=OFF)
+elseif(FPSDK_BUILD_TESTING STREQUAL "OFF")
+    message(STATUS "fpsdk: Not using gtest")
 
-    message(STATUS "fpsdk: testing disabled")
-    set(BUILD_TESTING OFF)
-
-# Automatically detect if a suitable GTest library is available
+    # Automatic, build tests if a suitable version of gtest is available (-DFPSDK_BUILD_TESTING=)
 else()
-
-    find_package(GTest 1.12.0 QUIET)
+    find_package(GTest 1.11.0 QUIET)
     if ("${GTest_VERSION}" STREQUAL "")
-        message(STATUS "fpsdk: No GTest found, disable testing")
-        set(BUILD_TESTING OFF)
+        set(FPSDK_BUILD_TESTING OFF)
+        message(STATUS "fpsdk: No gtest found")
     else()
-        message(STATUS "fpsdk: Using GTest (${GTest_VERSION})")
-        set(BUILD_TESTING ON)
+        set(FPSDK_BUILD_TESTING ON)
     endif()
-
 endif()
 
+# Setup testing stuff
+if(FPSDK_BUILD_TESTING)
+    message(STATUS "fpsdk: Using gtest (${GTest_VERSION})")
 
-if(BUILD_TESTING)
     # Make unique test executable names across projects
     set(GTEST_PREFIX "${PROJECT_NAME}")
     enable_testing()
@@ -71,6 +59,7 @@ if(BUILD_TESTING)
         endmacro()
 
 else()
+    set(BUILD_TESTING OFF)
 
     macro(add_gtest)
         # nothing...

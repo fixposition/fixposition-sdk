@@ -25,6 +25,7 @@
 #include <fpsdk_common/app.hpp>
 #include <fpsdk_common/logging.hpp>
 #include <fpsdk_common/string.hpp>
+#include <fpsdk_common/video.hpp>
 
 /* PACKAGE */
 
@@ -49,7 +50,10 @@ class FplToolOptions : public common::app::ProgramOptions
             { 'c', false, "compress"    },
             { 'S', true,  "skip"        },
             { 'D', true,  "duration"    },
-            { 'e', true,  "formats"     } }) {};  // clang-format on
+            { 'e', true,  "formats"     },
+            { 's', true,  "scale"       },
+            { 't', true,  "pixelfmt"    },
+        }) {};  // clang-format on
 
     /**
      * @brief Commands, modes of operation
@@ -77,12 +81,17 @@ class FplToolOptions : public common::app::ProgramOptions
     uint32_t                  skip_      = 0;                     //!< Skip start [sec]
     uint32_t                  duration_  = 0;                     //!< Duration [sec]
     std::vector<std::string>  formats_;                           //!< List of output formats for extraction
+#if FPSDK_USE_FFMPEG
+    double                    scale_     = 1.0;                   //!< Scale factor for decoded video frames
+    common::video::PixelFmt   pixelfmt_  = common::video::PixelFmt::RGB24; //!< Pixel format for decoded video frames
+#endif
     // clang-format on
 
     static constexpr const char* FORMAT_JSONL = "jsonl";
     static constexpr const char* FORMAT_RAW = "raw";
     static constexpr const char* FORMAT_FILE = "file";
     static constexpr const char* FORMAT_ROS = "ros";
+    static constexpr const char* FORMAT_CAM = "cam";
 
     void PrintHelp() override final
     {
@@ -109,6 +118,8 @@ class FplToolOptions : public common::app::ProgramOptions
             "    -S, --skip <sec>      -- Skip <sec> seconds from start of log (default: 0, i.e. no skip)\n"
             "    -D, --duration <sec>  -- Process <sec> seconds of log (default: everything)\n"
             "    -e, --formats <fmts>  -- Comma-separated list of output formats for the extract <command> (default: all)\n"
+            "    -s, --scale <fact>    -- Scale factor for decoded video frames: 0.1 - 1.0 (default: 1.0)\n"
+            "    -t, --pixelfmt <fmt>  -- Pixel format for decoded video frames: Y8, RGB24, GBRP (default: RGB24)\n"
             "    <command>             -- The command, see below\n"
             "    <fpl-file>            -- The .fpl (or .fpl.gz) file to process\n"
             "    \n"
@@ -140,11 +151,11 @@ class FplToolOptions : public common::app::ProgramOptions
             "\n"
             "    rosbag -- Extract (some of) the data to a ROS bag\n"
             "\n"
-            "        This is an alias of 'extract -e ros'. See that for details.\n"
+            "        This is an alias of 'extract -e ros,cam'. See that for details.\n"
             "\n"
             "    extract -- Extract the data in a .fpl file\n"
             "\n"
-            "        fpltool [-vqpPfocSD] [-e <fmts>] extract <fpl-file>\n"
+            "        fpltool [-vqpPfocSDst] [-e <fmts>] extract <fpl-file>\n"
             "\n"
             "        The data is extracted to different files in the current directory. The files are named like the\n"
             "        <fpl-file> with added suffixes and different file extension, depending on the kind of data that\n"
@@ -152,18 +163,23 @@ class FplToolOptions : public common::app::ProgramOptions
             "        list of formats in <fmts> to limit to some formats. The available output data formats are:\n"
             "\n"
             "        jsonl  -- All data in JSONL format (see below)\n"
-            "        raw    -- Stream messages (I/O messages, raw messages from GNSS receiver, ...)\n"
+            "        raw    -- Stream messages (I/O messages, raw messages from GNSS receiver, raw camera data, ...)\n"
             "        file   -- Recorded files (configuration, ...)\n"
             "        ros    -- ROS data extracted to a ROS bag. This option is only available when compiled with ROS\n"
             "                  (1 or 2) support (see output of 'fpltool -V' to check what your version is). For ROS1\n"
-            "                  the standard .bag file format is used. For ROS2 the standard sqlite3 format is used,\n"
-            "                  unless compression is used, in which case the mcap format is used.\n"
+            "                  the standard .bag file format is used. For ROS2 the standard sqlite3 or, with compression,\n"
+            "                  mcap format is used.\n"
+            "        cam    -- Camera data, such as encoded video frames (for example, from PBx-A1). With 'ros' and if\n"
+            "                  compiled with FFmpeg support (see 'fpltool -V' to check what your version is) encoded\n"
+            "                  video is decoded and stored as image to the ROS bag. In this case the mapping of the\n"
+            "                  --pixelfmt to ROS image encoding is: RGB24 -> rgb8, Y8 -> mono8, GBRP -> 8UC3.\n"
             "\n"
             "        The jsonl format consists of one JSON object per line. Depending on the data different fields are\n"
             "        available. The fields starting with a '_' (_type, ...) should always be present. The fields not\n"
             "        starting with a '_' are decoded values. What values can be decoded depends on the data in question,\n"
-            "        the sensor configuration and software version, and the fpltool support for the data. Typically,\n"
-            "        the following kind of JSON objects can be found in the exacted .jsonl file:\n"
+            "        the sensor configuration and software version, and the fpltool support for the data. Note that the\n"
+            "        order of records is the order in the recording (the .fpl file). The data is not ordered by data\n"
+            "        timestamp. Typically, the following kind of JSON objects can be found in the exacted .jsonl file:\n"
             "        \n"
             "        Log meta data: { \"_type\": \"LOGMETA\", \"_yaml\": \"...\", ... }\n"
             "\n"
@@ -182,8 +198,7 @@ class FplToolOptions : public common::app::ProgramOptions
             "            the decoded fields.\n"
             "\n"
             "        Stream messages: { \"_type\": \"STREAMMSG\", \"_stream\": \"...\", \"_stamp\": ..., \"_raw\": \"...\",\n"
-            "                           \"_raw_b64\": \"...\", \"_proto\": \"...\", \"_name\": \"...\", \"_seq\": ...,\n"
-            "                           \"_valid\": ..., ... } \n"
+            "            \"_raw_b64\": \"...\", \"_proto\": \"...\", \"_name\": \"...\", \"_seq\": ..., \"_valid\": ..., ... }\n"
             "\n"
             "            Where _stream is the stream name (userio, gnss1, ...), _stamp is the recording (!) timestamp,\n"
             "            _raw or _raw_b64 is the raw message data (_raw if data is non-binary, _raw_b64 = base64 encoded\n"
@@ -194,10 +209,20 @@ class FplToolOptions : public common::app::ProgramOptions
             "            decoded fields.\n"
             "\n"
             "        Files: { \"_type\": \"FILEDUMP\", \"_filename\": \"...\", \"_mtime\": \"...\", \"_stamp\": ...,\n"
-            "                 \"_data\": \"...\", \"_data_b64\": \"...\" } \n"
+            "            \"_data\": \"...\", \"_data_b64\": \"...\" } \n"
             "\n"
             "            Where _filename is the filename of the file, _mtime its last modification time and _data or\n"
             "            or _data_b64 is the file contents (_data if it is non-binary, _data_b64 = base64 encoded data).\n"
+            "\n"
+            "        Camera data: { \"_type\": \"CAMDATA\", \"cam_id\": \"...\", \"type\": \"...\", \"fmt\": \"...\",\n"
+            "            \"frm\": \"...\", \"height\": ..., \"seq\": ..., \"ts\": ... \"dt\": ..., \"data_b64\": \"...\" }\n"
+            "\n"
+            "            Where cam_id is the camera ID ('CAM1', ...), type is the data type (HIRES_VID, ...), fmt is the\n"
+            "            data format (H265_NAL, ...), frm is the frame type (I_FRAME, P_FRAME, ...), height and width are\n"
+            "            the image dimensions, seq is the sequence number (independent from other cameras), ts is the\n"
+            "            middle of exposure timestamps [ns] and dt is the exposure duration [ns]. The camera data (encoded\n"
+            "            video frame) is in data as base64 encoded string. This is only available on some products (for\n"
+            "            example, PBx-A1).\n"
             "\n"
             "Examples:\n"
             "\n"
@@ -211,14 +236,15 @@ class FplToolOptions : public common::app::ProgramOptions
             "\n"
             "    Extract all data from a .fpl file:\n"
             "\n"
-            "        fpltool extract some.fpl"
+            "        fpltool extract some.fpl\n"
             "\n"
             "    Create a ROS some.bag file (ROS1) resp. some_bag directory (ROS2) from a .fpl file:\n"
             "\n"
             "        fpltool extract -e ros some.fpl\n"
             "        fpltool robag some.fpl                  # shortcut\n"
             "\n"
-            "    Create a compressed another.bag (res. another_bag) with 2 minutes of data starting 60 seconds into some.fpl:\n"
+            "    Create a compressed another.bag (ROS1, another_bag/ for ROS2) with 2 minutes of data starting 60 seconds\n"
+            "    into some.fpl:\n"
             "\n"
             "        fpltool rosbag some.fpl -c -c -o another.bag -S 60 -D 120\n"
             "\n"
@@ -227,6 +253,11 @@ class FplToolOptions : public common::app::ProgramOptions
             "        rosbag info some.bag             # ROS 1\n"
             "        ros2 bag info some_bag           # ROS 2 (default, see above)\n"
             "        mcap info some_bag/some.mcap     # ROS 2 (with compression, see above)\n"
+            "\n"
+            "    Create a ROS bag, convert encoded video (e.g. from PBx-A1 sensor) to greyscale images of half size:\n"
+            "\n"
+            "        fpltool extract -e ros,cam some.fpl -s 0.5 -t Y8\n"
+            "        fpltool robag some.fpl -s 0.5 -t Y8               # shortcut\n"
             "\n"
             "    Check what is in some_userio.raw obtained by 'extract some.fpl':\n"
             "\n"
@@ -305,6 +336,19 @@ class FplToolOptions : public common::app::ProgramOptions
                 formats_ = common::string::StrSplit(argument, ",");
                 break;
             }
+#if FPSDK_USE_FFMPEG
+            case 's':
+                if (!common::string::StrToValue(argument, scale_) || (scale_ < 0.1) || (scale_ > 1.0)) {
+                    ok = false;
+                }
+                break;
+            case 't':
+                pixelfmt_ = PixelFmtFromStrOr(argument.c_str(), common::video::PixelFmt::UNSPECIFIED);
+                if (pixelfmt_ == common::video::PixelFmt::UNSPECIFIED) {
+                    ok = false;
+                }
+                break;
+#endif
             default:
                 ok = false;
                 break;
@@ -359,7 +403,10 @@ class FplToolOptions : public common::app::ProgramOptions
         DEBUG("skip          = %d", skip_);
         DEBUG("duration      = %d", duration_);
         DEBUG("formats       = %s", common::string::StrJoin(formats_, " ").c_str());
-
+#if FPSDK_USE_FFMPEG
+        DEBUG("scale         = %.1f", scale_);
+        DEBUG("pixelfmt      = %s", common::video::PixelFmtToStr(pixelfmt_));
+#endif
         return ok;
     }
 

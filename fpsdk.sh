@@ -172,15 +172,21 @@ function main
     local args="${docker_args}"
     # - single-use container, no funny network
     args="${args} --rm --network host"
-    # - connect stdin
-    args="${args} --interactive"
+    # - connect stdin, create tty
+    args="${args} --interactive --tty"
     # - Mount current directory as /data and run command inside docker from there
     args="${args} --volume ${PWD}:/data --workdir /data"
     # - Additional mounts
     args="${args} ${volume_args}"
     # - Set user, mount passwd and group file
     args="${args} --user $(id -u):$(id -g) --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro"
-
+    # - Allow FFmpeg vaapi access on some systems. Note: this doesn't work with "-i noetic" (Ubuntu 20).
+    #   Related: https://github.com/joedefen/ffmpeg-vaapi-docker
+    if [ -r /dev/dri ]; then
+        args="${args} --device=/dev/dri"
+        rendergid=$(awk -F: '/^render:/ { print $3 }' /etc/group)
+        args="${args} --group-add ${rendergid}"
+    fi
 
     [ ${DEBUG} -gt 0 ] && set -x
     if ! docker run ${args} ${image} "$@"; then

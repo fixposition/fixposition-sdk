@@ -10,6 +10,8 @@ BUILD_TYPE     = Debug
 INSTALL_PREFIX = fpsdk
 BUILD_TESTING  =
 VERBOSE        = 0
+USE_PROJ       =
+USE_FFMPEG     =
 
 # User vars
 -include config.mk
@@ -26,13 +28,13 @@ else ifeq ($(ROS_VERSION),2)
 endif
 
 # A unique ID for this exact config we're using
-configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING) $(FPSDK_VERSION_STRING) $(CC) $(CXX) $$(uname -a)" | md5sum | cut -d " " -f1)
+configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING) $(USE_PROJ) $(USE_FFMPEG) $(FPSDK_VERSION_STRING) $(CC) $(CXX) $$(uname -a)" | md5sum | cut -d " " -f1)
 
 .PHONY: help
 help:
 	@echo "Usage:"
 	@echo
-	@echo "    make <target> [INSTALL_PREFIX=...] [BUILD_TYPE=Debug|Release] [BUILD_TESTING=|ON|OFF] [FPSDK_VERSION_STRING=x.x.x-gggggggg] [VERBOSE=1]"
+	@echo "    make <target> [INSTALL_PREFIX=...] [BUILD_TYPE=Debug|Release] [BUILD_TESTING=|ON|OFF] [USE_PROJ=|ON|OFF] [USE_FFMPEG=|ON|OFF] [FPSDK_VERSION_STRING=x.x.x-gggggggg] [VERBOSE=1]"
 	@echo
 	@echo "Where possible <target>s are:"
 	@echo
@@ -57,6 +59,7 @@ help:
 	@echo "- All <target>s but 'clean' and 'pre-commit' require that the same command-line variables are passed"
 	@echo "- Command-line variables can be stored into a config.mk file, which is automatically loaded"
 	@echo "- 'make ci' runs the CI (more or less) like on Github. INSTALL_PREFIX and BUILD_TYPE have no effect here."
+	@echo "- For more control, such as disabling features, use cmake instead of this Makefile"
 	@echo
 
 ########################################################################################################################
@@ -125,7 +128,13 @@ ifneq ($(ROS_PACKAGE_PATH),)
   CMAKE_ARGS += -DROS_PACKAGE_PATH=$(ROS_PACKAGE_PATH)
 endif
 ifneq ($(BUILD_TESTING),)
-  CMAKE_ARGS += -DBUILD_TESTING=$(BUILD_TESTING)
+  CMAKE_ARGS += -DFPSDK_BUILD_TESTING=$(BUILD_TESTING)
+endif
+ifneq ($(USE_PROJ),)
+  CMAKE_ARGS += -DFPSDK_USE_PROJ=$(USE_PROJ)
+endif
+ifneq ($(USE_FFMPEG),)
+  CMAKE_ARGS += -DFPSDK_USE_FFMPEG=$(USE_FFMPEG)
 endif
 ifneq ($(FPSDK_VERSION_STRING),)
   CMAKE_ARGS += -DVERSION_STRING=$(FPSDK_VERSION_STRING)
@@ -166,26 +175,10 @@ distclean:
 $(BUILD_DIR):
 	$(V)$(MKDIR) -p $@
 
-# Detect changed build config
-ifneq ($(MAKECMDGOALS),)
-ifneq ($(MAKECMDGOALS),help)
-ifneq ($(MAKECMDGOALS),pre-commit)
-ifneq ($(MAKECMDGOALS),ci)
-ifneq ($(MAKECMDGOALS),distclean)
-ifneq ($(MAKECMDGOALS),doc)
-builddiruid=$(shell $(CAT) $(BUILD_DIR)/.make-uid 2>/dev/null || echo "none")
-ifneq ($(builddiruid),$(configuid))
-    dummy=$(shell $(RM) -f $(BUILD_DIR)/.make-uid)
-endif
-endif
-endif
-endif
-endif
-endif
-endif
-
-$(BUILD_DIR)/.make-uid: | $(BUILD_DIR)
-	$(V)$(ECHO) $(configuid) > $@
+$(BUILD_DIR)/.make-configuid-$(configuid): | $(BUILD_DIR)
+	@echo "Build config changed"
+	$(V)$(RM) -vf $(BUILD_DIR)/.make-configuid-*
+	$(V)$(TOUCH) $@
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -194,7 +187,7 @@ cmake: $(BUILD_DIR)/.make-cmake
 
 deps_cmake := Makefile $(wildcard config.mk) $(wildcard $(sort $(wildcard CMakeLists.txt */CMakeLists.txt */cmake/*)))
 
-$(BUILD_DIR)/.make-cmake: $(deps_cmake) $(BUILD_DIR)/.make-uid
+$(BUILD_DIR)/.make-cmake: $(deps_cmake) $(BUILD_DIR)/.make-configuid-$(configuid)
 	@echo "$(HLW)***** Configure ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)$(CMAKE) -B $(BUILD_DIR) $(CMAKE_ARGS)
 	$(V)$(TOUCH) $@
@@ -210,7 +203,7 @@ deps_build = $(sort $(wildcard fpsdk.sh fpsdk_doc/* \
 .PHONY: build
 build: $(BUILD_DIR)/.make-build
 
-$(BUILD_DIR)/.make-build: $(deps_build) $(BUILD_DIR)/.make-cmake $(BUILD_DIR)/.make-uid
+$(BUILD_DIR)/.make-build: $(deps_build) $(BUILD_DIR)/.make-cmake
 	@echo "$(HLW)***** Build ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)$(NICE_BUILD) $(CMAKE) --build $(BUILD_DIR) $(CMAKE_ARGS_BUILD) -- -k
 	$(V)$(TOUCH) $@

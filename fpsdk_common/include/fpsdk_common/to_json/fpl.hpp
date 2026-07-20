@@ -19,6 +19,7 @@
 #include <nlohmann/json.hpp>
 
 /* PACKAGE */
+#include "../cam.hpp"
 #include "../fpl.hpp"
 #include "../string.hpp"
 #include "time.hpp"
@@ -82,9 +83,9 @@ inline void to_json(nlohmann::json& j, const StreamMsg& m)
 
     if (std::all_of(m.msg_data_.data(), m.msg_data_.data() + m.msg_data_.size(),
             [](const uint8_t c) { return std::isprint(c) || std::isspace(c); })) {
-        j["_raw"] = string::BufToStr(m.msg_data_);
+        j["_data"] = string::BufToStr(m.msg_data_);
     } else {
-        j["_raw_b64"] = string::Base64Enc(m.msg_data_);
+        j["_data_b64"] = string::Base64Enc(m.msg_data_);
     }
 }
 
@@ -104,6 +105,25 @@ inline void to_json(nlohmann::json& j, const FileDump& m)
     } else {
         j["_data_b64"] = string::Base64Enc(m.data_);
     }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+inline void to_json(nlohmann::json& j, const CamData& m)
+{
+    j = nlohmann::json::object({
+        { "_type", FplTypeStr(FplType::CAMDATA) },
+        { "cam_id", cam::CamIdToStr(m.cam_id_) },
+        { "type", cam::CamDataTypeToStr(m.type_) },
+        { "fmt", cam::CamDataFmtToStr(m.fmt_) },
+        { "frm", cam::CamDataFrmToStr(m.frm_) },
+        { "seq", m.meta_.seq_ },
+        { "ts", m.meta_.ts_ },
+        { "dt", m.meta_.dt_ },
+        { "width", m.meta_.width_ },
+        { "height", m.meta_.height_ },
+        { "data_b64", string::Base64Enc(m.data_) },
+    });
 }
 
 }  // namespace fpsdk::common::fpl

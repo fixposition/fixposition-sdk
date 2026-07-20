@@ -8,27 +8,25 @@
 #
 ########################################################################################################################
 #
-# Install stuff for the *-ci images (CI)
+# Download, build nasm
 #
 ########################################################################################################################
 set -eEu
 
-# List of packages, with filter for the different images we make
-packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
-    noetic.humble.jazzy.trixie      rsync
-    noetic.humble.jazzy.trixie      va-driver-all
-    noetic.humble.jazzy.trixie      vainfo
-EOF
-)
 
-echo "Installing: ${packages}"
+curl -L https://www.nasm.us/pub/nasm/releasebuilds/3.01/nasm-3.01.tar.xz -o /tmp/nasm.tar.gz
+echo "f0531dfe9728192fe190cc4932df44a26f1bde7c /tmp/nasm.tar.gz" | sha1sum --check
 
-export DEBIAN_FRONTEND=noninteractive
+mkdir /tmp/nasm
+cd /tmp/nasm
+tar --strip-components=1 -xvf ../nasm.tar.gz
 
-apt-get -y update
-apt-get -y --with-new-pkgs upgrade
-apt-get -y --no-install-recommends install ${packages}
-apt-get -y autoremove
-apt-get clean
+./configure --prefix=/usr/local
+make -j4
+make install
+
+cd /
+rm -rf /tmp/nasm.tar.gz /tmp/nasm
+
 
 ########################################################################################################################

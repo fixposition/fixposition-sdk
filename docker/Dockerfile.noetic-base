@@ -42,6 +42,14 @@ RUN /tmp/install_proj.sh && rm -f /tmp/install_proj.sh
 COPY docker/scripts/install_doxygen.sh /tmp
 RUN /tmp/install_doxygen.sh && rm -f /tmp/install_doxygen.sh
 
+# Download, build and install NASM (for FFmpeg)
+COPY docker/scripts/install_nasm.sh /tmp
+RUN /tmp/install_nasm.sh && rm -f /tmp/install_nasm.sh
+
+# Download, build and install FFmpeg libraries (LGPL)
+COPY docker/scripts/install_ffmpeg.sh /tmp
+RUN /tmp/install_ffmpeg.sh && rm -f /tmp/install_ffmpeg.sh
+
 # Download, build and install pre-commit
 COPY docker/scripts/install_precommit.sh /tmp
 RUN /tmp/install_precommit.sh && rm -f /tmp/install_precommit.sh

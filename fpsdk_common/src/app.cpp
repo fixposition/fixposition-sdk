@@ -368,18 +368,30 @@ static constexpr const char* BUILDSTR =
 #endif
 static constexpr const char* ROSSTR =
 #if defined(FPSDK_USE_ROS1)
-    "ROS1";
+    ", ROS1";
 #elif defined(FPSDK_USE_ROS2)
-    "ROS2";
+    ", ROS2";
 #else
-        "no ROS";
+        ", noros";
+#endif
+static constexpr const char* PROJSTR =
+#if FPSDK_USE_PROJ
+    ", PROJ";
+#else
+    ", noproj";
+#endif
+static constexpr const char* FFMPEGSTR =
+#if FPSDK_USE_FFMPEG
+    ", FFmpeg";
+#else
+    ", noffmpeg";
 #endif
 
 void ProgramOptions::PrintVersion() const
 {
-    std::fprintf(stdout, "%s%s%s (fpsdk: %s, %s, %s)\n%s\n%s\n", app_name_.c_str(), version_str_.empty() ? "" : " ",
-        version_str_.empty() ? "" : version_str_.c_str(), BUILDSTR, ROSSTR, utils::GetVersionString(),
-        copy_str_.empty() ? utils::GetCopyrightString() : copy_str_.c_str(),
+    std::fprintf(stdout, "%s%s%s (fpsdk: %s%s%s%s, %s)\n%s\n%s\n", app_name_.c_str(), version_str_.empty() ? "" : " ",
+        version_str_.empty() ? "" : version_str_.c_str(), BUILDSTR, ROSSTR, PROJSTR, FFMPEGSTR,
+        utils::GetVersionString(), copy_str_.empty() ? utils::GetCopyrightString() : copy_str_.c_str(),
         lic_str_.empty() ? utils::GetLicenseString() : lic_str_.c_str());
 }
 

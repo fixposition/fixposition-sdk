@@ -31,7 +31,8 @@ namespace common {
 
     @section FPSDK_COMMON_MODULES Modules
 
-    - @subpage FPSDK_COMMON_APPS
+    - @subpage FPSDK_COMMON_APP
+    - @subpage FPSDK_COMMON_CAM
     - @subpage FPSDK_COMMON_CAN
     - @subpage FPSDK_COMMON_FPL
     - @subpage FPSDK_COMMON_GNSS
@@ -41,11 +42,12 @@ namespace common {
     - @subpage FPSDK_COMMON_PATH
     - @subpage FPSDK_COMMON_ROS1
     - @subpage FPSDK_COMMON_STRING
-    - @subpage FPSDK_COMMON_TIME
     - @subpage FPSDK_COMMON_THREAD
+    - @subpage FPSDK_COMMON_TIME
     - @subpage FPSDK_COMMON_TRAFO
     - @subpage FPSDK_COMMON_TYPES
     - @subpage FPSDK_COMMON_UTILS
+    - @subpage FPSDK_COMMON_VIDEO
     - @subpage FPSDK_COMMON_YAML
 
     @section FPSDK_COMMON_LICENSE License
