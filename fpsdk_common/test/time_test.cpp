@@ -102,6 +102,7 @@ TEST(TimeTest, RosTime)
     EXPECT_EQ(t0.nsec_, 0);
     EXPECT_NEAR(t0.ToSec(), 0.0, 1e-9);
     EXPECT_EQ(t0.ToNSec(), (uint64_t)0);
+    EXPECT_EQ(t0, RosTime(t0.ToNSec()));
 
     const RosTime t1(123, 456);
     EXPECT_FALSE(t1.IsZero());
@@ -109,6 +110,7 @@ TEST(TimeTest, RosTime)
     EXPECT_EQ(t1.nsec_, 456);
     EXPECT_NEAR(t1.ToSec(), 123.000000456, 1e-9);
     EXPECT_EQ(t1.ToNSec(), (uint64_t)123000000456);
+    EXPECT_EQ(t1, RosTime(t1.ToNSec()));
 
     const RosTime t2(123, 999999999);
     EXPECT_FALSE(t2.IsZero());
@@ -116,6 +118,7 @@ TEST(TimeTest, RosTime)
     EXPECT_EQ(t2.nsec_, 999999999);
     EXPECT_NEAR(t2.ToSec(), 123.999999999, 1e-9);
     EXPECT_EQ(t2.ToNSec(), (uint64_t)123999999999);
+    EXPECT_EQ(t2, RosTime(t2.ToNSec()));
 
     const RosTime t3(123, 999999999 + 1);
     EXPECT_FALSE(t3.IsZero());
@@ -123,6 +126,7 @@ TEST(TimeTest, RosTime)
     EXPECT_EQ(t3.nsec_, 0);
     EXPECT_NEAR(t3.ToSec(), 124.0, 1e-9);
     EXPECT_EQ(t3.ToNSec(), (uint64_t)124000000000);
+    EXPECT_EQ(t3, RosTime(t3.ToNSec()));
 
     const RosTime t4(123, 999999999 + 1 + 1);
     EXPECT_FALSE(t4.IsZero());
@@ -130,6 +134,7 @@ TEST(TimeTest, RosTime)
     EXPECT_EQ(t4.nsec_, 1);
     EXPECT_NEAR(t4.ToSec(), 124.000000001, 1e-9);
     EXPECT_EQ(t4.ToNSec(), (uint64_t)124000000001);
+    EXPECT_EQ(t4, RosTime(t4.ToNSec()));
 }
 
 // ---------------------------------------------------------------------------------------------------------------------

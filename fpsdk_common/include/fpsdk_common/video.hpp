@@ -211,13 +211,6 @@ class VideoFrameDecoder
     virtual ~VideoFrameDecoder();
 
     /**
-     * @brief Initialise video decoder
-     *
-     * @returns true on success, false otherwise (bad params, failed to initialse stuff, ...)
-     */
-    bool Init();
-
-    /**
      * @brief Decode one frame
      *
      * - This works for data that is available frame by frame. That is, it does not work for regular video streams where

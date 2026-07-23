@@ -164,6 +164,13 @@ struct RosTime
     RosTime(const uint32_t sec, const uint32_t nsec);
 
     /**
+     * @brief Constructor
+     *
+     * @param[in]  nsec  Time value nanoseconds
+     */
+    RosTime(const uint64_t nsec);
+
+    /**
      * @brief Convert to seconds
      *
      * @returns the time value (time since epoch) in [s]

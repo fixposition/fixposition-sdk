@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK examples: collecting fusion epoch data from FP_A messages
+ * @brief Fixposition SDK example: collecting fusion epoch data from FP_A messages
  *
  * To build and run:
  *

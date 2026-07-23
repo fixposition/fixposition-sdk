@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK examples: Making a FP_B-MEASUREMENTS message
+ * @brief Fixposition SDK example: Making a FP_B-MEASUREMENTS message
  *
  * To build and run:
  *

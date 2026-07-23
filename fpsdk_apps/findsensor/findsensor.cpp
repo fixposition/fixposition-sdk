@@ -540,7 +540,9 @@ const char* FindSensor::OpCodeToStr(const OpCode opcode) const
 
 bool FindSensor::Run()
 {
-    opts_.LogVersion();
+    if (!opts_.server_) {
+        opts_.LogVersion();
+    }
 
     socks_.push_back(std::make_unique<Socket>(ip::udp::endpoint(ip::address_v4::any(), opts_.port_),
         ip::udp::endpoint(ip::make_address(opts_.bcast_addr_), opts_.port_), ctx_, opts_));
