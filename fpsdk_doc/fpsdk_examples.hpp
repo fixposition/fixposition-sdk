@@ -24,6 +24,7 @@ namespace fpsdk {
     - @subpage FPSDK_EXAMPLES_PARSER_INTRO
     - @subpage FPSDK_EXAMPLES_FUSION_EPOCH
     - @subpage FPSDK_EXAMPLES_FPB_MEASUREMENTS
+    - @subpage FPSDK_EXAMPLES_CAMERA_STREAMING
     - @subpage FPSDK_EXAMPLES_ROS1_DEMO
     - @subpage FPSDK_EXAMPLES_ROS2_DEMO
 
@@ -41,6 +42,11 @@ namespace fpsdk {
     @page FPSDK_EXAMPLES_FPB_MEASUREMENTS Making a FP_B-MEASUREMENTS message
 
     @include{lineno} fpb_measurements.cpp
+
+
+    @page FPSDK_EXAMPLES_CAMERA_STREAMING Camera streaming from PBx-A1 sensor
+
+    @include{lineno} camera_streaming.cpp
 
 
     @page FPSDK_EXAMPLES_ROS1_DEMO ROS 1 node

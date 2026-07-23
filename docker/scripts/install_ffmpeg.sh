@@ -61,13 +61,11 @@ tar --strip-components=1 -xvf ../ffmpeg.tar.gz
   \
   --prefix=/usr/local
 
-#  --disable-avformat
 #  --disable-avdevice
 
-# --enable-vulkan
-# --enable-nvdec
+# --enable-vulkan   # only on more recent systems (?)
+# --enable-nvdec    # requires installing a LOT of dependencies (4+ GiB..) :-( libffmpeg-nvenc-dev, nvidia-cuda-toolkit, ...
 
-#./configure --disable-gpl --disable-nonfree --enable-shared --disable-static --prefix=/usr/local
 
 make -j4
 make install

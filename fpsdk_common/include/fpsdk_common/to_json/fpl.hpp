@@ -117,11 +117,11 @@ inline void to_json(nlohmann::json& j, const CamData& m)
         { "type", cam::CamDataTypeToStr(m.type_) },
         { "fmt", cam::CamDataFmtToStr(m.fmt_) },
         { "frm", cam::CamDataFrmToStr(m.frm_) },
-        { "seq", m.meta_.seq_ },
-        { "ts", m.meta_.ts_ },
-        { "dt", m.meta_.dt_ },
-        { "width", m.meta_.width_ },
-        { "height", m.meta_.height_ },
+        { "seq", m.seq_ },
+        { "ts", m.ts_ },
+        { "dt", m.dt_ },
+        { "width", m.width_ },
+        { "height", m.height_ },
         { "data_b64", string::Base64Enc(m.data_) },
     });
 }

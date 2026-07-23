@@ -699,21 +699,41 @@ FileDump::FileDump(const FplMessage& log_msg)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+struct CamDataMeta
+{  // clang-format off
+    uint8_t  cam_id_        = 0;     //!< Camera                  (CamId)
+    uint8_t  type_          = 0;     //!< Data type               (CamDataType)
+    uint8_t  fmt_           = 0;     //!< Data format             (CamDataFmt)
+    uint8_t  frm_           = 0;     //!< Frame type              (CamDataFrm)
+    uint8_t  reserved0_[4]  = { 0 }; //!< Reserved for future use, set to 0
+    uint64_t seq_           = 0;     //!< Sequence number
+    uint64_t ts_            = 0;     //!< Camera image time (middle of exposure) [CLOCK_REALTIME ns] (0 = invalid)
+    uint32_t dt_            = 0;     //!< Exposure time (duration) [ns] (0 = not available)
+    uint32_t width_         = 0;     //!< Width of the frame [px]
+    uint32_t height_        = 0;     //!< Height of the fram [px]
+    uint32_t size_          = 0;     //!< Size of the data (see LogMessage)
+    uint64_t rec_time_      = 0;     //!< Recording time [CLOCK_REALTIME ns] (for debugging)
+    uint8_t  reserved1_[16] = { 0 }; //!< Reserved for future use, set to 0
+};  // clang-format on
+
+static_assert(sizeof(CamDataMeta) == 64, "");
+
 CamData::CamData(const FplMessage& log_msg)
 {
     bool ok = true;
+    CamDataMeta meta;
     if (log_msg.PayloadType() == FplType::CAMDATA) {
         const uint8_t* payload = log_msg.PayloadData();
         const uint32_t payload_size = log_msg.PayloadSize();
 
-        if (payload_size >= sizeof(meta_)) {
-            std::memcpy(&meta_, payload, sizeof(meta_));
+        if (payload_size >= sizeof(meta)) {
+            std::memcpy(&meta, payload, sizeof(meta));
         } else {
             ok = false;
         }
 
-        if (ok && (payload_size >= (sizeof(meta_) + meta_.size_))) {
-            data_ = { &payload[sizeof(meta_)], &payload[sizeof(meta_)] + meta_.size_ };
+        if (ok && (payload_size >= (sizeof(meta) + meta.size_))) {
+            data_ = { &payload[sizeof(meta)], &payload[sizeof(meta)] + meta.size_ };
         } else {
             ok = false;
         }
@@ -721,14 +741,22 @@ CamData::CamData(const FplMessage& log_msg)
         ok = false;
     }
     if (ok) {
-        cam_id_ = CamIdFromValOr(meta_.cam_id_, cam::CamId::UNSPECIFIED);
-        type_ = CamDataTypeFromValOr(meta_.type_, cam::CamDataType::UNSPECIFIED);
-        fmt_ = CamDataFmtFromValOr(meta_.fmt_, cam::CamDataFmt::UNSPECIFIED);
-        frm_ = CamDataFrmFromValOr(meta_.frm_, cam::CamDataFrm::UNSPECIFIED);
+        // Translate enums, fall back to UNSPECIFIED (the sensor may know something we (sdk) don't know...)
+        cam_id_ = CamIdFromValOr(meta.cam_id_, cam::CamId::UNSPECIFIED);
+        type_ = CamDataTypeFromValOr(meta.type_, cam::CamDataType::UNSPECIFIED);
+        fmt_ = CamDataFmtFromValOr(meta.fmt_, cam::CamDataFmt::UNSPECIFIED);
+        frm_ = CamDataFrmFromValOr(meta.frm_, cam::CamDataFrm::UNSPECIFIED);
+        seq_ = meta.seq_;
+        ts_ = meta.ts_;
+        dt_ = meta.dt_;
+        width_ = meta.width_;
+        height_ = meta.height_;
+        rec_time_ = time::RosTime(meta.rec_time_);
+
         info_ = string::Sprintf("rec_time=%.3f cam_id=%s type=%s fmt=%s frm=%s %" PRIu32 "x%" PRIu32 " seq=%" PRIuMAX
                                 " ts=%.3f size=%" PRIuMAX,
-            (double)meta_.rec_time_ * 1e-9, CamIdToStr(cam_id_), CamDataTypeToStr(type_), CamDataFmtToStr(fmt_),
-            CamDataFrmToStr(frm_), meta_.width_, meta_.height_, meta_.seq_, (double)meta_.ts_ * 1e-9, data_.size());
+            rec_time_.ToSec() * 1e-9, CamIdToStr(cam_id_), CamDataTypeToStr(type_), CamDataFmtToStr(fmt_),
+            CamDataFrmToStr(frm_), width_, height_, seq_, (double)ts_ * 1e-9, data_.size());
     } else {
         WARNING("CamData: invalid message");
         info_ = "<invalid>";

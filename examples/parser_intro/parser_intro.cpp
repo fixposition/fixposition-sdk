@@ -8,7 +8,7 @@
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK examples: introduction to the parser and FP_A message decoding
+ * @brief Fixposition SDK example: introduction to the parser and FP_A message decoding
  *
  * To build and run:
  *

@@ -486,7 +486,7 @@ FplToolExtract::ProcRes FplToolExtract::ProcessCamData(const FplMessage& fpl_msg
         return ProcRes::OK;
     }
 
-    CamData camdata(fpl_msg);
+    fpsdk::common::fpl::CamData camdata(fpl_msg);
     if (!camdata.valid_) {
         WARNING("Invalid CAMDATA");
         return ProcRes::ERROR;
@@ -568,11 +568,11 @@ FplToolExtract::ProcRes FplToolExtract::ProcessAsyncDecData(const FplToolExtract
 
 #  if defined(FPSDK_USE_ROS1)
     sensor_msgs::Image rosmsg;
-    rosmsg.header.stamp.fromNSec(camdata.meta_.ts_);
-    rosmsg.header.seq = camdata.meta_.seq_;
+    rosmsg.header.stamp.fromNSec(camdata.ts_);
+    rosmsg.header.seq = camdata.seq_;
 #  else
     sensor_msgs::msg::Image rosmsg;
-    rosmsg.header.stamp = rclcpp::Time(static_cast<int64_t>(camdata.meta_.ts_), RCL_ROS_TIME);
+    rosmsg.header.stamp = rclcpp::Time(static_cast<int64_t>(camdata.ts_), RCL_ROS_TIME);
 #  endif
     rosmsg.header.frame_id = CamIdToStr(camdata.cam_id_);
     rosmsg.width = img.width_;
@@ -587,16 +587,15 @@ FplToolExtract::ProcRes FplToolExtract::ProcessAsyncDecData(const FplToolExtract
     rosmsg.data = { img.data_.data(), img.data_.data() + img.data_.size() };
     // Abuse pixel (0, 0) to store the exposure duration in [0.1ms]
     if (!rosmsg.data.empty()) {
-        const uint32_t dt01ms = camdata.meta_.dt_ / 100000;  // [ns] -> [0.1ms]
+        const uint32_t dt01ms = camdata.dt_ / 100000;  // [ns] -> [0.1ms]
         rosmsg.data[0] = std::clamp<uint32_t>(dt01ms, 0, 255);
     }
-
 #  if defined(FPSDK_USE_ROS1)
-    ros::Time stamp;
-    stamp.fromNSec(camdata.meta_.rec_time_);
+    const ros::Time stamp(camdata.rec_time_.sec_, camdata.rec_time_.nsec_);
 #  else
-    rclcpp::Time stamp(static_cast<int64_t>(camdata.meta_.rec_time_), RCL_ROS_TIME);
+    const rclcpp::Time stamp((int)camdata.rec_time_.sec_, camdata.rec_time_.nsec_, RCL_ROS_TIME);
 #  endif
+
     if (!bag_.WriteMessage(rosmsg, Sprintf("/%s/image", CamIdToStr(camdata.cam_id_)), stamp)) {
         return ProcRes::FATAL;
     }

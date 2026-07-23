@@ -6,15 +6,14 @@ deps = $(sort $(wildcard CMakeList.txt Makefile ../../fpsdk_doc/* *.cpp \
     ../../fpsdk_ros2/* ../../fpsdk_ros2/*/* ../../fpsdk_ros2/*/*/* ../../fpsdk_ros2/*/*/*/* \
     ../../fpsdk_apps/* ../../fpsdk_apps/*/* ../../fpsdk_apps/*/*/* ../../fpsdk_apps/*/*/*/*))
 
-$(info deps $(deps))
-
 .PHONY: default
 default: build/.make-build
 
-build:
-	mkdir -p $@
+.PHONY: build
+build: build/.make-build
 
-build/.make-build: $(deps) | build
+build/.make-build: $(deps)
+	mkdir -p build
 	cmake -B build -S .
 	cmake --build build --parallel 8
 	touch $@

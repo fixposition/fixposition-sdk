@@ -106,6 +106,12 @@ RosTime::RosTime(const uint32_t sec, const uint32_t nsec) : sec_{ sec }, nsec_{ 
     }
 }
 
+RosTime::RosTime(const uint64_t nsec) /* clang-format off */ :
+    sec_    { (uint32_t)(nsec / (uint64_t)1000000000) },
+    nsec_   { (uint32_t)(nsec % (uint64_t)1000000000) }  // clang-format on
+{
+}
+
 double RosTime::ToSec() const
 {
     return (double)sec_ + ((double)nsec_ * 1e-9);

@@ -1,10 +1,10 @@
 .SUFFIXES:
 
 .PHONY: build
-build: build-fpb_measurements build-fusion_epoch build-parser_intro
+build: build-fpb_measurements build-fusion_epoch build-parser_intro build-camera_streaming
 
 .PHONY: clean
-clean: clean-fpb_measurements clean-fusion_epoch clean-parser_intro
+clean: clean-fpb_measurements clean-fusion_epoch clean-parser_intro clean-camera_streaming
 
 
 
@@ -35,3 +35,13 @@ build-parser_intro:
 .PHONY: clean-parser_intro
 clean-parser_intro:
 	make -C parser_intro clean
+
+
+
+.PHONY: build-camera_streaming
+build-camera_streaming:
+	make -C camera_streaming
+
+.PHONY: clean-camera_streaming
+clean-camera_streaming:
+	make -C camera_streaming clean
