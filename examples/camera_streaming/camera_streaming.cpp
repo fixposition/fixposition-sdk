@@ -22,10 +22,21 @@
  */
 
 /* LIBC/STL */
+#include <cmath>
 #include <cstdint>
 #include <cstring>
 
 /* EXTERNAL */
+#include <boost/accumulators/accumulators.hpp>
+#include <boost/accumulators/statistics/count.hpp>
+#include <boost/accumulators/statistics/extended_p_square.hpp>
+#include <boost/accumulators/statistics/max.hpp>
+#include <boost/accumulators/statistics/mean.hpp>
+#include <boost/accumulators/statistics/median.hpp>
+#include <boost/accumulators/statistics/min.hpp>
+#include <boost/accumulators/statistics/stats.hpp>
+#include <boost/accumulators/statistics/sum.hpp>
+#include <boost/accumulators/statistics/variance.hpp>
 
 /* Fixposition SDK */
 #include <fpsdk_common/app.hpp>
@@ -33,6 +44,7 @@
 #include <fpsdk_common/logging.hpp>
 #include <fpsdk_common/string.hpp>
 #include <fpsdk_common/time.hpp>
+#include <fpsdk_common/types.hpp>
 #include <fpsdk_common/video.hpp>
 
 /* PACKAGE */
@@ -68,12 +80,17 @@ int main(int argc, char** argv)
             "Where: <sensor> is the sensor's hostname or IP address, <cam> is CAM1 or CAM2, <type> is\n"
             "HIRES_VID, LORES_VID, HIRES_IMG or LORES_IMG, and <rate> is the throttling rate (must be\n"
             "1 for encoded video)\n"
-            "For example: camera_streaming 10.0.2.1 CAM1 HIRES_VID 1");
+            "Examples:\n"
+            "    camera_streaming 10.0.2.1 CAM1 HIRES_VID 1\n"
+            "    camera_streaming 10.0.2.1 CAM1 HIRES_IMG 10");
         return EXIT_FAILURE;
     }
 
-    // LoggingSetParams({ LoggingLevel::TRACE, LoggingColour::AUTO, LoggingTimestamps::RELATIVE });
+#if 0  // Set to 1 (and build with CMAKE_BUILD_TYPE=Debug) for debugging
+    LoggingSetParams({ LoggingLevel::TRACE, LoggingColour::AUTO, LoggingTimestamps::RELATIVE });
+#else
     LoggingSetParams({ LoggingLevel::INFO, LoggingColour::AUTO, LoggingTimestamps::RELATIVE });
+#endif
 
     const std::string sensor = argv[1];
     const CamId cam_id = CamIdFromStrOr(argv[2], CamId::UNSPECIFIED);
@@ -97,12 +114,22 @@ int main(int argc, char** argv)
     // We'll decode encoded video frames
     VideoFrameDecoderPtr decoder;
 
+    // Statistics
+    using Accumulator = boost::accumulators::accumulator_set<double,
+        boost::accumulators::stats<boost::accumulators::tag::count, boost::accumulators::tag::mean,
+            boost::accumulators::tag::median, boost::accumulators::tag::min, boost::accumulators::tag::max,
+            boost::accumulators::tag::sum, boost::accumulators::tag::variance>>;
+    Accumulator acc_lat;   // Latency receiving the data
+    Accumulator acc_size;  // Size of the data
+    Accumulator acc_dec;   // Latency decoding video
+
     // Stream data until we get SIGINT (CTRL-c)
     SigIntHelper sigint;
     CamData data;
     std::size_t n_frames = 0;
     char info[1000];
     bool ok = true;
+    TicToc tt_str;
     while (ok && !sigint.ShouldAbort() && stream->NextFrame(data)) {
         // We'll calculate the latency from the time we received the data (now) and the data reference time. Note that
         // this requires the computer that runs this program being timesynced with the sensor (and the sensor being
@@ -110,18 +137,21 @@ int main(int argc, char** argv)
         // latency (could be to the better or to the worse).
         const auto t_recv = Time::FromClockRealtime();
         const auto t_data = Time::FromPosixNs(data.ts_);
-        const auto dt = Duration::FromNSec(data.dt_);  // exposure duration
         n_frames++;
 
         // Generic info
-        std::size_t len = std::snprintf(info, sizeof(info), "Frame %6" PRIuMAX ": %-7s %-5s %-10s %-9s %-7s %s %4.1f",
-            n_frames, data.valid_ ? "valid" : "invalid", CamIdToStr(data.cam_id_), CamDataTypeToStr(data.type_),
-            CamDataFmtToStr(data.fmt_), CamDataFrmToStr(data.frm_), t_data.StrIsoTime(3).c_str(), dt.GetSec() * 1e3);
+        std::size_t len =
+            std::snprintf(info, sizeof(info), "Frame %6" PRIuMAX ": %-7s %-5s %-10s %-9s %-7s %6" PRIuMAX " %s %4.1f",
+                n_frames, data.valid_ ? "valid" : "invalid", CamIdToStr(data.cam_id_), CamDataTypeToStr(data.type_),
+                CamDataFmtToStr(data.fmt_), CamDataFrmToStr(data.frm_), data.data_.size(), t_data.StrIsoTime(3).c_str(),
+                Duration::FromNSec(data.dt_).GetSec() * 1e3);
+        acc_size((double)data.data_.size() / 1024.0);  // [KiB]
 
         // Latency
         if (data.valid_) {
-            const auto lat = t_recv - t_data;
-            len += std::snprintf(&info[len], sizeof(info) - len, " -- %+5.1f", lat.GetSec() * 1e3 + 0.1);
+            const double lat = (t_recv - t_data).GetSec() * 1e3;  // [ms]
+            len += std::snprintf(&info[len], sizeof(info) - len, " -- latency: %+5.1f", lat);
+            acc_lat(lat);
         }
 
         // Decode video
@@ -138,14 +168,43 @@ int main(int argc, char** argv)
                     break;
                 }
 
-                len += std::snprintf(&info[len], sizeof(info) - len, " -- %+4.1f", tt.TocMs());
+                // --------------------------------------------------------------------------------------
+                // Now we have the decoded image in "img" and all the raw data and meta data in "data"...
+                // --------------------------------------------------------------------------------------
+
+                // Decoding adds latency
+                const auto lat = tt.Toc().GetSec() * 1e3;  // [ms]
+                len += std::snprintf(&info[len], sizeof(info) - len, " -- decode: %+4.1f", lat);
+                acc_dec(lat);
             }
         }
 
         INFO("%s", info);
     }
+    const double t_str = tt_str.Toc().GetSec();
 
     stream->Disconnect();
+
+    // Print stats
+    NOTICE("Streamed %s %s %s %d for %.0fs (%" PRIuMAX " frames)", sensor.c_str(), CamIdToStr(cam_id),
+        CamDataTypeToStr(type), rate, t_str, boost::accumulators::count(acc_size));
+    if (boost::accumulators::count(acc_lat) > 10) {
+        INFO("Latency receiving data [ms]: mean %4.1f (std %4.1f) min/median/max %4.1f %4.1f %4.1f",
+            boost::accumulators::mean(acc_lat), std::sqrt(boost::accumulators::variance(acc_lat)),
+            boost::accumulators::min(acc_lat), boost::accumulators::median(acc_lat), boost::accumulators::max(acc_lat));
+    }
+    if (boost::accumulators::count(acc_dec) > 10) {
+        INFO("Latency decoding video [ms]: mean %4.1f (std %4.1f) min/median/max %4.1f %4.1f %4.1f",
+            boost::accumulators::mean(acc_dec), std::sqrt(boost::accumulators::variance(acc_dec)),
+            boost::accumulators::min(acc_dec), boost::accumulators::median(acc_dec), boost::accumulators::max(acc_dec));
+    }
+    if ((boost::accumulators::count(acc_size) > 10) && (t_str > 1.0)) {
+        INFO("Data size per frame [KiB]:   mean %4.0f (std %4.0f) min/median/max %4.0f %4.0f %4.0f",
+            boost::accumulators::mean(acc_size), std::sqrt(boost::accumulators::variance(acc_size)),
+            boost::accumulators::min(acc_size), boost::accumulators::median(acc_size),
+            boost::accumulators::max(acc_size));
+        INFO("Average data rate [KiB/s]: %.0f", boost::accumulators::sum(acc_size) / t_str);
+    }
 
     return ok ? EXIT_SUCCESS : EXIT_FAILURE;
 }
