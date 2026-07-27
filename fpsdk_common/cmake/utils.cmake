@@ -78,9 +78,9 @@ macro(fpsdk_check_ffmpeg_is_lgpl)
     " FFMPEG_IS_LGPL)
 
     if (NOT FFMPEG_IS_LGPL)
-        message(STATUS "fpsdk: The FFmpeg libraries in ${libavutil_LIBRARY_DIRS} are not LGPL.")
+        message(STATUS "fpsdk: The FFmpeg libraries in ${libavutil_LIBRARY_DIRS} are not LGPL and/or not free.")
     else()
-        message(STATUS "fpsdk: The FFmpeg libraries in ${libavutil_LIBRARY_DIRS} are LGPL.")
+        message(STATUS "fpsdk: The FFmpeg libraries in ${libavutil_LIBRARY_DIRS} are LGPL and free.")
     endif()
 
     cmake_pop_check_state()
@@ -131,8 +131,8 @@ macro(fpsdk_find_package_ffmpeg)
     if(FPSDK_USE_FFMPEG STREQUAL "ON")
         if(NOT FFMPEG_IS_LGPL)
             message(FATAL_ERROR "fpsdk: The FFmpeg libraries in ${libavutil_LIBRARY_DIRS} \
-                are not LGPL. Please either disable the use of FFmpeg libraries (-DFPSDK_USE_FFMPEG=OFF) \
-                or provide suitably configured and compiled FFmpeg libraries (-DCMAKE_PREFIX_PATH=/path/to/ffmpeg).")
+                are not LGPL and/or not free. Please either disable the use of FFmpeg libraries (-DFPSDK_USE_FFMPEG=OFF) \
+                or provide FFmpeg libraries built with --disable-nonfree and --disable-gpl (-DCMAKE_PREFIX_PATH=/path/to/ffmpeg).")
         endif()
     endif()
 
