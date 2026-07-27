@@ -18,18 +18,20 @@
 #include <cstring>
 
 /* EXTERNAL */
+#if FPSDK_USE_FFMPEG
 extern "C" {
-#include <libavcodec/avcodec.h>
-#include <libavfilter/avfilter.h>
-#include <libavfilter/buffersink.h>
-#include <libavfilter/buffersrc.h>
-#include <libavutil/imgutils.h>
-#include <libavutil/log.h>
-#include <libavutil/opt.h>
-#include <libavutil/pixdesc.h>
-#include <libavutil/rational.h>
-#include <libswscale/swscale.h>
+#  include <libavcodec/avcodec.h>
+#  include <libavfilter/avfilter.h>
+#  include <libavfilter/buffersink.h>
+#  include <libavfilter/buffersrc.h>
+#  include <libavutil/imgutils.h>
+#  include <libavutil/log.h>
+#  include <libavutil/opt.h>
+#  include <libavutil/pixdesc.h>
+#  include <libavutil/rational.h>
+#  include <libswscale/swscale.h>
 }
+#endif
 
 /* PACKAGE */
 #include "fpsdk_common/logging.hpp"
