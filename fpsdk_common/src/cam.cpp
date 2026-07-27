@@ -367,7 +367,10 @@ bool CamStreamImpl::Connect()
         if (header != res.end()) {
             // Probably a bad API request (sensor doesn't have this API, bad params, ...)
             if (boost::algorithm::istarts_with(header->value(), "application/json")) {
-                ReadMore();  // Should give us e.g. {"_ok":false,"_message":"request fail"}
+                // We should get e.g. {"_ok":false,"_message":"request fail"}
+                int n = 10;
+                while ((n-- > 0) && ReadMore()) {
+                }
                 WARNING("CamStream(%s) unexpected response: %s", params_.name_.c_str(), buf_.c_str());
                 ok = false;
                 break;
@@ -557,7 +560,7 @@ bool CamStreamImpl::ReadMore()
         }
         // Message (body) complete, not expected
         else if (parser_.is_done()) {
-            WARNING("CamStream(%s) message copmplete", params_.name_.c_str());
+            WARNING("CamStream(%s) message complete (stream ended)", params_.name_.c_str());
             ok = false;
             break;
         }
@@ -592,21 +595,21 @@ std::unique_ptr<CamStream> CreateCamStream(const CamStreamParams& params)
     }
 
     switch (params.type_) {
-        case CamDataType::HIRES_IMG:
         case CamDataType::HIRES_VID:
-            if (params.rate_ != 1) {
-                ok = false;
-            }
-            break;
+        case CamDataType::HIRES_IMG:
         case CamDataType::LORES_IMG:
         case CamDataType::LORES_VID:
-            if ((params.rate_ < params.RATE_MIN) || (params.rate_ > params.RATE_MAX)) {
-                ok = false;
-            }
             break;
         case CamDataType::UNSPECIFIED:
             ok = false;
             break;
+    }
+
+    // Some data types support only rate 1 (typically for example HIRES_VID), but only the sensor knows what's okay and
+    // what isn't, so we cannot check more thoroughly here. CamStream::Connect() should will pass-through any error from
+    // the sensor.
+    if ((params.rate_ < params.RATE_MIN) || (params.rate_ > params.RATE_MAX)) {
+        ok = false;
     }
 
     if (params.timeout_ < Duration::FromSec(0.1)) {
