@@ -1845,8 +1845,8 @@ struct UBX_NAV_PVT_V1_GROUP0  // clang-format off
     uint32_t sAcc;           //!< @todo documentation
     uint32_t headAcc;        //!< @todo documentation
     uint16_t pDOP;           //!< @todo documentation
-    uint8_t  flags3;         //!< @todo documentation
-    uint8_t  reserved[5];    //!< @todo documentation
+    uint16_t flags3;         //!< @todo documentation
+    uint8_t  reserved0[4];   //!< @todo documentation
     int32_t  headVeh;        //!< @todo documentation
     int16_t  magDec;         //!< @todo documentation
     uint16_t magAcc;         //!< @todo documentation
@@ -1869,6 +1869,14 @@ static constexpr uint8_t     UBX_NAV_PVT_V1_FIXTYPE_3D_DR                       
 static constexpr uint8_t     UBX_NAV_PVT_V1_FIXTYPE_TIME                                            = 5;  //!< @todo documentation
 static constexpr bool        UBX_NAV_PVT_V1_FLAGS_GNSSFIXOK(const uint8_t flags)                    { return (flags & 0x01) == 0x01; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_PVT_V1_FLAGS_DIFFSOLN(const uint8_t flags)                     { return (flags & 0x02) == 0x02; }  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE(const uint8_t flags)                     { return (flags >> 2) & 0x07; }  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE_NOTACTIVE                                = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE_ENABLED                                  = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE_ACQUISITION                              = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE_TRACKING                                 = 3;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE_POT                                      = 4;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE_INACTIVE                                 = 5;  //!< @todo documentation
+static constexpr bool        UBX_NAV_PVT_V1_FLAGS_HEADVEHVALID(const uint8_t flags)                 { return (flags & 0x20) == 0x20; }  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_CARRSOLN(const uint8_t flags)                     { return (flags >> 6) & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_CARRSOLN_NO                                       = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_CARRSOLN_FLOAT                                    = 1;  //!< @todo documentation
@@ -1876,7 +1884,27 @@ static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_CARRSOLN_FIXED                
 static constexpr bool        UBX_NAV_PVT_V1_FLAGS2_CONFAVAIL(const uint8_t flags2)                  { return (flags2 & 0x20) == 0x20; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_PVT_V1_FLAGS2_CONFDATE(const uint8_t flags2)                   { return (flags2 & 0x40) == 0x40; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_PVT_V1_FLAGS2_CONFTIME(const uint8_t flags2)                   { return (flags2 & 0x80) == 0x80; }  //!< @todo documentation
-static constexpr bool        UBX_NAV_PVT_V1_FLAGS3_INVALIDLLH(const uint8_t flags3)                 { return (flags3 & 0x01) == 0x01; }  //!< @todo documentation
+static constexpr bool        UBX_NAV_PVT_V1_FLAGS3_INVALIDLLH(const uint16_t flags3)                { return (flags3 & 0x01) == 0x01; }  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE(const uint16_t flags3)         { return (flags3 >> 1) & 0x0F; }  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_NOT_AVAILABLE                  = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_0_TO_1_SEC                     = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_1_TO_2_SEC                     = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_3_TO_5_SEC                     = 3;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_5_TO_10_SEC                    = 4;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_10_TO_15_SEC                   = 5;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_15_TO_20_SEC                   = 6;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_20_TO_30_SEC                   = 7;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_30_TO_45_SEC                   = 8;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_45_TO_60_SEC                   = 9;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_60_TO_90_SEC                   = 10;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_90_TO_120_SEC                  = 11;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_GEQ_120_SEC                    = 12;  //!< @todo documentation
+static constexpr bool        UBX_NAV_PVT_V1_FLAGS3_AUTHTIME(const uint16_t flags3)                  { return (flags3 & 0x2000) == 0x2000; }  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_AUTHTIME_NOT_AUTHENTICATED                       = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_AUTHTIME_AUTHENTICATED                           = 1;  //!< @todo documentation
+static constexpr bool        UBX_NAV_PVT_V1_FLAGS3_NMAFIXSTATUS(const uint16_t flags3)              { return (flags3 & 0x4000) == 0x4000; }  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_NMAFIXSTATUS_NOT_VERIFIED                        = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_NMAFIXSTATUS_VERIFIED                            = 1;  //!< @todo documentation
 static constexpr double      UBX_NAV_PVT_V1_LAT_SCALE                                               = 1e-7;  //!< @todo documentation
 static constexpr double      UBX_NAV_PVT_V1_LON_SCALE                                               = 1e-7;  //!< @todo documentation
 static constexpr double      UBX_NAV_PVT_V1_HEIGHT_SCALE                                            = 1e-3;  //!< @todo documentation
@@ -2073,6 +2101,7 @@ static constexpr bool        UBX_NAV_SIG_V0_SIGFLAGS_DO_USED(const uint16_t sigF
 static constexpr bool        UBX_NAV_SIG_V0_SIGFLAGS_PR_CORR_USED(const uint16_t sigFlags)          { return (sigFlags & 0x0040) == 0x0040; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_SIG_V0_SIGFLAGS_CR_CORR_USED(const uint16_t sigFlags)          { return (sigFlags & 0x0080) == 0x0080; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_SIG_V0_SIGFLAGS_DO_CORR_USED(const uint16_t sigFlags)          { return (sigFlags & 0x0100) == 0x0100; }  //!< @todo documentation
+static constexpr bool        UBX_NAV_SIG_V0_SIGFLAGS_AUTH_STATUS(const uint16_t sigFlags)           { return (sigFlags & 0x0200) == 0x0200; }  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_NONE                                         = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_SBAS                                         = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_BDS                                          = 2;  //!< @todo documentation
@@ -2538,6 +2567,138 @@ static constexpr uint8_t     UBX_RXM_SPARTN_V1_FLAGS_MSGUSED(const uint8_t flags
 static constexpr uint8_t     UBX_RXM_SPARTN_V1_FLAGS_MSGUSED_UNKNOWN                                = 0x00;  //!< @todo documentation
 static constexpr uint8_t     UBX_RXM_SPARTN_V1_FLAGS_MSGUSED_UNUSED                                 = 0x01;  //!< @todo documentation
 static constexpr uint8_t     UBX_RXM_SPARTN_V1_FLAGS_MSGUSED_USED                                   = 0x02;  //!< @todo documentation
+// clang-format on
+
+///@}
+// ---------------------------------------------------------------------------------------------------------------------
+/**
+ * @name UBX-SEC-OSNMA message
+ * @{
+ */
+
+//! UBX-SEC-OSNMA (version 3, output) payload head
+struct UBX_SEC_OSNMA_V3_GROUP0  // clang-format off
+{
+    uint8_t  version;            //!< @todo documentation
+    uint8_t  nmaHeader;          //!< @todo documentation
+    uint16_t osnmaMonitoring;    //!< @todo documentation
+    uint8_t  timSyncReq;         //!< @todo documentation
+    uint8_t  reserved0[3];       //!< @todo documentation
+    int32_t  timSyncReqDiff;     //!< @todo documentation
+    uint8_t  reserved1[4];       //!< @todo documentation
+    uint32_t dsmAuthentication;  //!< @todo documentation
+    uint32_t teslaKey;           //!< @todo documentation
+    uint32_t generalAndTiming;   //!< @todo documentation
+};  // clang-format on
+
+static_assert(sizeof(UBX_SEC_OSNMA_V3_GROUP0) == 28, "");
+
+//! UBX-SEC-OSNMA (version 3, output) payload repeated group (per authenticated SV)
+struct UBX_SEC_OSNMA_V3_GROUP1  // clang-format off
+{
+    uint16_t bitfield1;      //!< @todo documentation
+    uint8_t  svId;           //!< @todo documentation
+    uint8_t  reserved2;      //!< @todo documentation
+};  // clang-format on
+
+static_assert(sizeof(UBX_SEC_OSNMA_V3_GROUP1) == 4, "");
+
+// clang-format off
+static constexpr uint8_t     UBX_SEC_OSNMA_VERSION(const uint8_t* msg)                                                  { return msg[UBX_HEAD_SIZE]; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_VERSION                                                                   = 0x03;  //!< @todo documentation
+static constexpr std::size_t UBX_SEC_OSNMA_V3_MIN_SIZE                                                                  = sizeof(UBX_SEC_OSNMA_V3_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_NMAHEADER_HEADERAUTHSTATUS(const uint8_t nmaHeader)                       { return (nmaHeader & 0x01) == 0x01; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS(const uint8_t nmaHeader)                              { return (nmaHeader >> 1) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS_NOTAUTHENTICATED                                      = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS_TEST                                                  = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS_OPERATIONAL                                           = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS_INVALID                                               = 3;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CHAININFORCE(const uint8_t nmaHeader)                           { return (nmaHeader >> 3) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS(const uint8_t nmaHeader)                                   { return (nmaHeader >> 5) & 0x07; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_NOTAPPLICABLE                                              = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_NOMINAL                                                    = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_EOC                                                        = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_CREV                                                       = 3;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_NPK                                                        = 4;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_PKREV                                                      = 5;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_NMT                                                        = 6;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_AM                                                         = 7;  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_OSNMAMONITORING_OSNMAENABLED(const uint16_t osnmaMonitoring)              { return (osnmaMonitoring & 0x0001) == 0x0001; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_OSNMAMONITORING_NUMBERSVS(const uint16_t osnmaMonitoring)                 { return (osnmaMonitoring >> 1) & 0x1f; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_OSNMAMONITORING_NMAHEADERUPDATE(const uint16_t osnmaMonitoring)           { return (osnmaMonitoring >> 6) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_OSNMAMONITORING_NMAHEADERUPDATE_SAME                                      = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_OSNMAMONITORING_NMAHEADERUPDATE_HEALTHY                                   = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_OSNMAMONITORING_NMAHEADERUPDATE_PROBLEM                                   = 2;  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_OSNMAMONITORING_NODATA(const uint16_t osnmaMonitoring)                    { return (osnmaMonitoring & 0x0100) == 0x0100; }  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_OSNMAMONITORING_WRONGDATA(const uint16_t osnmaMonitoring)                 { return (osnmaMonitoring & 0x0200) == 0x0200; }  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_OSNMAMONITORING_WRONGFLXMAC(const uint16_t osnmaMonitoring)               { return (osnmaMonitoring & 0x0400) == 0x0400; }  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_OSNMAMONITORING_WRONGMACLT(const uint16_t osnmaMonitoring)                { return (osnmaMonitoring & 0x0800) == 0x0800; }  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCENABLED(const uint8_t timSyncReq)                       { return (timSyncReq & 0x01) == 0x01; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS(const uint8_t timSyncReq)                        { return (timSyncReq >> 1) & 0x07; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS_NOTPERFORMED                                     = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS_NOTRUSTEDTIME                                    = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS_NOTACCURATE                                      = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS_PASSED                                           = 3;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS_FAILED                                           = 4;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS(const uint32_t dsmAuthentication) { return dsmAuthentication & 0x0000003f; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_NONE                            = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_KROOT                           = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_PKR                             = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_ALERT                           = 3;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_KROOTFAILED                     = 4;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_PKRFAILED                       = 5;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_UNKNOWNPUBKEY                   = 6;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_DECOMPRESSFAILED                = 7;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_UNSUPPORTEDCONFIG               = 8;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_MISSINGMERKLEROOT               = 9;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_HASHFUNCTION(const uint32_t dsmAuthentication)          { return (dsmAuthentication >> 6) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_MACFUNCTION(const uint32_t dsmAuthentication)           { return (dsmAuthentication >> 8) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_PUBKEYID(const uint32_t dsmAuthentication)              { return (dsmAuthentication >> 10) & 0x0f; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_MACLOOKUPTABLE(const uint32_t dsmAuthentication)        { return (dsmAuthentication >> 14) & 0xff; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_KEYSIZE(const uint32_t dsmAuthentication)               { return (dsmAuthentication >> 22) & 0x0f; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_MACSIZE(const uint32_t dsmAuthentication)               { return (dsmAuthentication >> 26) & 0x0f; }  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_FROMNVS(const uint32_t dsmAuthentication)               { return (dsmAuthentication & 0x40000000) == 0x40000000; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS(const uint32_t teslaKey)                      { return teslaKey & 0x00000007; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS_NONE                                          = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS_AUTHENTICATED                                 = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS_FAILED                                        = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS_ONGOING                                       = 3;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS_KEYINPAST                                     = 4;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS_ROOTKEYTOOOLD                                 = 5;  //!< @todo documentation
+static constexpr uint16_t    UBX_SEC_OSNMA_V3_TESLAKEY_WNSF(const uint32_t teslaKey)                                    { return (teslaKey >> 3) & 0x0fff; }  //!< @todo documentation
+static constexpr uint16_t    UBX_SEC_OSNMA_V3_TESLAKEY_TOWSF(const uint32_t teslaKey)                                   { return (teslaKey >> 15) & 0x7fff; }  //!< @todo documentation
+static constexpr double      UBX_SEC_OSNMA_V3_TESLAKEY_TOWSF_SCALE                                                      = 30.0;  //!< towSf is seconds of week divided by 30s (subframe length)
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_CHAINID(const uint32_t teslaKey)                                 { return (teslaKey >> 30) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_AUTHSVS(const uint32_t generalAndTiming)                 { return generalAndTiming & 0x0000003f; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_AUTHNUMTIM(const uint32_t generalAndTiming)              { return (generalAndTiming >> 6) & 0x3f; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_TIMINGAUTHRESULT(const uint32_t generalAndTiming)        { return (generalAndTiming >> 12) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_TIMINGAUTHRESULT_NONE                                    = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_TIMINGAUTHRESULT_AUTHENTICATED                           = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_TIMINGAUTHRESULT_FAILED                                  = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MACADKDTYPE(const uint32_t generalAndTiming)             { return (generalAndTiming >> 14) & 0x01; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MACADKDTYPE_FAST                                         = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MACADKDTYPE_SLOW                                         = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYSRC(const uint32_t generalAndTiming)               { return (generalAndTiming >> 15) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYSRC_FACTORY                                        = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYSRC_SATELLITES                                     = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYSRC_AIDED                                          = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYSRC_NVS                                            = 3;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MERKLEROOTSRC(const uint32_t generalAndTiming)           { return (generalAndTiming >> 17) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MERKLEROOTSRC_FACTORY                                    = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MERKLEROOTSRC_AIDED                                      = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MERKLEROOTSRC_NVS                                        = 3;  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_GENERALANDTIMING_MERKLEROOTVAL(const uint32_t generalAndTiming)           { return (generalAndTiming & 0x00080000) == 0x00080000; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREMERKLEROOTSRC(const uint32_t generalAndTiming)     { return (generalAndTiming >> 20) & 0x03; }  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREMERKLEROOTVAL(const uint32_t generalAndTiming)     { return (generalAndTiming & 0x00400000) == 0x00400000; }  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYVAL(const uint32_t generalAndTiming)               { return (generalAndTiming & 0x00800000) == 0x00800000; }  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREPUBKEYVAL(const uint32_t generalAndTiming)         { return (generalAndTiming & 0x01000000) == 0x01000000; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREPUBKEYSRC(const uint32_t generalAndTiming)         { return (generalAndTiming >> 25) & 0x03; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREPUBKEYID(const uint32_t generalAndTiming)          { return (generalAndTiming >> 27) & 0x0f; }  //!< @todo documentation
+static constexpr uint16_t    UBX_SEC_OSNMA_V3_GROUP1_BITFIELD1_IODE(const uint16_t bitfield1)                           { return bitfield1 & 0x03ff; }  //!< @todo documentation
+static constexpr uint8_t     UBX_SEC_OSNMA_V3_GROUP1_BITFIELD1_AUTHNUM(const uint16_t bitfield1)                        { return (bitfield1 >> 10) & 0x1f; }  //!< @todo documentation
+static constexpr bool        UBX_SEC_OSNMA_V3_GROUP1_BITFIELD1_AUTHSTATUS(const uint16_t bitfield1)                     { return (bitfield1 & 0x8000) == 0x8000; }  //!< @todo documentation
+static constexpr std::size_t UBX_SEC_OSNMA_V3_SIZE(const uint8_t* msg)                                                  { return  //!< @todo documentation
+    sizeof(UBX_SEC_OSNMA_V3_GROUP0) + UBX_FRAME_SIZE + (UBX_SEC_OSNMA_V3_GENERALANDTIMING_AUTHSVS(*((uint32_t *)&((uint8_t *)(msg))[UBX_HEAD_SIZE + 24])) * sizeof(UBX_SEC_OSNMA_V3_GROUP1)); }  //!< @todo documentation
 // clang-format on
 
 ///@}

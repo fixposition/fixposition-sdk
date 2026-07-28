@@ -823,12 +823,13 @@ static std::size_t StrUbxNavTimeutc(char* info, const std::size_t size, const ui
     const uint8_t utcStandard = UBX_NAV_TIMEUTC_V0_VALID_UTCSTANDARD(utc.valid);
     constexpr std::array<const char*, 9> utcStandardStr = { { "NA", "CRL", "NIST", "USNO", "BIPM", "EU", "SU", "NTSC",
         "NPLI" } };
-    return std::snprintf(info, size, "%010.3f %c %04u-%02u-%02u %c %02u:%02u:%02u.%03u %c %s",
+    return std::snprintf(info, size, "%010.3f %c %04u-%02u-%02u %c %02u:%02u:%02u.%03u %c %s %s",
         (double)utc.iTow * UBX_NAV_TIMEUTC_V0_ITOW_SCALE, UBX_NAV_TIMEUTC_V0_VALID_VALIDWKN(utc.valid) ? 'Y' : 'N',
         utc.year, utc.month, utc.day, UBX_NAV_TIMEUTC_V0_VALID_VALIDTOW(utc.valid) ? 'Y' : 'N', utc.hour, utc.min,
         utc.sec, (int)(utc.nano * UBX_NAV_TIMEUTC_V0_NANO_SCALE) / 1000000,
         UBX_NAV_TIMEUTC_V0_VALID_VALIDUTC(utc.valid) ? 'Y' : 'N',
-        utcStandard < utcStandardStr.size() ? utcStandardStr[utcStandard] : "?");
+        utcStandard < utcStandardStr.size() ? utcStandardStr[utcStandard] : "?",
+        UBX_NAV_TIMEUTC_V0_VALID_AUTHSTATUS(utc.valid) ? "auth" : "not_auth");
 }
 
 static std::size_t StrUbxNavSig(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
@@ -849,6 +850,27 @@ static std::size_t StrUbxNavSat(char* info, const std::size_t size, const uint8_
     UBX_NAV_SAT_V1_GROUP0 head;
     std::memcpy(&head, &msg[UBX_HEAD_SIZE], sizeof(head));
     return std::snprintf(info, size, "%010.3f %d", (double)head.iTOW * 1e-3, head.numSvs);
+}
+
+static std::size_t StrUbxSecOsnma(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
+{
+    if ((msg_size < UBX_SEC_OSNMA_V3_MIN_SIZE) || (UBX_SEC_OSNMA_VERSION(msg) != UBX_SEC_OSNMA_V3_VERSION)) {
+        return 0;
+    }
+    UBX_SEC_OSNMA_V3_GROUP0 osnma;
+    std::memcpy(&osnma, &msg[UBX_HEAD_SIZE], sizeof(osnma));
+
+    constexpr std::array<const char*, 4> nmaStatusStrs = { { "not_auth", "test", "operational", "invalid" } };
+    constexpr std::array<const char*, 6> teslaStrs = { { "none", "auth", "failed", "ongoing", "key_in_past",
+        "root_key_too_old" } };
+    const auto nmaStatus = UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS(osnma.nmaHeader);
+    const auto tesla = UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS(osnma.teslaKey);
+    return std::snprintf(info, size, "enabled=%c nmaStatus=%s numSVs=%u authSVs=%u tesla=%s",
+        UBX_SEC_OSNMA_V3_OSNMAMONITORING_OSNMAENABLED(osnma.osnmaMonitoring) ? 'Y' : 'N',
+        nmaStatus < nmaStatusStrs.size() ? nmaStatusStrs[nmaStatus] : "?",
+        UBX_SEC_OSNMA_V3_OSNMAMONITORING_NUMBERSVS(osnma.osnmaMonitoring),
+        UBX_SEC_OSNMA_V3_GENERALANDTIMING_AUTHSVS(osnma.generalAndTiming),
+        tesla < teslaStrs.size() ? teslaStrs[tesla] : "?");
 }
 
 static std::size_t StrUbxInf(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
@@ -1258,6 +1280,8 @@ bool UbxGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
         case UBX_NAV_SVIN_MSGID:         /* FALLTHROUGH */
         case UBX_NAV_ODO_MSGID:          /* FALLTHROUGH */
         case UBX_NAV_HPPOSLLH_MSGID:     len = StrUbxNav(info, size, msg, msg_size, 4);             break; } break;
+        case UBX_SEC_CLSID:              switch (msg_id) {
+        case UBX_SEC_OSNMA_MSGID:        len = StrUbxSecOsnma(info, size, msg, msg_size);           break; } break;
         case UBX_INF_CLSID:              len = StrUbxInf(info, size, msg, msg_size);                break;
         case UBX_RXM_CLSID:              switch (msg_id) {
         case UBX_RXM_RAWX_MSGID:         len = StrUbxRxmRawx(info, size, msg, msg_size);            break;
