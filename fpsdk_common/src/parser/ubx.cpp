@@ -852,6 +852,31 @@ static std::size_t StrUbxNavSat(char* info, const std::size_t size, const uint8_
     return std::snprintf(info, size, "%010.3f %d", (double)head.iTOW * 1e-3, head.numSvs);
 }
 
+static std::size_t StrUbxNavTimetrusted(
+    char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
+{
+    if ((msg_size != UBX_NAV_TIMETRUSTED_V1_SIZE) ||
+        (UBX_NAV_TIMETRUSTED_VERSION(msg) != UBX_NAV_TIMETRUSTED_V1_VERSION)) {
+        return 0;
+    }
+    UBX_NAV_TIMETRUSTED_V1_GROUP0 tt;
+    std::memcpy(&tt, &msg[UBX_HEAD_SIZE], sizeof(tt));
+    constexpr std::array<const char*, 4> refSysStrs = { { "none", "GPS", "GAL", "BDS" } };  // clang-format off
+    const char* refSysStr = (tt.refSys == UBX_NAV_TIMETRUSTED_V1_REFSYS_NAVIC ? "NavIC"
+        : (tt.refSys < refSysStrs.size() ? refSysStrs[tt.refSys] : "?"));  // clang-format on
+
+    return std::snprintf(info, size,
+        "%010.3f refSys=%s trusted=%c ini=%u:%.3f iniTAcc=%.3f prop=%u:%.3f propTAcc=%.3f delta=%c %+.3f",
+        (double)tt.iTOW * UBX_NAV_TIMETRUSTED_V1_ITOW_SCALE, refSysStr,
+        UBX_NAV_TIMETRUSTED_V1_VALID_TRUSTEDTIMEVALID(tt.valid) ? 'Y' : 'N', tt.iniWno,
+        (double)tt.iniTow * UBX_NAV_TIMETRUSTED_V1_INITOW_SCALE,
+        (double)tt.iniTAcc * UBX_NAV_TIMETRUSTED_V1_INITACC_SCALE, tt.propWno,
+        (double)tt.propTow * UBX_NAV_TIMETRUSTED_V1_PROPTOW_SCALE,
+        (double)tt.propTAcc * UBX_NAV_TIMETRUSTED_V1_PROPTACC_SCALE,
+        UBX_NAV_TIMETRUSTED_V1_VALID_DELTATIMEVALID(tt.valid) ? 'Y' : 'N',
+        (double)tt.deltaS + (double)tt.deltaMs * UBX_NAV_TIMETRUSTED_V1_DELTAMS_SCALE);
+}
+
 static std::size_t StrUbxSecOsnma(char* info, const std::size_t size, const uint8_t* msg, const std::size_t msg_size)
 {
     if ((msg_size < UBX_SEC_OSNMA_V3_MIN_SIZE) || (UBX_SEC_OSNMA_VERSION(msg) != UBX_SEC_OSNMA_V3_VERSION)) {
@@ -1267,6 +1292,7 @@ bool UbxGetMessageInfo(char* info, const std::size_t size, const uint8_t* msg, c
         case UBX_NAV_TIMEBDS_MSGID:      len = StrUbxNavTimebds(info, size, msg, msg_size);         break;
         case UBX_NAV_TIMEGLO_MSGID:      len = StrUbxNavTimeglo(info, size, msg, msg_size);         break;
         case UBX_NAV_TIMEUTC_MSGID:      len = StrUbxNavTimeutc(info, size, msg, msg_size);         break;
+        case UBX_NAV_TIMETRUSTED_MSGID:  len = StrUbxNavTimetrusted(info, size, msg, msg_size);     break;
         case UBX_NAV_ORB_MSGID:          /* FALLTHROUGH */
         case UBX_NAV_CLOCK_MSGID:        /* FALLTHROUGH */
         case UBX_NAV_DOP_MSGID:          /* FALLTHROUGH */
