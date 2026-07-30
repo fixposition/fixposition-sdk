@@ -1117,6 +1117,150 @@ static constexpr uint8_t     UBX_ESF_STATUS_V2_FAULTS_NOISYMEAS                 
 ///@}
 // ---------------------------------------------------------------------------------------------------------------------
 /**
+ * @name UBX-MGA-GAL-OSNMA_PUBKEY message
+ * @{
+ */
+
+//! UBX-MGA-GAL-OSNMA_PUBKEY (version 0, input) payload
+struct UBX_MGA_GAL_OSNMA_PUBKEY_V0_GROUP0  // clang-format off
+{
+    uint8_t  type;             //!< @todo documentation
+    uint8_t  version;          //!< @todo documentation
+    uint8_t  bitfield0;        //!< @todo documentation
+    uint8_t  reserved0;        //!< @todo documentation
+    uint8_t  pubKeyPoint[67];  //!< @todo documentation
+    uint8_t  reserved1;        //!< @todo documentation
+};  // clang-format on
+
+static_assert(sizeof(UBX_MGA_GAL_OSNMA_PUBKEY_V0_GROUP0) == 72, "");
+
+// clang-format off
+static constexpr uint8_t     UBX_MGA_GAL_OSNMA_PUBKEY_TYPE                                          = 0x07;  //!< @todo documentation
+static constexpr const char* UBX_MGA_GAL_OSNMA_PUBKEY_STRID                                         = "UBX-MGA-GAL-OSNMA_PUBKEY";  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_GAL_OSNMA_PUBKEY_V0_VERSION                                    = 0x00;  //!< @todo documentation
+static constexpr std::size_t UBX_MGA_GAL_OSNMA_PUBKEY_V0_SIZE                                       = sizeof(UBX_MGA_GAL_OSNMA_PUBKEY_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_GAL_OSNMA_PUBKEY_V0_BITFIELD0_PUBKEYID(const uint8_t bitfield0) { return bitfield0 & 0x0f; }  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_GAL_OSNMA_PUBKEY_V0_BITFIELD0_PUBKEYTYPE(const uint8_t bitfield0) { return (bitfield0 >> 4) & 0x0f; }  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_GAL_OSNMA_PUBKEY_V0_BITFIELD0_PUBKEYTYPE_ECDSAP256             = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_GAL_OSNMA_PUBKEY_V0_BITFIELD0_PUBKEYTYPE_ECDSAP521             = 3;  //!< @todo documentation
+// clang-format on
+
+///@}
+// ---------------------------------------------------------------------------------------------------------------------
+/**
+ * @name UBX-MGA-GAL-OSNMA_MERKLE message
+ * @{
+ */
+
+//! UBX-MGA-GAL-OSNMA_MERKLE (version 0, input) payload
+struct UBX_MGA_GAL_OSNMA_MERKLE_V0_GROUP0  // clang-format off
+{
+    uint8_t  type;           //!< @todo documentation
+    uint8_t  version;        //!< @todo documentation
+    uint8_t  bitfield0;      //!< @todo documentation
+    uint8_t  reserved0;      //!< @todo documentation
+    uint8_t  treeNode[32];   //!< @todo documentation
+};  // clang-format on
+
+static_assert(sizeof(UBX_MGA_GAL_OSNMA_MERKLE_V0_GROUP0) == 36, "");
+
+// clang-format off
+static constexpr uint8_t     UBX_MGA_GAL_OSNMA_MERKLE_TYPE                                          = 0x08;  //!< @todo documentation
+static constexpr const char* UBX_MGA_GAL_OSNMA_MERKLE_STRID                                         = "UBX-MGA-GAL-OSNMA_MERKLE";  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_GAL_OSNMA_MERKLE_V0_VERSION                                    = 0x00;  //!< @todo documentation
+static constexpr std::size_t UBX_MGA_GAL_OSNMA_MERKLE_V0_SIZE                                       = sizeof(UBX_MGA_GAL_OSNMA_MERKLE_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_GAL_OSNMA_MERKLE_V0_BITFIELD0_APPLICABILITYTIME(const uint8_t bitfield0) { return bitfield0 & 0x01; }  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_GAL_OSNMA_MERKLE_V0_BITFIELD0_APPLICABILITYTIME_CURRENT        = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_GAL_OSNMA_MERKLE_V0_BITFIELD0_APPLICABILITYTIME_FUTURE         = 1;  //!< @todo documentation
+// clang-format on
+
+///@}
+// ---------------------------------------------------------------------------------------------------------------------
+/**
+ * @name UBX-MGA-INI-TIME_UTC message
+ * @{
+ */
+
+//! UBX-MGA-INI-TIME_UTC (version 0, input) payload
+struct UBX_MGA_INI_TIME_UTC_V0_GROUP0  // clang-format off
+{
+    uint8_t  type;           //!< @todo documentation
+    uint8_t  version;        //!< @todo documentation
+    uint8_t  ref;            //!< @todo documentation
+    int8_t   leapSecs;       //!< @todo documentation
+    uint16_t year;           //!< @todo documentation
+    uint8_t  month;          //!< @todo documentation
+    uint8_t  day;            //!< @todo documentation
+    uint8_t  hour;           //!< @todo documentation
+    uint8_t  minute;         //!< @todo documentation
+    uint8_t  second;         //!< @todo documentation
+    uint8_t  bitfield0;      //!< @todo documentation
+    uint32_t ns;             //!< @todo documentation
+    uint16_t tAccS;          //!< @todo documentation
+    uint8_t  reserved0[2];   //!< @todo documentation
+    uint32_t tAccNs;         //!< @todo documentation
+};  // clang-format on
+
+static_assert(sizeof(UBX_MGA_INI_TIME_UTC_V0_GROUP0) == 24, "");
+
+// clang-format off
+static constexpr uint8_t     UBX_MGA_INI_TIME_UTC_TYPE                                              = 0x10;  //!< @todo documentation
+static constexpr const char* UBX_MGA_INI_TIME_UTC_STRID                                             = "UBX-MGA-INI-TIME_UTC";  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_INI_TIME_UTC_V0_VERSION                                        = 0x00;  //!< @todo documentation
+static constexpr std::size_t UBX_MGA_INI_TIME_UTC_V0_SIZE                                           = sizeof(UBX_MGA_INI_TIME_UTC_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_INI_TIME_UTC_V0_REF_SOURCE(const uint8_t ref)                  { return ref & 0x0f; }  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_INI_TIME_UTC_V0_REF_SOURCE_NONE                                = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_INI_TIME_UTC_V0_REF_SOURCE_EXTINT0                             = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_INI_TIME_UTC_V0_REF_SOURCE_EXTINT1                             = 2;  //!< @todo documentation
+static constexpr bool        UBX_MGA_INI_TIME_UTC_V0_REF_FALL(const uint8_t ref)                    { return (ref & 0x10) == 0x10; }  //!< @todo documentation
+static constexpr bool        UBX_MGA_INI_TIME_UTC_V0_REF_LAST(const uint8_t ref)                    { return (ref & 0x20) == 0x20; }  //!< @todo documentation
+static constexpr int8_t      UBX_MGA_INI_TIME_UTC_V0_LEAPSECS_UNKNOWN                               = -128;  //!< @todo documentation
+static constexpr bool        UBX_MGA_INI_TIME_UTC_V0_BITFIELD0_TRUSTEDSOURCE(const uint8_t bitfield0) { return (bitfield0 & 0x01) == 0x01; }  //!< @todo documentation
+// clang-format on
+
+///@}
+// ---------------------------------------------------------------------------------------------------------------------
+/**
+ * @name UBX-MGA-INI-TIME_GNSS message
+ * @{
+ */
+
+//! UBX-MGA-INI-TIME_GNSS (version 0, input) payload
+struct UBX_MGA_INI_TIME_GNSS_V0_GROUP0  // clang-format off
+{
+    uint8_t  type;           //!< @todo documentation
+    uint8_t  version;        //!< @todo documentation
+    uint8_t  ref;            //!< @todo documentation
+    uint8_t  gnssId;         //!< @todo documentation
+    uint8_t  bitfield0;      //!< @todo documentation
+    uint8_t  reserved0;      //!< @todo documentation
+    uint16_t week;           //!< @todo documentation
+    uint32_t tow;            //!< @todo documentation
+    uint32_t ns;             //!< @todo documentation
+    uint16_t tAccS;          //!< @todo documentation
+    uint8_t  reserved1[2];   //!< @todo documentation
+    uint32_t tAccNs;         //!< @todo documentation
+};  // clang-format on
+
+static_assert(sizeof(UBX_MGA_INI_TIME_GNSS_V0_GROUP0) == 24, "");
+
+// clang-format off
+static constexpr uint8_t     UBX_MGA_INI_TIME_GNSS_TYPE                                             = 0x11;  //!< @todo documentation
+static constexpr const char* UBX_MGA_INI_TIME_GNSS_STRID                                            = "UBX-MGA-INI-TIME_GNSS";  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_INI_TIME_GNSS_V0_VERSION                                       = 0x00;  //!< @todo documentation
+static constexpr std::size_t UBX_MGA_INI_TIME_GNSS_V0_SIZE                                          = sizeof(UBX_MGA_INI_TIME_GNSS_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_INI_TIME_GNSS_V0_REF_SOURCE(const uint8_t ref)                 { return ref & 0x0f; }  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_INI_TIME_GNSS_V0_REF_SOURCE_NONE                               = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_INI_TIME_GNSS_V0_REF_SOURCE_EXTINT0                            = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_MGA_INI_TIME_GNSS_V0_REF_SOURCE_EXTINT1                            = 2;  //!< @todo documentation
+static constexpr bool        UBX_MGA_INI_TIME_GNSS_V0_REF_FALL(const uint8_t ref)                   { return (ref & 0x10) == 0x10; }  //!< @todo documentation
+static constexpr bool        UBX_MGA_INI_TIME_GNSS_V0_REF_LAST(const uint8_t ref)                   { return (ref & 0x20) == 0x20; }  //!< @todo documentation
+static constexpr bool        UBX_MGA_INI_TIME_GNSS_V0_BITFIELD0_TRUSTEDSOURCE(const uint8_t bitfield0) { return (bitfield0 & 0x01) == 0x01; }  //!< @todo documentation
+// clang-format on
+
+///@}
+// ---------------------------------------------------------------------------------------------------------------------
+/**
  * @name UBX-MON-COMMS message
  * @{
  */
@@ -2111,6 +2255,53 @@ static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_RTCM3_SSR                
 static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_QZSS_SLAS                                    = 6;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_SPARTN                                       = 7;  //!< @todo documentation
 static constexpr double      UBX_NAV_SIG_V0_PRRES_SCALE                                             = 1e-1;  //!< @todo documentation
+// clang-format on
+
+///@}
+// ---------------------------------------------------------------------------------------------------------------------
+/**
+ * @name UBX-NAV-TIMETRUSTED message
+ * @{
+ */
+
+//! UBX-NAV-TIMETRUSTED (version 1, output) payload
+struct UBX_NAV_TIMETRUSTED_V1_GROUP0  // clang-format off
+{
+    uint8_t  version;        //!< @todo documentation
+    uint8_t  refSys;         //!< @todo documentation
+    uint8_t  valid;          //!< @todo documentation
+    uint8_t  reserved0;      //!< @todo documentation
+    uint32_t iTOW;           //!< @todo documentation
+    uint16_t iniWno;         //!< @todo documentation
+    uint16_t propWno;        //!< @todo documentation
+    uint32_t iniTow;         //!< @todo documentation
+    uint32_t propTow;        //!< @todo documentation
+    uint32_t iniTAcc;        //!< @todo documentation
+    uint32_t propTAcc;       //!< @todo documentation
+    int32_t  deltaS;         //!< @todo documentation
+    int32_t  deltaMs;        //!< @todo documentation
+    uint8_t  reserved1[4];   //!< @todo documentation
+};  // clang-format on
+
+static_assert(sizeof(UBX_NAV_TIMETRUSTED_V1_GROUP0) == 40, "");
+
+// clang-format off
+static constexpr uint8_t     UBX_NAV_TIMETRUSTED_VERSION(const uint8_t* msg)                        { return msg[UBX_HEAD_SIZE]; }  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_TIMETRUSTED_V1_VERSION                                         = 0x01;  //!< @todo documentation
+static constexpr std::size_t UBX_NAV_TIMETRUSTED_V1_SIZE                                            = sizeof(UBX_NAV_TIMETRUSTED_V1_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_TIMETRUSTED_V1_REFSYS_NONE                                     = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_TIMETRUSTED_V1_REFSYS_GPS                                      = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_TIMETRUSTED_V1_REFSYS_GAL                                      = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_TIMETRUSTED_V1_REFSYS_BDS                                      = 3;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_TIMETRUSTED_V1_REFSYS_NAVIC                                    = 15;  //!< @todo documentation
+static constexpr bool        UBX_NAV_TIMETRUSTED_V1_VALID_TRUSTEDTIMEVALID(const uint8_t valid)     { return (valid & 0x01) == 0x01; }  //!< @todo documentation
+static constexpr bool        UBX_NAV_TIMETRUSTED_V1_VALID_DELTATIMEVALID(const uint8_t valid)       { return (valid & 0x02) == 0x02; }  //!< @todo documentation
+static constexpr double      UBX_NAV_TIMETRUSTED_V1_ITOW_SCALE                                      = 1e-3;  //!< @todo documentation
+static constexpr double      UBX_NAV_TIMETRUSTED_V1_INITOW_SCALE                                    = 1e-3;  //!< @todo documentation
+static constexpr double      UBX_NAV_TIMETRUSTED_V1_PROPTOW_SCALE                                   = 1e-3;  //!< @todo documentation
+static constexpr double      UBX_NAV_TIMETRUSTED_V1_INITACC_SCALE                                   = 1e-3;  //!< @todo documentation
+static constexpr double      UBX_NAV_TIMETRUSTED_V1_PROPTACC_SCALE                                  = 1e-3;  //!< @todo documentation
+static constexpr double      UBX_NAV_TIMETRUSTED_V1_DELTAMS_SCALE                                   = 1e-3;  //!< @todo documentation
 // clang-format on
 
 ///@}
