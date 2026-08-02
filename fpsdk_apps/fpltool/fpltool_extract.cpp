@@ -41,10 +41,7 @@
 #include <fpsdk_common/time.hpp>
 #include <fpsdk_common/to_json/fpl.hpp>
 #include <fpsdk_common/to_json/fpl_ros1.hpp>
-#include <fpsdk_common/to_json/nmea.hpp>
 #include <fpsdk_common/to_json/parser.hpp>
-#include <fpsdk_common/to_json/parser_fpa.hpp>
-#include <fpsdk_common/to_json/parser_fpb.hpp>
 #include <fpsdk_common/to_json/ros1.hpp>
 #include <fpsdk_common/to_json/time.hpp>
 #include <fpsdk_common/types.hpp>
@@ -61,9 +58,6 @@ using namespace fpsdk::common::app;
 using namespace fpsdk::common::cam;
 using namespace fpsdk::common::fpl;
 using namespace fpsdk::common::parser;
-using namespace fpsdk::common::parser::fpa;
-using namespace fpsdk::common::parser::fpb;
-using namespace fpsdk::common::parser::nmea;
 using namespace fpsdk::common::path;
 using namespace fpsdk::common::ros1;
 using namespace fpsdk::common::string;
@@ -628,17 +622,8 @@ bool FplToolExtract::WriteJson(const std::string& name, const nlohmann::json& js
 bool FplToolExtract::WriteStreamMsg(const std::string& name, const StreamMsg& streammsg, const ParserMsg& parsermsg)
 {
     parsermsg.MakeInfo();
-    nlohmann::json jdata = streammsg;  // magic to_json() (_type, _stamp, _stream, _data/_data_b64)
-    jdata.update(parsermsg);           // magic to_json() (_proto, _name, _seq, _info, _data/_data_b64)
-
-    // We can decode some messages of some protocols
-    if (parsermsg.proto_ == Protocol::FP_A) {
-        jdata.update(FpaDecodeMessage(parsermsg.data_));  // magic to_json()
-    } else if (parsermsg.proto_ == Protocol::NMEA) {
-        jdata.update(NmeaDecodeMessage(parsermsg.data_));  // magic to_json()
-    } else if (parsermsg.proto_ == Protocol::FP_B) {
-        jdata.update(to_json_FP_B(parsermsg));  // magic to_json()
-    }
+    auto jdata = ParserMsgToJson(parsermsg);  // magic to_json() (_proto, _name, _seq, _info, _data/_data_b64)
+    jdata.update(streammsg);                  // magic to_json() (_type, _stamp, _stream, _data/_data_b64)
     return WriteJson(name, jdata);
 }
 

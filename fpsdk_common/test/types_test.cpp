@@ -81,6 +81,25 @@ TEST(TypesTest, Macros)
     EXPECT_EQ(SIZEOF_FIELD(SomeStruct, b), 3 * sizeof(uint8_t));
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+
+inline const char* IxToStrFunc(const std::size_t ix)
+{
+    return IxToStr(ix, "bla", "bla");
+}
+
+TEST(IxToStr, NumOf)
+{
+    ASSERT_EQ(std::string(IxToStr(0, "foo", "bar", "baz")), std::string("foo"));
+    ASSERT_EQ(std::string(IxToStr(1, "foo", "bar", "baz")), std::string("bar"));
+    ASSERT_EQ(std::string(IxToStr(2, "foo", "bar", "baz")), std::string("baz"));
+    ASSERT_EQ(std::string(IxToStr(3, "foo", "bar", "baz")), std::string("?"));
+    ASSERT_EQ(std::string(IxToStrFunc(0)), std::string("bla"));
+    const char* s1 = IxToStrFunc(1);
+    const char* s2 = IxToStrFunc(1);
+    ASSERT_EQ(s1, s2);
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace
 

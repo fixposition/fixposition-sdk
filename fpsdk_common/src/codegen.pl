@@ -282,6 +282,7 @@ my @UBX_MESSAGES =
     { class => 'SEC',    name => 'SIG',            msgid => 0x09 },
     { class => 'SEC',    name => 'SIGLOG',         msgid => 0x10 },
     { class => 'SEC',    name => 'UNIQID',         msgid => 0x03 },
+    { class => 'TIM',    name => 'SVIN',           msgid => 0x04 },
     { class => 'TIM',    name => 'TM2',            msgid => 0x03 },
     { class => 'TIM',    name => 'TP',             msgid => 0x01 },
     { class => 'TIM',    name => 'VRFY',           msgid => 0x06 },
