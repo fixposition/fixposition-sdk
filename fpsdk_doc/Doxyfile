@@ -1087,7 +1087,6 @@ EXAMPLE_PATH           = fpsdk_doc \
                          fpsdk_common/doc \
                          fpsdk_ros1 \
                          fpsdk_ros1/doc \
-                         fpsdk_ros1/msg \
                          fpsdk_ros2 \
                          fpsdk_ros2/doc \
                          fpsdk_apps \

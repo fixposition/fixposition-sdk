@@ -27,6 +27,7 @@
 #include <fpsdk_common/parser.hpp>
 #include <fpsdk_common/string.hpp>
 #include <fpsdk_common/time.hpp>
+#include <fpsdk_common/to_json/parser.hpp>
 
 /* PACKAGE */
 #include "../common/common.hpp"
@@ -50,15 +51,17 @@ class ParserToolOptions : public ProgramOptions
    public:
     ParserToolOptions()  // clang-format off
         : ProgramOptions("parsertool", {
-            { 'x', false, "hexdump" }, { 's', false, "save" }, { 'f', true, "filter" }, { 'c', false, "stdout" }
+            { 'x', false, "hexdump" }, { 's', false, "save" }, { 'f', true, "filter" }, { 'c', false, "stdout" },
+            { 'j', false, "jsonl" }
         }) {};  // clang-format on
 
     // clang-format off
-    bool                      hexdump_ = false;  //!< Do hexdump of messages
-    bool                      split_   = false;  //!< Split individual messages and save to files
-    std::vector<std::string>  inputs_;           //!< Input file(s)
-    std::vector<std::string>  filters_;          //!< Filters
-    bool                      stdout_  = false;  //!< Write message to stdout instead of info about it
+    bool                      hexdump_ = false;  //!< See help screen below
+    bool                      save_    = false;  //!< See help screen below
+    std::vector<std::string>  inputs_;           //!< See help screen below
+    std::vector<std::string>  filters_;          //!< See help screen below
+    bool                      stdout_  = false;  //!< See help screen below
+    bool                      jsonl_   = false;  //!< See help screen below
     // clang-format on
 
     void PrintHelp() override final
@@ -79,11 +82,12 @@ class ParserToolOptions : public ProgramOptions
         std::fputs(
             "\n"
             "    -x, --hexdump  -- Print hexdump of each message, not with -c\n"
-            "    -s, --save     -- Save each (!) message into a separate (!) file in the current directory, not with -c\n"
+            "    -s, --save     -- Save each (!) message into a separate (!) file in the current directory, not with -cj\n"
             "    -f <filter>, --filter <filter>\n"
             "                   -- Filter input, where <filter> is a comma-separated list of full or partial message.\n"
             "                      names. Multiple -f can be given.\n"
-            "    -c, --stdout   -- Write messages to stdout instead of printing info, useful with -f\n"
+            "    -c, --stdout   -- Write messages to stdout instead of printing info, useful with -f, not with -j\n"
+            "    -j, --jsonl    -- Write messages as JSONL to stdout instead of printing info, not with -c\n"
             "    <input>        -- File or device to read data from (instead of stdin)\n"
             "\n"
             "Examples:\n"
@@ -107,16 +111,24 @@ class ParserToolOptions : public ProgramOptions
             "\n"
             "    Filter all FP_A-ODOMETRY:\n"
             "\n"
-            "        parsertool -f FP_A-ODOMETRY fpsdk_common/test/data/mixed.bin\n"
+            "        parsertool -f FP_A-ODOMETRY fpsdk_common/test/data/test_data_mixed.bin\n"
             "\n"
             "    Filter all NMEA and FP_A messages. Either command does the same.\n"
             "\n"
-            "        parsertool -f FP_A -f NMEA fpsdk_common/test/data/mixed.bin\n"
-            "        parsertool -f FP_A,NMEA fpsdk_common/test/data/mixed.bin\n"
+            "        parsertool -f FP_A -f NMEA fpsdk_common/test/data/test_data_mixed.bin\n"
+            "        parsertool -f FP_A,NMEA fpsdk_common/test/data/test_data_mixed.bin\n"
             "\n"
             "    Filter all NMEA and FP_A messages and store to output.txt file:\n"
             "\n"
-            "        parsertool -f FP_A,NMEA -c fpsdk_common/test/data/mixed.bin > output.txt\n"
+            "        parsertool -f FP_A,NMEA -c fpsdk_common/test/data/test_data_mixed.bin > output.txt\n"
+            "\n"
+            "    Output messages as JSON (incl. decoding of fields where implemented):\n"
+            "\n"
+            "        parsertool -j fpsdk_common/test/data/test_data_mixed.bin\n"
+            "\n"
+            "    Output messages as JSON and pretty-print:\n"
+            "\n"
+            "        parsertool -j fpsdk_common/test/data/test_data_mixed.bin | jq\n"
             "\n"
             "\n", stdout);
         // clang-format on
@@ -130,7 +142,7 @@ class ParserToolOptions : public ProgramOptions
                 hexdump_ = true;
                 break;
             case 's':
-                split_ = true;
+                save_ = true;
                 break;
             case 'f':
                 for (auto& f : StrSplit(argument, ",")) {
@@ -139,6 +151,9 @@ class ParserToolOptions : public ProgramOptions
                 break;
             case 'c':
                 stdout_ = true;
+                break;
+            case 'j':
+                jsonl_ = true;
                 break;
             default:
                 ok = false;
@@ -158,11 +173,27 @@ class ParserToolOptions : public ProgramOptions
             DEBUG("inputs_[%" PRIuMAX "] = '%s'", ix, inputs_[ix].c_str());
         }
         DEBUG("hexdump    = %s", ToStr(hexdump_));
-        DEBUG("split      = %s", ToStr(split_));
+        DEBUG("save       = %s", ToStr(save_));
         for (std::size_t ix = 0; ix < filters_.size(); ix++) {
             DEBUG("filters[%" PRIuMAX "] = %s", ix, filters_[ix].c_str());
         }
         DEBUG("stdout     = %s", ToStr(stdout_));
+        DEBUG("jsonl      = %s", ToStr(jsonl_));
+
+        if (stdout_ && jsonl_) {
+            WARNING("Cannot do --stdout and --jsonl at the same time");
+            ok = false;
+        }
+
+        if (hexdump_ && jsonl_) {
+            WARNING("Cannot do --hexdump and --jsonl at the same time");
+            ok = false;
+        }
+
+        if (save_ && (stdout_ || jsonl_)) {
+            WARNING("Cannot do --save and --stdout or --jsonlat the same time");
+            ok = false;
+        }
 
         return ok;
     }
@@ -289,7 +320,8 @@ class ParserTool
     void PrintMessageHeader()
     {
         // Keep in sync with PrintMessageData()
-        std::printf("------- Seq#     Offset  Size Protocol Message                        Info\n");
+        std::fprintf(opts_.jsonl_ ? stderr : stdout,
+            "------- Seq#     Offset  Size Protocol Message                        Info\n");
     }
 
     // -----------------------------------------------------------------------------------------------------------------
@@ -302,16 +334,19 @@ class ParserTool
 
         if (opts_.stdout_) {
             std::fwrite(msg.Data(), msg.Size(), 1, stdout);
+        } else if (opts_.jsonl_) {
+            msg.MakeInfo();
+            std::printf("%s\n", ParserMsgToJson(msg).dump().c_str());
         } else {
             msg.MakeInfo();
-            std::printf("message %06" PRIuMAX " %8" PRIuMAX " %5" PRIuMAX " %-8s %-30s %s\n", msg.seq_, offs,
+            std::printf("message %08" PRIuMAX " %8" PRIuMAX " %5" PRIuMAX " %-8s %-30s %s\n", msg.seq_, offs,
                 msg.Size(), ProtocolStr(msg.proto_), msg.name_.c_str(), msg.info_.empty() ? "-" : msg.info_.c_str());
             if (hexdump) {
                 for (auto& line : HexDump(msg.data_)) {
                     std::printf("%s\n", line.c_str());
                 }
             }
-            if (opts_.split_) {
+            if (opts_.save_) {
                 SaveMessage(msg);
             }
         }
@@ -327,21 +362,22 @@ class ParserTool
         const auto& s = stats_;
         const double p_n = (s.n_msgs_ > 0 ? 100.0 / (double)s.n_msgs_ : 0.0);
         const double p_s = (s.s_msgs_ > 0 ? 100.0 / (double)s.s_msgs_ : 0.0);
-        std::printf("Stats:     Messages               Bytes\n");
+        FILE* f = (opts_.jsonl_ ? stderr : stdout);
+        std::fprintf(f, "Stats:     Messages               Bytes\n");
         const char* fmt = "%-8s %10" PRIu64 " (%5.1f%%) %10" PRIu64 " (%5.1f%%)\n";
         // clang-format off
-        std::printf(fmt, "Total",                              s.n_msgs_,   (double)s.n_msgs_   * p_n, s.s_msgs_,   (double)s.s_msgs_   * p_s);
-        std::printf(fmt, ProtocolStr(Protocol::FP_A),   s.n_fpa_,    (double)s.n_fpa_    * p_n, s.s_fpa_,    (double)s.s_fpa_    * p_s);
-        std::printf(fmt, ProtocolStr(Protocol::FP_B),   s.n_fpb_,    (double)s.n_fpb_    * p_n, s.s_fpb_,    (double)s.s_fpb_    * p_s);
-        std::printf(fmt, ProtocolStr(Protocol::NMEA),   s.n_nmea_,   (double)s.n_nmea_   * p_n, s.s_nmea_,   (double)s.s_nmea_   * p_s);
-        std::printf(fmt, ProtocolStr(Protocol::UBX),    s.n_ubx_,    (double)s.n_ubx_    * p_n, s.s_ubx_,    (double)s.s_ubx_    * p_s);
-        std::printf(fmt, ProtocolStr(Protocol::RTCM3),  s.n_rtcm3_,  (double)s.n_rtcm3_  * p_n, s.s_rtcm3_,  (double)s.s_rtcm3_  * p_s);
-        std::printf(fmt, ProtocolStr(Protocol::NOV_B),  s.n_novb_,   (double)s.n_novb_   * p_n, s.s_novb_,   (double)s.s_novb_   * p_s);
-        std::printf(fmt, ProtocolStr(Protocol::UNI_B),  s.n_unib_,   (double)s.n_unib_   * p_n, s.s_unib_,   (double)s.s_unib_   * p_s);
-        std::printf(fmt, ProtocolStr(Protocol::SBF),    s.n_sbf_,    (double)s.n_sbf_ *    p_n, s.s_sbf_,    (double)s.s_sbf_    * p_s);
-        std::printf(fmt, ProtocolStr(Protocol::QGC),    s.n_qgc_,    (double)s.n_qgc_ *    p_n, s.s_qgc_,    (double)s.s_qgc_    * p_s);
-        std::printf(fmt, ProtocolStr(Protocol::SPARTN), s.n_spartn_, (double)s.n_spartn_ * p_n, s.s_spartn_, (double)s.s_spartn_ * p_s);
-        std::printf(fmt, ProtocolStr(Protocol::OTHER),  s.n_other_,  (double)s.n_other_  * p_n, s.s_other_,  (double)s.s_other_  * p_s);
+        std::fprintf(f, fmt, "Total",                              s.n_msgs_,   (double)s.n_msgs_   * p_n, s.s_msgs_,   (double)s.s_msgs_   * p_s);
+        std::fprintf(f, fmt, ProtocolStr(Protocol::FP_A),   s.n_fpa_,    (double)s.n_fpa_    * p_n, s.s_fpa_,    (double)s.s_fpa_    * p_s);
+        std::fprintf(f, fmt, ProtocolStr(Protocol::FP_B),   s.n_fpb_,    (double)s.n_fpb_    * p_n, s.s_fpb_,    (double)s.s_fpb_    * p_s);
+        std::fprintf(f, fmt, ProtocolStr(Protocol::NMEA),   s.n_nmea_,   (double)s.n_nmea_   * p_n, s.s_nmea_,   (double)s.s_nmea_   * p_s);
+        std::fprintf(f, fmt, ProtocolStr(Protocol::UBX),    s.n_ubx_,    (double)s.n_ubx_    * p_n, s.s_ubx_,    (double)s.s_ubx_    * p_s);
+        std::fprintf(f, fmt, ProtocolStr(Protocol::RTCM3),  s.n_rtcm3_,  (double)s.n_rtcm3_  * p_n, s.s_rtcm3_,  (double)s.s_rtcm3_  * p_s);
+        std::fprintf(f, fmt, ProtocolStr(Protocol::NOV_B),  s.n_novb_,   (double)s.n_novb_   * p_n, s.s_novb_,   (double)s.s_novb_   * p_s);
+        std::fprintf(f, fmt, ProtocolStr(Protocol::UNI_B),  s.n_unib_,   (double)s.n_unib_   * p_n, s.s_unib_,   (double)s.s_unib_   * p_s);
+        std::fprintf(f, fmt, ProtocolStr(Protocol::SBF),    s.n_sbf_,    (double)s.n_sbf_ *    p_n, s.s_sbf_,    (double)s.s_sbf_    * p_s);
+        std::fprintf(f, fmt, ProtocolStr(Protocol::QGC),    s.n_qgc_,    (double)s.n_qgc_ *    p_n, s.s_qgc_,    (double)s.s_qgc_    * p_s);
+        std::fprintf(f, fmt, ProtocolStr(Protocol::SPARTN), s.n_spartn_, (double)s.n_spartn_ * p_n, s.s_spartn_, (double)s.s_spartn_ * p_s);
+        std::fprintf(f, fmt, ProtocolStr(Protocol::OTHER),  s.n_other_,  (double)s.n_other_  * p_n, s.s_other_,  (double)s.s_other_  * p_s);
         // clang-format on
     }
 

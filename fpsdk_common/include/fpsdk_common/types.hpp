@@ -131,6 +131,23 @@ class NoCopyNoMove  // clang-format off
 #  define _CONCAT(a, b) a##b
 #endif
 
+/**
+ * @brief Get string in list of strings by index
+ *
+ * @param[in]  ix    Index
+ * @param[in]  args  List of strings
+ *
+ * @returns the string, or "?" if index is too large
+ */
+template <typename... Args>
+constexpr const char* IxToStr(std::size_t ix, Args... args)
+{
+    static_assert((std::is_convertible_v<Args, const char*> && ...), "args must be const char*");
+    constexpr std::size_t N = sizeof...(Args);
+    const std::array<const char*, N> strs = { args... };
+    return ix < N ? strs[ix] : "?";
+}
+
 /* ****************************************************************************************************************** */
 }  // namespace types
 }  // namespace common

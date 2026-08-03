@@ -186,6 +186,7 @@ static const UbxMessagesInfo MSG_INFO =
     { UBX_SEC_CLSID,                 UBX_SEC_SIG_MSGID,             UBX_SEC_SIG_STRID              },
     { UBX_SEC_CLSID,                 UBX_SEC_SIGLOG_MSGID,          UBX_SEC_SIGLOG_STRID           },
     { UBX_SEC_CLSID,                 UBX_SEC_UNIQID_MSGID,          UBX_SEC_UNIQID_STRID           },
+    { UBX_TIM_CLSID,                 UBX_TIM_SVIN_MSGID,            UBX_TIM_SVIN_STRID             },
     { UBX_TIM_CLSID,                 UBX_TIM_TM2_MSGID,             UBX_TIM_TM2_STRID              },
     { UBX_TIM_CLSID,                 UBX_TIM_TP_MSGID,              UBX_TIM_TP_STRID               },
     { UBX_TIM_CLSID,                 UBX_TIM_VRFY_MSGID,            UBX_TIM_VRFY_STRID             },

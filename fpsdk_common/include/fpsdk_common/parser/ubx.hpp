@@ -40,6 +40,7 @@
 /* EXTERNAL */
 
 /* PACKAGE */
+#include "../types.hpp"
 
 namespace fpsdk {
 namespace common {
@@ -475,6 +476,8 @@ static constexpr uint8_t     UBX_SEC_SIGLOG_MSGID           = 0x10;             
 static constexpr const char* UBX_SEC_SIGLOG_STRID           = "UBX-SEC-SIGLOG";         //!< UBX-SEC-SIGLOG message name
 static constexpr uint8_t     UBX_SEC_UNIQID_MSGID           = 0x03;                     //!< UBX-SEC-UNIQID message ID
 static constexpr const char* UBX_SEC_UNIQID_STRID           = "UBX-SEC-UNIQID";         //!< UBX-SEC-UNIQID message name
+static constexpr uint8_t     UBX_TIM_SVIN_MSGID             = 0x04;                     //!< UBX-TIM-SVIN message ID
+static constexpr const char* UBX_TIM_SVIN_STRID             = "UBX-TIM-SVIN";           //!< UBX-TIM-SVIN message name
 static constexpr uint8_t     UBX_TIM_TM2_MSGID              = 0x03;                     //!< UBX-TIM-TM2 message ID
 static constexpr const char* UBX_TIM_TM2_STRID              = "UBX-TIM-TM2";            //!< UBX-TIM-TM2 message name
 static constexpr uint8_t     UBX_TIM_TP_MSGID               = 0x01;                     //!< UBX-TIM-TP message ID
@@ -610,7 +613,7 @@ struct UbxMsgInfo
 
 // @fp_codegen_begin{FPSDK_COMMON_PARSER_UBX_MSGINFO_HPP}
 using UbxClassesInfo = std::array<UbxMsgInfo, 15>;    //!< UBX classes lookup table
-using UbxMessagesInfo = std::array<UbxMsgInfo, 186>;  //!< UBX messages lookup table
+using UbxMessagesInfo = std::array<UbxMsgInfo, 187>;  //!< UBX messages lookup table
 // @fp_codegen_end{FPSDK_COMMON_PARSER_UBX_MSGINFO_HPP}
 
 /**
@@ -654,6 +657,7 @@ static constexpr uint8_t UBX_GNSSID_BDS          = 3;      //!< BeiDou
 static constexpr uint8_t UBX_GNSSID_QZSS         = 5;      //!< QZSS
 static constexpr uint8_t UBX_GNSSID_GLO          = 6;      //!< GLONASS
 static constexpr uint8_t UBX_GNSSID_NAVIC        = 7;      //!< NavIC
+inline      const char * UBX_GNSSID_STR(const uint8_t gnssId) { return gnssId == UBX_GNSSID_NONE ? "NONE" : types::IxToStr(gnssId, "GPS", "SBAS", "GAL", "BDS", "?", "QZSS", "GLO", "NAVIC"); } //!< @todo documentation
 // clang-format on
 ///@}
 
@@ -690,7 +694,9 @@ static constexpr uint8_t UBX_SIGID_GPS_L2CL      =  3;      //!< GPS L2 CL
 static constexpr uint8_t UBX_SIGID_GPS_L2CM      =  4;      //!< GPS L2 CM
 static constexpr uint8_t UBX_SIGID_GPS_L5I       =  6;      //!< GPS L5 I
 static constexpr uint8_t UBX_SIGID_GPS_L5Q       =  7;      //!< GPS L5 Q
+inline      const char * UBX_SIGID_GPS_STR(const uint8_t sigId) { return types::IxToStr(sigId, "L1CA", "?", "?", "L2CL", "L2CM", "?", "L5I", "L5Q"); } //!< @todo documentation
 static constexpr uint8_t UBX_SIGID_SBAS_L1CA     =  0;      //!< SBAS L1 C/A
+inline      const char * UBX_SIGID_SBAS_STR(const uint8_t sigId) { return types::IxToStr(sigId, "L1CA"); } //!< @todo documentation
 static constexpr uint8_t UBX_SIGID_GAL_E1C       =  0;      //!< Galileo E1 C
 static constexpr uint8_t UBX_SIGID_GAL_E1B       =  1;      //!< Galileo E1 B
 static constexpr uint8_t UBX_SIGID_GAL_E5AI      =  3;      //!< Galileo E5 aI
@@ -700,6 +706,7 @@ static constexpr uint8_t UBX_SIGID_GAL_E5BQ      =  6;      //!< Galileo E5 bQ
 static constexpr uint8_t UBX_SIGID_GAL_E6B       =  8;      //!< Galileo E6 B
 static constexpr uint8_t UBX_SIGID_GAL_E6C       =  9;      //!< Galileo E6 C
 static constexpr uint8_t UBX_SIGID_GAL_E6A       = 10;      //!< Galileo E6 A
+inline      const char * UBX_SIGID_GAL_STR(const uint8_t sigId) { return types::IxToStr(sigId, "E1C", "E1B", "?", "E5AI", "E5AQ", "E5BI", "E5BQ", "?", "E6B", "E6C", "E6A"); } //!< @todo documentation
 static constexpr uint8_t UBX_SIGID_BDS_B1ID1     =  0;      //!< BeiDou B1I D1
 static constexpr uint8_t UBX_SIGID_BDS_B1ID2     =  1;      //!< BeiDou B1I D2
 static constexpr uint8_t UBX_SIGID_BDS_B2ID1     =  2;      //!< BeiDou B2I D1
@@ -710,15 +717,29 @@ static constexpr uint8_t UBX_SIGID_BDS_B1CP      =  5;      //!< BeiDou B1 Cp (p
 static constexpr uint8_t UBX_SIGID_BDS_B1CD      =  6;      //!< BeiDou B1 Cd (data)
 static constexpr uint8_t UBX_SIGID_BDS_B2AP      =  7;      //!< BeiDou B2 ap (pilot)
 static constexpr uint8_t UBX_SIGID_BDS_B2AD      =  8;      //!< BeiDou B2 ad (data)
+inline      const char * UBX_SIGID_BDS_STR(const uint8_t sigId) { return types::IxToStr(sigId, "B1ID1", "B1ID2", "B2ID1", "B2ID2", "B3ID1", "B1CP", "B1CD", "B2AP", "B2AD", "?", "B3ID2"); } //!< @todo documentation
 static constexpr uint8_t UBX_SIGID_QZSS_L1CA     =  0;      //!< QZSS L1 C/A
 static constexpr uint8_t UBX_SIGID_QZSS_L1S      =  1;      //!< QZSS L1 S
 static constexpr uint8_t UBX_SIGID_QZSS_L2CM     =  4;      //!< QZSS L2 CM
 static constexpr uint8_t UBX_SIGID_QZSS_L2CL     =  5;      //!< QZSS L2 CL
 static constexpr uint8_t UBX_SIGID_QZSS_L5I      =  8;      //!< QZSS L5 I
 static constexpr uint8_t UBX_SIGID_QZSS_L5Q      =  9;      //!< QZSS L5 Q
+inline      const char * UBX_SIGID_QZSS_STR(const uint8_t sigId) { return types::IxToStr(sigId, "L1CA", "L1S", "?", "?", "L2CM", "L2CL", "?", "?", "L5I", "L5Q"); } //!< @todo documentation
 static constexpr uint8_t UBX_SIGID_GLO_L1OF      =  0;      //!< GLONASS L1 OF
 static constexpr uint8_t UBX_SIGID_GLO_L2OF      =  2;      //!< GLONASS L2 OF
+inline      const char * UBX_SIGID_GLO_STR(const uint8_t sigId) { return types::IxToStr(sigId, "L1OF", "?", "L2OF"); } //!< @todo documentation
 static constexpr uint8_t UBX_SIGID_NAVIC_L5A     =  0;      //!< NavIC L5 A
+inline      const char * UBX_SIGID_NAVIC_STR(const uint8_t sigId) { return types::IxToStr(sigId, "L5A"); } //!< @todo documentation
+inline      const char * UBX_SIGID_STR(const uint8_t gnssId, const uint8_t sigId) { \
+    if (sigId == UBX_SIGID_NONE) { return "NONE"; } \
+    switch (gnssId) { \
+        case UBX_GNSSID_GPS:   return UBX_SIGID_GPS_STR(sigId); \
+        case UBX_GNSSID_SBAS:  return UBX_SIGID_SBAS_STR(sigId); \
+        case UBX_GNSSID_GAL:   return UBX_SIGID_GAL_STR(sigId); \
+        case UBX_GNSSID_BDS:   return UBX_SIGID_BDS_STR(sigId); \
+        case UBX_GNSSID_QZSS:  return UBX_SIGID_QZSS_STR(sigId); \
+        case UBX_GNSSID_GLO:   return UBX_SIGID_GLO_STR(sigId); \
+        case UBX_GNSSID_NAVIC: return UBX_SIGID_NAVIC_STR(sigId); } return "?"; } //!< @todo documentation
 // clang-format on
 ///@}
 
@@ -808,6 +829,7 @@ static constexpr uint8_t     UBX_CFG_VALSET_V1_TRANSACTION_NONE                 
 static constexpr uint8_t     UBX_CFG_VALSET_V1_TRANSACTION_BEGIN                                    = 1;     //!< UBX-CFG-VALSET.transaction value: transaction begin
 static constexpr uint8_t     UBX_CFG_VALSET_V1_TRANSACTION_CONTINUE                                 = 2;     //!< UBX-CFG-VALSET.transaction value: transaction continue
 static constexpr uint8_t     UBX_CFG_VALSET_V1_TRANSACTION_END                                      = 3;     //!< UBX-CFG-VALSET.transaction value: transaction: end
+inline           const char * UBX_CFG_VALSET_V1_TRANSACTION_STR(const uint8_t transaction)          { return types::IxToStr(transaction, "NONE", "BEGIN", "CONTINUE", "END"); } //!< @todo documentation
 static constexpr uint8_t     UBX_CFG_VALSET_V1_RESERVED                                             = 0x00;  //!< UBX-CFG-VALSET.reserved value
 static constexpr std::size_t UBX_CFG_VALSET_V1_MAX_KV                                               = 64;    //!< UBX-CFG-VALSET.cfgData: maximum number of key-value pairs
 static constexpr std::size_t UBX_CFG_VALSET_V1_CFGDATA_MAX_SIZE                                     = UBX_CFG_VALSET_V1_MAX_KV * (4 + 8); //!< UBX-CFG-VALSET.cfgData maximum size
@@ -850,6 +872,7 @@ static constexpr uint8_t     UBX_CFG_VALGET_V0_LAYER_RAM                        
 static constexpr uint8_t     UBX_CFG_VALGET_V0_LAYER_BBR                                            = 1;         //!< UBX-CFG-VALGET.layers value: layer BBR
 static constexpr uint8_t     UBX_CFG_VALGET_V0_LAYER_FLASH                                          = 2;         //!< UBX-CFG-VALGET.layers value: layer Flash
 static constexpr uint8_t     UBX_CFG_VALGET_V0_LAYER_DEFAULT                                        = 7;         //!< UBX-CFG-VALGET.layers value: layer Default
+inline           const char * UBX_CFG_VALGET_V0_LAYER_STR(const uint8_t layer)                      { return types::IxToStr(layer, "RAM", "BBR", "FLASH", "?", "?", "?", "?", "DEFAULT"); } //!< @todo documentation
 static constexpr std::size_t UBX_CFG_VALGET_V0_MAX_K                                                = 64;        //!< UBX-CFG-VALGET.cfgData maximum number of keys
 static constexpr std::size_t UBX_CFG_VALGET_V0_KEYS_MAX_SIZE                                        = UBX_CFG_VALGET_V0_MAX_K * sizeof(uint32_t); //!< UBX-CFG-VALGET.keys maximum size
 static constexpr uint32_t    UBX_CFG_VALGET_V0_GROUP_WILDCARD(const uint32_t groupId)                  { return groupId | 0x0000ffff; } //!< UBX-CFG-VALGET.keys group wildcard
@@ -862,6 +885,7 @@ static constexpr uint8_t     UBX_CFG_VALGET_V1_LAYER_RAM                        
 static constexpr uint8_t     UBX_CFG_VALGET_V1_LAYER_BBR                                            = 1;         //!< UBX-CFG-VALGET.layers value: layer BBR
 static constexpr uint8_t     UBX_CFG_VALGET_V1_LAYER_FLASH                                          = 2;         //!< UBX-CFG-VALGET.layers value: layer Flash
 static constexpr uint8_t     UBX_CFG_VALGET_V1_LAYER_DEFAULT                                        = 7;         //!< UBX-CFG-VALGET.layers value: layer Default
+inline           const char * UBX_CFG_VALGET_V1_LAYER_STR(const uint8_t layer)                      { return types::IxToStr(layer, "RAM", "BBR", "FLASH", "?", "?", "?", "?", "DEFAULT"); } //!< @todo documentation
 static constexpr std::size_t UBX_CFG_VALGET_V1_MAX_KV                                               = 64;        //!< UBX-CFG-VALGET.cfgData maximum number of keys
 static constexpr std::size_t UBX_CFG_VALGET_V1_CFGDATA_MAX_SIZE                                     = UBX_CFG_VALGET_V1_MAX_KV * (sizeof(uint32_t) + sizeof(uint64_t)); //!< UBX-CFG-VALGET.keys maximum size
 static constexpr uint32_t    UBX_CFG_VALGET_V1_GROUP_WILDCARD(const uint32_t groupId)                  { return groupId | 0x0000ffff; } //!< UBX-CFG-VALGET.keys group wildcard
@@ -897,6 +921,7 @@ static constexpr uint8_t     UBX_CFG_VALDEL_V1_TRANSACTION_NONE                 
 static constexpr uint8_t     UBX_CFG_VALDEL_V1_TRANSACTION_BEGIN                                    = 1;         //!< UBX-CFG-VALDEL.transaction value: transaction begin
 static constexpr uint8_t     UBX_CFG_VALDEL_V1_TRANSACTION_CONTINUE                                 = 2;         //!< UBX-CFG-VALDEL.transaction value: transaction continue
 static constexpr uint8_t     UBX_CFG_VALDEL_V1_TRANSACTION_END                                      = 3;         //!< UBX-CFG-VALDEL.transaction value: transaction: end
+inline           const char * UBX_CFG_VALDEL_V1_TRANSACTION_STR(const uint8_t transaction)          { return types::IxToStr(transaction, "NONE", "BEGIN", "CONTINUE", "END"); } //!< @todo documentation
 static constexpr uint8_t     UBX_CFG_VALDEL_V1_RESERVED                                             = 0x00;      //!< UBX-CFG-VALDEL.reserved value
 static constexpr std::size_t UBX_CFG_VALDEL_V1_MAX_K                                                = 64;        //!< UBX-CFG-VALDEL.cfgData maximum number of key IDs
 static constexpr std::size_t UBX_CFG_VALDEL_V1_KEYS_MAX_SIZE                                        = UBX_CFG_VALDEL_V1_MAX_K * 4; //!< UBX-CFG-VALDEL.keys maximum size
@@ -942,6 +967,7 @@ static constexpr uint8_t     UBX_CFG_RST_V0_RESETMODE_GNSS                      
 static constexpr uint8_t     UBX_CFG_RST_V0_RESETMODE_HW_CONTROLLED                                 = 0x04;    //!< Controlled hardware reset
 static constexpr uint8_t     UBX_CFG_RST_V0_RESETMODE_GNSS_STOP                                     = 0x08;    //!< Stop GNSS
 static constexpr uint8_t     UBX_CFG_RST_V0_RESETMODE_GNSS_START                                    = 0x09;    //!< Start GNSS
+inline     const char *      UBX_CFG_RST_V0_RESETMODE_STR(const uint8_t resetMode)                  { return types::IxToStr(resetMode, "HW_FORCED", "SW", "GNSS", "?", "HW_CONTROLLED", "?", "?", "?", "GNSS_STOP", "GNSS_START"); } //!< @todo documentation
 static constexpr uint8_t     UBX_CFG_RST_V0_RESERVED                                                = 0x00;    //!< Reserved
 // clang-format on
 
@@ -1019,6 +1045,7 @@ static_assert(sizeof(UBX_ESF_MEAS_V0_GROUP2) == 4, "");
 // clang-format off
 static constexpr std::size_t UBX_ESF_MEAS_V0_MIN_SIZE                                               = sizeof(UBX_ESF_MEAS_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_MEAS_V0_FLAGS_TIMEMARKSENT(const uint16_t flags)               { return flags & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_ESF_MEAS_V0_FLAGS_TIMEMARKSENT_STR(const uint16_t flags)           { return types::IxToStr(UBX_ESF_MEAS_V0_FLAGS_TIMEMARKSENT(flags), "NONE", "EXT0", "EXT1"); } //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_MEAS_V0_FLAGS_TIMEMARKSENT_NONE                                = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_MEAS_V0_FLAGS_TIMEMARKSENT_EXT0                                = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_MEAS_V0_FLAGS_TIMEMARKSENT_EXT1                                = 2;  //!< @todo documentation
@@ -1073,20 +1100,24 @@ static constexpr std::size_t UBX_ESF_STATUS_V2_SIZE(const uint8_t* msg)         
     sizeof(UBX_ESF_STATUS_V2_GROUP0) + UBX_FRAME_SIZE + (((const uint8_t *)(msg))[UBX_HEAD_SIZE + 15] * sizeof(UBX_ESF_STATUS_V2_GROUP1)); }  //!< @todo documentation
 static constexpr double      UBX_ESF_STATUS_V2_ITOW_SCALE                                           = 1e-3;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS(const uint8_t initStatus1)  { return initStatus1 & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS_STR(const uint8_t initStatus1) { return types::IxToStr(UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS(initStatus1), "OFF", "INITALIZING", "INITIALIZED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS_OFF                         = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS_INITALIZING                 = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_WTINITSTATUS_INITIALIZED                 = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS(const uint8_t initStatus1)  { return (initStatus1 >> 2) & 0x07; }  //!< @todo documentation
+inline     const char *      UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS_STR(const uint8_t initStatus1) { return types::IxToStr(UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS(initStatus1), "OFF", "INITALIZING", "INITIALIZED1", "INITIALIZED2"); } //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS_OFF                         = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS_INITALIZING                 = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS_INITIALIZED1                = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_MNTALGSTATUS_INITIALIZED2                = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS(const uint8_t initStatus1) { return (initStatus1 >> 5) & 0x07; }  //!< @todo documentation
+inline     const char *      UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS_STR(const uint8_t initStatus1) { return types::IxToStr(UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS(initStatus1), "OFF", "INITALIZING", "INITIALIZED1", "INITIALIZED2"); } //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS_OFF                        = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS_INITALIZING                = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS_INITIALIZED1               = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS1_INSINITSTATUS_INITIALIZED2               = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS2_IMUINITSTATUS(const uint8_t initStatus2) { return initStatus2 & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_ESF_STATUS_V2_INITSTATUS2_IMUINITSTATUS_STR(const uint8_t initStatus2) { return types::IxToStr(UBX_ESF_STATUS_V2_INITSTATUS2_IMUINITSTATUS(initStatus2), "OFF", "INITALIZING", "INITIALIZED1", "INITIALIZED2"); } //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS2_IMUINITSTATUS_OFF                        = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS2_IMUINITSTATUS_INITALIZING                = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_INITSTATUS2_IMUINITSTATUS_INITIALIZED1               = 2;  //!< @todo documentation
@@ -1095,15 +1126,18 @@ static constexpr uint8_t     UBX_ESF_STATUS_V2_FUSIONMODE_INIT                  
 static constexpr uint8_t     UBX_ESF_STATUS_V2_FUSIONMODE_FUSION                                    = 0x01;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_FUSIONMODE_SUSPENDED                                 = 0x02;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_FUSIONMODE_DISABLED                                  = 0x03;  //!< @todo documentation
+inline     const char *      UBX_ESF_STATUS_V2_FUSIONMODE_STR(const uint8_t fusionMode)             { return types::IxToStr(fusionMode, "INIT", "FUSION", "SUSPENDED", "DISABLED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS1_TYPE(const uint8_t sensStatus1)          { return sensStatus1 & 0x3f; } //!< same enum as UBX-ESF-MEAS.dataType it seems  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS1_USED                                     = 0x40;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS1_READY                                    = 0x80;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS(const uint8_t sensStatus2)   { return sensStatus2 & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS_STR(const uint8_t sensStatus2) { return types::IxToStr(UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS(sensStatus2), "NOTCALIB", "CALIBRATING", "CALIBRATED1", "CALIBRATED2"); } //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS_NOTCALIB                     = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS_CALIBRATING                  = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS_CALIBRATED1                  = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_CALIBSTATUS_CALIBRATED2                  = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_TIMESTATUS(const uint8_t sensStatus2)    { return (sensStatus2 >> 2) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_ESF_STATUS_V2_SENSSTATUS2_TIMESTATUS_STR(const uint8_t sensStatus2) { return types::IxToStr(UBX_ESF_STATUS_V2_SENSSTATUS2_TIMESTATUS(sensStatus2), "NODATA", "FIRSTBYTE", "EVENT", "TIMETAG"); } //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_TIMESTATUS_NODATA                        = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_TIMESTATUS_FIRSTBYTE                     = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_ESF_STATUS_V2_SENSSTATUS2_TIMESTATUS_EVENT                         = 2;  //!< @todo documentation
@@ -1141,6 +1175,7 @@ static constexpr uint8_t     UBX_MGA_GAL_OSNMA_PUBKEY_V0_VERSION                
 static constexpr std::size_t UBX_MGA_GAL_OSNMA_PUBKEY_V0_SIZE                                       = sizeof(UBX_MGA_GAL_OSNMA_PUBKEY_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_GAL_OSNMA_PUBKEY_V0_BITFIELD0_PUBKEYID(const uint8_t bitfield0) { return bitfield0 & 0x0f; }  //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_GAL_OSNMA_PUBKEY_V0_BITFIELD0_PUBKEYTYPE(const uint8_t bitfield0) { return (bitfield0 >> 4) & 0x0f; }  //!< @todo documentation
+inline     const char *      UBX_MGA_GAL_OSNMA_PUBKEY_V0_BITFIELD0_PUBKEYTYPE_STR(const uint8_t bitfield0) { return types::IxToStr(UBX_MGA_GAL_OSNMA_PUBKEY_V0_BITFIELD0_PUBKEYTYPE(bitfield0), "?", "ECDSAP256", "?", "ECDSAP521"); } //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_GAL_OSNMA_PUBKEY_V0_BITFIELD0_PUBKEYTYPE_ECDSAP256             = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_GAL_OSNMA_PUBKEY_V0_BITFIELD0_PUBKEYTYPE_ECDSAP521             = 3;  //!< @todo documentation
 // clang-format on
@@ -1170,6 +1205,7 @@ static constexpr const char* UBX_MGA_GAL_OSNMA_MERKLE_STRID                     
 static constexpr uint8_t     UBX_MGA_GAL_OSNMA_MERKLE_V0_VERSION                                    = 0x00;  //!< @todo documentation
 static constexpr std::size_t UBX_MGA_GAL_OSNMA_MERKLE_V0_SIZE                                       = sizeof(UBX_MGA_GAL_OSNMA_MERKLE_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_GAL_OSNMA_MERKLE_V0_BITFIELD0_APPLICABILITYTIME(const uint8_t bitfield0) { return bitfield0 & 0x01; }  //!< @todo documentation
+inline     const char *      UBX_MGA_GAL_OSNMA_MERKLE_V0_BITFIELD0_APPLICABILITYTIME_STR(const uint8_t bitfield0) { return types::IxToStr(UBX_MGA_GAL_OSNMA_MERKLE_V0_BITFIELD0_APPLICABILITYTIME(bitfield0), "CURRENT", "FUTURE"); } //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_GAL_OSNMA_MERKLE_V0_BITFIELD0_APPLICABILITYTIME_CURRENT        = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_GAL_OSNMA_MERKLE_V0_BITFIELD0_APPLICABILITYTIME_FUTURE         = 1;  //!< @todo documentation
 // clang-format on
@@ -1209,6 +1245,7 @@ static constexpr const char* UBX_MGA_INI_TIME_UTC_STRID                         
 static constexpr uint8_t     UBX_MGA_INI_TIME_UTC_V0_VERSION                                        = 0x00;  //!< @todo documentation
 static constexpr std::size_t UBX_MGA_INI_TIME_UTC_V0_SIZE                                           = sizeof(UBX_MGA_INI_TIME_UTC_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_INI_TIME_UTC_V0_REF_SOURCE(const uint8_t ref)                  { return ref & 0x0f; }  //!< @todo documentation
+inline     const char *      UBX_MGA_INI_TIME_UTC_V0_REF_SOURCE_STR(const uint8_t ref)              { return types::IxToStr(UBX_MGA_INI_TIME_UTC_V0_REF_SOURCE(ref), "NONE", "EXTINT0", "EXTINT1"); } //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_INI_TIME_UTC_V0_REF_SOURCE_NONE                                = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_INI_TIME_UTC_V0_REF_SOURCE_EXTINT0                             = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_INI_TIME_UTC_V0_REF_SOURCE_EXTINT1                             = 2;  //!< @todo documentation
@@ -1250,6 +1287,7 @@ static constexpr const char* UBX_MGA_INI_TIME_GNSS_STRID                        
 static constexpr uint8_t     UBX_MGA_INI_TIME_GNSS_V0_VERSION                                       = 0x00;  //!< @todo documentation
 static constexpr std::size_t UBX_MGA_INI_TIME_GNSS_V0_SIZE                                          = sizeof(UBX_MGA_INI_TIME_GNSS_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_INI_TIME_GNSS_V0_REF_SOURCE(const uint8_t ref)                 { return ref & 0x0f; }  //!< @todo documentation
+inline     const char *      UBX_MGA_INI_TIME_GNSS_V0_REF_SOURCE_STR(const uint8_t ref)             { return types::IxToStr(UBX_MGA_INI_TIME_GNSS_V0_REF_SOURCE(ref), "NONE", "EXTINT0", "EXTINT1"); } //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_INI_TIME_GNSS_V0_REF_SOURCE_NONE                               = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_INI_TIME_GNSS_V0_REF_SOURCE_EXTINT0                            = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_MGA_INI_TIME_GNSS_V0_REF_SOURCE_EXTINT1                            = 2;  //!< @todo documentation
@@ -1310,6 +1348,7 @@ static constexpr std::size_t UBX_MON_COMMS_V0_SIZE(const uint8_t* msg)          
 static constexpr bool        UBX_MON_COMMS_V0_TXERRORS_MEM(const uint8_t txErrors)                  { return (txErrors & 0x01) == 0x01; }  //!< @todo documentation
 static constexpr bool        UBX_MON_COMMS_V0_TXERRORS_ALLOC(const uint8_t txErrors)                { return (txErrors & 0x02) == 0x02; }  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_COMMS_V0_TXERRORS_OUTPUTPORT(const uint8_t txErrors)           { return (txErrors >> 3) & 0x7; }  //!< @todo documentation
+inline     const char *      UBX_MON_COMMS_V0_TXERRORS_OUTPUTPORT_STR(const uint8_t txErrors)       { return types::IxToStr(UBX_MON_COMMS_V0_TXERRORS_OUTPUTPORT(txErrors), "NA", "I2C", "UART1", "UART2", "USB", "SPI"); } //!< @todo documentation
 static constexpr uint8_t     UBX_MON_COMMS_V0_TXERRORS_OUTPUTPORT_NA                                = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_COMMS_V0_TXERRORS_OUTPUTPORT_I2C                               = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_COMMS_V0_TXERRORS_OUTPUTPORT_UART1                             = 2;  //!< @todo documentation
@@ -1323,6 +1362,7 @@ static constexpr uint8_t     UBX_MON_COMMS_V0_PROTIDS_RTCM2                     
 static constexpr uint8_t     UBX_MON_COMMS_V0_PROTIDS_RTCM3                                         = 0x05;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_COMMS_V0_PROTIDS_SPARTN                                        = 0x06;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_COMMS_V0_PROTIDS_OTHER                                         = 0xff;  //!< @todo documentation
+inline     const char *      UBX_MON_COMMS_V0_PROTIDS_STR(const uint8_t protId)                     { return protId == UBX_MON_COMMS_V0_PROTIDS_OTHER ? "OTHER" : types::IxToStr(protId, "UBX", "NMEA", "RTCM2", "RAW", "?", "RTCM3", "SPARTN"); } //!< @todo documentation
 // clang-format on
 
 ///@}
@@ -1361,6 +1401,7 @@ static constexpr std::size_t UBX_MON_HW_V0_SIZE                                 
 static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_RTCCALIB                                           = 0x01;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_SAFEBOOT                                           = 0x02;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_JAMMINGSTATE(const uint8_t flags)                  { return (flags >> 2) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_MON_HW_V0_FLAGS_JAMMINGSTATE_STR(const uint8_t flags)              { return types::IxToStr(UBX_MON_HW_V0_FLAGS_JAMMINGSTATE(flags), "UNKNOWN", "OK", "WARNING", "CRITICAL"); } //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_JAMMINGSTATE_UNKNOWN                               = 0x00;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_JAMMINGSTATE_OK                                    = 0x01;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_FLAGS_JAMMINGSTATE_WARNING                               = 0x02;  //!< @todo documentation
@@ -1371,9 +1412,11 @@ static constexpr uint8_t     UBX_MON_HW_V0_ASTATUS_UNKNOWN                      
 static constexpr uint8_t     UBX_MON_HW_V0_ASTATUS_OK                                               = 0x02;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_ASTATUS_SHORT                                            = 0x03;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_ASTATUS_OPEN                                             = 0x04;  //!< @todo documentation
+inline     const char *      UBX_MON_HW_V0_ASTATUS_STR(const uint8_t aStatus)                       { return types::IxToStr(aStatus, "INIT", "UNKNOWN", "OK", "SHORT", "OPEN"); } //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_APOWER_OFF                                               = 0x00;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_APOWER_ON                                                = 0x01;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_APOWER_UNKNOWN                                           = 0x02;  //!< @todo documentation
+inline     const char *      UBX_MON_HW_V0_APOWER_STR(const uint8_t aPower)                         { return types::IxToStr(aPower, "OFF", "ON", "UNKNOWN"); } //!< @todo documentation
 static constexpr uint16_t    UBX_MON_HW_V0_NOISEPERMS_MAX                                           = 200;   //!< This seems to be what u-center uses..
 static constexpr uint16_t    UBX_MON_HW_V0_AGCCNT_MAX                                               = 8191;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW_V0_JAMIND_MAX                                               = 255;   //!< @todo documentation
@@ -1409,6 +1452,11 @@ static constexpr uint8_t     UBX_MON_HW2_V0_CFGSOURCE_ROM                       
 static constexpr uint8_t     UBX_MON_HW2_V0_CFGSOURCE_OTP                                           = 111;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW2_V0_CFGSOURCE_PIN                                           = 112;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW2_V0_CFGSOURCE_FLASH                                         = 102;  //!< @todo documentation
+inline     const char *      UBX_MON_HW2_V0_CFGSOURCE_STR(const uint8_t cfgSource)                  { switch (cfgSource) { \
+    case UBX_MON_HW2_V0_CFGSOURCE_ROM:   return "ROM"; \
+    case UBX_MON_HW2_V0_CFGSOURCE_OTP:   return "OTP"; \
+    case UBX_MON_HW2_V0_CFGSOURCE_PIN:   return "PIN"; \
+    case UBX_MON_HW2_V0_CFGSOURCE_FLASH: return "FLASH"; } return "?"; } //!< @todo documentation
 // clang-format on
 
 ///@}
@@ -1451,9 +1499,11 @@ static constexpr bool        UBX_MON_HW3_V0_FLAGS_RTCCALIB(const uint8_t flags) 
 static constexpr bool        UBX_MON_HW3_V0_FLAGS_SAFEBOOT(const uint8_t flags)                     { return (flags & 0x02) == 0x02; }  //!< @todo documentation
 static constexpr bool        UBX_MON_HW3_V0_FLAGS_XTALABSENT(const uint8_t flags)                   { return (flags & 0x04) == 0x04; }  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_PERIPHPIO(const uint16_t pinMask)               { return pinMask & 0x01; }  //!< @todo documentation
+inline     const char *      UBX_MON_HW3_V0_PINMASK_PERIPHPIO_STR(const uint16_t pinMask)           { return types::IxToStr(UBX_MON_HW3_V0_PINMASK_PERIPHPIO(pinMask), "PERIPH", "PIO"); } //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_PERIPHPIO_PERIPH                                = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_PERIPHPIO_PIO                                   = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_PINBANK(const uint16_t pinMask)                 { return (pinMask >> 1) & 0x01; }  //!< @todo documentation
+inline     const char *      UBX_MON_HW3_V0_PINMASK_PINBANK_STR(const uint16_t pinMask)             { return types::IxToStr(UBX_MON_HW3_V0_PINMASK_PINBANK(pinMask), "A", "B", "C", "D", "E", "F", "G", "H"); } //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_PINBANK_A                                       = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_PINBANK_B                                       = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_PINBANK_C                                       = 2;  //!< @todo documentation
@@ -1463,6 +1513,7 @@ static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_PINBANK_F                   
 static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_PINBANK_G                                       = 6;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_PINBANK_H                                       = 7;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_DIRECTION(const uint16_t pinMask)               { return (pinMask >> 4) & 0x01; }  //!< @todo documentation
+inline     const char *      UBX_MON_HW3_V0_PINMASK_DIRECTION_STR(const uint16_t pinMask)           { return types::IxToStr(UBX_MON_HW3_V0_PINMASK_DIRECTION(pinMask), "OUT", "IN"); } //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_DIRECTION_OUT                                   = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_HW3_V0_PINMASK_DIRECTION_IN                                    = 1;  //!< @todo documentation
 static constexpr bool        UBX_MON_HW3_V0_PINMASK_VALUE(const uint16_t pinMask)                   { return (pinMask & 0x0020) == 0x0020; }  //!< @todo documentation
@@ -1518,6 +1569,7 @@ static constexpr std::size_t UBX_MON_RF_V0_MIN_SIZE                             
 static constexpr std::size_t UBX_MON_RF_V0_SIZE(const uint8_t* msg)                                 { return
     sizeof(UBX_MON_RF_V0_GROUP0) + UBX_FRAME_SIZE + (((const uint8_t *)(msg))[UBX_HEAD_SIZE + 1] * sizeof(UBX_MON_RF_V0_GROUP1)); }  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_FLAGS_JAMMINGSTATE(const uint8_t flags)                  { return flags & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_MON_RF_V0_FLAGS_JAMMINGSTATE_STR(const uint8_t flags)              { return types::IxToStr(UBX_MON_RF_V0_FLAGS_JAMMINGSTATE(flags), "UNKN", "OK", "WARN", "CRIT"); } //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_FLAGS_JAMMINGSTATE_UNKN                                  = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_FLAGS_JAMMINGSTATE_OK                                    = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_FLAGS_JAMMINGSTATE_WARN                                  = 2;  //!< @todo documentation
@@ -1527,9 +1579,11 @@ static constexpr uint8_t     UBX_MON_RF_V0_ANTSTATUS_DONTKNOW                   
 static constexpr uint8_t     UBX_MON_RF_V0_ANTSTATUS_OK                                             = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_ANTSTATUS_SHORT                                          = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_ANTSTATUS_OPEN                                           = 4;  //!< @todo documentation
+inline     const char *      UBX_MON_RF_V0_ANTSTATUS_STR(const uint8_t antStatus)                   { return types::IxToStr(antStatus, "INIT", "DONTKNOW", "OK", "SHORT", "OPEN"); } //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_ANTPOWER_OFF                                             = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_ANTPOWER_ON                                              = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_ANTPOWER_DONTKNOW                                        = 2;  //!< @todo documentation
+inline     const char *      UBX_MON_RF_V0_ANTPOWER_STR(const uint8_t antPower)                     { return types::IxToStr(antPower, "OFF", "ON", "DONTKNOW"); } //!< @todo documentation
 static constexpr uint16_t    UBX_MON_RF_V0_NOISEPERMS_MAX                                           = 200; //!< This seems to be what u-center uses..
 static constexpr uint16_t    UBX_MON_RF_V0_AGCCNT_MAX                                               = 8191;  //!< @todo documentation
 static constexpr uint8_t     UBX_MON_RF_V0_JAMIND_MAX                                               = 255;  //!< @todo documentation
@@ -1621,6 +1675,7 @@ static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VDDXFAIL                   
 static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VDDRFFAIL                                      =  9;  //!< Boot type: VDD_RF fail
 static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_VCOREHIGHFAIL                                  = 10;  //!< Boot type: V_CORE_HIGH fail
 static constexpr uint8_t     UBX_MON_SYS_V1_BOOTTYPE_SYSTEMRESET                                    = 11;  //!< Boot type: system reset
+inline     const char *      UBX_MON_SYS_V1_BOOTTYPE_STR(const uint8_t bootType)                    { return types::IxToStr(bootType, "UNKNOWN", "COLDSTART", "WATCHDOG", "HWRESET", "HWBACKUP", "SWBACKUP", "SWRESET", "VIOFAIL", "VDDXFAIL", "VDDRFFAIL", "VCOREHIGHFAIL", "SYSTEMRESET"); } //!< @todo documentation
 // clang-format on
 
 ///@}
@@ -1672,7 +1727,7 @@ struct UBX_MON_VER_V0_GROUP1  // clang-format off
 static_assert(sizeof(UBX_MON_VER_V0_GROUP1) == 30, "");
 
 // clang-format off
-static constexpr uint8_t     UBX_MON_VER_V0_MIN_SIZE                                                = sizeof(UBX_MON_VER_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
+static constexpr std::size_t UBX_MON_VER_V0_MIN_SIZE                                                = sizeof(UBX_MON_VER_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 // clang-format on
 
 ///@}
@@ -1820,7 +1875,7 @@ struct UBX_NAV_EELL_V0_GROUP0  // clang-format off
 static_assert(sizeof(UBX_NAV_EELL_V0_GROUP0) == 16, "");
 
 // clang-format off
-static constexpr uint8_t     UBX_NAV_EELL_VERSION(const uint8_t* msg)                               { return msg[UBX_HEAD_SIZE]; }  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_EELL_VERSION(const uint8_t* msg)                               { return msg[UBX_HEAD_SIZE + sizeof(uint32_t)]; }  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_EELL_V0_VERSION                                                = 0x00;  //!< @todo documentation
 static constexpr std::size_t UBX_NAV_EELL_V0_SIZE                                                   = sizeof(UBX_NAV_EELL_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr double      UBX_NAV_EELL_V0_ITOW_SCALE                                             = 1e-3;  //!< @todo documentation
@@ -2011,9 +2066,11 @@ static constexpr uint8_t     UBX_NAV_PVT_V1_FIXTYPE_2D                          
 static constexpr uint8_t     UBX_NAV_PVT_V1_FIXTYPE_3D                                              = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FIXTYPE_3D_DR                                           = 4;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FIXTYPE_TIME                                            = 5;  //!< @todo documentation
+inline     const char *      UBX_NAV_PVT_V1_FIXTYPE_STR(const uint8_t fixType)                      { return types::IxToStr(fixType, "NOFIX", "DRONLY", "2D", "3D", "3D_DR", "TIME"); } //!< @todo documentation
 static constexpr bool        UBX_NAV_PVT_V1_FLAGS_GNSSFIXOK(const uint8_t flags)                    { return (flags & 0x01) == 0x01; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_PVT_V1_FLAGS_DIFFSOLN(const uint8_t flags)                     { return (flags & 0x02) == 0x02; }  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE(const uint8_t flags)                     { return (flags >> 2) & 0x07; }  //!< @todo documentation
+inline     const char *      UBX_NAV_PVT_V1_FLAGS_PSMSTATE_STR(const uint8_t flags)                 { return types::IxToStr(UBX_NAV_PVT_V1_FLAGS_PSMSTATE(flags), "NOTACTIVE", "ENABLED", "ACQUISITION", "TRACKING", "POT", "INACTIVE"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE_NOTACTIVE                                = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE_ENABLED                                  = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE_ACQUISITION                              = 2;  //!< @todo documentation
@@ -2022,6 +2079,7 @@ static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE_POT                  
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_PSMSTATE_INACTIVE                                 = 5;  //!< @todo documentation
 static constexpr bool        UBX_NAV_PVT_V1_FLAGS_HEADVEHVALID(const uint8_t flags)                 { return (flags & 0x20) == 0x20; }  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_CARRSOLN(const uint8_t flags)                     { return (flags >> 6) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_NAV_PVT_V1_FLAGS_CARRSOLN_STR(const uint8_t flags)                 { return types::IxToStr(UBX_NAV_PVT_V1_FLAGS_CARRSOLN(flags), "NO", "FLOAT", "FIXED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_CARRSOLN_NO                                       = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_CARRSOLN_FLOAT                                    = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS_CARRSOLN_FIXED                                    = 2;  //!< @todo documentation
@@ -2030,6 +2088,7 @@ static constexpr bool        UBX_NAV_PVT_V1_FLAGS2_CONFDATE(const uint8_t flags2
 static constexpr bool        UBX_NAV_PVT_V1_FLAGS2_CONFTIME(const uint8_t flags2)                   { return (flags2 & 0x80) == 0x80; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_PVT_V1_FLAGS3_INVALIDLLH(const uint16_t flags3)                { return (flags3 & 0x01) == 0x01; }  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE(const uint16_t flags3)         { return (flags3 >> 1) & 0x0F; }  //!< @todo documentation
+inline     const char *      UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_STR(const uint16_t flags3)     { return types::IxToStr(UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE(flags3), "NOT_AVAILABLE", "0_TO_1_SEC", "1_TO_2_SEC", "3_TO_5_SEC", "5_TO_10_SEC", "10_TO_15_SEC", "15_TO_20_SEC", "20_TO_30_SEC", "30_TO_45_SEC", "45_TO_60_SEC", "60_TO_90_SEC", "90_TO_120_SEC", "GEQ_120_SEC"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_NOT_AVAILABLE                  = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_0_TO_1_SEC                     = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_1_TO_2_SEC                     = 2;  //!< @todo documentation
@@ -2044,9 +2103,11 @@ static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_60_TO_90_SE
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_90_TO_120_SEC                  = 11;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_LASTCORRECTIONAGE_GEQ_120_SEC                    = 12;  //!< @todo documentation
 static constexpr bool        UBX_NAV_PVT_V1_FLAGS3_AUTHTIME(const uint16_t flags3)                  { return (flags3 & 0x2000) == 0x2000; }  //!< @todo documentation
+inline     const char *      UBX_NAV_PVT_V1_FLAGS3_AUTHTIME_STR(const uint16_t flags3)              { return types::IxToStr(UBX_NAV_PVT_V1_FLAGS3_AUTHTIME(flags3) ? 1 : 0, "NOT_AUTHENTICATED", "AUTHENTICATED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_AUTHTIME_NOT_AUTHENTICATED                       = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_AUTHTIME_AUTHENTICATED                           = 1;  //!< @todo documentation
 static constexpr bool        UBX_NAV_PVT_V1_FLAGS3_NMAFIXSTATUS(const uint16_t flags3)              { return (flags3 & 0x4000) == 0x4000; }  //!< @todo documentation
+inline     const char *      UBX_NAV_PVT_V1_FLAGS3_NMAFIXSTATUS_STR(const uint16_t flags3)          { return types::IxToStr(UBX_NAV_PVT_V1_FLAGS3_NMAFIXSTATUS(flags3) ? 1 : 0, "NOT_VERIFIED", "VERIFIED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_NMAFIXSTATUS_NOT_VERIFIED                        = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_PVT_V1_FLAGS3_NMAFIXSTATUS_VERIFIED                            = 1;  //!< @todo documentation
 static constexpr double      UBX_NAV_PVT_V1_LAT_SCALE                                               = 1e-7;  //!< @todo documentation
@@ -2116,6 +2177,7 @@ static constexpr bool        UBX_NAV_RELPOSNED_V1_FLAGS_GNSSFIXOK(const uint32_t
 static constexpr bool        UBX_NAV_RELPOSNED_V1_FLAGS_DIFFSOLN(const uint32_t flags)              { return (flags & 0x00000002) == 0x00000002; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_RELPOSNED_V1_FLAGS_RELPOSVALID(const uint32_t flags)           { return (flags & 0x00000004) == 0x00000004; }  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_RELPOSNED_V1_FLAGS_CARRSOLN(const uint32_t flags)              { return (flags >> 3) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_NAV_RELPOSNED_V1_FLAGS_CARRSOLN_STR(const uint32_t flags)          { return types::IxToStr(UBX_NAV_RELPOSNED_V1_FLAGS_CARRSOLN(flags), "NO", "FLOAT", "FIXED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_RELPOSNED_V1_FLAGS_CARRSOLN_NO                                 = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_RELPOSNED_V1_FLAGS_CARRSOLN_FLOAT                              = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_RELPOSNED_V1_FLAGS_CARRSOLN_FIXED                              = 2;  //!< @todo documentation
@@ -2165,6 +2227,7 @@ static constexpr std::size_t UBX_NAV_SAT_V1_MIN_SIZE                            
 static constexpr double      UBX_NAV_SAT_V1_ITOW_SCALE                                              = 1e-3;  //!< @todo documentation
 // Note: only those flags relevant for a SV are defined below. All other info should be taken from UBX-NAV-SIG.  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SAT_V1_FLAGS_ORBITSOURCE(const uint32_t flags)                 { return (flags >> 8) & 0x00000007; }  //!< @todo documentation
+inline     const char *      UBX_NAV_SAT_V1_FLAGS_ORBITSOURCE_STR(const uint32_t flags)             { return types::IxToStr(UBX_NAV_SAT_V1_FLAGS_ORBITSOURCE(flags), "NONE", "EPH", "ALM", "ANO", "ANA", "OTHER1", "OTHER2", "OTHER3"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SAT_V1_FLAGS_ORBITSOURCE_NONE                                  = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SAT_V1_FLAGS_ORBITSOURCE_EPH                                   = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SAT_V1_FLAGS_ORBITSOURCE_ALM                                   = 2;  //!< @todo documentation
@@ -2229,12 +2292,15 @@ static constexpr uint8_t     UBX_NAV_SIG_V0_QUALITYIND_CODELOCK                 
 static constexpr uint8_t     UBX_NAV_SIG_V0_QUALITYIND_CARRLOCK1                                    = 5;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_QUALITYIND_CARRLOCK2                                    = 6;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_QUALITYIND_CARRLOCK3                                    = 7;  //!< @todo documentation
+inline     const char *      UBX_NAV_SIG_V0_QUALITYIND_STR(const uint8_t qualityInd)                { return types::IxToStr(qualityInd, "NOSIG", "SEARCH", "ACQUIRED", "UNUSED", "CODELOCK", "CARRLOCK1", "CARRLOCK2", "CARRLOCK3"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_IONOMODEL_NONE                                          = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_IONOMODEL_KLOB_GPS                                      = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_IONOMODEL_SBAS                                          = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_IONOMODEL_KLOB_BDS                                      = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_IONOMODEL_DUALFREQ                                      = 8;  //!< @todo documentation
+inline     const char *      UBX_NAV_SIG_V0_IONOMODEL_STR(const uint8_t ionoModel)                  { return types::IxToStr(ionoModel, "NONE", "KLOB_GPS", "SBAS", "KLOB_BDS", "?", "?", "?", "?", "DUALFREQ"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_SIGFLAGS_HEALTH(const uint16_t sigFlags)                { return sigFlags & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_NAV_SIG_V0_SIGFLAGS_HEALTH_STR(const uint16_t sigFlags)            { return types::IxToStr(UBX_NAV_SIG_V0_SIGFLAGS_HEALTH(sigFlags), "UNKNO", "HEALTHY", "UNHEALTHY"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_SIGFLAGS_HEALTH_UNKNO                                   = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_SIGFLAGS_HEALTH_HEALTHY                                 = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_SIGFLAGS_HEALTH_UNHEALTHY                               = 2;  //!< @todo documentation
@@ -2254,6 +2320,7 @@ static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_RTCM3_OSR                
 static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_RTCM3_SSR                                    = 5;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_QZSS_SLAS                                    = 6;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_SPARTN                                       = 7;  //!< @todo documentation
+inline     const char *      UBX_NAV_SIG_V0_CORRSOURCE_STR(const uint8_t corrSource)                { return types::IxToStr(corrSource, "NONE", "SBAS", "BDS", "RTCM2", "RTCM3_OSR", "RTCM3_SSR", "QZSS_SLAS", "SPARTN"); } //!< @todo documentation
 static constexpr double      UBX_NAV_SIG_V0_PRRES_SCALE                                             = 1e-1;  //!< @todo documentation
 // clang-format on
 
@@ -2294,6 +2361,7 @@ static constexpr uint8_t     UBX_NAV_TIMETRUSTED_V1_REFSYS_GPS                  
 static constexpr uint8_t     UBX_NAV_TIMETRUSTED_V1_REFSYS_GAL                                      = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_TIMETRUSTED_V1_REFSYS_BDS                                      = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_TIMETRUSTED_V1_REFSYS_NAVIC                                    = 15;  //!< @todo documentation
+inline     const char *      UBX_NAV_TIMETRUSTED_V1_REFSYS_STR(const uint8_t refSys)                { return refSys == UBX_NAV_TIMETRUSTED_V1_REFSYS_NAVIC ? "NAVIC" : types::IxToStr(refSys, "NONE", "GPS", "GAL", "BDS"); } //!< @todo documentation
 static constexpr bool        UBX_NAV_TIMETRUSTED_V1_VALID_TRUSTEDTIMEVALID(const uint8_t valid)     { return (valid & 0x01) == 0x01; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_TIMETRUSTED_V1_VALID_DELTATIMEVALID(const uint8_t valid)       { return (valid & 0x02) == 0x02; }  //!< @todo documentation
 static constexpr double      UBX_NAV_TIMETRUSTED_V1_ITOW_SCALE                                      = 1e-3;  //!< @todo documentation
@@ -2328,12 +2396,13 @@ static_assert(sizeof(UBX_NAV_STATUS_V0_GROUP0) == 16, "");
 // clang-format off
 static constexpr std::size_t UBX_NAV_STATUS_V0_SIZE                                                 = sizeof(UBX_NAV_STATUS_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr double      UBX_NAV_STATUS_V0_ITOW_SCALE                                           = 1e-3;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_STATUS_V0_FIXTYPE_NOFIX                                        = 0;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_STATUS_V0_FIXTYPE_DRONLY                                       = 1;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_STATUS_V0_FIXTYPE_2D                                           = 2;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_STATUS_V0_FIXTYPE_3D                                           = 3;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_STATUS_V0_FIXTYPE_3D_DR                                        = 4;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_STATUS_V0_FIXTYPE_TIME                                         = 5;  //!< @todo documentation
+inline     const char *      UBX_NAV_STATUS_V0_GPSFIX_STR(const uint8_t gpsFix)                     { return types::IxToStr(gpsFix, "NOFIX", "DRONLY", "2D", "3D", "3D_DR", "TIME"); } //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_STATUS_V0_GPSFIX_NOFIX                                         = 0;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_STATUS_V0_GPSFIX_DRONLY                                        = 1;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_STATUS_V0_GPSFIX_2D                                            = 2;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_STATUS_V0_GPSFIX_3D                                            = 3;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_STATUS_V0_GPSFIX_3D_DR                                         = 4;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_STATUS_V0_GPSFIX_TIME                                          = 5;  //!< @todo documentation
 static constexpr bool        UBX_NAV_STATUS_V0_FLAGS_GPSFIXOK(const uint8_t flags)                  { return (flags & 0x01) == 0x01; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_STATUS_V0_FLAGS_DIFFSOLN(const uint8_t flags)                  { return (flags & 0x02) == 0x02; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_STATUS_V0_FLAGS_WKNSET(const uint8_t flags)                    { return (flags & 0x04) == 0x04; }  //!< @todo documentation
@@ -2341,16 +2410,19 @@ static constexpr bool        UBX_NAV_STATUS_V0_FLAGS_TOWSET(const uint8_t flags)
 static constexpr bool        UBX_NAV_STATUS_V0_FIXSTAT_DIFFCORR(const uint8_t fixStat)              { return (fixStat & 0x01) ==  0x01; } //!< @todo documentation
 static constexpr bool        UBX_NAV_STATUS_V0_FIXSTAT_CARRSOLNVALID(const uint8_t fixStat)         { return (fixStat & 0x02) ==  0x02; } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE(const uint8_t flags2)                { return flags2 & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE_STR(const uint8_t flags2)            { return types::IxToStr(UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE(flags2), "ACQUISITION", "TRACKING", "POWEROPT", "INACTIVE"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE_ACQUISITION                          = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE_TRACKING                             = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE_POWEROPT                             = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_PSMSTATE_INACTIVE                             = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE(const uint8_t flags2)           { return (flags2 >> 3) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_STR(const uint8_t flags2)       { return types::IxToStr(UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE(flags2), "UNKNOWN", "NONE", "INDICATED", "AFFIRMED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_UNKNOWN                         = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_NONE                            = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_INDICATED                       = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_SPOOFDETSTATE_AFFIRMED                        = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_CARRSOLN(const uint8_t flags2)                { return (flags2 >> 6) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_NAV_STATUS_V0_FLAGS2_CARRSOLN_STR(const uint8_t flags2)            { return types::IxToStr(UBX_NAV_STATUS_V0_FLAGS2_CARRSOLN(flags2), "NO", "FLOAT", "FIXED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_CARRSOLN_NO                                   = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_CARRSOLN_FLOAT                                = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_STATUS_V0_FLAGS2_CARRSOLN_FIXED                                = 2;  //!< @todo documentation
@@ -2441,7 +2513,7 @@ struct UBX_NAV_TIMEBDS_V0_GROUP0  // clang-format off
 static_assert(sizeof(UBX_NAV_TIMEBDS_V0_GROUP0) == 20, "");
 
 // clang-format off
-static constexpr uint32_t    UBX_NAV_TIMEBDS_V0_SIZE                                                = sizeof(UBX_NAV_TIMEBDS_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
+static constexpr std::size_t UBX_NAV_TIMEBDS_V0_SIZE                                                = sizeof(UBX_NAV_TIMEBDS_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr double      UBX_NAV_TIMEBDS_V0_ITOW_SCALE                                          = 1e-3;  //!< @todo documentation
 static constexpr double      UBX_NAV_TIMEBDS_V0_FSOW_SCALE                                          = 1e-9;  //!< @todo documentation
 static constexpr double      UBX_NAV_TIMEBDS_V0_TACC_SCALE                                          = 1e-9;  //!< @todo documentation
@@ -2472,7 +2544,7 @@ struct UBX_NAV_TIMEGLO_V0_GROUP0  // clang-format off
 static_assert(sizeof(UBX_NAV_TIMEGLO_V0_GROUP0) == 20, "");
 
 // clang-format off
-static constexpr double      UBX_NAV_TIMEGLO_V0_SIZE                                                = sizeof(UBX_NAV_TIMEGLO_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
+static constexpr std::size_t UBX_NAV_TIMEGLO_V0_SIZE                                                = sizeof(UBX_NAV_TIMEGLO_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr double      UBX_NAV_TIMEGLO_V0_ITOW_SCALE                                          = 1e-3;  //!< @todo documentation
 static constexpr double      UBX_NAV_TIMEGLO_V0_FTOD_SCALE                                          = 1e-9;  //!< @todo documentation
 static constexpr double      UBX_NAV_TIMEGLO_V0_TACC_SCALE                                          = 1e-9;  //!< @todo documentation
@@ -2524,6 +2596,8 @@ static constexpr uint8_t     UBX_NAV_TIMEUTC_V0_VALID_UTCSTANDARD_SU            
 static constexpr uint8_t     UBX_NAV_TIMEUTC_V0_VALID_UTCSTANDARD_NTSC                              =  7;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_TIMEUTC_V0_VALID_UTCSTANDARD_NPLI                              =  8;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_TIMEUTC_V0_VALID_UTCSTANDARD_UNNOWN                            = 15;  //!< @todo documentation
+inline     const char *      UBX_NAV_TIMEUTC_V0_VALID_UTCSTANDARD_STR(const uint8_t valid)          { return UBX_NAV_TIMEUTC_V0_VALID_UTCSTANDARD(valid) == UBX_NAV_TIMEUTC_V0_VALID_UTCSTANDARD_UNNOWN ? "UNNOWN" : \
+    types::IxToStr(UBX_NAV_TIMEUTC_V0_VALID_UTCSTANDARD(valid), "INFONA", "CRL", "NIST", "USNO", "BIPM", "EU", "SU", "NTSC", "NPLI"); } //!< @todo documentation
 // clang-format on
 
 ///@}
@@ -2563,12 +2637,14 @@ static constexpr uint8_t     UBX_NAV_TIMELS_V0_SRCOFCURRLS_BDS                  
 static constexpr uint8_t     UBX_NAV_TIMELS_V0_SRCOFCURRLS_GAL                                      = 5;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_TIMELS_V0_SRCOFCURRLS_CONFIG                                   = 7;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_TIMELS_V0_SRCOFCURRLS_UNKNOWN                                  = 255;  //!< @todo documentation
+inline     const char *      UBX_NAV_TIMELS_V0_SRCOFCURRLS_STR(const uint8_t srcOfCurrLs)           { return srcOfCurrLs == UBX_NAV_TIMELS_V0_SRCOFCURRLS_UNKNOWN ? "UNKNOWN" : types::IxToStr(srcOfCurrLs, "DEFAULT", "GPSGLO", "GPS", "SBAS", "BDS", "GAL", "?", "CONFIG"); } //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_TIMELS_V0_SRCOFCURRLSCHANGE_NONE                               = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_TIMELS_V0_SRCOFCURRLSCHANGE_GPS                                = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_TIMELS_V0_SRCOFCURRLSCHANGE_SBAS                               = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_TIMELS_V0_SRCOFCURRLSCHANGE_BDS                                = 4;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_TIMELS_V0_SRCOFCURRLSCHANGE_GAL                                = 5;  //!< @todo documentation
 static constexpr uint8_t     UBX_NAV_TIMELS_V0_SRCOFCURRLSCHANGE_GLO                                = 6;  //!< @todo documentation
+inline     const char *      UBX_NAV_TIMELS_V0_SRCOFCURRLSCHANGE_STR(const uint8_t srcOfLsChange)   { return types::IxToStr(srcOfLsChange, "NONE", "?", "GPS", "SBAS", "BDS", "GAL", "GLO"); } //!< @todo documentation
 static constexpr bool        UBX_NAV_TIMELS_V0_VALID_CURRLSVALID(const uint8_t valid)               { return (valid & 0x01) == 0x01; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_TIMELS_V0_VALID_TIMETOLSEVENTVALID(const uint8_t valid)        { return (valid & 0x02) == 0x02; }  //!< @todo documentation
 // clang-format on
@@ -2690,6 +2766,7 @@ static constexpr uint8_t     UBX_RXM_RTCM_V2_VERSION                            
 static constexpr std::size_t UBX_RXM_RTCM_V2_SIZE                                                   = sizeof(UBX_RXM_RTCM_V2_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr bool        UBX_RXM_RTCM_V2_FLAGS_CRCFAILED(const uint8_t flags)                   { return (flags & 0x01) == 0x01; }  //!< @todo documentation
 static constexpr uint8_t     UBX_RXM_RTCM_V2_FLAGS_MSGUSED(const uint8_t flags)                     { return (flags >> 1) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_RXM_RTCM_V2_FLAGS_MSGUSED_STR(const uint8_t flags)                 { return types::IxToStr(UBX_RXM_RTCM_V2_FLAGS_MSGUSED(flags), "UNKNOWN", "UNUSED", "USED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_RXM_RTCM_V2_FLAGS_MSGUSED_UNKNOWN                                  = 0x00;  //!< @todo documentation
 static constexpr uint8_t     UBX_RXM_RTCM_V2_FLAGS_MSGUSED_UNUSED                                   = 0x01;  //!< @todo documentation
 static constexpr uint8_t     UBX_RXM_RTCM_V2_FLAGS_MSGUSED_USED                                     = 0x02;  //!< @todo documentation
@@ -2755,6 +2832,7 @@ static constexpr uint8_t     UBX_RXM_SPARTN_VERSION(const uint8_t* msg)         
 static constexpr uint8_t     UBX_RXM_SPARTN_V1_VERSION                                              = 0x01;  //!< @todo documentation
 static constexpr std::size_t UBX_RXM_SPARTN_V1_SIZE                                                 = sizeof(UBX_RXM_SPARTN_V1_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr uint8_t     UBX_RXM_SPARTN_V1_FLAGS_MSGUSED(const uint8_t flags)                   { return (flags >> 1) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_RXM_SPARTN_V1_FLAGS_MSGUSED_STR(const uint8_t flags)               { return types::IxToStr(UBX_RXM_SPARTN_V1_FLAGS_MSGUSED(flags), "UNKNOWN", "UNUSED", "USED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_RXM_SPARTN_V1_FLAGS_MSGUSED_UNKNOWN                                = 0x00;  //!< @todo documentation
 static constexpr uint8_t     UBX_RXM_SPARTN_V1_FLAGS_MSGUSED_UNUSED                                 = 0x01;  //!< @todo documentation
 static constexpr uint8_t     UBX_RXM_SPARTN_V1_FLAGS_MSGUSED_USED                                   = 0x02;  //!< @todo documentation
@@ -2800,12 +2878,14 @@ static constexpr uint8_t     UBX_SEC_OSNMA_V3_VERSION                           
 static constexpr std::size_t UBX_SEC_OSNMA_V3_MIN_SIZE                                                                  = sizeof(UBX_SEC_OSNMA_V3_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr bool        UBX_SEC_OSNMA_V3_NMAHEADER_HEADERAUTHSTATUS(const uint8_t nmaHeader)                       { return (nmaHeader & 0x01) == 0x01; }  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS(const uint8_t nmaHeader)                              { return (nmaHeader >> 1) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS_STR(const uint8_t nmaHeader)                          { return types::IxToStr(UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS(nmaHeader), "NOTAUTHENTICATED", "TEST", "OPERATIONAL", "INVALID"); } //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS_NOTAUTHENTICATED                                      = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS_TEST                                                  = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS_OPERATIONAL                                           = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_NMASTATUS_INVALID                                               = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CHAININFORCE(const uint8_t nmaHeader)                           { return (nmaHeader >> 3) & 0x03; }  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS(const uint8_t nmaHeader)                                   { return (nmaHeader >> 5) & 0x07; }  //!< @todo documentation
+inline     const char *      UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_STR(const uint8_t nmaHeader)                               { return types::IxToStr(UBX_SEC_OSNMA_V3_NMAHEADER_CPKS(nmaHeader), "NOTAPPLICABLE", "NOMINAL", "EOC", "CREV", "NPK", "PKREV", "NMT", "AM"); } //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_NOTAPPLICABLE                                              = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_NOMINAL                                                    = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_EOC                                                        = 2;  //!< @todo documentation
@@ -2817,6 +2897,7 @@ static constexpr uint8_t     UBX_SEC_OSNMA_V3_NMAHEADER_CPKS_AM                 
 static constexpr bool        UBX_SEC_OSNMA_V3_OSNMAMONITORING_OSNMAENABLED(const uint16_t osnmaMonitoring)              { return (osnmaMonitoring & 0x0001) == 0x0001; }  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_OSNMAMONITORING_NUMBERSVS(const uint16_t osnmaMonitoring)                 { return (osnmaMonitoring >> 1) & 0x1f; }  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_OSNMAMONITORING_NMAHEADERUPDATE(const uint16_t osnmaMonitoring)           { return (osnmaMonitoring >> 6) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_SEC_OSNMA_V3_OSNMAMONITORING_NMAHEADERUPDATE_STR(const uint16_t osnmaMonitoring)       { return types::IxToStr(UBX_SEC_OSNMA_V3_OSNMAMONITORING_NMAHEADERUPDATE(osnmaMonitoring), "SAME", "HEALTHY", "PROBLEM"); } //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_OSNMAMONITORING_NMAHEADERUPDATE_SAME                                      = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_OSNMAMONITORING_NMAHEADERUPDATE_HEALTHY                                   = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_OSNMAMONITORING_NMAHEADERUPDATE_PROBLEM                                   = 2;  //!< @todo documentation
@@ -2826,12 +2907,14 @@ static constexpr bool        UBX_SEC_OSNMA_V3_OSNMAMONITORING_WRONGFLXMAC(const 
 static constexpr bool        UBX_SEC_OSNMA_V3_OSNMAMONITORING_WRONGMACLT(const uint16_t osnmaMonitoring)                { return (osnmaMonitoring & 0x0800) == 0x0800; }  //!< @todo documentation
 static constexpr bool        UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCENABLED(const uint8_t timSyncReq)                       { return (timSyncReq & 0x01) == 0x01; }  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS(const uint8_t timSyncReq)                        { return (timSyncReq >> 1) & 0x07; }  //!< @todo documentation
+inline     const char *      UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS_STR(const uint8_t timSyncReq)                    { return types::IxToStr(UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS(timSyncReq), "NOTPERFORMED", "NOTRUSTEDTIME", "NOTACCURATE", "PASSED", "FAILED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS_NOTPERFORMED                                     = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS_NOTRUSTEDTIME                                    = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS_NOTACCURATE                                      = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS_PASSED                                           = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_TIMSYNCREQ_TIMSYNCSTATUS_FAILED                                           = 4;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS(const uint32_t dsmAuthentication) { return dsmAuthentication & 0x0000003f; }  //!< @todo documentation
+inline     const char *      UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_STR(const uint32_t dsmAuthentication) { return types::IxToStr(UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS(dsmAuthentication), "NONE", "KROOT", "PKR", "ALERT", "KROOTFAILED", "PKRFAILED", "UNKNOWNPUBKEY", "DECOMPRESSFAILED", "UNSUPPORTEDCONFIG", "MISSINGMERKLEROOT"); } //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_NONE                            = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_KROOT                           = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_DSMAUTHENTICATIONSTATUS_PKR                             = 2;  //!< @todo documentation
@@ -2850,6 +2933,7 @@ static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_KEYSIZE(const ui
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_MACSIZE(const uint32_t dsmAuthentication)               { return (dsmAuthentication >> 26) & 0x0f; }  //!< @todo documentation
 static constexpr bool        UBX_SEC_OSNMA_V3_DSMAUTHENTICATION_FROMNVS(const uint32_t dsmAuthentication)               { return (dsmAuthentication & 0x40000000) == 0x40000000; }  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS(const uint32_t teslaKey)                      { return teslaKey & 0x00000007; }  //!< @todo documentation
+inline     const char *      UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS_STR(const uint32_t teslaKey)                  { return types::IxToStr(UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS(teslaKey), "NONE", "AUTHENTICATED", "FAILED", "ONGOING", "KEYINPAST", "ROOTKEYTOOOLD"); } //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS_NONE                                          = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS_AUTHENTICATED                                 = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_TESLAKEYAUTHSTATUS_FAILED                                        = 2;  //!< @todo documentation
@@ -2863,27 +2947,33 @@ static constexpr uint8_t     UBX_SEC_OSNMA_V3_TESLAKEY_CHAINID(const uint32_t te
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_AUTHSVS(const uint32_t generalAndTiming)                 { return generalAndTiming & 0x0000003f; }  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_AUTHNUMTIM(const uint32_t generalAndTiming)              { return (generalAndTiming >> 6) & 0x3f; }  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_TIMINGAUTHRESULT(const uint32_t generalAndTiming)        { return (generalAndTiming >> 12) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_SEC_OSNMA_V3_GENERALANDTIMING_TIMINGAUTHRESULT_STR(const uint32_t generalAndTiming)    { return types::IxToStr(UBX_SEC_OSNMA_V3_GENERALANDTIMING_TIMINGAUTHRESULT(generalAndTiming), "NONE", "AUTHENTICATED", "FAILED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_TIMINGAUTHRESULT_NONE                                    = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_TIMINGAUTHRESULT_AUTHENTICATED                           = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_TIMINGAUTHRESULT_FAILED                                  = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MACADKDTYPE(const uint32_t generalAndTiming)             { return (generalAndTiming >> 14) & 0x01; }  //!< @todo documentation
+inline     const char *      UBX_SEC_OSNMA_V3_GENERALANDTIMING_MACADKDTYPE_STR(const uint32_t generalAndTiming)         { return types::IxToStr(UBX_SEC_OSNMA_V3_GENERALANDTIMING_MACADKDTYPE(generalAndTiming), "FAST", "SLOW"); } //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MACADKDTYPE_FAST                                         = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MACADKDTYPE_SLOW                                         = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYSRC(const uint32_t generalAndTiming)               { return (generalAndTiming >> 15) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYSRC_STR(const uint32_t generalAndTiming)           { return types::IxToStr(UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYSRC(generalAndTiming), "FACTORY", "SATELLITES", "AIDED", "NVS"); } //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYSRC_FACTORY                                        = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYSRC_SATELLITES                                     = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYSRC_AIDED                                          = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYSRC_NVS                                            = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MERKLEROOTSRC(const uint32_t generalAndTiming)           { return (generalAndTiming >> 17) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_SEC_OSNMA_V3_GENERALANDTIMING_MERKLEROOTSRC_STR(const uint32_t generalAndTiming)       { return types::IxToStr(UBX_SEC_OSNMA_V3_GENERALANDTIMING_MERKLEROOTSRC(generalAndTiming), "FACTORY", "?", "AIDED", "NVS"); } //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MERKLEROOTSRC_FACTORY                                    = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MERKLEROOTSRC_AIDED                                      = 2;  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_MERKLEROOTSRC_NVS                                        = 3;  //!< @todo documentation
 static constexpr bool        UBX_SEC_OSNMA_V3_GENERALANDTIMING_MERKLEROOTVAL(const uint32_t generalAndTiming)           { return (generalAndTiming & 0x00080000) == 0x00080000; }  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREMERKLEROOTSRC(const uint32_t generalAndTiming)     { return (generalAndTiming >> 20) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREMERKLEROOTSRC_STR(const uint32_t generalAndTiming) { return types::IxToStr(UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREMERKLEROOTSRC(generalAndTiming), "FACTORY", "?", "AIDED", "NVS"); } //!< @todo documentation
 static constexpr bool        UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREMERKLEROOTVAL(const uint32_t generalAndTiming)     { return (generalAndTiming & 0x00400000) == 0x00400000; }  //!< @todo documentation
 static constexpr bool        UBX_SEC_OSNMA_V3_GENERALANDTIMING_PUBKEYVAL(const uint32_t generalAndTiming)               { return (generalAndTiming & 0x00800000) == 0x00800000; }  //!< @todo documentation
 static constexpr bool        UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREPUBKEYVAL(const uint32_t generalAndTiming)         { return (generalAndTiming & 0x01000000) == 0x01000000; }  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREPUBKEYSRC(const uint32_t generalAndTiming)         { return (generalAndTiming >> 25) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREPUBKEYSRC_STR(const uint32_t generalAndTiming)     { return types::IxToStr(UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREPUBKEYSRC(generalAndTiming), "FACTORY", "SATELLITES", "AIDED", "NVS"); } //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GENERALANDTIMING_FUTUREPUBKEYID(const uint32_t generalAndTiming)          { return (generalAndTiming >> 27) & 0x0f; }  //!< @todo documentation
 static constexpr uint16_t    UBX_SEC_OSNMA_V3_GROUP1_BITFIELD1_IODE(const uint16_t bitfield1)                           { return bitfield1 & 0x03ff; }  //!< @todo documentation
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GROUP1_BITFIELD1_AUTHNUM(const uint16_t bitfield1)                        { return (bitfield1 >> 10) & 0x1f; }  //!< @todo documentation
@@ -2946,13 +3036,16 @@ static_assert(sizeof(UBX_TIM_TM2_V0_GROUP0) == 28, "");
 // clang-format off
 static constexpr std::size_t UBX_TIM_TM2_V0_SIZE                                                    = sizeof(UBX_TIM_TM2_V0_GROUP0) + UBX_FRAME_SIZE;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TM2_V0_FLAGS_MODE(const uint8_t flags)                         { return flags & 0x01; }  //!< @todo documentation
+inline     const char *      UBX_TIM_TM2_V0_FLAGS_MODE_STR(const uint8_t flags)                     { return types::IxToStr(UBX_TIM_TM2_V0_FLAGS_MODE(flags), "SINGLE", "RUNNING"); } //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TM2_V0_FLAGS_MODE_SINGLE                                       = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TM2_V0_FLAGS_MODE_RUNNING                                      = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TM2_V0_FLAGS_RUN(const uint8_t flags)                          { return (flags >> 1) & 0x01; }  //!< @todo documentation
+inline     const char *      UBX_TIM_TM2_V0_FLAGS_RUN_STR(const uint8_t flags)                      { return types::IxToStr(UBX_TIM_TM2_V0_FLAGS_RUN(flags), "ARMED", "STOPPED"); } //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TM2_V0_FLAGS_RUN_ARMED                                         = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TM2_V0_FLAGS_RUN_STOPPED                                       = 1;  //!< @todo documentation
 static constexpr bool        UBX_TIM_TM2_V0_FLAGS_NEWFALLINGEDGE(const uint8_t flags)               { return (flags & 0x04) == 0x04; }  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TM2_V0_FLAGS_TIMEBASE(const uint8_t flags)                     { return (flags >> 3) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_TIM_TM2_V0_FLAGS_TIMEBASE_STR(const uint8_t flags)                 { return types::IxToStr(UBX_TIM_TM2_V0_FLAGS_TIMEBASE(flags), "RX", "GNSS", "UTC"); } //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TM2_V0_FLAGS_TIMEBASE_RX                                       = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TM2_V0_FLAGS_TIMEBASE_GNSS                                     = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TM2_V0_FLAGS_TIMEBASE_UTC                                      = 2;  //!< @todo documentation
@@ -2990,10 +3083,12 @@ static constexpr double      UBX_TIM_TP_V0_TOWMS_SCALE                          
 static constexpr double      UBX_TIM_TP_V0_TOWSUBMS_SCALE                                           = 0x1.0624dd2f1a9fcp-42;  //!< perl -e 'printf "%a", 2**-32 * 1e-3'
 static constexpr double      UBX_TIM_TP_V0_TOWSUBMS_SCALE_APPROX                                    = 2.3283064365386963e-18; //!< perl -e 'printf "%.18g", 2**-32 * 1e-8'
 static constexpr uint8_t     UBX_TIM_TP_V0_FLAGS_TIMEBASE(const uint8_t flags)                      { return flags & 0x01; }  //!< @todo documentation
+inline     const char *      UBX_TIM_TP_V0_FLAGS_TIMEBASE_STR(const uint8_t flags)                  { return types::IxToStr(UBX_TIM_TP_V0_FLAGS_TIMEBASE(flags), "GNSS", "UTC"); } //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_FLAGS_TIMEBASE_GNSS                                      = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_FLAGS_TIMEBASE_UTC                                       = 1;  //!< @todo documentation
 static constexpr bool        UBX_TIM_TP_V0_FLAGS_UTC(const uint8_t flags)                           { return (flags & 0x02) == 0x02; }  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_FLAGS_RAIM(const uint8_t flags)                          { return (flags >> 2) & 0x03; }  //!< @todo documentation
+inline     const char *      UBX_TIM_TP_V0_FLAGS_RAIM_STR(const uint8_t flags)                      { return types::IxToStr(UBX_TIM_TP_V0_FLAGS_RAIM(flags), "NA", "INACTIVE", "ACTIVE"); } //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_FLAGS_RAIM_NA                                            = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_FLAGS_RAIM_INACTIVE                                      = 1;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_FLAGS_RAIM_ACTIVE                                        = 2;  //!< @todo documentation
@@ -3006,6 +3101,8 @@ static constexpr uint8_t     UBX_TIM_TP_V0_REFINFO_TIMEREFGNSS_BDS              
 static constexpr uint8_t     UBX_TIM_TP_V0_REFINFO_TIMEREFGNSS_GAL                                  = 3;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_REFINFO_TIMEREFGNSS_NAVIC                                = 4;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_REFINFO_TIMEREFGNSS_UNKNOWN                              = 15;  //!< @todo documentation
+inline     const char *      UBX_TIM_TP_V0_REFINFO_TIMEREFGNSS_STR(const uint8_t refInfo)           { return UBX_TIM_TP_V0_REFINFO_TIMEREFGNSS(refInfo) == UBX_TIM_TP_V0_REFINFO_TIMEREFGNSS_UNKNOWN ? "UNKNOWN" : \
+    types::IxToStr(UBX_TIM_TP_V0_REFINFO_TIMEREFGNSS(refInfo), "GPS", "GLO", "BDS", "GAL", "NAVIC"); } //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_REFINFO_UTCSTANDARD(const uint8_t refInfo)               { return (refInfo >> 4) & 0x0f; }  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_REFINFO_UTCSTANDARD_INFONA                               = 0;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_REFINFO_UTCSTANDARD_CRL                                  = 1;  //!< @todo documentation
@@ -3017,6 +3114,8 @@ static constexpr uint8_t     UBX_TIM_TP_V0_REFINFO_UTCSTANDARD_SU               
 static constexpr uint8_t     UBX_TIM_TP_V0_REFINFO_UTCSTANDARD_NTSC                                 = 7;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_REFINFO_UTCSTANDARD_NPLI                                 = 8;  //!< @todo documentation
 static constexpr uint8_t     UBX_TIM_TP_V0_REFINFO_UTCSTANDARD_UNNOWN                               = 15;  //!< @todo documentation
+inline     const char *      UBX_TIM_TP_V0_REFINFO_UTCSTANDARD_STR(const uint8_t refInfo)           { return UBX_TIM_TP_V0_REFINFO_UTCSTANDARD(refInfo) == UBX_TIM_TP_V0_REFINFO_UTCSTANDARD_UNNOWN ? "UNNOWN" : \
+    types::IxToStr(UBX_TIM_TP_V0_REFINFO_UTCSTANDARD(refInfo), "INFONA", "CRL", "NIST", "USNO", "BIPM", "EU", "SU", "NTSC", "NPLI"); } //!< @todo documentation
 // clang-format on
 
 ///@}

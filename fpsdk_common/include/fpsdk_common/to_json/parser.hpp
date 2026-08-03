@@ -20,6 +20,11 @@
 
 /* PACKAGE */
 #include "../parser/types.hpp"
+#include "../string.hpp"
+#include "parser_fpa.hpp"
+#include "parser_fpb.hpp"
+#include "parser_nmea.hpp"
+#include "parser_ubx.hpp"
 
 #ifndef _DOXYGEN_  // not documenting these
 /* ****************************************************************************************************************** */
@@ -31,6 +36,7 @@ inline void to_json(nlohmann::json& j, const ParserMsg& m)
         { "_proto", ProtocolStr(m.proto_) },
         { "_name", m.name_ },
         { "_seq", m.seq_ },
+        { "_size", m.data_.size() },
     });
 
     if (!m.info_.empty()) {
@@ -45,6 +51,25 @@ inline void to_json(nlohmann::json& j, const ParserMsg& m)
     } else {
         j["_data_b64"] = string::Base64Enc(m.data_);
     }
+}
+
+inline nlohmann::json ParserMsgToJson(const ParserMsg& m)
+{
+    nlohmann::json j = m;
+    switch (m.proto_) {  // clang-format off
+        case Protocol::FP_A:   j.update(fpa::FpaDecodeMessage(m.data_));    break;
+        case Protocol::FP_B:   j.update(fpb::to_json_FP_B(m));              break;
+        case Protocol::NMEA:   j.update(nmea::NmeaDecodeMessage(m.data_));  break;
+        case Protocol::UBX:    j.update(ubx::to_json_UBX(m));               break;
+        case Protocol::RTCM3:
+        case Protocol::UNI_B:
+        case Protocol::NOV_B:
+        case Protocol::SBF:
+        case Protocol::QGC:
+        case Protocol::SPARTN:
+        case Protocol::OTHER:  break;
+    }  // clang-format on
+    return j;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
