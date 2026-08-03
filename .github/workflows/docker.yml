@@ -143,6 +143,40 @@ jobs:
                   docker compose push build-jazzy-run
 
 
+    docker-fpsdk-lyrical:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+            - name: Login
+              uses: docker/login-action@v4
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
+            # Build and push (!) one image after the other. E.g. we must build and push base before we can build ci, because it needs base (in the registry)
+            - name: Build and push (base)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-lyrical-base
+                  docker compose push build-lyrical-base
+            - name: Build and push (ci)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-lyrical-ci
+                  docker compose push build-lyrical-ci
+            - name: Build and push (dev)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-lyrical-dev
+                  docker compose push build-lyrical-dev
+            - name: Build and push (run)
+              run: |
+                  cd ${GITHUB_WORKSPACE}/docker
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-lyrical-run
+                  docker compose push build-lyrical-run
+
+
     docker-fpsdk-cleanup:
         runs-on: ubuntu-latest
         needs:
@@ -150,6 +184,7 @@ jobs:
             - docker-fpsdk-noetic
             - docker-fpsdk-humble
             - docker-fpsdk-jazzy
+            - docker-fpsdk-lyrical
         steps:
             - name: Expire old images
               uses: actions/delete-package-versions@v5

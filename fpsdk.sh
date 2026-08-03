@@ -48,6 +48,7 @@ function main
                 echo "                noetic    -- ROS1 Noetic (additional ROS1 functionality available)"
                 echo "                humble    -- ROS2 Humble (additional ROS2 functionality available)"
                 echo "                jazzy     -- ROS2 Jazzy (additional ROS2 functionality available)"
+                echo "                lyrical   -- ROS2 Lyrical (additional ROS2 functionality available)"
                 echo "    -v <dir>    Additional directory to mount as volumes in docker (see examples below)"
                 echo "    <command>   The command to run,"
                 echo "    ...         and its arguments (if any)"

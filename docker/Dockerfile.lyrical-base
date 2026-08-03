@@ -1,0 +1,38 @@
+########################################################################################################################
+# ___    ___
+# \  \  /  /
+#  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+#  /  /\  \   License: see the LICENSE file
+# /__/  \__\
+#
+########################################################################################################################
+
+# ROS Lyrical Luth (LTS until May 2031) base image (Ubuntu 26.04 LTS "Resolute")
+FROM ros:lyrical-ros-base
+
+# Metadata for github packages
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Lyrical (Ubuntu 26.04 Resolute) base image with minimal stuff required to build"
+LABEL org.opencontainers.image.source=https://github.com/fixposition
+
+# Variables used in our Docker build and CI scripts
+ENV FPSDK_IMAGE=lyrical-base
+ENV ROS_DISTRO=lyrical
+
+# Remove automatic use of /ros_entrypoint.sh, we'll deal with this ourselves
+ENTRYPOINT []
+
+# Install stuff
+COPY docker/scripts/install_apt_base.sh /tmp
+RUN /tmp/install_apt_base.sh && rm -f /tmp/install_apt_base.sh
+
+# Download, build and install FFmpeg libraries (LGPL)
+COPY docker/scripts/install_ffmpeg.sh /tmp
+RUN /tmp/install_ffmpeg.sh && rm -f /tmp/install_ffmpeg.sh
+
+# Update ld cache for the installed libraries
+RUN /usr/sbin/ldconfig
+
+# For debugging docker builds... (last layer!)
+RUN date > /fixposition-sdk-${FPSDK_IMAGE}
+
+########################################################################################################################

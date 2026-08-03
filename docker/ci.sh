@@ -17,6 +17,8 @@ if [ -z "${FPSDK_IMAGE:-}" ]; then
             export ROS_DISTRO=humble
         elif [ -d /opt/ros/jazzy ]; then
             export ROS_DISTRO=jazzy
+        elif [ -d /opt/ros/lyrical ]; then
+            export ROS_DISTRO=lyrical
         else
             export ROS_DISTRO=
         fi
@@ -106,6 +108,7 @@ function build_toplevel_release_noros
     rm -rf build/${buildname}
     make install \
         INSTALL_PREFIX=install/${buildname} \
+        BUILD_TESTING=ON USE_FFMPEG=ON USE_PROJ=ON \
         BUILD_TYPE=Release \
         BUILD_DIR=build/${buildname} || return 1
     install/${buildname}/bin/fpltool -V || return 1
@@ -119,6 +122,7 @@ function test_toplevel_release_noros
     cd ${FPSDK_SRC_DIR}
     make test \
         INSTALL_PREFIX=install/${buildname} \
+        BUILD_TESTING=ON USE_FFMPEG=ON USE_PROJ=ON \
         BUILD_TYPE=Release \
         BUILD_DIR=build/${buildname} || return 1
 }
@@ -134,6 +138,7 @@ function build_toplevel_debug_noros
     rm -rf build/${buildname}
     make install \
         INSTALL_PREFIX=install/${buildname} \
+        BUILD_TESTING=ON USE_FFMPEG=ON USE_PROJ=ON \
         BUILD_TYPE=Debug \
         BUILD_DIR=build/${buildname} || return 1
     install/${buildname}/bin/fpltool -V || return 1
@@ -147,6 +152,7 @@ function test_toplevel_debug_noros
     cd ${FPSDK_SRC_DIR}
     make test \
         INSTALL_PREFIX=install/${buildname} \
+        BUILD_TESTING=ON USE_FFMPEG=ON USE_PROJ=ON \
         BUILD_TYPE=Debug \
         BUILD_DIR=build/${buildname} || return 1
 }
@@ -507,7 +513,7 @@ function build_colcon_release
     ln -s ../../../fpsdk_apps .
     ln -s ../../../examples/ros2_fpsdk_demo .
     cd ..
-    colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release || return 1
+    colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release || return 1
     set +u
     source install/setup.bash || return 1
     set -u
@@ -573,7 +579,7 @@ if [ "${ROS_DISTRO}" = "noetic" ]; then
     #do_step doxygen_release_ros1          || true # continue
 
 # - Or ROS 2
-elif [ "${ROS_DISTRO}" = "humble" -o "${ROS_DISTRO}" = "jazzy" ]; then
+elif [ "${ROS_DISTRO}" = "humble" -o "${ROS_DISTRO}" = "jazzy" -o "${ROS_DISTRO}" = "lyrical" ]; then
     echo "===== ROS2 builds ====="
     set +u
     source /opt/ros/${ROS_DISTRO}/setup.bash

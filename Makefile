@@ -274,7 +274,7 @@ $(BUILD_DIR)/.lint-clang-tidy: $(BUILD_DIR)/.make-build
 # ----------------------------------------------------------------------------------------------------------------------
 
 .PHONY: ci
-ci: $(BUILD_DIR)/.ci-bookworm $(BUILD_DIR)/.ci-noetic $(BUILD_DIR)/.ci-humble $(BUILD_DIR)/.ci-jazzy
+ci: $(BUILD_DIR)/.ci-bookworm $(BUILD_DIR)/.ci-noetic $(BUILD_DIR)/.ci-humble $(BUILD_DIR)/.ci-jazzy $(BUILD_DIR)/.ci-lyrical
 
 $(BUILD_DIR)/.ci-bookworm: $(deps)
 	@echo "$(HLW)***** CI (bookworm) *****$(HLO)"
@@ -310,6 +310,16 @@ $(BUILD_DIR)/.ci-jazzy: $(deps)
 	@echo "$(HLW)***** CI (jazzy) *****$(HLO)"
 ifeq ($(FPSDK_IMAGE),)
 	$(V)docker/docker.sh run jazzy-ci ./docker/ci.sh
+	$(V)$(TOUCH) $@
+else
+	@echo "This ($@) should not run inside Docker!"
+	@false
+endif
+
+$(BUILD_DIR)/.ci-lyrical: $(deps)
+	@echo "$(HLW)***** CI (lyrical) *****$(HLO)"
+ifeq ($(FPSDK_IMAGE),)
+	$(V)docker/docker.sh run lyrical-ci ./docker/ci.sh
 	$(V)$(TOUCH) $@
 else
 	@echo "This ($@) should not run inside Docker!"

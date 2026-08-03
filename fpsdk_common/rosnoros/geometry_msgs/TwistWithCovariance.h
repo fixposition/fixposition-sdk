@@ -27,13 +27,13 @@ struct TwistWithCovariance_
   TwistWithCovariance_()
     : twist()
     , covariance()  {
-      covariance.assign(0.0);
+      covariance.fill(0.0);
   }
   TwistWithCovariance_(const ContainerAllocator& _alloc)
     : twist(_alloc)
     , covariance()  {
   (void)_alloc;
-      covariance.assign(0.0);
+      covariance.fill(0.0);
   }
 
 

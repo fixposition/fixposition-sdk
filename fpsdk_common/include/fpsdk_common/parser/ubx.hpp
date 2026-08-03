@@ -2979,7 +2979,7 @@ static constexpr uint16_t    UBX_SEC_OSNMA_V3_GROUP1_BITFIELD1_IODE(const uint16
 static constexpr uint8_t     UBX_SEC_OSNMA_V3_GROUP1_BITFIELD1_AUTHNUM(const uint16_t bitfield1)                        { return (bitfield1 >> 10) & 0x1f; }  //!< @todo documentation
 static constexpr bool        UBX_SEC_OSNMA_V3_GROUP1_BITFIELD1_AUTHSTATUS(const uint16_t bitfield1)                     { return (bitfield1 & 0x8000) == 0x8000; }  //!< @todo documentation
 static constexpr std::size_t UBX_SEC_OSNMA_V3_SIZE(const uint8_t* msg)                                                  { return  //!< @todo documentation
-    sizeof(UBX_SEC_OSNMA_V3_GROUP0) + UBX_FRAME_SIZE + (UBX_SEC_OSNMA_V3_GENERALANDTIMING_AUTHSVS(*((uint32_t *)&((uint8_t *)(msg))[UBX_HEAD_SIZE + 24])) * sizeof(UBX_SEC_OSNMA_V3_GROUP1)); }  //!< @todo documentation
+    sizeof(UBX_SEC_OSNMA_V3_GROUP0) + UBX_FRAME_SIZE + (UBX_SEC_OSNMA_V3_GENERALANDTIMING_AUTHSVS(((const uint8_t *)(msg))[UBX_HEAD_SIZE + 24]) * sizeof(UBX_SEC_OSNMA_V3_GROUP1)); }  //!< @todo documentation
 // clang-format on
 
 ///@}

@@ -35,11 +35,11 @@ struct Imu_
     , angular_velocity_covariance()
     , linear_acceleration()
     , linear_acceleration_covariance()  {
-      orientation_covariance.assign(0.0);
+      orientation_covariance.fill(0.0);
 
-      angular_velocity_covariance.assign(0.0);
+      angular_velocity_covariance.fill(0.0);
 
-      linear_acceleration_covariance.assign(0.0);
+      linear_acceleration_covariance.fill(0.0);
   }
   Imu_(const ContainerAllocator& _alloc)
     : header(_alloc)
@@ -50,11 +50,11 @@ struct Imu_
     , linear_acceleration(_alloc)
     , linear_acceleration_covariance()  {
   (void)_alloc;
-      orientation_covariance.assign(0.0);
+      orientation_covariance.fill(0.0);
 
-      angular_velocity_covariance.assign(0.0);
+      angular_velocity_covariance.fill(0.0);
 
-      linear_acceleration_covariance.assign(0.0);
+      linear_acceleration_covariance.fill(0.0);
   }
 
 

@@ -1,0 +1,60 @@
+########################################################################################################################
+# ___    ___
+# \  \  /  /
+#  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+#  /  /\  \   License: see the LICENSE file
+# /__/  \__\
+#
+########################################################################################################################
+
+FROM ghcr.io/fixposition/fixposition-sdk:lyrical-base
+
+# Metadata for github packages
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Lyrical (Ubuntu 26.04 Resolute) image for vscode devcontainer"
+LABEL org.opencontainers.image.source=https://github.com/fixposition
+
+# Variables used in our Docker build and CI scripts
+ENV FPSDK_IMAGE=lyrical-dev
+
+# Unminimize system
+COPY docker/scripts/unminimize_system.sh /tmp
+RUN /tmp/unminimize_system.sh && rm -f /tmp/unminimize_system.sh
+
+# Add user for devcontainer, see ../.devcontainer/devcontainer.json
+COPY docker/scripts/adduser_fpsdk.sh /tmp
+RUN /tmp/adduser_fpsdk.sh && rm -f /tmp/adduser_fpsdk.sh
+
+# # Install pre-commit hooks (fpsdk user)
+# COPY .pre-commit-config.yaml /tmp
+# COPY docker/scripts/install_precommithooks.sh /tmp
+# RUN sudo -u fpsdk /tmp/install_precommithooks.sh && rm -f /tmp/install_precommithooks.sh /tmp/.pre-commit-config.yaml
+
+# Install git-bash-prompt (fpsdk user)
+COPY .devcontainer/fpsdk.bgptheme /tmp
+COPY docker/scripts/install_gitbashprompt.sh /tmp
+RUN sudo -u fpsdk /tmp/install_gitbashprompt.sh && rm -f /tmp/install_gitbashprompt.sh /tmp/.devcontainer/fpsdk.bgptheme
+
+# Set timezone, sane language and locale
+ENV TZ=Europe/Zurich
+ENV LANG=en_GB.UTF-8
+ENV LANGUAGE=en_GB
+ENV LC_ALL=C.UTF-8
+COPY docker/scripts/install_locales.sh /tmp
+RUN /tmp/install_locales.sh && rm -f /tmp/install_locales.sh
+
+# Install yq
+COPY docker/scripts/install_yq.sh /tmp
+RUN /tmp/install_yq.sh && rm -f /tmp/install_yq.sh
+
+# Install mcap
+COPY docker/scripts/install_mcap.sh /tmp
+RUN /tmp/install_mcap.sh && rm -f /tmp/install_mcap.sh
+
+# Install useful stuff
+COPY docker/scripts/install_apt_dev.sh /tmp
+RUN /tmp/install_apt_dev.sh && rm -f /tmp/install_apt_dev.share
+
+# For debugging docker builds... (last layer!)
+RUN date > /fixposition-sdk-${FPSDK_IMAGE}
+
+########################################################################################################################

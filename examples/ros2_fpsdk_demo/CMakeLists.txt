@@ -4,7 +4,7 @@ message(STATUS "fpsdk: ----- ${CMAKE_CURRENT_SOURCE_DIR} -----")
 cmake_minimum_required(VERSION 3.16)
 
 project(ros2_fpsdk_demo
-    LANGUAGES CXX
+    LANGUAGES CXX C
     VERSION 1.0.0
     DESCRIPTION "Fixposition SDK: ROS2 Demo"
 )
@@ -49,8 +49,8 @@ add_library(${PROJECT_NAME}_lib SHARED
     src/node.cpp
 )
 
-#target_link_libraries(${PROJECT_NAME}_lib fpsdk_common fpsdk_ros2)
-ament_target_dependencies(${PROJECT_NAME}_lib rclcpp fpsdk_common fpsdk_ros2 std_msgs)
+target_link_libraries(${PROJECT_NAME}_lib
+    rclcpp::rclcpp fpsdk_common fpsdk_ros2 ${std_msgs_TARGETS})
 
 
 # EXECUTABLES ==========================================================================================================
@@ -59,8 +59,8 @@ add_executable(${PROJECT_NAME}_node
     src/node_main.cpp
 )
 
-target_link_libraries(${PROJECT_NAME}_node ${PROJECT_NAME}_lib fpsdk_common fpsdk_ros2 ${rosbag2_cpp_TARGETS})
-ament_target_dependencies(${PROJECT_NAME}_node rclcpp fpsdk_common fpsdk_ros2)
+target_link_libraries(${PROJECT_NAME}_node
+    ${PROJECT_NAME}_lib rclcpp::rclcpp fpsdk_common fpsdk_ros2 ${rosbag2_cpp_TARGETS})
 
 target_include_directories(${PROJECT_NAME}_lib
     PUBLIC

@@ -301,7 +301,7 @@ bool CamStreamImpl::Connect()
 
     // Connect
     TRACE("CamStream(%s) connect %s:%" PRIu16, params_.name_.c_str(),
-        endpoints->endpoint().address().to_string().c_str(), endpoints->endpoint().port());
+        endpoints.begin()->endpoint().address().to_string().c_str(), endpoints.begin()->endpoint().port());
     ResetTimeout();
     stream_.connect(endpoints, ec);
     if (ec) {

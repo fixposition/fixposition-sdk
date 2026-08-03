@@ -35,10 +35,10 @@ services:
 
     trixie-base:
         image: ghcr.io/fixposition/fixposition-sdk:trixie-base
-        command: tail -f
+        command: tail -f /dev/null
     trixie-ci:
         image: ghcr.io/fixposition/fixposition-sdk:trixie-ci
-        command: tail -f
+        command: tail -f /dev/null
     trixie-dev:
         image: ghcr.io/fixposition/fixposition-sdk:trixie-dev
         volumes:
@@ -54,7 +54,7 @@ services:
             - SYS_PTRACE # Set kernel.yama.ptrace_scope = 0 in /etc/sysctl.d/10-ptrace.conf
         hostname: fpsdk-trixie-dev-${USER}
         # Apparently required... (so that the container doesn't kill itself?)
-        command: tail -f
+        command: tail -f /dev/null
 
 
     # ----- ROS1 -------------------------------------------------------------------------------------------------------
@@ -64,7 +64,7 @@ services:
         build:
             context: ..
             dockerfile: docker/Dockerfile.noetic-base
-        command: tail -f
+        command: tail -f /dev/null
     build-noetic-ci:
         image: ghcr.io/fixposition/fixposition-sdk:noetic-ci
         build:
@@ -72,7 +72,7 @@ services:
             dockerfile: docker/Dockerfile.noetic-ci
         depends_on:
             - build-noetic-base
-        command: tail -f
+        command: tail -f /dev/null
     build-noetic-dev:
         image: ghcr.io/fixposition/fixposition-sdk:noetic-dev
         build:
@@ -80,14 +80,14 @@ services:
             dockerfile: docker/Dockerfile.noetic-dev
         depends_on:
             - build-noetic-base
-        command: tail -f
+        command: tail -f /dev/null
 
     noetic-base:
         image: ghcr.io/fixposition/fixposition-sdk:noetic-base
-        command: tail -f
+        command: tail -f /dev/null
     noetic-ci:
         image: ghcr.io/fixposition/fixposition-sdk:noetic-ci
-        command: tail -f
+        command: tail -f /dev/null
     noetic-dev:
         image: ghcr.io/fixposition/fixposition-sdk:noetic-dev
         volumes:
@@ -99,7 +99,7 @@ services:
         cap_add:
             - SYS_PTRACE
         hostname: fpsdk-noetic-dev-${USER}
-        command: tail -f
+        command: tail -f /dev/null
 
 
     # ----- ROS2 -------------------------------------------------------------------------------------------------------
@@ -109,7 +109,7 @@ services:
         build:
             context: ..
             dockerfile: docker/Dockerfile.humble-base
-        command: tail -f
+        command: tail -f /dev/null
     build-humble-ci:
         image: ghcr.io/fixposition/fixposition-sdk:humble-ci
         build:
@@ -117,22 +117,22 @@ services:
             dockerfile: docker/Dockerfile.humble-ci
         depends_on:
             - build-humble-base
-        command: tail -f
+        command: tail -f /dev/null
     build-humble-dev:
         image: ghcr.io/fixposition/fixposition-sdk:humble-dev
         build:
             context: ..
             dockerfile: docker/Dockerfile.humble-dev
-        command: tail -f
+        command: tail -f /dev/null
         depends_on:
             - build-humble-base
+
     humble-base:
         image: ghcr.io/fixposition/fixposition-sdk:humble-base
-        command: tail -f
-
+        command: tail -f /dev/null
     humble-ci:
         image: ghcr.io/fixposition/fixposition-sdk:humble-ci
-        command: tail -f
+        command: tail -f /dev/null
     humble-dev:
         image: ghcr.io/fixposition/fixposition-sdk:humble-dev
         volumes:
@@ -144,7 +144,7 @@ services:
         cap_add:
             - SYS_PTRACE
         hostname: fpsdk-humble-dev-${USER}
-        command: tail -f
+        command: tail -f /dev/null
 
 
     build-jazzy-base:
@@ -152,7 +152,7 @@ services:
         build:
             context: ..
             dockerfile: docker/Dockerfile.jazzy-base
-        command: tail -f
+        command: tail -f /dev/null
     build-jazzy-ci:
         image: ghcr.io/fixposition/fixposition-sdk:jazzy-ci
         build:
@@ -160,7 +160,7 @@ services:
             dockerfile: docker/Dockerfile.jazzy-ci
         depends_on:
             - build-jazzy-base
-        command: tail -f
+        command: tail -f /dev/null
     build-jazzy-dev:
         image: ghcr.io/fixposition/fixposition-sdk:jazzy-dev
         build:
@@ -171,10 +171,10 @@ services:
 
     jazzy-base:
         image: ghcr.io/fixposition/fixposition-sdk:jazzy-base
-        command: tail -f
+        command: tail -f /dev/null
     jazzy-ci:
         image: ghcr.io/fixposition/fixposition-sdk:jazzy-ci
-        command: tail -f
+        command: tail -f /dev/null
     jazzy-dev:
         image: ghcr.io/fixposition/fixposition-sdk:jazzy-dev
         volumes:
@@ -186,7 +186,49 @@ services:
         cap_add:
             - SYS_PTRACE
         hostname: fpsdk-jazzy-dev-${USER}
-        command: tail -f
+        command: tail -f /dev/null
+
+
+    build-lyrical-base:
+        image: ghcr.io/fixposition/fixposition-sdk:lyrical-base
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.lyrical-base
+        command: tail -f /dev/null
+    build-lyrical-ci:
+        image: ghcr.io/fixposition/fixposition-sdk:lyrical-ci
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.lyrical-ci
+        depends_on:
+            - build-lyrical-base
+        command: tail -f /dev/null
+    build-lyrical-dev:
+        image: ghcr.io/fixposition/fixposition-sdk:lyrical-dev
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.lyrical-dev
+        depends_on:
+            - build-lyrical-base
+
+    lyrical-base:
+        image: ghcr.io/fixposition/fixposition-sdk:lyrical-base
+        command: tail -f /dev/null
+    lyrical-ci:
+        image: ghcr.io/fixposition/fixposition-sdk:lyrical-ci
+        command: tail -f /dev/null
+    lyrical-dev:
+        image: ghcr.io/fixposition/fixposition-sdk:lyrical-dev
+        volumes:
+            - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
+            - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
+            - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.:/home/fpsdk/fixposition-sdk
+        cap_add:
+            - SYS_PTRACE
+        hostname: fpsdk-lyrical-dev-${USER}
+        command: tail -f /dev/null
 
 
     # ----- containers to run pre-built apps ---------------------------------------------------------------------------
@@ -200,7 +242,7 @@ services:
             - trixie-base
     trixie-run:
         image: ghcr.io/fixposition/fixposition-sdk:trixie-run
-        command: tail -f
+        command: tail -f /dev/null
 
     build-noetic-run:
         image: ghcr.io/fixposition/fixposition-sdk:noetic-run
@@ -211,7 +253,7 @@ services:
             - noetic-base
     noetic-run:
         image: ghcr.io/fixposition/fixposition-sdk:noetic-run
-        command: tail -f
+        command: tail -f /dev/null
 
     build-humble-run:
         image: ghcr.io/fixposition/fixposition-sdk:humble-run
@@ -222,7 +264,7 @@ services:
             - humble-base
     humble-run:
         image: ghcr.io/fixposition/fixposition-sdk:humble-run
-        command: tail -f
+        command: tail -f /dev/null
 
     build-jazzy-run:
         image: ghcr.io/fixposition/fixposition-sdk:jazzy-run
@@ -233,7 +275,18 @@ services:
             - jazzy-base
     jazzy-run:
         image: ghcr.io/fixposition/fixposition-sdk:jazzy-run
-        command: tail -f
+        command: tail -f /dev/null
+
+    build-lyrical-run:
+        image: ghcr.io/fixposition/fixposition-sdk:lyrical-run
+        build:
+            context: ..
+            dockerfile: docker/Dockerfile.lyrical-run
+        depends_on:
+            - lyrical-base
+    lyrical-run:
+        image: ghcr.io/fixposition/fixposition-sdk:lyrical-run
+        command: tail -f /dev/null
 
 
 ########################################################################################################################
