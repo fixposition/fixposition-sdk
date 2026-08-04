@@ -90,6 +90,26 @@ jobs:
                   name: fpsdk_common_versions_jazzy
                   path: build/jazzy-ci_build_toplevel_release_ros2/*/*_versions.txt
 
+    ci-fpsdk-lyrical:
+        runs-on: ubuntu-latest
+        container:
+            image: ghcr.io/fixposition/fixposition-sdk:lyrical-ci
+        defaults:
+            run:
+                shell: bash
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v6
+            - name: CI
+              run: |
+                  git config --global --add safe.directory ${GITHUB_WORKSPACE}
+                  ./docker/ci.sh
+            - name: Artefacts
+              uses: actions/upload-artifact@v6
+              with:
+                  name: fpsdk_common_versions_lyrical
+                  path: build/lyrical-ci_build_toplevel_release_ros2/*/*_versions.txt
+
     ci-images:
         runs-on: ubuntu-latest
         needs: # we build the images only if these are successful
@@ -97,6 +117,7 @@ jobs:
             - ci-fpsdk-noetic
             - ci-fpsdk-humble
             - ci-fpsdk-jazzy
+            - ci-fpsdk-lyrical
         steps:
             - name: Checkout
               uses: actions/checkout@v6
@@ -109,16 +130,16 @@ jobs:
             - name: Pull
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=4 docker compose pull trixie-base noetic-base humble-base jazzy-base
+                  COMPOSE_PARALLEL_LIMIT=4 docker compose pull trixie-base noetic-base humble-base jazzy-base lyrical-base
             - name: Build
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-run build-noetic-run build-humble-run build-jazzy-run
+                  COMPOSE_PARALLEL_LIMIT=1 docker compose build build-trixie-run build-noetic-run build-humble-run build-jazzy-run build-lyrical-run
             - name: Push
               if: ${{ github.ref == 'refs/heads/main' }}
               run: |
                   cd ${GITHUB_WORKSPACE}/docker
-                  docker compose push build-trixie-run build-noetic-run build-humble-run build-jazzy-run
+                  docker compose push build-trixie-run build-noetic-run build-humble-run build-jazzy-run build-lyrical-run
             - name: Expire old images
               if: ${{ github.ref == 'refs/heads/main' }}
               uses: actions/delete-package-versions@v5 # https://github.com/actions/delete-package-versions
@@ -137,6 +158,7 @@ jobs:
             - ci-fpsdk-noetic
             - ci-fpsdk-humble
             - ci-fpsdk-jazzy
+            - ci-fpsdk-lyrical
         permissions:
             pages: write
             id-token: write

@@ -27,13 +27,13 @@ struct PoseWithCovariance_
   PoseWithCovariance_()
     : pose()
     , covariance()  {
-      covariance.assign(0.0);
+      covariance.fill(0.0);
   }
   PoseWithCovariance_(const ContainerAllocator& _alloc)
     : pose(_alloc)
     , covariance()  {
   (void)_alloc;
-      covariance.assign(0.0);
+      covariance.fill(0.0);
   }
 
 

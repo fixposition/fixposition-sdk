@@ -48,7 +48,7 @@ namespace fpsdk {
     - PROJ         (*) (≥ 9.4.x)
     - FFmpeg (libavcodec, libavutil, ...) (**) (= 7.1.x)
     - ROS1         (*) (Noetic), or
-    - ROS2         (*) (Humble or Jazzy)
+    - ROS2         (*) (Humble, Jazzy or Lyrical)
 
     (*) Optional dependencies. Without these some functionality in the libraries and apps is unavailable (compiled out).
 
@@ -118,6 +118,7 @@ namespace fpsdk {
     ./docker/docker.sh run noetic-ci ./docker/ci.sh
     ./docker/docker.sh run humble-ci ./docker/ci.sh
     ./docker/docker.sh run jazzy-ci ./docker/ci.sh
+    ./docker/docker.sh run lyrical-ci ./docker/ci.sh
     @endcode
 
     <!-- trick doxygen -->
@@ -256,6 +257,11 @@ namespace fpsdk {
     The builds using ROS Jazzy (Ubuntu 24.04 LTS "Noble") currently use:
 
     @include fpsdk_common_versions_jazzy/fpsdk_common/fpsdk_common_versions.txt
+
+
+    The builds using ROS Lyrical (Ubuntu 26.04 LTS "Raccoon") currently use:
+
+    @include fpsdk_common_versions_lyrical/fpsdk_common/fpsdk_common_versions.txt
 */
 
 // clang-format on

@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.16)
 include(../fpsdk_common/cmake/setup.cmake)
 
 project(fpsdk_ros2
-    LANGUAGES CXX
+    LANGUAGES CXX C
     VERSION ${FPSDK_VERSION_NUMBER}
     DESCRIPTION "Fixposition SDK: ROS2 library"
 )

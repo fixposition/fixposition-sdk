@@ -6,7 +6,7 @@ include(../fpsdk_common/cmake/setup.cmake)
 include(../fpsdk_common/cmake/utils.cmake)
 
 project(fpsdk_apps
-    LANGUAGES CXX
+    LANGUAGES CXX C
     VERSION ${FPSDK_VERSION_NUMBER}
     DESCRIPTION "Fixposition SDK: Apps"
 )

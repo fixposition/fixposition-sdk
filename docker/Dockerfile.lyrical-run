@@ -1,0 +1,37 @@
+########################################################################################################################
+# ___    ___
+# \  \  /  /
+#  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
+#  /  /\  \   License: see the LICENSE file
+# /__/  \__\
+#
+########################################################################################################################
+
+FROM ghcr.io/fixposition/fixposition-sdk:lyrical-base
+
+# Metadata for github packages
+LABEL org.opencontainers.image.description="Fixposition SDK docker image: ROS Lyrical (Ubuntu 26.04 Resolute) image with pre-built binaries"
+LABEL org.opencontainers.image.source=https://github.com/fixposition
+
+# Variables used in our Docker build and CI scripts
+ENV FPSDK_IMAGE=lyrical-run
+
+# Install useful stuff
+COPY docker/scripts/install_apt_run.sh /tmp
+RUN /tmp/install_apt_run.sh && rm -f /tmp/install_apt_run.sh
+
+COPY .git /tmp/fpsdk/.git/
+RUN <<EOF
+    # Compile and install Fixposition SDK
+    cd /tmp/fpsdk
+    git checkout -- .
+    . /opt/ros/lyrical/setup.sh
+    make -C /tmp/fpsdk install BUILD_TESTING=OFF BUILD_TYPE=Release INSTALL_PREFIX=/usr/local
+EOF
+
+ENTRYPOINT [ "/ros_entrypoint.sh" ]
+
+# For debugging docker builds... (last layer!)
+RUN date > /fixposition-sdk-${FPSDK_IMAGE}
+
+########################################################################################################################
