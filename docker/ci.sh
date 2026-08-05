@@ -555,9 +555,9 @@ do_step build_projs_release_noros_mindeps      || true # continue
 
 do_step build_examples                 || true # continue
 
-# Some minimal checks with clang on the reference system (Trixie) and a more recent Ubuntu 26 (= ROS2 Lyrical)
+# Not on Noetic/Ubuntu 20, that is just way too ancient...
 echo "===== clang ====="
-if [ "${FPSDK_IMAGE%-*}" = "trixie" -o "${FPSDK_IMAGE%-*}" = "lyrical" ]; then
+if [ "${FPSDK_IMAGE%-*}" = "trixie" -o "${FPSDK_IMAGE%-*}" = "humble" -o "${FPSDK_IMAGE%-*}" = "jazzy" -o "${FPSDK_IMAGE%-*}" = "lyrical" ]; then
     do_step build_toplevel_release_clang  || true # continue
     do_step build_toplevel_debug_clang    || true # continue
 fi
