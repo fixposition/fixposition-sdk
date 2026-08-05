@@ -12,6 +12,8 @@ BUILD_TESTING  =
 VERBOSE        = 0
 USE_PROJ       =
 USE_FFMPEG     =
+C_COMPILER     =
+CXX_COMPILER   =
 
 # User vars
 -include config.mk
@@ -28,7 +30,7 @@ else ifeq ($(ROS_VERSION),2)
 endif
 
 # A unique ID for this exact config we're using
-configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING) $(USE_PROJ) $(USE_FFMPEG) $(FPSDK_VERSION_STRING) $(CC) $(CXX) $$(uname -a)" | md5sum | cut -d " " -f1)
+configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING) $(USE_PROJ) $(USE_FFMPEG) $(FPSDK_VERSION_STRING) $(C_COMPILER) $(CXX_COMPILER) $$(uname -a)" | md5sum | cut -d " " -f1)
 
 .PHONY: help
 help:
@@ -139,6 +141,12 @@ endif
 ifneq ($(FPSDK_VERSION_STRING),)
   CMAKE_ARGS += -DVERSION_STRING=$(FPSDK_VERSION_STRING)
 endif
+ifneq ($(C_COMPILER),)
+  CMAKE_ARGS += -DCMAKE_C_COMPILER=$(C_COMPILER)
+endif
+ifneq ($(CXX_COMPILER),)
+  CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(CXX_COMPILER)
+endif
 
 ifeq ($(BUILD_TYPE),Release)
   CMAKE_ARGS_INSTALL += --strip
@@ -188,7 +196,7 @@ cmake: $(BUILD_DIR)/.make-cmake
 deps_cmake := Makefile $(wildcard config.mk) $(wildcard $(sort $(wildcard CMakeLists.txt */CMakeLists.txt */cmake/*)))
 
 $(BUILD_DIR)/.make-cmake: $(deps_cmake) $(BUILD_DIR)/.make-configuid-$(configuid)
-	@echo "$(HLW)***** Configure ($(BUILD_TYPE)) *****$(HLO)"
+	@echo "$(HLW)***** Configure ($(CMAKE_ARGS)) *****$(HLO)"
 	$(V)$(CMAKE) -B $(BUILD_DIR) $(CMAKE_ARGS)
 	$(V)$(TOUCH) $@
 
