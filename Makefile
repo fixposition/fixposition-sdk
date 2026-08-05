@@ -144,8 +144,8 @@ endif
 ifneq ($(C_COMPILER),)
   CMAKE_ARGS += -DCMAKE_C_COMPILER=$(C_COMPILER)
 endif
-ifneq ($(CXXCOMPILER),)
-  CMAKE_ARGS += -DCMAKE_CXXCOMPILER=$(CXXCOMPILER)
+ifneq ($(CXX_COMPILER),)
+  CMAKE_ARGS += -DCMAKE_CXX_COMPILER=$(CXX_COMPILER)
 endif
 
 ifeq ($(BUILD_TYPE),Release)
@@ -196,7 +196,7 @@ cmake: $(BUILD_DIR)/.make-cmake
 deps_cmake := Makefile $(wildcard config.mk) $(wildcard $(sort $(wildcard CMakeLists.txt */CMakeLists.txt */cmake/*)))
 
 $(BUILD_DIR)/.make-cmake: $(deps_cmake) $(BUILD_DIR)/.make-configuid-$(configuid)
-	@echo "$(HLW)***** Configure ($(BUILD_TYPE)) *****$(HLO)"
+	@echo "$(HLW)***** Configure ($(CMAKE_ARGS)) *****$(HLO)"
 	$(V)$(CMAKE) -B $(BUILD_DIR) $(CMAKE_ARGS)
 	$(V)$(TOUCH) $@
 
