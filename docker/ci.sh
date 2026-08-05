@@ -207,7 +207,7 @@ function build_toplevel_release_clang
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
     make install \
-        CC=clang CXX=clang++ \
+        C_COMPILER=clang CXX_COMPILER=clang++ \
         INSTALL_PREFIX=install/${buildname} \
         BUILD_TYPE=Release \
         BUILD_DIR=build/${buildname} || return 1
@@ -222,7 +222,7 @@ function build_toplevel_debug_clang
     cd ${FPSDK_SRC_DIR}
     rm -rf build/${buildname}
     make install \
-        CC=clang CXX=clang++ \
+        C_COMPILER=clang CXX_COMPILER=clang++ \
         INSTALL_PREFIX=install/${buildname} \
         BUILD_TYPE=Debug \
         BUILD_DIR=build/${buildname} || return 1
