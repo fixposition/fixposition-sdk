@@ -555,9 +555,9 @@ do_step build_projs_release_noros_mindeps      || true # continue
 
 do_step build_examples                 || true # continue
 
-# Some minimal checks with clang
+# Some minimal checks with clang on the reference system (Trixie) and a more recent Ubuntu 26 (= ROS2 Lyrical)
 echo "===== clang ====="
-if [ "${FPSDK_IMAGE%-*}" = "trixie" ]; then
+if [ "${FPSDK_IMAGE%-*}" = "trixie" -o "${FPSDK_IMAGE%-*}" = "lyrical" ]; then
     do_step build_toplevel_release_clang  || true # continue
     do_step build_toplevel_debug_clang    || true # continue
 fi

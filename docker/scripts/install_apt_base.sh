@@ -44,6 +44,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     ..............jazzy.lyrical.trixie      libproj25
     ..............jazzy.lyrical.trixie      libproj-dev
     noetic.humble.jazzy.lyrical.trixie      libssl-dev
+    ....................lyrical.......      libstdc++-16-dev
     noetic.humble.jazzy.lyrical.trixie      libsqlite3-dev
     noetic.humble.jazzy.lyrical.trixie      libtiff-dev
     noetic.humble.jazzy.lyrical.trixie      libva-dev                         # automatically installs va-driver-all?
