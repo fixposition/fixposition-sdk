@@ -978,7 +978,42 @@ TEST(ParserFpaTest, FpaVersionPayload)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-TEST(ParserNmeaTest, FpaDecodeMessage)
+TEST(FpaTest, FpaConfigPayload)
+{
+    {
+        FpaConfigPayload payload;
+        const char* msg = "$FP,CONFIG,1,DEFAULT,,,,,,*4A\r\n";
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
+        EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.action, FpaConfigAction::DEFAULT);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(FpaTest, FpaAckPayload)
+{
+    {
+        FpaAckPayload payload;
+        const char* msg = "$FP,ACK,1,CONFIG,OK,,,,*60\r\n";
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
+        EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.ack_msg, FpaMessageType::CONFIG);
+        EXPECT_EQ(payload.ack_res, FpaAckRes::OK);
+    }
+    {
+        FpaAckPayload payload;
+        const char* msg = "$FP,ACK,1,CONFIG,FAIL,,,,*66\r\n";
+        EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
+        EXPECT_TRUE(payload.valid_);
+        EXPECT_EQ(payload.ack_msg, FpaMessageType::CONFIG);
+        EXPECT_EQ(payload.ack_res, FpaAckRes::FAIL);
+    }
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(ParserFpaTest, FpaDecodeMessage)
 {
     {
         const char* msg = "$FP,VERSION,1,fp_vrtk2-release-vr2_2.123.0-456,NAV_VR2,v1.3b,fp-5d6f64,VRTK2_STK,*3F\r\n";
