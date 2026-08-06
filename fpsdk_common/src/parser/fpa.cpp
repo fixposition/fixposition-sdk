@@ -478,6 +478,56 @@ const char* FpaTimerefStr(const FpaTimeref ref)
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaConfigActionStr(const FpaConfigAction action)
+{
+    switch (action) {  // clang-format off
+        case FpaConfigAction::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaConfigAction::DEFAULT:     return "DEFAULT";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaAckResStr(const FpaAckRes res)
+{
+    switch (res) {  // clang-format off
+        case FpaAckRes::UNSPECIFIED: return "UNSPECIFIED";
+        case FpaAckRes::OK:          return "OK";
+        case FpaAckRes::FAIL:        return "FAIL";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* FpaMessageTypeStr(const FpaMessageType msg_type)
+{
+    switch (msg_type) {  // clang-format off
+        case FpaMessageType::UNSPECIFIED:  return "UNSPECIFIED";
+        case FpaMessageType::EOE:          return "EOE";
+        case FpaMessageType::GNSSANT:      return "GNSSANT";
+        case FpaMessageType::GNSSCORR:     return "GNSSCORR";
+        case FpaMessageType::RAWIMU:       return "RAWIMU";
+        case FpaMessageType::CORRIMU:      return "CORRIMU";
+        case FpaMessageType::IMUBIAS:      return "IMUBIAS";
+        case FpaMessageType::LLH:          return "LLH";
+        case FpaMessageType::ODOMETRY:     return "ODOMETRY";
+        case FpaMessageType::ODOMENU:      return "ODOMENU";
+        case FpaMessageType::ODOMSH:       return "ODOMSH";
+        case FpaMessageType::ODOMSTATUS:   return "ODOMSTATUS";
+        case FpaMessageType::TEXT:         return "TEXT";
+        case FpaMessageType::TF:           return "TF";
+        case FpaMessageType::TP:           return "TP";
+        case FpaMessageType::VERSION:      return "VERSION";
+        case FpaMessageType::CONFIG:       return "CONFIG";
+        case FpaMessageType::ACK:          return "ACK";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 // Various helpers for the SetFromMsg() FP_A decoding functions
 
 // Debug prints, for development
@@ -1002,6 +1052,34 @@ static bool GetTimeref(FpaTimeref& ref, const std::string& field)
     else if (field == "OTHER") { ref = FpaTimeref::OTHER;    }
     else                       { ref = FpaTimeref::UNSPECIFIED; }  // clang-format on
     FPA_TRACE("GetTimeref(\"%s\")=%s ref=%d", field.c_str(), string::ToStr(ok), types::EnumToVal(ref));
+    return ok;
+}
+
+static bool GetAction(FpaConfigAction& act, const std::string& field)
+{
+    bool ok = true;  // clang-format off
+    if      (field == "DEFAULT")  { act = FpaConfigAction::DEFAULT; }
+    else                          { act = FpaConfigAction::UNSPECIFIED; }  // clang-format on
+    FPA_TRACE("GetAction(\"%s\")=%s act=%d", field.c_str(), string::ToStr(ok), fp::common::EnumToUnderlyingType(act));
+    return ok;
+}
+
+static bool GetAckRes(FpaAckRes& res, const std::string& field)
+{
+    bool ok = true;  // clang-format off
+    if      (field == "OK")       { res = FpaAckRes::OK; }
+    else if (field == "FAIL")     { res = FpaAckRes::FAIL; }
+    else                          { res = FpaAckRes::UNSPECIFIED; }  // clang-format on
+    FPA_TRACE("GetAckRes(\"%s\")=%s res=%d", field.c_str(), string::ToStr(ok), fp::common::EnumToUnderlyingType(res));
+    return ok;
+}
+
+static bool GetAckMsg(FpaMessageType& msg, const std::string& field)
+{
+    bool ok = true;  // clang-format off
+    if      (field == "CONFIG")   { msg = FpaMessageType::CONFIG; }
+    else                          { msg = FpaMessageType::UNSPECIFIED; }  // clang-format on
+    FPA_TRACE("GetAckMsg(\"%s\")=%s msg=%d", field.c_str(), string::ToStr(ok), fp::common::EnumToUnderlyingType(msg));
     return ok;
 }
 
@@ -1537,6 +1615,46 @@ bool FpaVersionPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_siz
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+bool FpaConfigPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
+{
+    // clang-format off
+    // $FP,CONFIG,1,DEFAULT,,,,,,*4A
+    //              0      123456
+    // clang-format on
+    bool ok = false;
+    FpaParts m;
+    if (GetParts(m, "CONFIG", msg, msg_size) && (m.meta_.msg_version_ == 1) && (m.fields_.size() == 7)) {
+        ok = GetAction(action, m.fields_[0]) && m.fields_[1].empty() && m.fields_[2].empty() && m.fields_[3].empty() &&
+             m.fields_[4].empty() && m.fields_[5].empty() && m.fields_[6].empty();
+    }
+    FPA_TRACE("FpaConfigPayload %s", string::ToStr(ok));
+    valid_ = ok;
+    msg_type_ = FpaMessageType::CONFIG;
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool FpaAckPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
+{
+    // clang-format off
+    // $FP,ACK,1,CONFIG,OK,,,,*60\r\n
+    //           0      1 2345
+    // clang-format on
+    bool ok = false;
+    FpaParts m;
+    if (GetParts(m, "ACK", msg, msg_size) && (m.meta_.msg_version_ == 1) && (m.fields_.size() == 6)) {
+        ok = GetAckMsg(ack_msg, m.fields_[0]) && GetAckRes(ack_res, m.fields_[1]) && m.fields_[2].empty() &&
+             m.fields_[3].empty() && m.fields_[4].empty() && m.fields_[5].empty();
+    }
+    FPA_TRACE("FpaAckPayload %s", string::ToStr(ok));
+    valid_ = ok;
+    msg_type_ = FpaMessageType::ACK;
+    return ok;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 FpaPayloadPtr FpaDecodeMessage(const uint8_t* msg, const std::size_t msg_size)
 {
     FpaMessageMeta meta;
@@ -1570,6 +1688,8 @@ FpaPayloadPtr FpaDecodeMessage(const uint8_t* msg, const std::size_t msg_size)
     _GEN("TF",         FpaTfPayload)
     _GEN("TP",         FpaTpPayload)
     _GEN("VERSION",    FpaVersionPayload)
+    _GEN("CONFIG",     FpaConfigPayload)
+    _GEN("ACK",        FpaAckPayload)
     // clang-format on
 
 #undef _GEN
@@ -1577,7 +1697,8 @@ FpaPayloadPtr FpaDecodeMessage(const uint8_t* msg, const std::size_t msg_size)
     return nullptr;
 }
 
-/* ****************************************************************************************************************** */
+/* ******************************************************************************************************************
+ */
 }  // namespace fpa
 }  // namespace parser
 }  // namespace common

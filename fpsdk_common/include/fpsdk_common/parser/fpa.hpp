@@ -672,6 +672,43 @@ enum class FpaTimeref : int
 const char* FpaTimerefStr(const FpaTimeref ref);
 
 /**
+ * @brief FP_A-CONFIG action
+ */
+enum class FpaConfigAction : int
+{
+    UNSPECIFIED = 0,  //!< Unspecified
+    DEFAULT,          //!< Default
+};
+
+/**
+ * @brief Stringify action
+ *
+ * @param[in]  action  The action
+ *
+ * @returns the stringification of the action ("DEFAULT", etc.)
+ */
+const char* FpaConfigActionStr(const FpaConfigAction action);
+
+/**
+ * @brief FP_A-ACK result
+ */
+enum class FpaAckRes : int
+{
+    UNSPECIFIED = 0,  //!< Unspecified
+    OK,               //!< Positive acknowledgement
+    FAIL,             //!< Negative acknowledgement
+};
+
+/**
+ * @brief Stringify result
+ *
+ * @param[in]  res  The result
+ *
+ * @returns the stringification of the result ("OK", "FAIL", ..)
+ */
+const char* FpaAckResStr(const FpaAckRes res);
+
+/**
  * @brief FP_A integer value
  */
 struct FpaInt
@@ -753,7 +790,18 @@ enum class FpaMessageType
     TF,           //!< FpaTfPayload
     TP,           //!< FpaTpPayload
     VERSION,      //!< FpaVersionPayload
+    CONFIG,       //!< FpaConfigPayload
+    ACK,          //!< FpaAckPayload
 };
+
+/**
+ * @brief Stringify FP_A message type
+ *
+ * @param[in]  msg_type  The message type
+ *
+ * @returns the stringification of the message type
+ */
+const char* FpaMessageTypeStr(const FpaMessageType msg_type);
 
 /**
  * @brief FP_A payload base class
@@ -1073,6 +1121,33 @@ struct FpaVersionPayload : public FpaPayload
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
     static constexpr const char* MSG_NAME = "FP_A-VERSION";  //!< Message name
+};
+
+/**
+ * @brief FP_A-CONFIG (version 1) message payload
+ */
+struct FpaConfigPayload : public FpaPayload
+{  // clang-format off
+    FpaConfigAction action = FpaConfigAction::UNSPECIFIED; //!< Action
+    // clang-format on
+
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
+
+    static constexpr const char* MSG_NAME = "FP_A-CONFIG";  //!< Message name
+};
+
+/**
+ * @brief FP_A-ACK (version 1) message payload
+ */
+struct FpaAckPayload : public FpaPayload
+{  // clang-format off
+    FpaMessageType ack_msg = FpaMessageType::UNSPECIFIED; //!< Message is being acknowledged
+    FpaAckRes      ack_res = FpaAckRes::UNSPECIFIED;      //!< Acknowledge result
+    // clang-format on
+
+    bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
+
+    static constexpr const char* MSG_NAME = "FP_A-ACK";  //!< Message name
 };
 
 // ---------------------------------------------------------------------------------------------------------------------

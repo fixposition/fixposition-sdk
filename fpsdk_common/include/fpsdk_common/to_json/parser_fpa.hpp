@@ -419,6 +419,25 @@ inline void to_json(nlohmann::json& j, const FpaVersionPayload& m)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
+inline void to_json(nlohmann::json& j, const FpaConfigPayload& m)
+{
+    j = nlohmann::json::object({
+        { "action", FpaConfigActionStr(m.action) },
+    });
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+inline void to_json(nlohmann::json& j, const FpaAckPayload& m)
+{
+    j = nlohmann::json::object({
+        { "ack_msg", FpaMessageTypeStr(m.ack_msg) },
+        { "ack_res", FpaAckResStr(m.ack_res) },
+    });
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
 inline void to_json(nlohmann::json& j, const FpaPayloadPtr& fpa)
 {
     j = nlohmann::json::object();
@@ -444,6 +463,8 @@ inline void to_json(nlohmann::json& j, const FpaPayloadPtr& fpa)
             case FpaMessageType::TF:          j.update(dynamic_cast<const FpaTfPayload&>(*fpa));         break;
             case FpaMessageType::TP:          j.update(dynamic_cast<const FpaTpPayload&>(*fpa));         break;
             case FpaMessageType::VERSION:     j.update(dynamic_cast<const FpaVersionPayload&>(*fpa));    break;
+            case FpaMessageType::CONFIG:      j.update(dynamic_cast<const FpaConfigPayload&>(*fpa));     break;
+            case FpaMessageType::ACK:         j.update(dynamic_cast<const FpaAckPayload&>(*fpa));        break;
         }  // clang-format on
     }
 }
