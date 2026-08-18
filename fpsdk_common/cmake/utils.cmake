@@ -24,6 +24,38 @@ endmacro()
 
 ########################################################################################################################
 
+# bzip2 is optional, unless explicitly requested with -DFPSDK_USE_BZ2=ON. It is used for compressing ROS1 bags.
+macro(fpsdk_find_package_bz2)
+    # message(STATUS "fpsdk: FPSDK_USE_BZ2=${FPSDK_USE_BZ2}")
+
+    # Explicitly requested by user to use bzip2
+    if(FPSDK_USE_BZ2 STREQUAL "ON")
+        find_package(BZip2 REQUIRED)
+
+    # Explicitly requested by user to not use bzip2
+    elseif(FPSDK_USE_BZ2 STREQUAL "OFF")
+        message(STATUS "fpsdk: Not using bzip2")
+
+    # Automatic, use bzip2 if it is available
+    else()
+        find_package(BZip2 QUIET)
+        if(${BZIP2_FOUND})
+            set(FPSDK_USE_BZ2 ON)
+        else()
+            message(STATUS "fpsdk: No bzip2 found")
+            set(FPSDK_USE_BZ2 OFF)
+        endif()
+    endif()
+
+    if(FPSDK_USE_BZ2)
+        message(STATUS "fpsdk: Using bzip2 (${BZIP2_VERSION_STRING}, ${BZIP2_INCLUDE_DIRS})")
+    endif()
+
+endmacro()
+
+
+########################################################################################################################
+
 # PROJ is optional, unless explicitly requested with -DFPSDK_USE_PROJ=ON
 macro(fpsdk_find_package_proj)
     # message(STATUS "fpsdk: FPSDK_USE_PROJ=${FPSDK_USE_PROJ}")

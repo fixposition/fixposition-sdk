@@ -25,8 +25,6 @@ namespace fpsdk {
     - @subpage FPSDK_EXAMPLES_FUSION_EPOCH
     - @subpage FPSDK_EXAMPLES_FPB_MEASUREMENTS
     - @subpage FPSDK_EXAMPLES_CAMERA_STREAMING
-    - @subpage FPSDK_EXAMPLES_ROS1_DEMO
-    - @subpage FPSDK_EXAMPLES_ROS2_DEMO
 
 
     @page FPSDK_EXAMPLES_PARSER_INTRO Parsing and decoding FP_A messages
@@ -48,17 +46,6 @@ namespace fpsdk {
 
     @include{lineno} camera_streaming.cpp
 
-
-    @page FPSDK_EXAMPLES_ROS1_DEMO ROS 1 node
-
-    This is a demonstratation of using the Fixposition SDK in a simple ROS 1 node. See the examples/ros1_fpsdk_demo
-    directory in the source code repository for details.
-
-
-    @page FPSDK_EXAMPLES_ROS2_DEMO ROS 2 node
-
-    This is a demonstratation of using the Fixposition SDK in a simple ROS 2 node. See the examples/ros2_fpsdk_demo
-    directory in the source code repository for details.
 */
 
 // clang-format on

@@ -99,7 +99,7 @@
  * @section FPSDK_COMMON_PARSER_NAMING Protocol and message naming
  *
  * The protocols names are defined in #fpsdk::common::parser::Protocol and can be stringified using
- * fpsdk::common::parser::ProtocolStr(). The names must match `/^[A-Z][A-Z0-9_]{2,5}$/.
+ * fpsdk::common::parser::ProtocolStr(). The names must match `/^[A-Z][A-Z0-9_]{2,5}$/`.
  *
  * The message naming scheme consists of words separated by dashes. The first word is always the protocol name.
  * Depending on the protocol one or two more words are added. All words must match `/^[A-Z][A-Z0-9]{2,9}$/`.

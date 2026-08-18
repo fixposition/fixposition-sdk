@@ -92,7 +92,7 @@ bool DoTrim(const FplToolOptions& opts)
         // Report progress
         if (opts.progress_ > 0) {
             if (reader.GetProgress(progress, rate)) {
-                INFO("Processing... %.1f%% (%.0f MiB/s) -- time into log %" PRIu32 ", used %" PRIu64 " msgs\r",
+                INFO("Processing... %.1f%% (%.1f MiB/s) -- time into log %" PRIu32 ", used %" PRIu64 " msgs\r",
                     progress, rate, time_into_log, n_used);
             }
         }

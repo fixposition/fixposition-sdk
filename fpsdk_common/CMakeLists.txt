@@ -11,6 +11,7 @@ project(fpsdk_common
     DESCRIPTION "Fixposition SDK: Common Library"
 )
 
+set(_unused "${CMAKE_C_COMPILER}") # suppress warning in some setups
 
 # COMPILER SETUP =======================================================================================================
 
@@ -59,20 +60,30 @@ find_package(nlohmann_json REQUIRED)
 find_package(Threads REQUIRED)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(OpenSSL REQUIRED IMPORTED_TARGET openssl)
+fpsdk_find_package_bz2()
 fpsdk_find_package_proj()
 fpsdk_find_package_ffmpeg()
 
 if(FPSDK_USE_ROS1)
+    fpsdk_cmake_find_ros1_package(roscpp)
+    fpsdk_cmake_find_ros1_package(rosconsole)
     fpsdk_cmake_find_ros1_package(std_msgs)
     fpsdk_cmake_find_ros1_package(sensor_msgs)
     fpsdk_cmake_find_ros1_package(geometry_msgs)
     fpsdk_cmake_find_ros1_package(tf2_msgs)
     fpsdk_cmake_find_ros1_package(nav_msgs)
-    add_compile_definitions(FPSDK_USE_ROS1)
 else()
     if(FPSDK_USE_ROS2)
-        add_compile_definitions(FPSDK_USE_ROS2)
+        find_package(rclcpp REQUIRED)
+        find_package(rosbag2_cpp REQUIRED)
+        find_package(std_msgs REQUIRED)
+        find_package(sensor_msgs REQUIRED)
+        find_package(geometry_msgs REQUIRED)
+        find_package(tf2_msgs REQUIRED)
+        find_package(nav_msgs REQUIRED)
     endif()
+
+    # Minimal ROS1 stuff needed for fpltool
     fpsdk_cmake_local_ros1_package(std_msgs)
     fpsdk_cmake_local_ros1_package(sensor_msgs)
     fpsdk_cmake_local_ros1_package(geometry_msgs)
@@ -81,12 +92,38 @@ else()
 endif()
 
 fpsdk_save_versions(FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_versions.txt
-    PACKAGES CMAKE Boost yaml-cpp ZLIB Eigen3 nlohmann_json OpenSSL PROJ libavcodec libavutil libavfilter libswscale)
+    PACKAGES CMAKE Boost yaml-cpp ZLIB BZIP2 Eigen3 nlohmann_json OpenSSL PROJ libavcodec libavutil libavfilter libswscale)
 
 # SHARED LIBRARY =======================================================================================================
 
 file(GLOB CPP_FILES src/*.cpp src/parser/*.cpp src/stream/*.cpp)
+
+# Unless building on a real ROS1 system we have to build some minimal implementation. Most things are header-only,
+# though. See the fpsdk_cmake_local_ros1_package() and the setup for the rosnoros/ headers below.
+if(NOT FPSDK_USE_ROS1)
+    file(GLOB ROSNOROS_CPP_FILES rosnoros/ros/*.cpp)
+    list(APPEND CPP_FILES ${ROSNOROS_CPP_FILES})
+endif()
+
 add_library(${PROJECT_NAME} SHARED ${CPP_FILES})
+
+if(FPSDK_USE_ROS1)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_ROS1=1)
+else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_ROS1=0)
+endif()
+
+if(FPSDK_USE_ROS2)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_ROS2=1)
+else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_ROS2=0)
+endif()
+
+if(FPSDK_USE_BZ2)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_BZ2=1)
+else()
+    target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_BZ2=0)
+endif()
 
 if(FPSDK_USE_PROJ)
     target_compile_definitions(${PROJECT_NAME} PUBLIC FPSDK_USE_PROJ=1)
@@ -120,7 +157,10 @@ target_link_libraries(${PROJECT_NAME}
     PUBLIC
         Eigen3::Eigen
         yaml-cpp
+        Threads::Threads
     PRIVATE
+        $<TARGET_NAME_IF_EXISTS:ros1::rosconsole>
+        $<TARGET_NAME_IF_EXISTS:ros1::roscpp>
         $<TARGET_NAME_IF_EXISTS:ros1::std_msgs>
         $<TARGET_NAME_IF_EXISTS:ros1::geometry_msgs>
         $<TARGET_NAME_IF_EXISTS:ros1::sensor_msgs>
@@ -130,13 +170,20 @@ target_link_libraries(${PROJECT_NAME}
         ${CMAKE_DL_LIBS}
         ZLIB::ZLIB
         PkgConfig::OpenSSL
-        Threads::Threads
         nlohmann_json::nlohmann_json
         $<$<BOOL:${FPSDK_USE_PROJ}>:PROJ::proj>
         $<$<BOOL:${FPSDK_USE_FFMPEG}>:PkgConfig::libavcodec>
         $<$<BOOL:${FPSDK_USE_FFMPEG}>:PkgConfig::libavutil>
         $<$<BOOL:${FPSDK_USE_FFMPEG}>:PkgConfig::libavfilter>
         $<$<BOOL:${FPSDK_USE_FFMPEG}>:PkgConfig::libswscale>
+        $<$<BOOL:${FPSDK_USE_BZ2}>:BZip2::BZip2>
+        ${rclcpp_TARGETS}
+        ${rosbag2_cpp_TARGETS}
+        ${std_msgs_TARGETS}
+        ${sensor_msgs_TARGETS}
+        ${geometry_msgs_TARGETS}
+        ${tf2_msgs_TARGETS}
+        ${nav_msgs_TARGETS}
 )
 
 set_target_properties(${PROJECT_NAME}
@@ -161,6 +208,7 @@ install(DIRECTORY include/${PROJECT_NAME}/
 
 install(DIRECTORY rosnoros
     DESTINATION ${PROJECT_INCLUDE_DIR}
+    FILES_MATCHING PATTERN "*.h"
 )
 
 # Library, tools
@@ -249,7 +297,8 @@ add_gtest(TARGET parser_types_test    SOURCES test/parser_types_test.cpp    LINK
 add_gtest(TARGET parser_ubx_test      SOURCES test/parser_ubx_test.cpp      LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET parser_unib_test     SOURCES test/parser_unib_test.cpp     LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET path_test            SOURCES test/path_test.cpp            LINK_LIBS ${PROJECT_NAME})
-add_gtest(TARGET ros1_test            SOURCES test/ros1_test.cpp            LINK_LIBS ${PROJECT_NAME} ros1::sensor_msgs ros1::tf2_msgs)
+add_gtest(TARGET ros1_test            SOURCES test/ros1_test.cpp            LINK_LIBS ${PROJECT_NAME} $<TARGET_NAME_IF_EXISTS:ros1::roscpp> $<TARGET_NAME_IF_EXISTS:ros1::rosconsole> $<TARGET_NAME_IF_EXISTS:ros1::std_msgs> $<TARGET_NAME_IF_EXISTS:ros1::geometry_msgs> $<TARGET_NAME_IF_EXISTS:ros1::sensor_msgs> $<TARGET_NAME_IF_EXISTS:ros1::tf2_msgs> $<TARGET_NAME_IF_EXISTS:ros1::nav_msgs> $<$<BOOL:${FPSDK_USE_BZ2}>:BZip2::BZip2>)
+add_gtest(TARGET ros2_test            SOURCES test/ros2_test.cpp            LINK_LIBS ${PROJECT_NAME} ${rclcpp_TARGETS} ${rosbag2_cpp_TARGETS} ${std_msgs_TARGETS} ${sensor_msgs_TARGETS} ${geometry_msgs_TARGETS} ${tf2_msgs_TARGETS} ${nav_msgs_TARGETS})
 add_gtest(TARGET string_test          SOURCES test/string_test.cpp          LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET time_test            SOURCES test/time_test.cpp            LINK_LIBS ${PROJECT_NAME})
 add_gtest(TARGET thread_test          SOURCES test/thread_test.cpp          LINK_LIBS ${PROJECT_NAME})

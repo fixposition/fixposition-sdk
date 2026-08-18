@@ -82,7 +82,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 
 --------------------------------------------------------------------------------
 
-Some of fpsdk_common uses FFmpeg libraries (libavcodec, libavutil and libswscale)
+Some of fpsdk_common optionally uses FFmpeg libraries (libavcodec, libavutil,
+libavfilter, libswscale), built with --disable-gpl and --disable-nonfree,
 licensed under the GNU Lesser General Public License version 2.1 or later.
 
 Source code for these libraries is available at: https://ffmpeg.org/

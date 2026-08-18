@@ -8,10 +8,4 @@ project(fpsdk
 )
 
 add_subdirectory(fpsdk_common)
-if(FPSDK_USE_ROS1)
-    add_subdirectory(fpsdk_ros1)
-endif()
-if(FPSDK_USE_ROS2)
-    add_subdirectory(fpsdk_ros2)
-endif()
 add_subdirectory(fpsdk_apps)

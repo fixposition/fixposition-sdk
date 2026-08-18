@@ -2,8 +2,6 @@
 
 deps = $(sort $(wildcard CMakeList.txt Makefile ../../fpsdk_doc/* *.cpp \
     ../../fpsdk_common/* ../../fpsdk_common/*/* ../../fpsdk_common/*/*/* ../../fpsdk_common/*/*/*/* \
-    ../../fpsdk_ros1/* ../../fpsdk_ros1/*/* ../../fpsdk_ros1/*/*/* ../../fpsdk_ros1/*/*/*/* \
-    ../../fpsdk_ros2/* ../../fpsdk_ros2/*/* ../../fpsdk_ros2/*/*/* ../../fpsdk_ros2/*/*/*/* \
     ../../fpsdk_apps/* ../../fpsdk_apps/*/* ../../fpsdk_apps/*/*/* ../../fpsdk_apps/*/*/*/*))
 
 .PHONY: default

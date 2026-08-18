@@ -29,9 +29,14 @@
  *  @file
  *  @brief ROS time polyfill
  *
- *  @details Files impoorted:
+ *  @details Files imported:
  *              - ros/duration.h
  *              - ros/time.h
+ *              - ros/impl/duration.h
+ *              - ros/impl/time.h
+ *
+ *  @details The implementation of the non-template parts is in time.cpp (which is only built in the non-ROS1 case).
+ *           The toBoost()/fromBoost() and sleep() methods as well as the Rate class are not available.
  *
  *  ___    ___
  *  \  \  /  /
@@ -51,7 +56,10 @@
 #include <cmath>
 #include <cstdint>
 #include <ctime>
+#include <iomanip>
 #include <iostream>
+#include <limits>
+#include <stdexcept>
 
 namespace boost {
 namespace posix_time {
@@ -439,7 +447,221 @@ ROSTIME_DECL std::ostream& operator<<(std::ostream& os, const SteadyTime& rhs);
 }  // namespace ros
 
 /**********************************************************************************************************************/
-// ros/....h
+// ros/impl/duration.h
 /**********************************************************************************************************************/
+namespace ros {
+
+template <class T>
+DurationBase<T>::DurationBase(int32_t _sec, int32_t _nsec) : sec(_sec), nsec(_nsec) {
+    normalizeSecNSecSigned(sec, nsec);
+}
+
+template <class T>
+T& DurationBase<T>::fromSec(double d) {
+    if (!std::isfinite(d)) {
+        throw std::runtime_error("Duration has to be finite.");
+    }
+    constexpr double minInt64AsDouble = static_cast<double>(std::numeric_limits<int64_t>::min());
+    constexpr double maxInt64AsDouble = static_cast<double>(std::numeric_limits<int64_t>::max());
+    if ((d <= minInt64AsDouble) || (d >= maxInt64AsDouble)) {
+        throw std::runtime_error("Duration is out of 64-bit integer range");
+    }
+    const int64_t sec64 = static_cast<int64_t>(std::floor(d));
+    if ((sec64 < std::numeric_limits<int32_t>::min()) || (sec64 > std::numeric_limits<int32_t>::max())) {
+        throw std::runtime_error("Duration is out of dual 32-bit range");
+    }
+    sec = static_cast<int32_t>(sec64);
+    nsec = static_cast<int32_t>(std::round((d - static_cast<double>(sec)) * 1e9));
+    const int32_t rollover = nsec / 1000000000;
+    sec += rollover;
+    nsec %= 1000000000;
+    return *static_cast<T*>(this);
+}
+
+template <class T>
+T& DurationBase<T>::fromNSec(int64_t t) {
+    const int64_t sec64 = t / 1000000000LL;
+    if ((sec64 < std::numeric_limits<int32_t>::min()) || (sec64 > std::numeric_limits<int32_t>::max())) {
+        throw std::runtime_error("Duration is out of dual 32-bit range");
+    }
+    sec = static_cast<int32_t>(sec64);
+    nsec = static_cast<int32_t>(t % 1000000000LL);
+    normalizeSecNSecSigned(sec, nsec);
+    return *static_cast<T*>(this);
+}
+
+template <class T>
+T DurationBase<T>::operator+(const T& rhs) const {
+    T t;
+    return t.fromNSec(toNSec() + rhs.toNSec());
+}
+
+template <class T>
+T DurationBase<T>::operator*(double scale) const {
+    return T(toSec() * scale);
+}
+
+template <class T>
+T DurationBase<T>::operator-(const T& rhs) const {
+    T t;
+    return t.fromNSec(toNSec() - rhs.toNSec());
+}
+
+template <class T>
+T DurationBase<T>::operator-() const {
+    T t;
+    return t.fromNSec(-toNSec());
+}
+
+template <class T>
+T& DurationBase<T>::operator+=(const T& rhs) {
+    *this = *this + rhs;
+    return *static_cast<T*>(this);
+}
+
+template <class T>
+T& DurationBase<T>::operator-=(const T& rhs) {
+    *this += (-rhs);
+    return *static_cast<T*>(this);
+}
+
+template <class T>
+T& DurationBase<T>::operator*=(double scale) {
+    fromSec(toSec() * scale);
+    return *static_cast<T*>(this);
+}
+
+template <class T>
+bool DurationBase<T>::operator<(const T& rhs) const {
+    return (sec < rhs.sec) || ((sec == rhs.sec) && (nsec < rhs.nsec));
+}
+
+template <class T>
+bool DurationBase<T>::operator>(const T& rhs) const {
+    return (sec > rhs.sec) || ((sec == rhs.sec) && (nsec > rhs.nsec));
+}
+
+template <class T>
+bool DurationBase<T>::operator<=(const T& rhs) const {
+    return (sec < rhs.sec) || ((sec == rhs.sec) && (nsec <= rhs.nsec));
+}
+
+template <class T>
+bool DurationBase<T>::operator>=(const T& rhs) const {
+    return (sec > rhs.sec) || ((sec == rhs.sec) && (nsec >= rhs.nsec));
+}
+
+template <class T>
+bool DurationBase<T>::operator==(const T& rhs) const {
+    return (sec == rhs.sec) && (nsec == rhs.nsec);
+}
+
+template <class T>
+bool DurationBase<T>::isZero() const {
+    return (sec == 0) && (nsec == 0);
+}
+
+}  // namespace ros
+
+/**********************************************************************************************************************/
+// ros/impl/time.h
+/**********************************************************************************************************************/
+namespace ros {
+
+template <class T, class D>
+T& TimeBase<T, D>::fromNSec(uint64_t t) {
+    uint64_t sec64 = 0;
+    uint64_t nsec64 = t;
+    normalizeSecNSec(sec64, nsec64);
+    sec = static_cast<uint32_t>(sec64);
+    nsec = static_cast<uint32_t>(nsec64);
+    return *static_cast<T*>(this);
+}
+
+template <class T, class D>
+T& TimeBase<T, D>::fromSec(double t) {
+    if (t < 0) {
+        throw std::runtime_error("Time cannot be negative.");
+    }
+    if (!std::isfinite(t)) {
+        throw std::runtime_error("Time has to be finite.");
+    }
+    constexpr double maxInt64AsDouble = static_cast<double>(std::numeric_limits<int64_t>::max());
+    if (t >= maxInt64AsDouble) {
+        throw std::runtime_error("Time is out of 64-bit integer range");
+    }
+    const int64_t sec64 = static_cast<int64_t>(std::floor(t));
+    if (sec64 > static_cast<int64_t>(std::numeric_limits<uint32_t>::max())) {
+        throw std::runtime_error("Time is out of dual 32-bit range");
+    }
+    sec = static_cast<uint32_t>(sec64);
+    nsec = static_cast<uint32_t>(std::round((t - static_cast<double>(sec)) * 1e9));
+    // avoid rounding errors
+    sec += (nsec / 1000000000u);
+    nsec %= 1000000000u;
+    return *static_cast<T*>(this);
+}
+
+template <class T, class D>
+D TimeBase<T, D>::operator-(const T& rhs) const {
+    D d;
+    return d.fromNSec(static_cast<int64_t>(toNSec()) - static_cast<int64_t>(rhs.toNSec()));
+}
+
+template <class T, class D>
+T TimeBase<T, D>::operator-(const D& rhs) const {
+    return *static_cast<const T*>(this) + (-rhs);
+}
+
+template <class T, class D>
+T TimeBase<T, D>::operator+(const D& rhs) const {
+    int64_t sec_sum = static_cast<int64_t>(sec) + static_cast<int64_t>(rhs.sec);
+    int64_t nsec_sum = static_cast<int64_t>(nsec) + static_cast<int64_t>(rhs.nsec);
+
+    // Throws an exception if we go out of 32-bit range
+    normalizeSecNSecUnsigned(sec_sum, nsec_sum);
+
+    // now, it's safe to downcast back to uint32 bits
+    return T(static_cast<uint32_t>(sec_sum), static_cast<uint32_t>(nsec_sum));
+}
+
+template <class T, class D>
+T& TimeBase<T, D>::operator+=(const D& rhs) {
+    *this = *this + rhs;
+    return *static_cast<T*>(this);
+}
+
+template <class T, class D>
+T& TimeBase<T, D>::operator-=(const D& rhs) {
+    *this += (-rhs);
+    return *static_cast<T*>(this);
+}
+
+template <class T, class D>
+bool TimeBase<T, D>::operator==(const T& rhs) const {
+    return (sec == rhs.sec) && (nsec == rhs.nsec);
+}
+
+template <class T, class D>
+bool TimeBase<T, D>::operator<(const T& rhs) const {
+    return (sec < rhs.sec) || ((sec == rhs.sec) && (nsec < rhs.nsec));
+}
+
+template <class T, class D>
+bool TimeBase<T, D>::operator>(const T& rhs) const {
+    return (sec > rhs.sec) || ((sec == rhs.sec) && (nsec > rhs.nsec));
+}
+
+template <class T, class D>
+bool TimeBase<T, D>::operator<=(const T& rhs) const {
+    return (sec < rhs.sec) || ((sec == rhs.sec) && (nsec <= rhs.nsec));
+}
+
+template <class T, class D>
+bool TimeBase<T, D>::operator>=(const T& rhs) const {
+    return (sec > rhs.sec) || ((sec == rhs.sec) && (nsec >= rhs.nsec));
+}
+
+}  // namespace ros
 
 #endif  // __ROSNOROS__TIME_H__

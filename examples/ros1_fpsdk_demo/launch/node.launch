@@ -1,8 +1,0 @@
-<launch>
-    <arg name="node_name"   default="ros1_fpsdk_demo_node" doc="Node name"/>
-    <arg name="launcher"    default=""                     doc="Launch node via this (node launch-prefix)"/>
-    <env name="ROSCONSOLE_CONFIG_FILE" value="$(find ros1_fpsdk_demo)/launch/console.conf"/>
-    <node name="$(arg node_name)" pkg="ros1_fpsdk_demo" type="ros1_fpsdk_demo_node" output="screen" respawn="false" launch-prefix="$(arg launcher)">
-        <rosparam command="load" file="$(find ros1_fpsdk_demo)/launch/config.yaml"/>
-    </node>
-</launch>

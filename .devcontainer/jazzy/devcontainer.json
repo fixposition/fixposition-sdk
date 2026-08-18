@@ -3,7 +3,7 @@
     "dockerComposeFile": "../../docker/docker-compose.yaml",
     "shutdownAction": "stopCompose",
 
-    "name": "Fixposition SDK (ROS Jazzy)", "service": "jazzy-dev", "runServices": [ "jazzy-dev" ],
+    "name": "Fixposition SDK (ROS2 Jazzy)", "service": "jazzy-dev", "runServices": [ "jazzy-dev" ],
 
     // Use this user in the container, re-map IDs to local user automatically
     "remoteUser": "fpsdk",

@@ -20,12 +20,6 @@
 
 /* EXTERNAL */
 #include <nlohmann/json.hpp>
-#if defined(FPSDK_USE_ROS1)
-#  include <fpsdk_ros1/ext/ros_msgs.hpp>
-#elif defined(FPSDK_USE_ROS2)
-#  include <fpsdk_ros2/ext/msgs.hpp>
-#  include <fpsdk_ros2/ext/rclcpp.hpp>
-#endif
 
 /* Fixposition SDK */
 #include <fpsdk_common/app.hpp>
@@ -37,6 +31,7 @@
 #include <fpsdk_common/parser/nmea.hpp>
 #include <fpsdk_common/path.hpp>
 #include <fpsdk_common/ros1.hpp>
+#include <fpsdk_common/ros2.hpp>
 #include <fpsdk_common/string.hpp>
 #include <fpsdk_common/time.hpp>
 #include <fpsdk_common/to_json/fpl.hpp>
@@ -64,11 +59,8 @@ using namespace fpsdk::common::string;
 using namespace fpsdk::common::time;
 using namespace fpsdk::common::types;
 using namespace fpsdk::common::video;
-#ifdef FPSDK_USE_ROS1
-using namespace fpsdk::ros1::bagwriter;
-#endif
-#ifdef FPSDK_USE_ROS2
-using namespace fpsdk::ros2::bagwriter;
+#if FPSDK_USE_ROS2
+using namespace fpsdk::common::ros2;
 #endif
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -101,25 +93,15 @@ bool FplToolExtract::Run()
     do_jsonl_ = opts_.formats_.empty();
     do_raw_ = opts_.formats_.empty();
     do_file_ = opts_.formats_.empty();
-#if defined(FPSDK_USE_ROS1) || defined(FPSDK_USE_ROS2)
     do_ros_ = opts_.formats_.empty();
-#else
-    do_ros_ = false;
-#endif
     do_cam_ = opts_.formats_.empty();
     for (auto& fmt : opts_.formats_) {  // clang-format off
         if      (fmt == opts_.FORMAT_JSONL) { do_jsonl_ = true; }
         else if (fmt == opts_.FORMAT_RAW)   { do_raw_ = true; }
         else if (fmt == opts_.FORMAT_FILE)  { do_file_ = true; }
         else if (fmt == opts_.FORMAT_CAM)   { do_cam_ = true; }
-        else if (fmt == opts_.FORMAT_ROS) {  // clang-format on
-#if defined(FPSDK_USE_ROS1) || defined(FPSDK_USE_ROS2)
-            do_ros_ = true;
-#else
-            WARNING("Cannot extract to ROS bag. This fpltool is not built with ROS support.");
-            return false;
-#endif
-        } else {
+        else if (fmt == opts_.FORMAT_ROS)   { do_ros_ = true; }  // clang-format on
+        else {
             WARNING("Bad argument '%s' to option -e, --formats", fmt.c_str());
             return false;
         }
@@ -132,12 +114,11 @@ bool FplToolExtract::Run()
     NOTICE("Extracting from %s to %s_...", input_fpl.c_str(), output_prefix_.c_str());
     TicToc tt;
 
-#if defined(FPSDK_USE_ROS1) || defined(FPSDK_USE_ROS2)
-#  ifdef FPSDK_USE_ROS1
-    const auto output_bag = output_prefix_ + ".bag";  // File
-#  else
+#if FPSDK_USE_ROS2
     const auto output_bag = output_prefix_ + "_bag";  // Directory! (even for single-file .mcap)
-#  endif
+#else
+    const auto output_bag = output_prefix_ + ".bag";  // File
+#endif
     if (PathExists(output_bag)) {
         if (!opts_.overwrite_) {
             WARNING("Output bag %s already exists", output_bag.c_str());
@@ -146,12 +127,15 @@ bool FplToolExtract::Run()
             RemoveAll(output_bag);
         }
     }
+#if FPSDK_USE_ROS2
+    if (do_ros_ && !bag_.Open(output_bag, opts_.mcap_, opts_.compress_)) {
+#else
     if (do_ros_ && !bag_.Open(output_bag, opts_.compress_)) {
+#endif
         return false;
     }
 
     NOTICE("Extracting to %s", output_bag.c_str());
-#endif
 
     // Handle SIGINT (C-c) to abort nicely
     SigIntHelper sig_int;
@@ -168,7 +152,7 @@ bool FplToolExtract::Run()
         // Report progress
         if (opts_.progress_ > 0) {
             if (fpl_reader.GetProgress(progress, rate)) {
-                INFO("Extracting... %.1f%% (%.0f MiB/s)\r", progress, rate);
+                INFO("Extracting... %.1f%% (%.1f MiB/s)\r", progress, rate);
             }
         }
 
@@ -219,7 +203,6 @@ bool FplToolExtract::Run()
 
     // Close output files
     CloseAll(ok);
-#if defined(FPSDK_USE_ROS1) || defined(FPSDK_USE_ROS2)
     if (do_ros_) {
         bag_.Close();
         if (ok) {
@@ -228,7 +211,6 @@ bool FplToolExtract::Run()
             WARNING("Incomplete bag %s (%s)", output_bag.c_str(), OutputSizeStr(output_bag).c_str());
         }
     }
-#endif
 
     const auto dur_wall = tt.Toc().GetSec();
     const double dur_log = (double)time_into_log - (double)opts_.skip_;
@@ -304,11 +286,9 @@ FplToolExtract::ProcRes FplToolExtract::ProcessRosMsgDef(const FplMessage& fpl_m
         }
     }
 
-#if defined(FPSDK_USE_ROS1) || defined(FPSDK_USE_ROS2)
     if (do_ros_) {
         bag_.AddMsgDef(rosmsgdef);
     }
-#endif
 
     return ProcRes::OK;
 }
@@ -367,11 +347,9 @@ FplToolExtract::ProcRes FplToolExtract::ProcessRosMsgBin(const FplMessage& fpl_m
         }
     }
 
-#if defined(FPSDK_USE_ROS1) || defined(FPSDK_USE_ROS2)
     if (do_ros_ && !bag_.WriteMessage(rosmsgbin)) {
         return ProcRes::FATAL;
     }
-#endif
 
     return ProcRes::OK;
 }
@@ -415,30 +393,23 @@ FplToolExtract::ProcRes FplToolExtract::ProcessStreamMsg(const FplMessage& fpl_m
             return ProcRes::FATAL;
         }
 
-#if defined(FPSDK_USE_ROS1) || defined(FPSDK_USE_ROS2)
         if (do_ros_) {
-#  if defined(FPSDK_USE_ROS1)
-            std_msgs::ByteMultiArray rosmsg;
-            ros::Time stamp;
-#  else
+#if FPSDK_USE_ROS2
             std_msgs::msg::ByteMultiArray rosmsg;
-            rclcpp::Time stamp;
-#  endif
+#else
+            std_msgs::ByteMultiArray rosmsg;
+#endif
             rosmsg.layout.dim.resize(1);
             rosmsg.layout.dim[0].label = msg.name_;
             rosmsg.layout.dim[0].size = msg.data_.size();
             rosmsg.layout.dim[0].stride = msg.data_.size();
             rosmsg.data = { msg.data_.data(), msg.data_.data() + msg.data_.size() };
-#  if defined(FPSDK_USE_ROS1)
-            stamp = { streammsg.rec_time_.sec_, streammsg.rec_time_.nsec_ };
-#  else
-            stamp = { (int)streammsg.rec_time_.sec_, streammsg.rec_time_.nsec_, RCL_ROS_TIME };
-#  endif
+
+            const RosTime stamp(streammsg.rec_time_.sec_, streammsg.rec_time_.nsec_);
             if (!bag_.WriteMessage(rosmsg, "/" + streammsg.stream_name_ + "/raw", stamp)) {
                 return ProcRes::FATAL;
             }
         }
-#endif
     }
 
     return ProcRes::OK;
@@ -500,7 +471,7 @@ FplToolExtract::ProcRes FplToolExtract::ProcessCamData(const FplMessage& fpl_msg
 
     ProcRes res = ProcRes::OK;
 
-#if FPSDK_USE_FFMPEG && (defined(FPSDK_USE_ROS1) || defined(FPSDK_USE_ROS2))
+#if FPSDK_USE_FFMPEG
     VideoCodec codec = VideoCodec::UNSPECIFIED;
     switch (camdata.fmt_) {  // clang-format off
         case CamDataFmt::H264_NAL: codec = VideoCodec::H264; break;
@@ -549,7 +520,7 @@ FplToolExtract::ProcRes FplToolExtract::ProcessCamData(const FplMessage& fpl_msg
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-#if FPSDK_USE_FFMPEG && (defined(FPSDK_USE_ROS1) || defined(FPSDK_USE_ROS2))
+#if FPSDK_USE_FFMPEG
 FplToolExtract::ProcRes FplToolExtract::ProcessAsyncDecData(const FplToolExtract::AsyncDecData& decdata)
 {
     auto& camdata = decdata.camdata_;
@@ -560,13 +531,13 @@ FplToolExtract::ProcRes FplToolExtract::ProcessAsyncDecData(const FplToolExtract
     auto& img = *decdata.img_;
     TRACE("CAMDATA decoded %s -> %dx%d %s", camdata.info_.c_str(), img.width_, img.height_, PixelFmtToStr(img.fmt_));
 
-#  if defined(FPSDK_USE_ROS1)
+#  if FPSDK_USE_ROS2
+    sensor_msgs::msg::Image rosmsg;
+    rosmsg.header.stamp = rclcpp::Time(static_cast<int64_t>(camdata.ts_), RCL_ROS_TIME);
+#  else
     sensor_msgs::Image rosmsg;
     rosmsg.header.stamp.fromNSec(camdata.ts_);
     rosmsg.header.seq = camdata.seq_;
-#  else
-    sensor_msgs::msg::Image rosmsg;
-    rosmsg.header.stamp = rclcpp::Time(static_cast<int64_t>(camdata.ts_), RCL_ROS_TIME);
 #  endif
     rosmsg.header.frame_id = CamIdToStr(camdata.cam_id_);
     rosmsg.width = img.width_;
@@ -584,12 +555,7 @@ FplToolExtract::ProcRes FplToolExtract::ProcessAsyncDecData(const FplToolExtract
         const uint32_t dt01ms = camdata.dt_ / 100000;  // [ns] -> [0.1ms]
         rosmsg.data[0] = std::clamp<uint32_t>(dt01ms, 0, 255);
     }
-#  if defined(FPSDK_USE_ROS1)
-    const ros::Time stamp(camdata.rec_time_.sec_, camdata.rec_time_.nsec_);
-#  else
-    const rclcpp::Time stamp((int)camdata.rec_time_.sec_, camdata.rec_time_.nsec_, RCL_ROS_TIME);
-#  endif
-
+    const RosTime stamp(camdata.rec_time_.sec_, camdata.rec_time_.nsec_);
     if (!bag_.WriteMessage(rosmsg, Sprintf("/%s/image", CamIdToStr(camdata.cam_id_)), stamp)) {
         return ProcRes::FATAL;
     }

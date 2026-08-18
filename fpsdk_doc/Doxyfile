@@ -986,11 +986,7 @@ WARN_LOGFILE           =
 
 INPUT                  = fpsdk_doc \
                          fpsdk_common/doc \
-                         fpsdk_ros1/doc \
-                         fpsdk_ros2/doc \
                          fpsdk_common/include \
-                         fpsdk_ros1/include \
-                         fpsdk_ros2/include \
                          fpsdk_apps/doc \
                          fpsdk_apps/fpltool/fpltool_doc.hpp \
                          fpsdk_apps/parsertool/parsertool_doc.hpp \
@@ -1085,10 +1081,6 @@ EXCLUDE_SYMBOLS        =
 EXAMPLE_PATH           = fpsdk_doc \
                          fpsdk_common \
                          fpsdk_common/doc \
-                         fpsdk_ros1 \
-                         fpsdk_ros1/doc \
-                         fpsdk_ros2 \
-                         fpsdk_ros2/doc \
                          fpsdk_apps \
                          fpsdk_apps/doc \
                          examples/parser_intro \
@@ -1115,9 +1107,7 @@ EXAMPLE_RECURSIVE      = YES
 # \image command).
 
 IMAGE_PATH             = fpsdk_doc \
-                         fpsdk_common/doc \
-                         fpsdk_ros1/doc \
-                         fpsdk_apps/doc
+                         fpsdk_common/doc
 
 # The INPUT_FILTER tag can be used to specify a program that Doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

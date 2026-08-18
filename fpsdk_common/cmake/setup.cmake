@@ -22,8 +22,8 @@ endif()
 
 
 ########################################################################################################################
-# Check if we have ROS, and add to cmake path to that require(rosbag) works. User can either specify it as a cmake
-# argument or we can detect it from the environment
+# Check if we have ROS, and add to cmake path to that. User can either specify it as a cmake argument or we can detect
+# it from the environment
 # - ROS2 environment loaded
 if("$ENV{ROS_VERSION}" STREQUAL "2")
     message(STATUS "fpsdk: Using ROS2")

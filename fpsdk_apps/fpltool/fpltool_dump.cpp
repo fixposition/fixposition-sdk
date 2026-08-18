@@ -101,7 +101,7 @@ bool DoDump(const FplToolOptions& opts)
         // Report progress
         if (opts.progress_ > 0) {
             if (reader.GetProgress(progress, rate)) {
-                INFO("Dumping... %.1f%% (%.0f MiB/s)\r", progress, rate);
+                INFO("Dumping... %.1f%% (%.1f MiB/s)\r", progress, rate);
             }
         }
 

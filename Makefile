@@ -12,31 +12,22 @@ BUILD_TESTING  =
 VERBOSE        = 0
 USE_PROJ       =
 USE_FFMPEG     =
+USE_BZ2        =
 C_COMPILER     =
 CXX_COMPILER   =
 
 # User vars
 -include config.mk
 
-# Check if we have ROS
-FPSDK_USE_ROS1=
-FPSDK_USE_ROS2=
-ifneq ($(ROS_PACKAGE_PATH),)
-	FPSDK_USE_ROS1=yes
-else ifeq ($(ROS_VERSION),2)
-	FPSDK_USE_ROS2=yes
-# else
-# 	$(info No ROS_PACKAGE_PATH (ROS1) and no ROS_VERSION (ROS2) found)
-endif
-
 # A unique ID for this exact config we're using
-configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING) $(USE_PROJ) $(USE_FFMPEG) $(FPSDK_VERSION_STRING) $(C_COMPILER) $(CXX_COMPILER) $$(uname -a)" | md5sum | cut -d " " -f1)
+configuid=$(shell echo "$(BUILD_TYPE) $(INSTALL_PREFIX) $(BUILD_TESTING) $(USE_PROJ) $(USE_FFMPEG) $(USE_BZ2) $(FPSDK_VERSION_STRING) $(C_COMPILER) $(CXX_COMPILER) $$(uname -a)" | md5sum | cut -d " " -f1)
 
 .PHONY: help
 help:
 	@echo "Usage:"
 	@echo
-	@echo "    make <target> [INSTALL_PREFIX=...] [BUILD_TYPE=Debug|Release] [BUILD_TESTING=|ON|OFF] [USE_PROJ=|ON|OFF] [USE_FFMPEG=|ON|OFF] [FPSDK_VERSION_STRING=x.x.x-gggggggg] [VERBOSE=1]"
+	@echo "    make <target> [INSTALL_PREFIX=...] [BUILD_TYPE=Debug|Release] [BUILD_TESTING=|ON|OFF] [USE_PROJ=|ON|OFF]"
+	@echo "        [USE_FFMPEG=|ON|OFF] [USE_BZ2=|ON|OFF] [FPSDK_VERSION_STRING=x.x.x-gggggggg] [VERBOSE=1]"
 	@echo
 	@echo "Where possible <target>s are:"
 	@echo
@@ -138,6 +129,9 @@ endif
 ifneq ($(USE_FFMPEG),)
   CMAKE_ARGS += -DFPSDK_USE_FFMPEG=$(USE_FFMPEG)
 endif
+ifneq ($(USE_BZ2),)
+  CMAKE_ARGS += -DFPSDK_USE_BZ2=$(USE_BZ2)
+endif
 ifneq ($(FPSDK_VERSION_STRING),)
   CMAKE_ARGS += -DVERSION_STRING=$(FPSDK_VERSION_STRING)
 endif
@@ -204,8 +198,6 @@ $(BUILD_DIR)/.make-cmake: $(deps_cmake) $(BUILD_DIR)/.make-configuid-$(configuid
 
 deps_build = $(sort $(wildcard fpsdk.sh fpsdk_doc/* \
     fpsdk_common/* fpsdk_common/*/* fpsdk_common/*/*/* fpsdk_common/*/*/*/* \
-    fpsdk_ros1/* fpsdk_ros1/*/* fpsdk_ros1/*/*/* fpsdk_ros1/*/*/*/* \
-    fpsdk_ros2/* fpsdk_ros2/*/* fpsdk_ros2/*/*/* fpsdk_ros2/*/*/*/* \
     fpsdk_apps/* fpsdk_apps/*/* fpsdk_apps/*/*/* fpsdk_apps/*/*/*/*))
 
 .PHONY: build
@@ -232,12 +224,6 @@ $(BUILD_DIR)/.make-install: $(BUILD_DIR)/.make-build
 test: $(BUILD_DIR)/.make-build
 	@echo "$(HLW)***** Test ($(BUILD_TYPE)) *****$(HLO)"
 	$(V)(cd $(BUILD_DIR)/fpsdk_common && ctest $(CTEST_ARGS))
-ifneq ($(FPSDK_USE_ROS1),)
-	$(V)(cd $(BUILD_DIR)/fpsdk_ros1 && ctest $(CTEST_ARGS))
-endif
-ifneq ($(FPSDK_USE_ROS2),)
-	$(V)(cd $(BUILD_DIR)/fpsdk_ros2 && ctest $(CTEST_ARGS))
-endif
 
 # ----------------------------------------------------------------------------------------------------------------------
 

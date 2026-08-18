@@ -2,41 +2,187 @@
  * \verbatim
  * ___    ___
  * \  \  /  /
- *  \  \/  /   Copyright (c) Fixposition AG
+ *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
  *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: ROS2 types conversion from ROS1
+ * @brief Fixposition SDK: ROS2 types and utils
  *
- * @page FPSDK_ROS2_ROS1 ROS2 types conversion from ROS1
+ * @page FPSDK_COMMON_ROS2 ROS2 types and utils
  *
- * **API**: fpsdk_ros2/ros1.hpp and fpsdk::ros2::ros1
+ * **API**: fpsdk_common/ros2.hpp and fpsdk::common::ros2
  *
+ * This is only available when built in a ROS2 environment.
  */
-#ifndef __FPSDK_ROS2_ROS1_HPP__
-#define __FPSDK_ROS2_ROS1_HPP__
+#ifndef __FPSDK_COMMON_ROS2_HPP__
+#define __FPSDK_COMMON_ROS2_HPP__
+#if FPSDK_USE_ROS2 || defined(_DOXYGEN_)
 
 /* LIBC/STL */
-#include <algorithm>
+#  include <cstdint>
+#  include <string>
 
 /* EXTERNAL */
-#include <fpsdk_ros2/ext/msgs.hpp>
 
-/* Fixposition SDK */
-#include <fpsdk_common/ros1.hpp>
+/* ROS2 */
+#  pragma GCC diagnostic push
+// #pragma GCC diagnostic ignored "-Wpedantic"
+// #pragma GCC diagnostic ignored "-Wunused-parameter"
+#  pragma GCC diagnostic ignored "-Wshadow"
+#  include <rclcpp/rclcpp.hpp>
+//
+#  include <rosbag2_cpp/writer.hpp>
+#  include <rosbag2_storage/storage_options.hpp>
+//
+#  include <nav_msgs/msg/odometry.hpp>
+#  include <sensor_msgs/msg/image.hpp>
+#  include <sensor_msgs/msg/imu.hpp>
+#  include <sensor_msgs/msg/temperature.hpp>
+#  include <std_msgs/msg/byte_multi_array.hpp>
+#  include <tf2_msgs/msg/tf_message.hpp>
+#  pragma GCC diagnostic pop
 
 /* PACKAGE */
+#  include "fpsdk_common/ros1.hpp"
+#  include "fpsdk_common/time.hpp"
 
 namespace fpsdk {
-namespace ros2 {
+namespace common {
 /**
- * @brief ROS2 types conversion from ROS1
+ * @brief ROS2 types and utils
  */
-namespace ros1 {
+namespace ros2 {
 /* ****************************************************************************************************************** */
-#ifdef _DOXYGEN_
+
+/**
+ * @brief Redirect fp:common::logging to ROS console
+ *
+ * This configures the fpsdk::common::logging facility to output via the ROS console. This does *not* configure the ROS
+ * console (logger level, logger name, etc.).
+ *
+ * The mapping of fpsdk::common::logging::LoggingLevel to rclcpp levels is as follows:
+ *
+ * - TRACE and DEBUG --> DEBUG
+ * - INFO and NOTICE --> INFO
+ * - WARNING         --> WARN
+ * - ERROR           --> ERROR
+ * - FATAL           --> FATAL
+ *
+ * @param[in]  logger_name  The name of the logger. The recommended value is node->get_logger().get_name()
+ */
+void RedirectLoggingToRosConsole(const char* logger_name = "fpsdk_common");
+
+/**
+ * @brief Convert to ROS time (atomic -> POSIX)
+ *
+ * @param[in]  time        The Time object (atomic)
+ * @param[in]  clock_type  The clock to use (to assume)
+ *
+ * @returns the ROS time object (POSIX)
+ */
+rclcpp::Time ConvTime(const fpsdk::common::time::Time& time, rcl_clock_type_t clock_type = RCL_ROS_TIME);
+
+/**
+ * @brief Convert from ROS time (POSIX -> atomic)
+ *
+ * @param[in]  time  The ROS time object (POSIX)
+ *
+ * @returns the Time object (atomic)
+ */
+fpsdk::common::time::Time ConvTime(const rclcpp::Time& time);
+
+/**
+ * @brief ROS2 bag writer helper
+ */
+class BagWriter
+{
+   public:
+    BagWriter();
+    ~BagWriter();
+
+    /**
+     * @brief Open bag for writing
+     *
+     * @param[in]  path      Path of the bag directory
+     * @param[in]  mcap      Use mcap instead of sqlite3 format
+     * @param[in]  compress  Compress bag more (only with mcap = true), 0 = zstd_small, >=1 = zstd_fast,
+     *                       ignored with mcap = false
+     *
+     * @returns true if bag was sucessfully opened
+     */
+    bool Open(const std::string& path, const bool mcap = false, const int compress = 0);
+
+    /**
+     * @brief Close bag
+     */
+    void Close();
+
+    /**
+     * @brief Write a message to the bag
+     *
+     * @tparam     T      ROS message type
+     * @param[in]  msg    The message
+     * @param[in]  topic  Topic name
+     * @param[in]  time   Bag record time
+     *
+     * @returns true if message was added, false otherwise (message definition missing)
+     */
+    template <typename T>
+    bool WriteMessage(const T& msg, const std::string& topic, const rclcpp::Time& time)
+    {
+        bool ok = false;
+        try {
+            if (bag_) {
+                bag_->write(msg, topic, time);
+                ok = true;
+            }
+        } catch (const std::exception& ex) {
+            WARNING("BagWriter: write fail: %s", ex.what());
+        }
+        return ok;
+    }
+
+    /**
+     * @brief Write a message to the bag
+     *
+     * @tparam     T      ROS message type
+     * @param[in]  msg    The message
+     * @param[in]  topic  Topic name
+     * @param[in]  time   Bag record time
+     */
+    template <typename T>
+    bool WriteMessage(const T& msg, const std::string& topic, const common::time::RosTime& time)
+    {
+        return WriteMessage(msg, topic, rclcpp::Time(time.sec_, time.nsec_, RCL_ROS_TIME));
+    }
+
+    /**
+     * @brief Add ROS message definition from .fpl
+     *
+     * @note No checks on the provided data are done!
+     *
+     * @param[in]  rosmsgdef  The message definition
+     */
+    void AddMsgDef(const common::fpl::RosMsgDef& rosmsgdef);
+
+    /**
+     * @brief Write message from .fpl
+     *
+     * @note No checks on the provided data are done!
+     *
+     * @param[in]  rosmsgbin  The recorded message
+     *
+     * @returns true if message was added, false otherwise (e.g. ROS1->ROS2 conversion not implemented)
+     */
+    bool WriteMessage(const common::fpl::RosMsgBin& rosmsgbin);
+
+   private:
+    std::unique_ptr<rosbag2_cpp::Writer> bag_;            //!< Bag file handle
+    std::map<std::string, common::fpl::RosMsgDef> defs_;  //!< Message definitions (connection headers)
+};
+#  ifdef _DOXYGEN_
 
 // Dummy documentation
 /**
@@ -52,7 +198,7 @@ namespace ros1 {
 template <typename Ros1MsgT, typename Ros2MsgT>
 void Ros1ToRos2(Ros1MsgT& ros1, Ros2MsgT& ros2);
 
-#else
+#  else
 
 inline void Ros1ToRos2(const ros::Time& ros1, builtin_interfaces::msg::Time& ros2)
 {
@@ -196,9 +342,11 @@ inline void Ros1ToRos2(const tf2_msgs::TFMessage& ros1, tf2_msgs::msg::TFMessage
     }
 }
 
-#endif  // !_DOXYGEN_
+#  endif  // !_DOXYGEN_
+
 /* ****************************************************************************************************************** */
-}  // namespace ros1
 }  // namespace ros2
+}  // namespace common
 }  // namespace fpsdk
-#endif  // __FPSDK_ROS2_ROS1_HPP__
+#endif  // FPSDK_USE_ROS2 || _DOXYGEN_
+#endif  // __FPSDK_COMMON_ROS2_HPP__

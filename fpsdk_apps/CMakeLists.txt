@@ -11,6 +11,9 @@ project(fpsdk_apps
     DESCRIPTION "Fixposition SDK: Apps"
 )
 
+set(_unused "${FPSDK_BUILD_TESTING}") # suppress warning in some setups
+set(_unused "${CMAKE_C_COMPILER}") # suppress warning in some setups
+
 
 # COMPILER SETUP =======================================================================================================
 
@@ -37,23 +40,21 @@ if(NOT TARGET fpsdk_common)
 endif()
 
 if(FPSDK_USE_ROS1)
-    if(NOT TARGET fpsdk_ros1)
-        find_package(fpsdk_ros1 REQUIRED)
-    endif()
-    fpsdk_cmake_find_ros1_package(rosbag)
-    add_compile_definitions(FPSDK_USE_ROS1)
+    fpsdk_cmake_find_ros1_package(roscpp)
+    fpsdk_cmake_find_ros1_package(rosconsole)
+    fpsdk_cmake_find_ros1_package(std_msgs)
+    fpsdk_cmake_find_ros1_package(sensor_msgs)
+    fpsdk_cmake_find_ros1_package(geometry_msgs)
+    fpsdk_cmake_find_ros1_package(tf2_msgs)
+    fpsdk_cmake_find_ros1_package(nav_msgs)
 elseif(FPSDK_USE_ROS2)
-    add_compile_definitions(FPSDK_USE_ROS2)
-    # Why necessary, what are we doing wrong? See fpsdk_ros2/CMakeLists.txt
+    find_package(rclcpp REQUIRED)
     find_package(rosbag2_cpp REQUIRED)
     find_package(std_msgs REQUIRED)
     find_package(sensor_msgs REQUIRED)
     find_package(geometry_msgs REQUIRED)
     find_package(tf2_msgs REQUIRED)
     find_package(nav_msgs REQUIRED)
-    if(NOT TARGET fpsdk_ros2)
-        find_package(fpsdk_ros2 REQUIRED)
-    endif()
 else()
     message(STATUS "fpsdk_apps: No ROS available")
 endif()
@@ -67,12 +68,6 @@ find_package(nlohmann_json REQUIRED)
 # https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/RPATH-handling#recommendations
 list(APPEND CMAKE_INSTALL_RPATH $ORIGIN)
 list(APPEND CMAKE_INSTALL_RPATH $ORIGIN/../lib)
-if(FPSDK_USE_ROS1)
-    #list(APPEND CMAKE_INSTALL_RPATH ${fpsdk_ros1_ROS_LIBRARIES_DIRS})
-    # Note that user still has to load the ROS environment (setup.bash) as the RUNPATH (mistakenly called RPATH by
-    # cmake) a) does not work for indirect loading (app -> libfpsdk_ros1 -> someroslib) and b) ROS does funny things
-    # run-time (such as loading more libs)
-endif()
 
 
 # EXECUTABLES ==========================================================================================================
@@ -84,10 +79,20 @@ add_executable(fpltool ${FPLTOOL_CPP_FILES})
 target_link_libraries(fpltool
     PRIVATE
         fpsdk_common
-        $<$<BOOL:${FPSDK_USE_ROS1}>:fpsdk_ros1>
-        $<$<BOOL:${FPSDK_USE_ROS2}>:fpsdk_ros2>
-        $<TARGET_NAME_IF_EXISTS:ros1::rosbag>
+        $<TARGET_NAME_IF_EXISTS:ros1::rosconsole>
+        $<TARGET_NAME_IF_EXISTS:ros1::roscpp>
+        $<TARGET_NAME_IF_EXISTS:ros1::std_msgs>
+        $<TARGET_NAME_IF_EXISTS:ros1::geometry_msgs>
+        $<TARGET_NAME_IF_EXISTS:ros1::sensor_msgs>
+        $<TARGET_NAME_IF_EXISTS:ros1::tf2_msgs>
+        $<TARGET_NAME_IF_EXISTS:ros1::nav_msgs>
+        ${rclcpp_TARGETS}
         ${rosbag2_cpp_TARGETS}
+        ${std_msgs_TARGETS}
+        ${sensor_msgs_TARGETS}
+        ${geometry_msgs_TARGETS}
+        ${tf2_msgs_TARGETS}
+        ${nav_msgs_TARGETS}
 )
 
 file(GLOB PARSERTOOL_CPP_FILES parsertool/*.cpp)
