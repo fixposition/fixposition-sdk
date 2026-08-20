@@ -329,6 +329,15 @@ struct MemUsage
  */
 MemUsage GetMemUsage();
 
+/**
+ * @brief Notify systemd that a unit became ready
+ *
+ * This notifies systemd that we (the current process) became ready.
+ *
+ * @returns true if systemd could be notified or if not running from a systemd unit, false if the notification failed.
+ */
+bool SystemdNotifyReady();
+
 /* ****************************************************************************************************************** */
 }  // namespace app
 }  // namespace common

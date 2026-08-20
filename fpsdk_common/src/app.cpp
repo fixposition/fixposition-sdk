@@ -13,6 +13,7 @@
 
 /* LIBC/STL */
 #include <csignal>
+#include <cstdlib>
 #include <iostream>
 #include <unistd.h>
 
@@ -492,6 +493,35 @@ MemUsage GetMemUsage()
         // clang-format on
     }
     return mem_usage;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool SystemdNotifyReady()
+{
+    // The presence of the non-empty environment variable indicates that we're running from a systemd unit.
+    const char* notify_socket = std::getenv("NOTIFY_SOCKET");
+    if ((notify_socket == nullptr) || (notify_socket[0] == '\0')) {
+        return true;
+    }
+
+    // We run systemd-notify(1) instead of using the sd_notify() API, as the latter would add the libsystemd dependency
+    // to nearly *everything* we build, which isn't desirable. And we also want to prevent complicated build
+    // configurations to make that dependency optional. And since we only need to do this notification once on start of
+    // every node, calling an external program seems a reasonable practical solution. Of course, if we wanted to use the
+    // full potential of sd_notify(), we'd just have to live with the libsystemd dependency.
+    INFO("SystemdNotifyReady");
+    // Note that std::system() runs the command through the command processor (/bin/sh). So we have to "exec" so that
+    // systemd-notify becomes a direct child process (which is a requirement for --ready to work, see the man page).
+    const int res = std::system("exec systemd-notify --ready");
+    if (res != 0) {
+        WARNING("SystemdNotifyReady fail (%d)", res);
+        return false;
+    } else {
+        return true;
+    }
+
+    return true;
 }
 
 /* ****************************************************************************************************************** */
