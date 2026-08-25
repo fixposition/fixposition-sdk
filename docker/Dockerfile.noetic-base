@@ -50,6 +50,10 @@ RUN /tmp/install_nasm.sh && rm -f /tmp/install_nasm.sh
 COPY docker/scripts/install_ffmpeg.sh /tmp
 RUN /tmp/install_ffmpeg.sh && rm -f /tmp/install_ffmpeg.sh
 
+# Install yq
+COPY docker/scripts/install_yq.sh /tmp
+RUN /tmp/install_yq.sh && rm -f /tmp/install_yq.sh
+
 # Download, build and install pre-commit
 COPY docker/scripts/install_precommit.sh /tmp
 RUN /tmp/install_precommit.sh && rm -f /tmp/install_precommit.sh

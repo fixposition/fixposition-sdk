@@ -29,6 +29,10 @@ RUN /tmp/install_apt_base.sh && rm -f /tmp/install_apt_base.sh
 COPY docker/scripts/install_ffmpeg.sh /tmp
 RUN /tmp/install_ffmpeg.sh && rm -f /tmp/install_ffmpeg.sh
 
+# Install yq
+COPY docker/scripts/install_yq.sh /tmp
+RUN /tmp/install_yq.sh && rm -f /tmp/install_yq.sh
+
 # Update ld cache for the installed libraries
 RUN /usr/sbin/ldconfig
 

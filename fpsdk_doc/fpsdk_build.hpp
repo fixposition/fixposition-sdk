@@ -36,7 +36,7 @@ namespace fpsdk {
 
     The Fixposition SDK is made for **Linux**. To build it a **GCC** (C++-17) toolchain is required. You may have some
     luck using clang, but you're on your own there. Besides a glibc and standard Linux tools, such as CMake, make, bash,
-    xxd, sed, awk, etc. are required to build. This is tested and known to work with Ubuntu 20.04, 22.04, 24.04/ and
+    xxd, sed, awk, etc. are required to build. This is tested and known to work with Ubuntu 20.04, 22.04, 24.04 and
     26.04, as well as Debian Trixie.
 
     For building the libraries and apps the following dependencies are used. Some are required and some are optional.
@@ -65,12 +65,13 @@ namespace fpsdk {
         `-DFPSDK_USE_PROJ=ON` to required the use of the PROJ library. See also @ref FPSDK_BUILD_BUILD_MANUAL below.
 
     (2) The FFmpeg libraries must be configured with --disable-gpl and --disable-nonfree in order to comply
-        with the Fixposition SDK license.
+        with the Fixposition SDK license. The CMake tests for that and refuses to use non-free/gpl builds of the FFmpeg
+        libraries.
 
     (3) ROS support is optional, and it's either ROS1 *or* ROS2. To enable, build in a ROS environment using catkin
         resp. colcon and the availability of ROS is detected automatically.
 
-    (4) These are only needed for development. That is, they are not required for building the \@ref FPSDK_COMMON_DOC
+    (4) These are only needed for development. That is, they are not required for building the @ref FPSDK_COMMON_DOC
         and @ref FPSDK_APPS_DOC.
 
     See @ref FPSDK_BUILD_CIVERSIONS for the versions used in the CI builds.
