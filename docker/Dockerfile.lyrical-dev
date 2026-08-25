@@ -42,10 +42,6 @@ ENV LC_ALL=C.UTF-8
 COPY docker/scripts/install_locales.sh /tmp
 RUN /tmp/install_locales.sh && rm -f /tmp/install_locales.sh
 
-# Install yq
-COPY docker/scripts/install_yq.sh /tmp
-RUN /tmp/install_yq.sh && rm -f /tmp/install_yq.sh
-
 # Install mcap
 COPY docker/scripts/install_mcap.sh /tmp
 RUN /tmp/install_mcap.sh && rm -f /tmp/install_mcap.sh
