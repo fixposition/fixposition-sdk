@@ -88,12 +88,12 @@ int main(int argc, char** argv)
     fpsdk::common::app::StacktraceHelper stacktrace;
 #endif
 
-    // We need three things (see CamStreamParams):
+    // We need four things (see CamStreamParams):
     //
     // 1. The sensor (hostname, IP address)
     // 2. Which camera (CAM1, CAM2, ...)
     // 3. Which data (HIRES_VID, LORES_IMG, ...)
-    // 4. Throttle value
+    // 4. Throttle value (must be 1 for ..._VID, can be > 1 for ..._IMG)
     //
     if (argc != 5) {
         ERROR("Missing arguments!");
