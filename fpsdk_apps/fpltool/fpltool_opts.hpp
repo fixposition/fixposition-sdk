@@ -48,6 +48,7 @@ class FplToolOptions : public common::app::ProgramOptions
             { 'p', false, "progress"    },
             { 'P', false, "no-progress" },
             { 'c', false, "compress"    },
+            { 'm', false, "mcap"        },
             { 'S', true,  "skip"        },
             { 'D', true,  "duration"    },
             { 'e', true,  "formats"     },
@@ -78,6 +79,9 @@ class FplToolOptions : public common::app::ProgramOptions
     int                       extra_     = 0;                     //!< Enable extra output, such as hexdumps
     int                       progress_  = 0;                     //!< Do progress reports
     int                       compress_  = 0;                     //!< Compress output
+#if FPSDK_USE_ROS2
+    bool                      mcap_      = false;                 //!< Use mcap instead of sqlite3 for ROS2 bags
+#endif
     uint32_t                  skip_      = 0;                     //!< Skip start [sec]
     uint32_t                  duration_  = 0;                     //!< Duration [sec]
     std::vector<std::string>  formats_;                           //!< List of output formats for extraction
@@ -112,7 +116,8 @@ class FplToolOptions : public common::app::ProgramOptions
             "    -p, --progress        -- Show progress (default: automatic)\n"
             "    -P, --no-progress     -- Don't show progress (default: automatic)\n"
             "    -f, --force           -- Force overwrite output (default: refuse to overwrite existing output files)\n"
-            "    -c, --compress        -- Compress output (e.g. ROS bags), -c -c to compress more\n"
+            "    -c, --compress        -- Compress output (e.g. ROS bags), -c -c to compress more (in some cases)\n"
+            "    -m, --mcap            -- Use mcap instead of sqlite3 for ROS2 bags\n"
             "    -x, --extra           -- Add extra output, multiple -x can be given\n"
             "    -o, --output <out>    -- Output file prefix <out> (default: derive from <fpl-file> name)\n"
             "    -S, --skip <sec>      -- Skip <sec> seconds from start of log (default: 0, i.e. no skip)\n"
@@ -165,10 +170,11 @@ class FplToolOptions : public common::app::ProgramOptions
             "        jsonl  -- All data in JSONL format (see below)\n"
             "        raw    -- Stream messages (I/O messages, raw messages from GNSS receiver, raw camera data, ...)\n"
             "        file   -- Recorded files (configuration, ...)\n"
-            "        ros    -- ROS data extracted to a ROS bag. This option is only available when compiled with ROS\n"
-            "                  (1 or 2) support (see output of 'fpltool -V' to check what your version is). For ROS1\n"
-            "                  the standard .bag file format is used. For ROS2 the standard sqlite3 or, with compression,\n"
-            "                  mcap format is used.\n"
+            "        ros    -- ROS data extracted to a ROS bag. Without ROS2 support (see output of 'fpltool -V' to\n"
+            "                  check what your version is) a ROS1 bag (the standard .bag file format) is written. This\n"
+            "                  works also if this fpltool is built without any ROS support. With -c these bags are bz2\n"
+            "                  compressed (if bz2 support is compiled in, see 'fpltool -V'). With ROS2 support a\n"
+            "                  ROS2 bag (the standard sqlite3 or, with -m, mcap format, which can use -c) is written.\n"
             "        cam    -- Camera data, such as encoded video frames (for example, from PBx-A1). With 'ros' and if\n"
             "                  compiled with FFmpeg support (see 'fpltool -V' to check what your version is) encoded\n"
             "                  video is decoded and stored as image to the ROS bag. In this case the mapping of the\n"
@@ -240,10 +246,10 @@ class FplToolOptions : public common::app::ProgramOptions
             "\n"
             "    Create a ROS some.bag file (ROS1) resp. some_bag directory (ROS2) from a .fpl file:\n"
             "\n"
-            "        fpltool extract -e ros some.fpl\n"
+            "        fpltool extract -e ros,cam some.fpl\n"
             "        fpltool robag some.fpl                  # shortcut\n"
             "\n"
-            "    Create a compressed another.bag (ROS1, another_bag/ for ROS2) with 2 minutes of data starting 60 seconds\n"
+            "    Create another.bag (ROS1, another_bag/ for ROS2) with 2 minutes of data starting 60 seconds\n"
             "    into some.fpl:\n"
             "\n"
             "        fpltool rosbag some.fpl -c -c -o another.bag -S 60 -D 120\n"
@@ -252,7 +258,7 @@ class FplToolOptions : public common::app::ProgramOptions
             "\n"
             "        rosbag info some.bag             # ROS 1\n"
             "        ros2 bag info some_bag           # ROS 2 (default, see above)\n"
-            "        mcap info some_bag/some.mcap     # ROS 2 (with compression, see above)\n"
+            "        mcap info some_bag/some.mcap     # ROS 2 (with -m, see above)\n"
             "\n"
             "    Create a ROS bag, convert encoded video (e.g. from PBx-A1 sensor) to greyscale images of half size:\n"
             "\n"
@@ -322,6 +328,14 @@ class FplToolOptions : public common::app::ProgramOptions
             case 'c':
                 compress_++;
                 break;
+            case 'm':
+#if FPSDK_USE_ROS2
+                mcap_ = true;
+#else
+                WARNING("Cannot use --mpcap, this fpltool is not compiled with ROS2");
+                ok = false;
+#endif
+                break;
             case 'S':
                 if (!common::string::StrToValue(argument, skip_)) {
                     ok = false;
@@ -336,19 +350,27 @@ class FplToolOptions : public common::app::ProgramOptions
                 formats_ = common::string::StrSplit(argument, ",");
                 break;
             }
-#if FPSDK_USE_FFMPEG
             case 's':
+#if FPSDK_USE_FFMPEG
                 if (!common::string::StrToValue(argument, scale_) || (scale_ < 0.1) || (scale_ > 1.0)) {
                     ok = false;
                 }
+#else
+                WARNING("Cannot use --scale, this fpltool is not compiled with FFmpeg");
+                ok = false;
+#endif
                 break;
             case 't':
+#if FPSDK_USE_FFMPEG
                 pixelfmt_ = PixelFmtFromStrOr(argument.c_str(), common::video::PixelFmt::UNSPECIFIED);
                 if (pixelfmt_ == common::video::PixelFmt::UNSPECIFIED) {
                     ok = false;
                 }
-                break;
+#else
+                WARNING("Cannot use --pixelfmt, this fpltool is not compiled with FFmpeg");
+                ok = false;
 #endif
+                break;
             default:
                 ok = false;
                 break;
@@ -400,6 +422,9 @@ class FplToolOptions : public common::app::ProgramOptions
         DEBUG("extra         = %d", extra_);
         DEBUG("progress      = %d", progress_);
         DEBUG("compress      = %d", compress_);
+#if FPSDK_USE_ROS2
+        DEBUG("mcap          = %d", mcap_);
+#endif
         DEBUG("skip          = %d", skip_);
         DEBUG("duration      = %d", duration_);
         DEBUG("formats       = %s", common::string::StrJoin(formats_, " ").c_str());

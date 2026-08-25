@@ -193,7 +193,7 @@ namespace logging {
  * The logging levels loosely follow syslog levels (indicated in [] below, see also
  * https://en.wikipedia.org/wiki/Syslog)
  *
- * Libraries (fpsdk_common, fpsdk_ros1, ...) code shall only use WARNING and DEBUG.
+ * Libraries (fpsdk_common, ...) code shall only use WARNING and DEBUG.
  */
 enum class LoggingLevel : int
 {  // clang-format off

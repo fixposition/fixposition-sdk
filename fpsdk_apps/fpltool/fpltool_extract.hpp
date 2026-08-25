@@ -22,16 +22,13 @@
 
 /* EXTERNAL */
 #include <nlohmann/json.hpp>
-#if defined(FPSDK_USE_ROS1)
-#  include <fpsdk_ros1/bagwriter.hpp>
-#elif defined(FPSDK_USE_ROS2)
-#  include <fpsdk_ros2/bagwriter.hpp>
-#endif
 
 /* Fixposition SDK */
 #include <fpsdk_common/fpl.hpp>
 #include <fpsdk_common/parser.hpp>
 #include <fpsdk_common/path.hpp>
+#include <fpsdk_common/ros1.hpp>
+#include <fpsdk_common/ros2.hpp>
 #include <fpsdk_common/video.hpp>
 
 /* PACKAGE */
@@ -104,10 +101,10 @@ class FplToolExtract
 #endif
 
     // Output files
-#if defined(FPSDK_USE_ROS1)
-    ros1::bagwriter::BagWriter bag_;
-#elif defined(FPSDK_USE_ROS2)
-    ros2::bagwriter::BagWriter bag_;
+#if FPSDK_USE_ROS2
+    common::ros2::BagWriter bag_;
+#else
+    common::ros1::BagWriter bag_;
 #endif
     std::map<std::string, std::unique_ptr<common::path::OutputFile>> files_;
     common::path::OutputFile* GetOutputFile(const std::string& name);

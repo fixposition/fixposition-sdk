@@ -210,9 +210,11 @@ Eigen::Vector3d LlhDegToRad(const Eigen::Vector3d& llh_deg);
  */
 Eigen::Vector3d LlhRadToDeg(const Eigen::Vector3d& llh_rad);
 
-#if FPSDK_USE_PROJ
+#if FPSDK_USE_PROJ || defined(_DOXYGEN_)
 /**
  * @brief "Universal" coordinate transformer, backed by PROJ
+ *
+ * @note This is only available if compiled with PROJ, see @ref FPSDK_BUILD_DEPS.
  */
 class Transformer : private types::NoCopyNoMove
 {

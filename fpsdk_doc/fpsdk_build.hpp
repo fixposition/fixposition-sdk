@@ -26,7 +26,7 @@ namespace fpsdk {
 
     This page describes how the Fixposition SDK can be built and installed. This is intended for users who are familiar
     with developing c++ code and building software and who want to build their own applications using the @ref
-    FPSDK_COMMON_DOC (etc.)
+    FPSDK_COMMON_DOC.
 
     For users interested in simply *using* the @ref FPSDK_APPS_DOC it is recommended to use the @ref FPSDK_RUN_DOC
     instead of building and installing those themselves.
@@ -34,32 +34,44 @@ namespace fpsdk {
 
     @section FPSDK_BUILD_DEPS Dependencies
 
-    For building the libraries and apps:
+    The Fixposition SDK is made for **Linux**. To build it a **GCC** (C++-17) toolchain is required. You may have some
+    luck using clang, but you're on your own there. Besides a glibc and standard Linux tools, such as CMake, make, bash,
+    xxd, sed, awk, etc. are required to build. This is tested and known to work with Ubuntu 20.04, 22.04, 24.04/ and
+    26.04, as well as Debian Trixie.
 
-    - **Linux**, **GCC** (C++-17), glibc, cmake, bash, etc. (tested with Ubuntu 20.04/22.04/24.04 and Debian Trixie)
-    - boost            (≥ 1.71.0)
-    - curl             (≥ 7.68.0)
-    - Eigen3           (≥ 3.3.7)
-    - yaml-cpp         (≥ 0.6.2)
-    - zlib1g           (≥ 1.2.11)
-    - OpenSSL (libssl) (≥ 1.1.x)
-    - nlohmann-json3   (≥ 3.7.3)
-    - Various Linux tools, including Bash, CMake, make, xxd, sed, awk, ...
-    - PROJ         (*) (≥ 9.4.x)
-    - FFmpeg (libavcodec, libavutil, ...) (**) (= 7.1.x)
-    - ROS1         (*) (Noetic), or
-    - ROS2         (*) (Humble, Jazzy or Lyrical)
+    For building the libraries and apps the following dependencies are used. Some are required and some are optional.
 
-    (*) Optional dependencies. Without these some functionality in the libraries and apps is unavailable (compiled out).
+    | Dependency         | Version   | Required | CMake (1)           | Optional use             |
+    |--------------------|-----------|----------|---------------------|--------------------------|
+    | boost              | ≥ 1.71.0  | required |                     |                          |
+    | BZip2              | ≥ 1.0.8   | optional | FPSDK_USE_BZ2       | fpsdk::common::ros1::BagWriter  |
+    | curl               | ≥ 7.68.0  | required |                     |                          |
+    | Eigen3             | ≥ 3.3.7   | required |                     |                          |
+    | yaml-cpp           | ≥ 0.6.2   | required |                     |                          |
+    | zlib1g             | ≥ 1.2.11  | required |                     |                          |
+    | OpenSSL (libssl)   | ≥ 1.1.x   | required |                     |                          |
+    | nlohmann-json3     | ≥ 3.7.3   | required |                     |                          |
+    | PROJ               | ≥ 9.4.x   | optional | FPSDK_USE_PROJ      | fpsdk::common::trafo::Transformer |
+    | FFmpeg         (2) | = 7.1.x   | optional | FPSDK_USE_FFMPEG    | fpsdk::common::video, @ref FPSDK_APPS_FPLTOOL |
+    | ROS1           (3) | Noetic    | optional |                     | fpsdk::common::ros1      |
+    | ROS2           (3) | Humble, Jazzy or Lyrical | optional|       | fpsdk::common::ros2, @ref FPSDK_APPS_FPLTOOL |
+    | clang-format   (4) | ≥ 19      | optional |                     | for development          |
+    | Doxygen        (4) | ≥ 1.14.0  | optional |                     | for development          |
+    | GTest          (4) | ≥ 1.13.0  | optional | FPSDK_BUILD_TESTING | for development          |
 
-    (**) Optional. The FFmpeg libraries must be configured with --disable-gpl and --disable-nonfree in order to comply
-         with the Fixposition SDK license. See *Configure* below for related build configuration options.
+    (1) These CMake arguments are available to control these dependencies. By default the dependency is automatically
+        used when a suitable library is found. To explicitly enable or disable the use of such a dependency one can set
+        the CMake argument accordingly. For example: `-DFPSDK_USE_PROJ=OFF` to disable the use of the PROJ library or
+        `-DFPSDK_USE_PROJ=ON` to required the use of the PROJ library. See also @ref FPSDK_BUILD_BUILD_MANUAL below.
 
-    For development additionally:
+    (2) The FFmpeg libraries must be configured with --disable-gpl and --disable-nonfree in order to comply
+        with the Fixposition SDK license.
 
-    - clang-format (≥ 19, tested with 19)
-    - Doxygen      (≥ 1.11.0, tested with 1.14.0)
-    - GTest        (≥ 1.13.0)
+    (3) ROS support is optional, and it's either ROS1 *or* ROS2. To enable, build in a ROS environment using catkin
+        resp. colcon and the availability of ROS is detected automatically.
+
+    (4) These are only needed for development. That is, they are not required for building the \@ref FPSDK_COMMON_DOC
+        and @ref FPSDK_APPS_DOC.
 
     See @ref FPSDK_BUILD_CIVERSIONS for the versions used in the CI builds.
 
@@ -72,10 +84,9 @@ namespace fpsdk {
     @subsection FPSDK_BUILD_BUILD_TLDR tl;dr
 
     @code{sh}
-    ./docker/docker.sh pull noetic-dev       # Or "docker.sh build noetic-dev" to build the image locally
-    ./docker/docker.sh run noetic-dev bash
+    ./docker/docker.sh pull trixie-dev       # Or "docker.sh build trixie-dev" to build the image locally
+    ./docker/docker.sh run trixie-dev bash
     # Now inside Docker do:
-    source /opt/ros/noetic/setup.bash
     make install
     ./fpsdk/bin/fpltool -h
     @endcode
@@ -84,7 +95,8 @@ namespace fpsdk {
 
     @subsection FPSDK_BUILD_BUILD_DEVCONTAINER VSCode devcontainer
 
-    Open the fpsdk.code-workspace, change to one of the provided devcontainers, and in a terminal do:
+    Open the fpsdk.code-workspace, change to one of the provided devcontainers (recommended: trixie), and in a terminal
+    do:
 
     @code{sh}
     make install
@@ -98,23 +110,28 @@ namespace fpsdk {
     Docker images are provided that include all the dependencies:
 
     @code{sh}
-    ./docker/docker.sh pull noetic-dev       # Or "docker.sh build noetic-dev" to build the image locally
-    ./docker/docker.sh run noetic-dev bash
-    source /opt/ros/noetic/setup.bash
+    ./docker/docker.sh pull trixie-dev       # Or "docker.sh build trixie-dev" to build the image locally
+    ./docker/docker.sh run trixie-dev bash
     make install
     ./fpsdk/bin/fpltool
     @endcode
 
-    Note that the "docker.sh" script does not give you a suitable ROS runtime (or development, playground, ...)
-    environment! Its only purpose is to run the CI for this repo and to demonstrate the building here. For a ROS
-    run-time environment please setup a docker *container* yourself elsewhere (perhaps using the docker *image* provided
-    here). See ROS and Docker documentation and the Internet for help.
+    Note that for the containers with ROS (Noetic, Lyrical, etc.) you'll have to source the ROS stuff. For example:
+
+    @code{sh}
+    ./docker/docker.sh pull noetic-dev       # Or "docker.sh build noetic-dev" to build the image locally
+    ./docker/docker.sh run noetic-dev bash
+    . /opt/ros/noetic/setup.bash
+    make install
+    ./fpsdk/bin/fpltool
+    @endcode
 
     <!-- trick doxygen -->
 
     @subsection FPSDK_BUILD_BUILD_CI Run CI
 
     @code{sh}
+    ./docker/docker.sh run trixie-ci ./docker/ci.sh
     ./docker/docker.sh run noetic-ci ./docker/ci.sh
     ./docker/docker.sh run humble-ci ./docker/ci.sh
     ./docker/docker.sh run jazzy-ci ./docker/ci.sh
@@ -133,12 +150,15 @@ namespace fpsdk {
     1. Setup build system, install dependencies
 
         The exact steps required depend on your system. You'll need the dependencies mentioned above installed system
-        wide or otherwise tell CMake where to find them.
+        wide or otherwise tell CMake where to find them. Refer to the provided Docker configuration and helper scripts,
+        namely "install_apt_base.sh", to check which packages can be installed in Ubuntu or Debian.
+
+        Something like this should work:
 
         @code{sh}
         sudo apt install libyaml-cpp-dev libboost-all-dev zlib1g-dev libeigen3-dev linux-libc-dev xxd   # For building
         sudo apt install libgtest-dev clang-format doxygen pre-commit                                   # For development
-        source /opt/ros/noetic/setup.bash                                                               # If you have ROS1
+        source /opt/ros/lyrical/setup.bash                                                              # If you have ROS2 Lyrical
         @endcode
 
     3. Configure
@@ -147,17 +167,10 @@ namespace fpsdk {
         cmake -B build -DCMAKE_INSTALL_PREFIX=~/fpsdk
         @endcode
 
-        Additional parameters include (see CMakeList.txt files of the projects for details and more parameters):
+        Additional parameters, such as `-DFPSDK_USE_PROJ=OFF`, can be given. See @ref FPSDK_BUILD_DEPS above.
 
-        - Build type: `-DCMAKE_BUILD_TYPE=Debug` or `-DCMAKE_BUILD_TYPE=Release` (default)
-        - Force ROS1 package path: `-DROS_PACKAGE_PATH=/path/to/ros` (default: auto-detect)
-        - Explicitly enable or disable testing: `-DFPSDK_BUILD_TESTING=ON` or `-DFPSDK_BUILD_TESTING=OFF`.
-          The default is to automatically enable testing if a suitable GTest library is found.
-        - Explicitly enable or disable use of the PROJ library: `-DFPSDK_USE_PROJ=ON` or `-DFPSDK_USE_PROJ=OFF`.
-          The default is to automatically use the PROJ library if a suitable version is found.
-        - Explicitly enable or disable use of the FFmpeg libraries: `-DFPSDK_USE_FFMPEG=ON` or `-DFPSDK_USE_FFMPEG=OFF`.
-          The default is to automatically use the FFmpeg libraries if suitable versions are found.
-        - Add `-DCMAKE_PREFIX_PATH=...` to hint at non-standard installation paths, such as `/path/to/ffmpeg-lgpl`.
+        The build type can be selected by `-DCMAKE_BUILD_TYPE=Debug` or `-DCMAKE_BUILD_TYPE=Release` (default).
+        Add `-DCMAKE_PREFIX_PATH=...` to hint at non-standard installation paths, such as `/path/to/ffmpeg-lgpl`.
 
     4. Build
 
@@ -211,21 +224,19 @@ namespace fpsdk {
     catkin build fpsdk_common
     @endcode
 
-    Note that if you clone this repository directly to your `ros_workspace/src` directory, you'll have to place
+    Note that if you clone this repository directly to your `ros_workspace/src` directory, you may have to place
     CATKIN_IGNORE resp. COLCON_IGNORE files in some places. For example:
 
     @code{sh}
     # ROS1 catkin workspace
     touch src/fixposition-sdk/examples/CATKIN_IGNORE                   # Ignore all examples, or
-    touch src/fixposition-sdk/examples/ros1_fpsdk_demo/CATKIN_IGNORE   # Ignore only this example
-    touch src/fixposition-sdk/fpsdk_ros2/CATKIN_IGNORE
+    touch src/fixposition-sdk/examples/parser_intro/CATKIN_IGNORE     # Ignore only this example
     @endcode
 
     @code{sh}
     # ROS2 colcon workspace
     touch src/fixposition-sdk/examples/COLCON_IGNORE                   # Ignore all examples, or
-    touch src/fixposition-sdk/examples/ros2_fpsdk_demo/COLCON_IGNORE   # Ignore only this example
-    touch src/fixposition-sdk/fpsdk_ros1/COLCON_IGNORE
+    touch src/fixposition-sdk/examples/parser_intro/COLCON_IGNORE      # Ignore only this example
     @endcode
 
     <!-- trick doxygen -->

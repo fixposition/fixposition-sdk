@@ -40,8 +40,6 @@ namespace fpsdk {
     The SDK consists of the following packages:
 
     - @subpage FPSDK_COMMON_DOC
-    - @subpage FPSDK_ROS1_DOC
-    - @subpage FPSDK_ROS2_DOC
     - @subpage FPSDK_APPS_DOC
 
     @section FPSDK_EXAMPLES Examples
@@ -60,10 +58,10 @@ namespace fpsdk {
 
     - Fixposition SDK source code repository: https://github.com/fixposition/fixposition-sdk
 
-    @section FPSDK_LICENSE Licenses
+    @section FPSDK_LICENSE License
 
     See the LICENSE file included in the source of each package or the generated documentation (@ref
-    FPSDK_COMMON_LICENSE, @ref FPSDK_ROS1_LICENSE, @ref FPSDK_ROS2_LICENSE and @ref FPSDK_APPS_LICENSE).
+    FPSDK_COMMON_LICENSE and @ref FPSDK_APPS_LICENSE).
 */
 
 // clang-format on

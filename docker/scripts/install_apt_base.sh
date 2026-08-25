@@ -34,6 +34,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.lyrical.trixie      jq
     ....................lyrical.trixie      libbacktrace-dev                  # GCC has its own, but clang needs this
     noetic.humble.jazzy.lyrical.trixie      libboost-all-dev                  # This is not small... :-/
+    noetic.humble.jazzy.lyrical.trixie      libbz2-dev                        # For compressing ROS1 bags
     noetic.humble.jazzy.lyrical.trixie      libclone-perl
     noetic.humble.jazzy.lyrical.trixie      libcurl4-openssl-dev
     noetic.humble.jazzy.lyrical.trixie      libeigen3-dev

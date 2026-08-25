@@ -14,6 +14,7 @@
  *
  * **API**: fpsdk_common/video.hpp and fpsdk::common::video
  *
+ * @note This is only available if compiled with FFmpeg, see @ref FPSDK_BUILD_DEPS.
  */
 #ifndef __FPSDK_COMMON_VIDEO_HPP__
 #define __FPSDK_COMMON_VIDEO_HPP__
@@ -35,7 +36,7 @@ namespace common {
  */
 namespace video {
 /* ****************************************************************************************************************** */
-#if FPSDK_USE_FFMPEG
+#if FPSDK_USE_FFMPEG || defined(_DOXYGEN_)
 
 /**
  * @brief Video codec
@@ -191,7 +192,7 @@ struct ImageData
 /**
  * @brief Helper for decoding video frames
  *
- * Note that separate instances of this should be used to process different video streams.
+ * @note This is only available if compiled with FFmpeg, see @ref FPSDK_BUILD_DEPS.
  */
 class VideoFrameDecoder
 {
@@ -224,6 +225,7 @@ class VideoFrameDecoder
      *     types 16-23 (IRAP, Intra Random Access Point) NALUs might work)
      * - The video encoder should be configured accordingly (to repeat the VPS/SPS/PPS for each I-frame, and possibly to
      *   produce all/only I frames.
+     * - Separate instances of this should be used to process different video streams
      *
      * @param[in]  data  Data for one (not more, not less) video frame
      * @param[in]  size  Size of data

@@ -3,7 +3,7 @@
     "dockerComposeFile": "../../docker/docker-compose.yaml",
     "shutdownAction": "stopCompose",
 
-    "name": "Fixposition SDK (ROS Noetic)", "service": "noetic-dev", "runServices": [ "noetic-dev" ],
+    "name": "Fixposition SDK (ROS1 Noetic)", "service": "noetic-dev", "runServices": [ "noetic-dev" ],
 
     // Use this user in the container, re-map IDs to local user automatically
     "remoteUser": "fpsdk",

@@ -58,9 +58,9 @@
         // https://code.visualstudio.com/docs/cpp/customize-default-settings-cpp,
         // https://code.visualstudio.com/docs/cpp/c-cpp-properties-schema-reference)
         "C_Cpp.default.includePath":           [
-            "${workspaceFolder}/fpsdk_common/**", "${workspaceFolder}/fpsdk_ros1/**", "${workspaceFolder}/fpsdk_ros2/**", "${workspaceFolder}/fpsdk_apps/**",
+            "${workspaceFolder}/fpsdk_common/**", "${workspaceFolder}/fpsdk_apps/**",
             "/opt/ros/noetic/include", "/opt/ros/humble/include", "/opt/ros/jazzy/include", "/opt/ros/lyrical/include" ],
-        "C_Cpp.default.defines":               [ "FPSDK_USE_ROS1" ],
+        "C_Cpp.default.defines":               [ ],
         //"C_Cpp.default.compileCommands":       "",
         //"C_Cpp.default.forcedIncludes":      [ ],
         "C_Cpp.default.intelliSenseMode":        "gcc-x64",

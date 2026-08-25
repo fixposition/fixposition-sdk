@@ -5,31 +5,73 @@
  *  \  \/  /   Copyright (c) Fixposition AG (www.fixposition.com) and contributors
  *  /  /\  \   License: see the LICENSE file
  * /__/  \__\
+ *
  * \endverbatim
  *
  * @file
- * @brief Fixposition SDK: ROS2 bag writer
+ * @brief Fixposition SDK: ROS2 types and utils
+ *
+ * @note This is only available if compiled with ROS2, see @ref FPSDK_BUILD_DEPS.
  */
+#if FPSDK_USE_ROS2
 
 /* LIBC/STL */
-#include <stdexcept>
+#  include <stdexcept>
 
 /* EXTERNAL */
-#include <std_msgs/msg/string.hpp>
-#include "fpsdk_ros2/ext/msgs.hpp"
-
-/* Fixposition SDK */
-#include <fpsdk_common/logging.hpp>
-#include <fpsdk_common/ros1.hpp>
 
 /* PACKAGE */
-#include "fpsdk_ros2/bagwriter.hpp"
-#include "fpsdk_ros2/ros1.hpp"
-#include "fpsdk_ros2/utils.hpp"
+#  include "fpsdk_common/logging.hpp"
+#  include "fpsdk_common/ros2.hpp"
 
 namespace fpsdk {
+namespace common {
 namespace ros2 {
-namespace bagwriter {
+/* ****************************************************************************************************************** */
+
+using namespace fpsdk::common::logging;
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+static std::unique_ptr<rclcpp::Logger> g_logger;
+
+static void sLoggingFn(const LoggingParams& /*params*/, const LoggingLevel level, const char* str)
+{
+    // By default these will appear under the "fpsdk_common" logger
+    switch (level) {  // clang-format off
+        case LoggingLevel::TRACE:   RCLCPP_DEBUG((*g_logger), "%s", str); break;
+        case LoggingLevel::DEBUG:   RCLCPP_DEBUG((*g_logger), "%s", str); break;
+        case LoggingLevel::INFO:    RCLCPP_INFO( (*g_logger), "%s", str); break;
+        case LoggingLevel::NOTICE:  RCLCPP_INFO( (*g_logger), "%s", str); break;
+        case LoggingLevel::WARNING: RCLCPP_WARN( (*g_logger), "%s", str); break;
+        case LoggingLevel::ERROR:   RCLCPP_ERROR((*g_logger), "%s", str); break;
+        case LoggingLevel::FATAL:   RCLCPP_FATAL((*g_logger), "%s", str); break;
+    }  // clang-format on
+}
+
+void RedirectLoggingToRosConsole(const char* logger_name)
+{
+    g_logger = std::make_unique<rclcpp::Logger>(rclcpp::get_logger(logger_name));
+    LoggingParams params = LoggingGetParams();
+    params.fn_ = sLoggingFn;
+    params.level_ = LoggingLevel::TRACE;  // We leave it up to ROS to decide what to print
+    LoggingSetParams(params);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+rclcpp::Time ConvTime(const fpsdk::common::time::Time& time, rcl_clock_type_t clock_type)
+{
+    const auto rt = time.GetRosTime();
+    return rclcpp::Time(rt.sec_, rt.nsec_, clock_type);
+}
+
+fpsdk::common::time::Time ConvTime(const rclcpp::Time& time)
+{
+    const uint64_t nsec = time.nanoseconds();
+    return fpsdk::common::time::Time::FromRosTime(
+        { static_cast<uint32_t>(nsec / 1000000000), static_cast<uint32_t>(nsec % 1000000000) });
+}
 /* ****************************************************************************************************************** */
 
 BagWriter::BagWriter()
@@ -43,22 +85,22 @@ BagWriter::~BagWriter()
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-bool BagWriter::Open(const std::string& path, const int compress)
+bool BagWriter::Open(const std::string& path, const bool mcap, const int compress)
 {
     Close();
     bag_ = std::make_unique<rosbag2_cpp::Writer>();
     rosbag2_storage::StorageOptions opts;
     opts.uri = path;
-    if (compress > 0) {
+    if (mcap) {
         opts.storage_id = "mcap";  // apt install ros-${ROS_DISTRO}-rosbag2-storage-mcap
-        opts.storage_preset_profile = (compress > 1 ? "zstd_small" : "zstd_fast");
+        opts.storage_preset_profile = (compress > 0 ? "zstd_small" : "zstd_fast");
     } else {
         opts.storage_id = "sqlite3";
     }
     try {
         bag_->open(opts);
     } catch (const std::exception& ex) {
-        WARNING("BagWriter: open fail %s: %s. Maybe %s storage plugin is not installed?", path.c_str(), ex.what(),
+        WARNING("BagWriter: open fail %s: %s. Maybe the %s storage plugin is not installed?", path.c_str(), ex.what(),
             opts.storage_id.c_str());
         bag_.reset();
         return false;
@@ -92,13 +134,13 @@ void BagWriter::AddMsgDef(const common::fpl::RosMsgDef& rosmsgdef)
 
 template <typename Ros1MsgT, typename Ros2MsgT>
 inline bool WriteMessageEx(
-    const common::fpl::RosMsgDef& rosmsgdef, const common::fpl::RosMsgBin& rosmsgbin, ros2::bagwriter::BagWriter& bag)
+    const common::fpl::RosMsgDef& rosmsgdef, const common::fpl::RosMsgBin& rosmsgbin, BagWriter& bag)
 {
     if (rosmsgdef.msg_name_ == ros::message_traits::datatype<Ros1MsgT>()) {
         Ros1MsgT ros1;
         common::ros1::DeserializeMessage(rosmsgbin.msg_data_, ros1);
         Ros2MsgT ros2;
-        ros2::ros1::Ros1ToRos2(ros1, ros2);
+        Ros1ToRos2(ros1, ros2);
         bag.WriteMessage(ros2, rosmsgbin.topic_name_, rosmsgbin.rec_time_);
         return true;
     } else {
@@ -143,6 +185,7 @@ bool BagWriter::WriteMessage(const common::fpl::RosMsgBin& rosmsgbin)
 }
 
 /* ****************************************************************************************************************** */
-}  // namespace bagwriter
 }  // namespace ros2
+}  // namespace common
 }  // namespace fpsdk
+#endif  // FPSDK_USE_ROS2
