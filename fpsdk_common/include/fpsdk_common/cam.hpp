@@ -84,11 +84,15 @@ CamId CamIdFromValOr(const uint8_t val, const CamId def);
  */
 enum class CamDataType : uint8_t  // clang-format off
 {
-    UNSPECIFIED = 0,    //!< Unspecified
-    HIRES_IMG   = 1,    //!< High-res image
-    LORES_IMG   = 2,    //!< Low-res image
-    HIRES_VID   = 3,    //!< High-res video
-    LORES_VID   = 4,    //!< Low-res video
+    UNSPECIFIED = 0,  //!< Unspecified
+    HIRES_IMG   = 1,  //!< High-res image  (typically CamDataFmt::NV12)
+    LORES_IMG   = 2,  //!< Low-res image   (typically CamDataFmt::NV12)
+    HIRES_VID   = 3,  //!< High-res video  (typically CamDataFmt::H265)
+    LORES_VID   = 4,  //!< Low-res video   (typically CamDataFmt::JPEG)
+    FURES_IMG   = 5,  //!< Full-res image  (typically CamDataFmt::NV12, for some cameras/sensors only, not streamable)
+    FURES_VID   = 6,  //!< Full-res video  (typically CamDataFmt::H265, for some cameras/sensors only)
+    DEPTH_IMG   = 7,  //!< Internal use, ignore
+    DEPTH_VID   = 8,  //!< Internal use, ignore
 };  // clang-format on
 
 /**

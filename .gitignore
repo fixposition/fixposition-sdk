@@ -16,6 +16,8 @@ CMakeCache.txt
 *.bag
 *.bak
 /.devcontainer/.bash_history.d
+/.devcontainer/.claude
+/.devcontainer/.local
 /.devcontainer/.vscode-server
 /.devcontainer/.claude
 /.devcontainer/.local

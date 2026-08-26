@@ -84,6 +84,10 @@ const char* CamDataTypeToStr(const CamDataType type)
         case CamDataType::LORES_IMG:   return "LORES_IMG";
         case CamDataType::HIRES_VID:   return "HIRES_VID";
         case CamDataType::LORES_VID:   return "LORES_VID";
+        case CamDataType::FURES_IMG:   return "FURES_IMG";
+        case CamDataType::FURES_VID:   return "FURES_VID";
+        case CamDataType::DEPTH_IMG:   return "DEPTH_IMG";
+        case CamDataType::DEPTH_VID:   return "DEPTH_VID";
     }  // clang-format on
     return "?";
 }
@@ -95,6 +99,10 @@ CamDataType CamDataTypeFromStrOr(const char* str, const CamDataType def)
     if (std::strcmp(str, "LORES_IMG")   == 0) { return CamDataType::LORES_IMG; }
     if (std::strcmp(str, "HIRES_VID")   == 0) { return CamDataType::HIRES_VID; }
     if (std::strcmp(str, "LORES_VID")   == 0) { return CamDataType::LORES_VID; }
+    if (std::strcmp(str, "FURES_IMG")   == 0) { return CamDataType::FURES_IMG; }
+    if (std::strcmp(str, "FURES_VID")   == 0) { return CamDataType::FURES_VID; }
+    if (std::strcmp(str, "DEPTH_IMG")   == 0) { return CamDataType::DEPTH_IMG; }
+    if (std::strcmp(str, "DEPTH_VID")   == 0) { return CamDataType::DEPTH_VID; }
     return def;  // clang-format on
 }
 
@@ -106,6 +114,10 @@ CamDataType CamDataTypeFromValOr(const uint8_t val, const CamDataType def)
         case EnumToVal(CamDataType::LORES_IMG):   return CamDataType::LORES_IMG;
         case EnumToVal(CamDataType::HIRES_VID):   return CamDataType::HIRES_VID;
         case EnumToVal(CamDataType::LORES_VID):   return CamDataType::LORES_VID;
+        case EnumToVal(CamDataType::FURES_IMG):   return CamDataType::FURES_IMG;
+        case EnumToVal(CamDataType::FURES_VID):   return CamDataType::FURES_VID;
+        case EnumToVal(CamDataType::DEPTH_IMG):   return CamDataType::DEPTH_IMG;
+        case EnumToVal(CamDataType::DEPTH_VID):   return CamDataType::DEPTH_VID;
     }
     return def;  // clang-format on
 }
@@ -583,26 +595,12 @@ std::unique_ptr<CamStream> CreateCamStream(const CamStreamParams& params)
     // Some sanity checks..
     bool ok = true;
 
-    switch (params.cam_id_) {
-        case CamId::CAM1:
-        case CamId::CAM2:
-        case CamId::CAM3:
-        case CamId::CAM4:
-            break;
-        case CamId::UNSPECIFIED:
-            ok = false;
-            break;
+    if (params.cam_id_ == CamId::UNSPECIFIED) {
+        ok = false;
     }
 
-    switch (params.type_) {
-        case CamDataType::HIRES_VID:
-        case CamDataType::HIRES_IMG:
-        case CamDataType::LORES_IMG:
-        case CamDataType::LORES_VID:
-            break;
-        case CamDataType::UNSPECIFIED:
-            ok = false;
-            break;
+    if (params.type_ == CamDataType::UNSPECIFIED) {
+        ok = false;
     }
 
     // Some data types support only rate 1 (typically for example HIRES_VID), but only the sensor knows what's okay and

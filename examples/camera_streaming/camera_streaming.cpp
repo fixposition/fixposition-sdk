@@ -26,6 +26,7 @@
 #include <cmath>
 #include <cstdint>
 #include <cstring>
+#include <string>
 
 /* EXTERNAL */
 #include <boost/accumulators/accumulators.hpp>
@@ -76,8 +77,99 @@ struct Stats
     Accumulator lat  { boost::accumulators::extended_p_square_probabilities = PROB };  // Latency receiving the data
     Accumulator size { boost::accumulators::extended_p_square_probabilities = PROB };  // Size of the data
     Accumulator exp  { boost::accumulators::extended_p_square_probabilities = PROB };  // Exposure duration
+#if FPSDK_USE_FFMPEG
     Accumulator dec  { boost::accumulators::extended_p_square_probabilities = PROB };  // Time decoding video
+#endif
     // clang-format on
+};
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+// Program options
+class Opts : public ProgramOptions
+{
+    // clang-format off
+   public:
+    Opts() /* clang-format off */ :
+        ProgramOptions("camera_streaming", { { 's', true, "sensor" }, { 'n', true, "camera" },
+        { 'd', true, "data" }, { 'r', true, "rate" }, { 'c', false, "stdout" } })  // clang-format on
+    {};
+
+    // clang-format off
+    std::string sensor_;
+    CamId       camera_ = CamId::UNSPECIFIED;
+    CamDataType data_   = CamDataType::UNSPECIFIED;
+    int         rate_   = 1;
+    bool        stdout_ = false;
+    // clang-format on
+
+    void PrintHelp() override final
+    {
+        // clang-format off
+        std::fputs(
+            "\n"
+            "PBx-A1 camera streaming example\n"
+            "\n"
+            "Usage:\n"
+            "\n"
+            "    camera_streaming -s <sensor> -c <camera> -d <data> [-r <rate>] [-c]\n"
+            "\n", stdout);
+        std::fputs(COMMON_FLAGS_HELP, stdout);
+        std::fputs(
+            "\n"
+            "    -s, --sensor   -- Hostname or IP address of sensor\n"
+            "    -n, --camera   -- Which camera to use (CAM1, CAM2, ...)\n"
+            "    -d, --data     -- Which data to stream (HIRES_VID, LORES_IMG, etc.)\n"
+            "    -r, --rate     -- Throttling rate (default 1, >1 only for _IMG streams)\n"
+            "    -c, --stdout   -- Pipe raw image/video data to stdout (careful!)\n"
+            "\n"
+            "Example:\n"
+            "\n"
+            "     camera_streaming -s 10.0.2.1 -n CAM1 -d HIRES_VID\n"
+            "\n"
+            "     camera_streaming -s 10.0.2.1 -n CAM1 -d LORES_IMG\n"
+            "\n"
+            "     timeout -s SIGINT 60 camera_streaming ...\n"
+            "\n"
+            "     camera_streaming -s 10.0.2.1 -n CAM1 -d HIRES_VID -c | ffmpeg -i - -c copy out.mp4\n"
+            "\n"
+            "     camera_streaming -s 10.0.2.1 -n CAM1 -d HIRES_VID -q -c | \\\n"
+            "         mpv --cache-secs=0 --profile=low-latency --demuxer-readahead-secs=0 --untimed --cache-pause=no -\n"
+            "     camera_streaming -s 10.0.2.1 -n CAM1 -d HIRES_VID -q -c | \\\n"
+            "         ffplay -fflags nobuffer -flags low_delay -framedrop -probesize 32 -analyzeduration 0 -\n"
+            "\n"
+            "\n", stdout);
+        // clang-format on
+    }
+
+    bool HandleOption(const Option& option, const std::string& argument) final
+    {
+        bool ok = true;
+        switch (option.flag) {  // clang-format off
+            case 's': sensor_ = argument; break;
+            case 'n': camera_ = CamIdFromStrOr(argument.c_str(), CamId::UNSPECIFIED); break;
+            case 'd': data_ = CamDataTypeFromStrOr(argument.c_str(), CamDataType::UNSPECIFIED); break;
+            case 'r': StrToValue(argument, rate_); break;
+            case 'c': stdout_ = true; break;
+            default:  ok = false; break;
+        }  // clang-format on
+        return ok;
+    }
+
+    bool CheckOptions(const std::vector<std::string>& args) final
+    {
+        bool ok = true;
+        INFO("sensor   = %s", sensor_.c_str());
+        INFO("camera   = %s", CamIdToStr(camera_));
+        INFO("data     = %s", CamDataTypeToStr(data_));
+        INFO("rate     = %d", rate_);
+        INFO("stdout   = %s", ToStr(stdout_));
+        if (!args.empty() || sensor_.empty() || (camera_ == CamId::UNSPECIFIED) ||
+            (data_ == CamDataType::UNSPECIFIED) || (rate_ < 1)) {
+            ok = false;
+        }
+        return ok;
+    }
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -88,43 +180,26 @@ int main(int argc, char** argv)
     fpsdk::common::app::StacktraceHelper stacktrace;
 #endif
 
+#if !FPSDK_USE_FFMPEG
+    WARNING("!!!!! This app is not compiled with FFmpeg support !!!!!");
+#endif
+
     // We need four things (see CamStreamParams):
     //
     // 1. The sensor (hostname, IP address)
     // 2. Which camera (CAM1, CAM2, ...)
     // 3. Which data (HIRES_VID, LORES_IMG, ...)
-    // 4. Throttle value (must be 1 for ..._VID, can be > 1 for ..._IMG)
-    //
-    if (argc != 5) {
-        ERROR("Missing arguments!");
-        INFO(
-            "Usage: camera_streaming <sensor> <cam> <type> <rate>\n"
-            "Where: <sensor> is the sensor's hostname or IP address, <cam> is CAM1 or CAM2, <type> is\n"
-            "HIRES_VID, LORES_VID, HIRES_IMG or LORES_IMG, and <rate> is the throttling rate (must be\n"
-            "1 for encoded video)\n"
-            "Examples:\n"
-            "    camera_streaming 10.0.2.1 CAM1 HIRES_VID 1\n"
-            "    camera_streaming 10.0.2.1 CAM1 HIRES_IMG 10\n"
-            "    timeout -s SIGINT 60 camera_streaming ...");
-        return EXIT_FAILURE;
+    // 4. Rate value (must be 1 for ..._VID, can be > 1 for ..._IMG)
+    Opts opts;
+    if (!opts.LoadFromArgv(argc, argv)) {
+        return false;
     }
+    opts.LogVersion();
 
-#if 0  // Set to 1 (and build with CMAKE_BUILD_TYPE=Debug) for debugging
-    LoggingSetParams({ LoggingLevel::TRACE, LoggingColour::AUTO, LoggingTimestamps::RELATIVE });
-#else
-    LoggingSetParams({ LoggingLevel::INFO, LoggingColour::AUTO, LoggingTimestamps::RELATIVE });
-#endif
-
-    const std::string sensor = argv[1];
-    const CamId cam_id = CamIdFromStrOr(argv[2], CamId::UNSPECIFIED);
-    const CamDataType type = CamDataTypeFromStrOr(argv[3], CamDataType::UNSPECIFIED);
-    int rate = 0;
-    StrToValue(argv[4], rate);
-
-    NOTICE("camera_streaming %s %s %s %d", sensor.c_str(), CamIdToStr(cam_id), CamDataTypeToStr(type), rate);
+    NOTICE("Streaming...");
 
     // Create stream handle (this formally verifies the arguments)
-    auto stream = CreateCamStream({ "cam", sensor, cam_id, type, rate });
+    auto stream = CreateCamStream({ "cam", opts.sensor_, opts.camera_, opts.data_, opts.rate_ });
     if (!stream) {
         return EXIT_FAILURE;
     }
@@ -134,8 +209,10 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
+#if FPSDK_USE_FFMPEG
     // We'll decode encoded video frames
     VideoFrameDecoderPtr decoder;
+#endif
 
     // Statistics
     Stats stats;
@@ -159,11 +236,12 @@ int main(int argc, char** argv)
         n_frames++;
 
         // Generic info
-        std::size_t len =
-            std::snprintf(info, sizeof(info), "Frame %6" PRIuMAX ": %-7s %-5s %-10s %-9s %-7s %6" PRIuMAX " %s %4.1f",
-                n_frames, data.valid_ ? "valid" : "invalid", CamIdToStr(data.cam_id_), CamDataTypeToStr(data.type_),
-                CamDataFmtToStr(data.fmt_), CamDataFrmToStr(data.frm_), data.data_.size(), t_data.StrIsoTime(3).c_str(),
-                Duration::FromNSec(data.dt_).GetSec() * 1e3);
+        std::size_t len = std::snprintf(info, sizeof(info),  // clang-format off
+            "Frame %6" PRIuMAX ": %06" PRIuMAX " %-7s %-5s %-10s %-9s %" PRIu32 "x%" PRIu32 " %-7s %6" PRIuMAX " %s %4.1f",
+            n_frames, data.seq_, data.valid_ ? "valid" : "invalid", CamIdToStr(data.cam_id_),
+            CamDataTypeToStr(data.type_), CamDataFmtToStr(data.fmt_), data.width_, data.height_,
+            CamDataFrmToStr(data.frm_), data.data_.size(), t_data.StrIsoTime(3).c_str(),
+            Duration::FromNSec(data.dt_).GetSec() * 1e3);  // clang-format on
 
         // Update statistics
         stats.size((double)data.data_.size() / 1024.0);  // [KiB]
@@ -176,6 +254,15 @@ int main(int argc, char** argv)
             stats.lat(lat);
         }
 
+        // -------------------------------------------------------
+        // Now we have all the raw data and meta data in "data"...
+        // -------------------------------------------------------
+
+        if (opts.stdout_) {
+            write(fileno(stdout), data.data_.data(), data.data_.size());
+        }
+
+#if FPSDK_USE_FFMPEG
         // Decode video
         if (data.fmt_ == CamDataFmt::H265_NAL) {
             // We can only start decoding from the first I-frame onwards
@@ -185,21 +272,23 @@ int main(int argc, char** argv)
             if (decoder) {
                 TicToc tt;
                 const auto img = decoder->DecodeFrame(data.data_);
-                if (!img) {
-                    ok = false;
-                    break;
-                }
-
-                // --------------------------------------------------------------------------------------
-                // Now we have the decoded image in "img" and all the raw data and meta data in "data"...
-                // --------------------------------------------------------------------------------------
 
                 // Decoding adds latency
-                const auto lat = tt.Toc().GetSec() * 1e3;  // [ms]
-                len += std::snprintf(&info[len], sizeof(info) - len, " -- decode: %+5.1f", lat);
-                stats.dec(lat);
+                if (img) {
+                    const auto lat = tt.Toc().GetSec() * 1e3;  // [ms]
+                    len += std::snprintf(&info[len], sizeof(info) - len, " -- decode: %+5.1f", lat);
+                    stats.dec(lat);
+                } else {
+                    len += std::snprintf(&info[len], sizeof(info) - len, " -- DECODE FAIL");
+                    continue;
+                }
+
+                // ----------------------------------------------------------------------------------------
+                // Now we have the decoded image in "img"... (and all the raw data and meta data in "data")
+                // ----------------------------------------------------------------------------------------
             }
         }
+#endif
 
         INFO("%s", info);
     }
@@ -209,8 +298,8 @@ int main(int argc, char** argv)
     stream->Disconnect();
 
     // Print stats
-    NOTICE("Streamed %s %s %s %d for %.0fs (%" PRIuMAX " frames)", sensor.c_str(), CamIdToStr(cam_id),
-        CamDataTypeToStr(type), rate, t_str, boost::accumulators::count(stats.size));
+    NOTICE("Streamed %s %s %s %d for %.0fs (%" PRIuMAX " frames)", opts.sensor_.c_str(), CamIdToStr(opts.camera_),
+        CamDataTypeToStr(opts.data_), opts.rate_, t_str, boost::accumulators::count(stats.size));
     if (boost::accumulators::count(stats.lat) > 10) {  // clang-format off
         INFO("Latency receiving data [ms]: mean %4.1f (std %4.1f) min/0.5/0.68/0.95/0.997/max %4.1f %4.1f %4.1f %4.1f %4.1f %4.1f",  // clang-format on
             boost::accumulators::mean(stats.lat), std::sqrt(boost::accumulators::variance(stats.lat)),
@@ -218,6 +307,7 @@ int main(int argc, char** argv)
             boost::accumulators::extended_p_square(stats.lat)[1], boost::accumulators::extended_p_square(stats.lat)[2],
             boost::accumulators::extended_p_square(stats.lat)[3], boost::accumulators::max(stats.lat));
     }
+#if FPSDK_USE_FFMPEG
     if (boost::accumulators::count(stats.dec) > 10) {  // clang-format off
         INFO("Latency decoding video [ms]: mean %4.1f (std %4.1f) min/0.5/0.68/0.95/0.997/max %4.1f %4.1f %4.1f %4.1f %4.1f %4.1f",  // clang-format on
             boost::accumulators::mean(stats.dec), std::sqrt(boost::accumulators::variance(stats.dec)),
@@ -225,6 +315,7 @@ int main(int argc, char** argv)
             boost::accumulators::extended_p_square(stats.dec)[1], boost::accumulators::extended_p_square(stats.dec)[2],
             boost::accumulators::extended_p_square(stats.dec)[3], boost::accumulators::max(stats.dec));
     }
+#endif
     if (boost::accumulators::count(stats.exp) > 10) {  // clang-format off
         INFO("Exposure duration [ms]:      mean %4.1f (std %4.1f) min/0.5/0.68/0.95/0.997/max %4.1f %4.1f %4.1f %4.1f %4.1f %4.1f",  // clang-format on
             boost::accumulators::mean(stats.exp), std::sqrt(boost::accumulators::variance(stats.exp)),

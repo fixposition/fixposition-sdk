@@ -48,6 +48,8 @@ services:
             # Persistent stuff
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.local:/home/fpsdk/.local
             # Workspace
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
@@ -95,6 +97,8 @@ services:
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.local:/home/fpsdk/.local
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
             - SYS_PTRACE
@@ -140,6 +144,8 @@ services:
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.local:/home/fpsdk/.local
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
             - SYS_PTRACE
@@ -182,6 +188,8 @@ services:
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.local:/home/fpsdk/.local
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
             - SYS_PTRACE
@@ -224,6 +232,8 @@ services:
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.local:/home/fpsdk/.local
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
             - SYS_PTRACE
