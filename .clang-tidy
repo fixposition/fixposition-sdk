@@ -1,1 +1,4 @@
-# Checks: "-clang-analyzer-unix.Stream,-clang-analyzer-optin.core.EnumCastOutOfRange"
+Checks: ""
+# -clang-analyzer-unix.Stream
+# -clang-analyzer-optin.core.EnumCastOutOfRange
+# TODO: google-explicit-constructor / misc-explicit-constructor

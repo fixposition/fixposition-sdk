@@ -168,7 +168,7 @@ struct RosTime
      *
      * @param[in]  nsec  Time value nanoseconds
      */
-    RosTime(const uint64_t nsec);
+    explicit RosTime(const uint64_t nsec);
 
     /**
      * @brief Convert to seconds
@@ -488,7 +488,7 @@ struct WnoTow
      *
      * @param[in]  sys  GNSS
      */
-    WnoTow(const Sys sys = Sys::GPS);
+    explicit WnoTow(const Sys sys = Sys::GPS);
 
     /**
      * @brief Constructor

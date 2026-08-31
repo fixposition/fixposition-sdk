@@ -380,7 +380,7 @@ class LoggingOstream
      *
      * @param[in]  level  The logging level to use
      */
-    LoggingOstream(const LoggingLevel level);
+    explicit LoggingOstream(const LoggingLevel level);
 
     /**
      * @brief Get stream handle

@@ -97,6 +97,13 @@ function pre_commit_check
     make pre-commit
 }
 
+TITLES["lint_check"]="Linters"
+function lint_check
+{
+    cd ${FPSDK_SRC_DIR}
+    make lint
+}
+
 ########################################################################################################################
 
 TITLES["build_toplevel_release_noros"]="Build top-level project (release, without ROS)"
@@ -524,6 +531,7 @@ function doxygen_release_ros2
 echo "===== non-ROS builds ====="
 if [ "${FPSDK_IMAGE%-*}" = "trixie" ]; then
     do_step pre_commit_check           || true # continue
+    do_step lint_check           || true # continue
 fi
 do_step build_toplevel_release_noros   || true # continue
 do_step test_toplevel_release_noros    || true # continue

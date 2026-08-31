@@ -77,7 +77,7 @@ class CircularBuffer
      *
      * @param[in]  size  Size of buffer [bytes]
      */
-    CircularBuffer(const std::size_t size);
+    explicit CircularBuffer(const std::size_t size);
 
     /**
      * @brief Reset buffer, discard all data

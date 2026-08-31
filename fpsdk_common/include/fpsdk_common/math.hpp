@@ -76,7 +76,7 @@ struct DegMinSec
      *
      * @param[in]  deg  Fractional degrees
      */
-    DegMinSec(const double deg);
+    explicit DegMinSec(const double deg);
     int deg_ = 0;       //!< Integer degrees
     int min_ = 0;       //!< Integer minutes
     double sec_ = 0.0;  //!< Fractional seconds

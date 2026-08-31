@@ -268,7 +268,7 @@ struct LogMeta
      *
      * @param[in]  log_msg  .fpl log message
      */
-    LogMeta(const FplMessage& log_msg);
+    explicit LogMeta(const FplMessage& log_msg);
     bool valid_ = false;                 //!< Data valid, successfully extracted from message
     std::string info_;                   //!< Stringification of (some of the) data, for debugging
     std::string hw_uid_;                 //!< Hardware UID
@@ -296,7 +296,7 @@ struct LogStatus
      *
      * @param[in]  log_msg  .fpl log message
      */
-    LogStatus(const FplMessage& log_msg);
+    explicit LogStatus(const FplMessage& log_msg);
     bool valid_;  //!< Data valid, successfully extracted from message
 
     // Version 1 and later
@@ -343,7 +343,7 @@ struct RosMsgDef
      *
      * @param[in]  log_msg  .fpl log message
      */
-    RosMsgDef(const FplMessage& log_msg);
+    explicit RosMsgDef(const FplMessage& log_msg);
     bool valid_ = false;      //!< Data valid, successfully extracted from message
     std::string info_;        //!< Stringification of (some of the) data, for debugging
     std::string topic_name_;  //!< The topic name
@@ -366,7 +366,7 @@ struct RosMsgBin
      *
      * @param[in]  log_msg  .fpl log message
      */
-    RosMsgBin(const FplMessage& log_msg);
+    explicit RosMsgBin(const FplMessage& log_msg);
     bool valid_ = false;             //!< Data valid, successfully extracted from message
     std::string info_;               //!< Stringification of (some of the) data, for debugging
     std::string topic_name_;         //!< The topic name
@@ -388,7 +388,7 @@ struct StreamMsg
      *
      * @param[in]  log_msg  .fpl log message
      */
-    StreamMsg(const FplMessage& log_msg);
+    explicit StreamMsg(const FplMessage& log_msg);
     bool valid_ = false;             //!< Data valid, successfully extracted from message
     std::string info_;               //!< Stringification of (some of the) data, for debugging
     time::RosTime rec_time_;         //!< Recording timestamp
@@ -408,7 +408,7 @@ struct FileDump
      *
      * @param[in]  log_msg  .fpl log message
      */
-    FileDump(const FplMessage& log_msg);
+    explicit FileDump(const FplMessage& log_msg);
     bool valid_;                 //!< Data valid, successfully extracted from message
     std::string info_;           //!< Stringification of (some of the) data, for debugging
     std::string filename_;       //!< Filename
@@ -428,7 +428,7 @@ struct CamData : public cam::CamData
      *
      * @param[in]  log_msg  .fpl log message
      */
-    CamData(const FplMessage& log_msg);
+    explicit CamData(const FplMessage& log_msg);
     std::string info_;        //!< Stringification of (some of the) data, for debugging
     time::RosTime rec_time_;  //!< Recording timestamp
 };

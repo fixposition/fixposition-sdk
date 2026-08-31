@@ -204,7 +204,7 @@ class VideoFrameDecoder
      *
      * @param[in]  params  The parameters
      */
-    VideoFrameDecoder(const VideoDecoderParams& params);
+    explicit VideoFrameDecoder(const VideoDecoderParams& params);
 
     /**
      * @brief Destructor
