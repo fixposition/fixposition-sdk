@@ -89,6 +89,7 @@ class FplToolExtract
     {
         common::fpl::CamData camdata_;
         std::optional<common::video::ImageData> img_;
+        bool dec_is_okay_ = true;
     };
     struct AsyncDecState
     {

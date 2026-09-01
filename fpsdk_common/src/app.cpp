@@ -404,10 +404,11 @@ void ProgramOptions::PrintVersion() const
 
 void ProgramOptions::LogVersion() const
 {
-    INFO("%s%s%s (fpsdk: %s%s%s%s%s, %s)\n%s\n%s\n", app_name_.c_str(), version_str_.empty() ? "" : " ",
+    INFO("%s%s%s (fpsdk: %s%s%s%s%s, %s)", app_name_.c_str(), version_str_.empty() ? "" : " ",
         version_str_.empty() ? "" : version_str_.c_str(), BUILDSTR, ROSSTR, PROJSTR, FFMPEGSTR, BZ2STR,
-        utils::GetVersionString(), copy_str_.empty() ? utils::GetCopyrightString() : copy_str_.c_str(),
-        lic_str_.empty() ? utils::GetLicenseString() : lic_str_.c_str());
+        utils::GetVersionString());
+    INFO("%s", copy_str_.empty() ? utils::GetCopyrightString() : copy_str_.c_str());
+    INFO("%s", lic_str_.empty() ? utils::GetLicenseString() : lic_str_.c_str());
 }
 
 /* ****************************************************************************************************************** */

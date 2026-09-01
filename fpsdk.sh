@@ -27,7 +27,8 @@ function main
     local volume_args=
     local docker_args=
 	local dochecks=1
-    while getopts ":hduxti:v:" opt; do
+    local hwaccel=0
+    while getopts ":hduxtai:v:" opt; do
         case $opt in
             h)
                 echo
@@ -35,7 +36,7 @@ function main
                 echo
                 echo "This uses Docker images with pre-built binaries of the Fixposition SDK apps."
                 echo
-                echo "Usage: $0 [-d] [-u] [-x] [-i <image>] [-v <volume> ...] <command> ..."
+                echo "Usage: $0 [-d] [-u] [-x] [-t] [-a] [-i <image>] [-v <volume> ...] <command> ..."
                 echo
                 echo "Where:"
                 echo
@@ -43,6 +44,7 @@ function main
 				echo "    -x          Bypass checks (check for running in Docker, running as root, ...)"
                 echo "    -u          Update (pull) the necessary Docker <image>"
                 echo "    -t          Executes <command> with docker run --tty"
+                echo "    -a          Try to enable hw acceleration for video decoding"
                 echo "    -i <image>  Specifies which Docker image to use (default: trixie). Available images are:"
                 echo "                trixie    -- Debian Trixie (no ROS, some functionality not available)"
                 echo "                noetic    -- ROS1 Noetic (additional ROS1 functionality available)"
@@ -90,6 +92,9 @@ function main
 				;;
             t)
                 docker_args="--tty"
+                ;;
+            a)
+                hwaccel=1
                 ;;
             i)
                 image=${OPTARG}
@@ -183,10 +188,12 @@ function main
     args="${args} --user $(id -u):$(id -g) --volume /etc/passwd:/etc/passwd:ro --volume /etc/group:/etc/group:ro"
     # - Allow FFmpeg vaapi access on some systems. Note: this doesn't work with "-i noetic" (Ubuntu 20).
     #   Related: https://github.com/joedefen/ffmpeg-vaapi-docker
-    if [ -r /dev/dri ]; then
-        args="${args} --device=/dev/dri"
-        rendergid=$(awk -F: '/^render:/ { print $3 }' /etc/group)
-        args="${args} --group-add ${rendergid}"
+    if [ ${hwaccel} -gt 0 ]; then
+        if [ -r /dev/dri ]; then
+            args="${args} --device=/dev/dri"
+            rendergid=$(awk -F: '/^render:/ { print $3 }' /etc/group)
+            args="${args} --group-add ${rendergid}"
+        fi
     fi
 
     [ ${DEBUG} -gt 0 ] && set -x
