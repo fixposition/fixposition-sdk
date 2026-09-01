@@ -20,6 +20,8 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.lyrical.trixie      build-essential
     .......humble.jazzy.lyrical.trixie      clang
     ....................lyrical.trixie      clang-format
+    ....................lyrical.trixie      clang-tools
+    ....................lyrical.trixie      clang-tidy
     noetic.humble.jazzy.lyrical.trixie      cmake
     noetic.humble.jazzy.lyrical.trixie      curl
     ............................trixie      doxygen
