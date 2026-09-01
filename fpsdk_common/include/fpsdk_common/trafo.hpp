@@ -224,7 +224,7 @@ class Transformer : private types::NoCopyNoMove
      *
      * @param[in]  name   Optional name, for debugging
      */
-    Transformer(const std::string& name = "");
+    explicit Transformer(const std::string& name = "");
 
     ~Transformer();
 

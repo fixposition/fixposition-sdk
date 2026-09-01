@@ -395,7 +395,7 @@ struct Sat
      *
      * @param[in]  str  The string ("G03", "R22", "C12", ...)
      */
-    Sat(const char* str);
+    explicit Sat(const char* str);
 
     /**
      * @brief Get GNSS

@@ -147,7 +147,7 @@ class RawCan : private types::NoCopyNoMove
      *
      * @param[in]  device   Device name (e.g. "can0")
      */
-    RawCan(const std::string& device);
+    explicit RawCan(const std::string& device);
 
     /**
      * @brief Destructor

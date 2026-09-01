@@ -71,7 +71,7 @@ namespace ros1 {
 // without needing the mutability of the buffer itself.
 struct ConstBuffer
 {
-    ConstBuffer(const std::vector<uint8_t>& buf)
+    explicit ConstBuffer(const std::vector<uint8_t>& buf)
         : data_{ buf.data() }, end_{ buf.data() + static_cast<uint32_t>(buf.size()) }
     {
     }

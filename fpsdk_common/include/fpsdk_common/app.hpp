@@ -68,7 +68,7 @@ class SigIntHelper
      *
      * @param[in]  warn  Print a WARNING() (true, default) or a DEBUG() (false) on signal
      */
-    SigIntHelper(const bool warn = true);
+    explicit SigIntHelper(const bool warn = true);
 
     /**
      * @brief Destructor
@@ -106,7 +106,7 @@ class SigTermHelper
      *
      * @param[in]  warn  Print a WARNING() (true, default) or a DEBUG() (false) on signal
      */
-    SigTermHelper(const bool warn = true);
+    explicit SigTermHelper(const bool warn = true);
 
     /**
      * @brief Destructor
@@ -144,7 +144,7 @@ class SigPipeHelper
      *
      * @param[in]  warn  Print a WARNING() (true) or a DEBUG() (false, default)
      */
-    SigPipeHelper(const bool warn = false);
+    explicit SigPipeHelper(const bool warn = false);
 
     /**
      * @brief Destructor

@@ -32,8 +32,6 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.lyrical.trixie      can-utils
     noetic.humble.jazzy.lyrical.trixie      ccache
     noetic.humble.jazzy.lyrical.trixie      chrpath
-    ....................lyrical.trixie      clang-tools
-    ....................lyrical.trixie      clang-tidy
     ....................lyrical.trixie      clangd
     noetic.humble.jazzy.lyrical.trixie      curl
     noetic.humble.jazzy.lyrical.trixie      dlocate

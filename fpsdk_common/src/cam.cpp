@@ -216,7 +216,7 @@ CamStream::~CamStream()
 class CamStreamImpl : public CamStream, private NoCopyNoMove
 {
    public:
-    CamStreamImpl(const CamStreamParams& params);
+    explicit CamStreamImpl(const CamStreamParams& params);
     ~CamStreamImpl();
     bool Connect() override final;
     void Disconnect() override final;

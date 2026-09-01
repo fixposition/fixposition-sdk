@@ -309,7 +309,7 @@ void LoggingPrint(const LoggingLevel level, const std::size_t repeat, const char
         if (len > (sizeof(g_line) - repeat_str_len)) {
             len = sizeof(g_line) - repeat_str_len;
         }
-        len += std::snprintf(&g_line[len], sizeof(g_line) - len, " [%" PRIuMAX "x]", repeat);
+        /*len +=*/std::snprintf(&g_line[len], sizeof(g_line) - len, " [%" PRIuMAX "x]", repeat);
     }
 
     g_params.fn_(g_params, level, g_line);

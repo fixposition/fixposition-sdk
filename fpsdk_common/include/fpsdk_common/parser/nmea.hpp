@@ -197,7 +197,7 @@ struct NmeaCoordinates
      * @param[in]  degs    Decimal degrees
      * @param[in]  digits  Number of digits (0-12), param clamped to range
      */
-    NmeaCoordinates(const double degs, const int digits = 5);
+    explicit NmeaCoordinates(const double degs, const int digits = 5);
 
     int deg_;     //!< Integer degrees value, >= 0
     double min_;  //!< Fractional minutes value, >= 0.0

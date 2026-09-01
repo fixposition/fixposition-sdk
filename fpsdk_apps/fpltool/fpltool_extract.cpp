@@ -151,7 +151,7 @@ bool FplToolExtract::Run()
     double rate = 0.0;
     bool ok = true;
     FplMessage fpl_msg;
-    bool do_extract = (opts_.skip_ == 0);
+    bool do_extract = true;
     uint32_t time_into_log = 0;
     std::size_t errors = 0;
     while (!sig_int.ShouldAbort() && fpl_reader.Next(fpl_msg) && ok) {

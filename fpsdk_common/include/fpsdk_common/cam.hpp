@@ -263,7 +263,7 @@ class CamStream
      *
      * @param[in]  params  Parameters
      */
-    CamStream(const CamStreamParams& params);
+    explicit CamStream(const CamStreamParams& params);
 
     /**
      * @brief Destructor

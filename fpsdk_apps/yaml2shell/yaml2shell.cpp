@@ -184,9 +184,10 @@ class YamlToShell
         // Have filter?
         if (!opts_.filter_.empty()) {
             try {
-                filter_ = std::make_unique<std::regex>(opts_.filter_,
-                    opts_.filter_ == StrToLower(opts_.filter_) ? std::regex_constants::icase
-                                                               : (std::regex_constants::syntax_option_type)0);
+                filter_ = std::make_unique<std::regex>(
+                    opts_.filter_, opts_.filter_ == StrToLower(opts_.filter_)
+                                       ? std::regex_constants::ECMAScript | std::regex_constants::icase
+                                       : std::regex_constants::ECMAScript);
             } catch (std::exception& ex) {
                 WARNING("Bad filter %s: %s", opts_.filter_.c_str(), ex.what());
                 return false;

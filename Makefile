@@ -34,12 +34,12 @@ help:
 	@echo "    clean               Clean build directory"
 	@echo "    cmake               Configure packages"
 	@echo "    build               Build packages"
-	@echo "    pre-commit          Run pre-commit"
+	@echo "    pre-commit          Run pre-commit (clang-format, ...)"
 	@echo "    test                Run tests"
 	@echo "    install             Install packages (into INSTALL_PREFIX path)"
 	@echo "    doc                 Generate documentation (into build directory)"
 	@echo "    doc-dev             Generate documentation and start webserver to view it"
-	@echo "    lint                Run linter"
+	@echo "    lint                Run linters (clang-tidy, ...)"
 	@echo
 	@echo "Typically you want to do something like this:"
 	@echo
@@ -70,6 +70,7 @@ SED        := sed
 LN         := ln
 TEE        := tee
 RUN_CLANG_TIDY := run-clang-tidy
+JQ         := jq
 
 ifeq ($(VERBOSE),1)
 V =
@@ -256,14 +257,26 @@ doc-dev: $(BUILD_DIR)/.make-doc
 
 # ----------------------------------------------------------------------------------------------------------------------
 
+.PHONY: pre-commit
+pre-commit: | $(BUILD_DIR)
+	@echo "$(HLW)***** pre-commit checks *****$(HLO)"
+	$(V)$(MKDIR) -p $(BUILD_DIR)/.bin
+	$(V)$(LN) -sf /usr/bin/clang-format-17 $(BUILD_DIR)/.bin/clang-format
+	$(V)export PATH=$(BUILD_DIR)/.bin:$$PATH; pre-commit run --all-files --hook-stage manual || return 1
+
+# ----------------------------------------------------------------------------------------------------------------------
+
 .PHONY: lint
 lint: $(BUILD_DIR)/.lint-clang-tidy
 
-$(BUILD_DIR)/.lint-clang-tidy: $(BUILD_DIR)/.make-build
+$(BUILD_DIR)/.lint-clang-tidy: $(BUILD_DIR)/.make-cmake .clang-tidy
 	@echo "$(HLW)***** clang-tidy ($(BUILD_TYPE)) *****$(HLO)"
-	$(V)$(NICE_BUILD) $(RUN_CLANG_TIDY) -p $(BUILD_DIR) -header-filter=.* -j $(PARALLEL) \
-	    | $(TEE) $(BUILD_DIR)/clang-tidy.log
+	$(V)$(MKDIR) -p $(BUILD_DIR)/.clang-tidy
+	$(V)$(JQ) '[ .[] | select(.file | test("/(fpsdk_common/src|fpsdk_apps)/")) ]' < $(BUILD_DIR)/compile_commands.json \
+	    > $(BUILD_DIR)/.clang-tidy/compile_commands.json
+	$(V)$(NICE_BUILD) $(RUN_CLANG_TIDY) -p $(BUILD_DIR)/.clang-tidy -header-filter=.* -warnings-as-errors="*" -j $(PARALLEL)
 	$(V)$(TOUCH) $@
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -319,14 +332,5 @@ else
 	@echo "This ($@) should not run inside Docker!"
 	@false
 endif
-
-# ----------------------------------------------------------------------------------------------------------------------
-
-.PHONY: pre-commit
-pre-commit: | $(BUILD_DIR)
-	@echo "$(HLW)***** pre-commit checks *****$(HLO)"
-	$(V)$(MKDIR) -p $(BUILD_DIR)/.bin
-	$(V)$(LN) -sf /usr/bin/clang-format-17 $(BUILD_DIR)/.bin/clang-format
-	$(V)export PATH=$(BUILD_DIR)/.bin:$$PATH; pre-commit run --all-files --hook-stage manual || return 1
 
 ########################################################################################################################

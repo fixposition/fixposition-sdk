@@ -205,7 +205,7 @@ std::optional<ImageData> VideoFrameDecoder::DecodeFrame(const std::vector<uint8_
 class VideoFrameDecoderImpl : public VideoFrameDecoder, private NoCopyNoMove
 {
    public:
-    VideoFrameDecoderImpl(const VideoDecoderParams& params);
+    explicit VideoFrameDecoderImpl(const VideoDecoderParams& params);
     ~VideoFrameDecoderImpl();
     std::optional<ImageData> DecodeFrame(const uint8_t* data, const std::size_t size) override final;
     bool IsOkay() const override final;
