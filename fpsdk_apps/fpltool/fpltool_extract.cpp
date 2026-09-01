@@ -89,12 +89,12 @@ bool FplToolExtract::Run()
         return false;
     }
 
-    // Check which output formats we want
+    // Check which output formats we want. Keep defaults in sync with help screen!
     do_jsonl_ = opts_.formats_.empty();
     do_raw_ = opts_.formats_.empty();
     do_file_ = opts_.formats_.empty();
-    do_ros_ = opts_.formats_.empty();
-    do_cam_ = opts_.formats_.empty();
+    do_ros_ = false;
+    do_cam_ = false;
     for (auto& fmt : opts_.formats_) {  // clang-format off
         if      (fmt == opts_.FORMAT_JSONL) { do_jsonl_ = true; }
         else if (fmt == opts_.FORMAT_RAW)   { do_raw_ = true; }
@@ -111,31 +111,37 @@ bool FplToolExtract::Run()
         return false;
     }
 
+    DEBUG("do_jsonl=%s do_raw=%s do_file=%s do_ros=%s do_cam=%s", ToStr(do_jsonl_), ToStr(do_raw_), ToStr(do_file_),
+        ToStr(do_ros_), ToStr(do_cam_));
+
     NOTICE("Extracting from %s to %s_...", input_fpl.c_str(), output_prefix_.c_str());
     TicToc tt;
 
+    std::string output_bag;
+    if (do_ros_) {
 #if FPSDK_USE_ROS2
-    const auto output_bag = output_prefix_ + "_bag";  // Directory! (even for single-file .mcap)
+        output_bag = output_prefix_ + "_bag";  // Directory! (even for single-file .mcap)
 #else
-    const auto output_bag = output_prefix_ + ".bag";  // File
+        output_bag = output_prefix_ + ".bag";  // File
 #endif
-    if (PathExists(output_bag)) {
-        if (!opts_.overwrite_) {
-            WARNING("Output bag %s already exists", output_bag.c_str());
-            return false;
-        } else {
-            RemoveAll(output_bag);
+        if (PathExists(output_bag)) {
+            if (!opts_.overwrite_) {
+                WARNING("Output bag %s already exists", output_bag.c_str());
+                return false;
+            } else {
+                RemoveAll(output_bag);
+            }
         }
-    }
 #if FPSDK_USE_ROS2
-    if (do_ros_ && !bag_.Open(output_bag, opts_.mcap_, opts_.compress_)) {
+        if (do_ros_ && !bag_.Open(output_bag, opts_.mcap_, opts_.compress_)) {
 #else
-    if (do_ros_ && !bag_.Open(output_bag, opts_.compress_)) {
+        if (do_ros_ && !bag_.Open(output_bag, opts_.compress_)) {
 #endif
-        return false;
-    }
+            return false;
+        }
 
-    NOTICE("Extracting to %s", output_bag.c_str());
+        NOTICE("Extracting to %s", output_bag.c_str());
+    }
 
     // Handle SIGINT (C-c) to abort nicely
     SigIntHelper sig_int;
@@ -508,8 +514,9 @@ FplToolExtract::ProcRes FplToolExtract::ProcessCamData(const FplMessage& fpl_msg
         }
 
         // Decode this frame
-        fut = std::async(std::launch::async,
-            [&dec, /*copy!*/ camdata]() -> AsyncDecData { return { camdata, dec->DecodeFrame(camdata.data_) }; });
+        fut = std::async(std::launch::async, [&dec, /*copy!*/ camdata]() -> AsyncDecData {
+            return { camdata, dec->DecodeFrame(camdata.data_), dec->IsOkay() };
+        });
 
         break;
     }
@@ -526,7 +533,11 @@ FplToolExtract::ProcRes FplToolExtract::ProcessAsyncDecData(const FplToolExtract
     auto& camdata = decdata.camdata_;
     if (!decdata.img_) {
         WARNING("No image from CAMDATA %s", camdata.info_.c_str());
-        return ProcRes::ERROR;
+        if (!decdata.dec_is_okay_) {
+            return ProcRes::FATAL;
+        } else {
+            return ProcRes::ERROR;
+        }
     }
     auto& img = *decdata.img_;
     TRACE("CAMDATA decoded %s -> %dx%d %s", camdata.info_.c_str(), img.width_, img.height_, PixelFmtToStr(img.fmt_));
