@@ -9,7 +9,9 @@ project(camera_streaming
 )
 
 set(FPSDK_BUILD_TESTING OFF)
-set(FPSDK_USE_FFMPEG ON)
+# Set this if you require encoded image decoding
+# set(FPSDK_USE_FFMPEG ON)
+
 
 # COMPILER SETUP =======================================================================================================
 
