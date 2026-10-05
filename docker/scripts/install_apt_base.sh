@@ -83,6 +83,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic............................      ros-noetic-tf2-geometry-msgs
     noetic.humble.jazzy.lyrical.trixie      sqlite3
     noetic.humble.jazzy.lyrical.trixie      sudo
+    noetic.humble.jazzy.lyrical.trixie      time
     ..............jazzy.lyrical.......      unminimize
     noetic.humble.jazzy.lyrical.trixie      unzip
     noetic.humble.jazzy.lyrical.trixie      zlib1g-dev

@@ -26,8 +26,7 @@
             ".vscode-cache": true,
             "**/*~": true,
             ".vstags": true,
-            "core": true,
-            ".devcontainer/.vscode-server/**": true
+            "core": true
         },
         // Exclude things from search (this automatically uses files.exclude + what you add here)
         "search.exclude": {
@@ -38,8 +37,7 @@
             "build/**": true,
             "install/**": true,
             "ws/**": true,
-            ".devcontainer/.vscode-server/**": true,
-            ".devcontainer/.bash_history.d/history": true,
+            ".devcontainer/.persist/**": true
         },
         // Exclude some things from the files watcher
         "files.watcherExclude": {
@@ -74,7 +72,7 @@
         "C_Cpp.default.browse.limitSymbolsToIncludedHeaders": false,
         //"C_Cpp.clang_format_style": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 120 }",
         "C_Cpp.files.exclude": {
-            ".devcontainer/.vscode-server/**": true
+            ".devcontainer/.persist/**": true
         },
         "editor.formatOnSave": false,
 

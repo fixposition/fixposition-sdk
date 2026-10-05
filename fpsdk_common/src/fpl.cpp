@@ -755,7 +755,7 @@ CamData::CamData(const FplMessage& log_msg)
 
         info_ = string::Sprintf("rec_time=%.3f cam_id=%s type=%s fmt=%s frm=%s %" PRIu32 "x%" PRIu32 " seq=%" PRIuMAX
                                 " ts=%.3f size=%" PRIuMAX,
-            rec_time_.ToSec() * 1e-9, CamIdToStr(cam_id_), CamDataTypeToStr(type_), CamDataFmtToStr(fmt_),
+            rec_time_.ToSec(), CamIdToStr(cam_id_), CamDataTypeToStr(type_), CamDataFmtToStr(fmt_),
             CamDataFrmToStr(frm_), width_, height_, seq_, (double)ts_ * 1e-9, data_.size());
     } else {
         WARNING("CamData: invalid message");
