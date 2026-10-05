@@ -16,6 +16,7 @@
 /* LIBC/STL */
 #include <cstdint>
 #include <string>
+#include <thread>
 #include <vector>
 
 /* EXTERNAL */
@@ -54,6 +55,8 @@ class FplToolOptions : public common::app::ProgramOptions
             { 'e', true,  "formats"     },
             { 's', true,  "scale"       },
             { 't', true,  "pixelfmt"    },
+            { 'j', true,  "jobs"        },
+            { 'a', true,  "accel"       },
         }) {};  // clang-format on
 
     /**
@@ -88,6 +91,8 @@ class FplToolOptions : public common::app::ProgramOptions
 #if FPSDK_USE_FFMPEG
     double                    scale_     = 1.0;                   //!< Scale factor for decoded video frames
     common::video::PixelFmt   pixelfmt_  = common::video::PixelFmt::RGB24; //!< Pixel format for decoded video frames
+    uint32_t                  jobs_      = 0;                     //!< Number of parallel video decoders (0 = auto)
+    common::video::HwAccel    accel_     = common::video::HwAccel::SW; //!< Hw acceleration for video decoders
 #endif
     // clang-format on
 
@@ -125,6 +130,8 @@ class FplToolOptions : public common::app::ProgramOptions
             "    -e, --formats <fmts>  -- Comma-separated list of output formats for the extract <command> (default: jsonl,raw,file)\n"
             "    -s, --scale <fact>    -- Scale factor for decoded video frames: 0.1 - 1.0 (default: 1.0)\n"
             "    -t, --pixelfmt <fmt>  -- Pixel format for decoded video frames: Y8, RGB24, GBRP (default: RGB24)\n"
+            "    -j, --jobs <num>      -- Number of video decoders to run in parallel (default: number of CPUs - 2, at least 1)\n"
+            "    -a, --accel <accel>   -- Hardware acceleration for video decoders: SW (default, recommended), HW or AUTO\n"
             "    <command>             -- The command, see below\n"
             "    <fpl-file>            -- The .fpl (or .fpl.gz) file to process\n"
             "    \n"
@@ -160,7 +167,7 @@ class FplToolOptions : public common::app::ProgramOptions
             "\n"
             "    extract -- Extract the data in a .fpl file\n"
             "\n"
-            "        fpltool [-vqpPfocSDst] [-e <fmts>] extract <fpl-file>\n"
+            "        fpltool [-vqpPfocSDstja] [-e <fmts>] extract <fpl-file>\n"
             "\n"
             "        The data is extracted to different files in the current directory. The files are named like the\n"
             "        <fpl-file> with added suffixes and different file extension, depending on the kind of data that\n"
@@ -375,6 +382,27 @@ class FplToolOptions : public common::app::ProgramOptions
                 ok = false;
 #endif
                 break;
+            case 'j':
+#if FPSDK_USE_FFMPEG
+                if (!common::string::StrToValue(argument, jobs_) || (jobs_ < 1)) {
+                    ok = false;
+                }
+#else
+                WARNING("Cannot use --jobs, this fpltool is not compiled with FFmpeg");
+                ok = false;
+#endif
+                break;
+            case 'a':
+#if FPSDK_USE_FFMPEG
+                accel_ = HwAccelFromStrOr(argument.c_str(), common::video::HwAccel::UNSPECIFIED);
+                if (accel_ == common::video::HwAccel::UNSPECIFIED) {
+                    ok = false;
+                }
+#else
+                WARNING("Cannot use --accel, this fpltool is not compiled with FFmpeg");
+                ok = false;
+#endif
+                break;
             default:
                 ok = false;
                 break;
@@ -416,6 +444,14 @@ class FplToolOptions : public common::app::ProgramOptions
             progress_ = 1;
         }
 
+#if FPSDK_USE_FFMPEG
+        // Default number of jobs: leave two CPUs for the rest (reading, writing)
+        if (jobs_ == 0) {
+            const uint32_t num_cpus = std::thread::hardware_concurrency();
+            jobs_ = (num_cpus > 2 ? num_cpus - 2 : 1);
+        }
+#endif
+
         // Debug
         DEBUG("command_      = '%s'", command_str_.c_str());
         for (std::size_t ix = 0; ix < inputs_.size(); ix++) {
@@ -435,6 +471,8 @@ class FplToolOptions : public common::app::ProgramOptions
 #if FPSDK_USE_FFMPEG
         DEBUG("scale         = %.1f", scale_);
         DEBUG("pixelfmt      = %s", common::video::PixelFmtToStr(pixelfmt_));
+        DEBUG("jobs          = %d", jobs_);
+        DEBUG("accel         = %s", common::video::HwAccelToStr(accel_));
 #endif
         return ok;
     }
