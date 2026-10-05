@@ -297,6 +297,7 @@ bool FplToolExtract::ProcessQueue(const QueueWait wait)
             case ProcRes::OK:
                 break;
             case ProcRes::ERROR:
+                errors_++;
                 if (errors_ >= 100) {
                     WARNING("Too many errors, giving up");
                     return false;
