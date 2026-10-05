@@ -259,7 +259,11 @@ bool FplToolExtract::Run()
 
 bool FplToolExtract::ProcessQueue(const QueueWait wait)
 {
+#if FPSDK_USE_FFMPEG
     bool may_wait = (wait != QueueWait::NONE);
+#else
+    UNUSED(wait);
+#endif
     while (!queue_.empty()) {
         auto& item = queue_.front();
 
