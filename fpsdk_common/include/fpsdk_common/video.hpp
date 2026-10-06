@@ -9,7 +9,9 @@
  *
  * @file
  * @brief Fixposition SDK: Video frame decoding
- *
+ */
+// clang-format off
+/**
  * @page FPSDK_COMMON_VIDEO Video frame decoding
  *
  * **API**: fpsdk_common/video.hpp and fpsdk::common::video
@@ -40,6 +42,7 @@
  *   the number of decoders. The conversion to the output pixel format is done in software in both cases.
  * - The results may be different for other video (larger frames, H.264, longer GOPs), GPUs and drivers.
  */
+// clang-format on
 #ifndef __FPSDK_COMMON_VIDEO_HPP__
 #define __FPSDK_COMMON_VIDEO_HPP__
 
