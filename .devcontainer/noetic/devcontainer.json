@@ -12,6 +12,9 @@
     // compare .services.noetic-dev.volumes in ../../docker/docker-compose.yaml
     "workspaceFolder": "/home/fpsdk/fixposition-sdk",
 
+    "initializeCommand": "${localWorkspaceFolder}/.devcontainer/helper.sh initializeCommand ${localWorkspaceFolder}",
+    "onCreateCommand": "${containerWorkspaceFolder}/.devcontainer/helper.sh onCreateCommand ${containerWorkspaceFolder}",
+
     // Deliberately empty, see fpsdk.code-workspace instead
     "customizations": {}
 }

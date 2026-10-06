@@ -46,12 +46,15 @@ services:
             - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
             # Persistent stuff
-            - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
-            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
-            - ../.devcontainer/.claude:/home/fpsdk/.claude
-            - ../.devcontainer/.local:/home/fpsdk/.local
+            - ../.devcontainer/.persist/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.devcontainer/.persist/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.persist/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.persist/.claude.json:/home/fpsdk/.claude.json
+            - ../.devcontainer/.persist/.local:/home/fpsdk/.local
             # Workspace
             - ../.:/home/fpsdk/fixposition-sdk
+        devices:
+            - /dev/dri
         cap_add:
             - SYS_PTRACE # Set kernel.yama.ptrace_scope = 0 in /etc/sysctl.d/10-ptrace.conf
         hostname: fpsdk-trixie-dev-${USER}
@@ -95,10 +98,11 @@ services:
         volumes:
             - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
-            - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
-            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
-            - ../.devcontainer/.claude:/home/fpsdk/.claude
-            - ../.devcontainer/.local:/home/fpsdk/.local
+            - ../.devcontainer/.persist/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.devcontainer/.persist/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.persist/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.persist/.claude.json:/home/fpsdk/.claude.json
+            - ../.devcontainer/.persist/.local:/home/fpsdk/.local
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
             - SYS_PTRACE
@@ -142,10 +146,11 @@ services:
         volumes:
             - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
-            - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
-            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
-            - ../.devcontainer/.claude:/home/fpsdk/.claude
-            - ../.devcontainer/.local:/home/fpsdk/.local
+            - ../.devcontainer/.persist/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.devcontainer/.persist/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.persist/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.persist/.claude.json:/home/fpsdk/.claude.json
+            - ../.devcontainer/.persist/.local:/home/fpsdk/.local
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
             - SYS_PTRACE
@@ -186,10 +191,11 @@ services:
         volumes:
             - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
             - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
-            - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
-            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
-            - ../.devcontainer/.claude:/home/fpsdk/.claude
-            - ../.devcontainer/.local:/home/fpsdk/.local
+            - ../.devcontainer/.persist/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.devcontainer/.persist/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.persist/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.persist/.claude.json:/home/fpsdk/.claude.json
+            - ../.devcontainer/.persist/.local:/home/fpsdk/.local
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
             - SYS_PTRACE
@@ -233,6 +239,7 @@ services:
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
             - ../.devcontainer/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.claude.json:/home/fpsdk/.claude.json
             - ../.devcontainer/.local:/home/fpsdk/.local
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:

@@ -9,13 +9,40 @@
  *
  * @file
  * @brief Fixposition SDK: Video frame decoding
- *
+ */
+// clang-format off
+/**
  * @page FPSDK_COMMON_VIDEO Video frame decoding
  *
  * **API**: fpsdk_common/video.hpp and fpsdk::common::video
  *
  * @note This is only available if compiled with FFmpeg, see @ref FPSDK_BUILD_DEPS.
+ *
+ * @section FPSDK_COMMON_VIDEO_HWACCEL Hardware vs. software decoding
+ *
+ * Hardware decoding (fpsdk::common::video::HwAccel::HW, currently VA-API) is not necessarily faster than software
+ * decoding (fpsdk::common::video::HwAccel::SW). The following are wall-clock times for "fpltool extract" of a 32 s
+ * recording with two cameras (H.265, 1024x768, 25 fps, 10 frames per GOP, 1547 frames in total) decoded to RGB24
+ * (a 3.5 GB ROS1 bag), using different numbers of parallel decoders (-j). Measured on an AMD Ryzen 7 PRO 8840HS
+ * (8 cores, 16 threads) with Radeon 780M graphics, FFmpeg 7.1, Release build, median of three runs:
+ *
+ * | Decoders | -e jsonl,raw,file,ros,cam -a SW | -e jsonl,raw,file,ros,cam -a HW | -e ros,cam -a SW | -e ros,cam -a HW |
+ * |----------|---------------------------------|---------------------------------|------------------|------------------|
+ * | -j 1     | 5.3 s                           | 5.9 s                           | 4.4 s            | 5.7 s            |
+ * | -j 2     | 4.7 s                           | 5.8 s                           | 4.7 s            | 6.2 s            |
+ * | -j 4     | 4.2 s                           | 6.1 s                           | 4.2 s            | 5.6 s            |
+ * | -j 8     | 4.2 s                           | 6.5 s                           | 4.0 s            | 5.5 s            |
+ *
+ * Findings:
+ *
+ * - Software decoding is faster than hardware decoding in all cases
+ * - Decoding this kind of video is cheap on the CPU (about 1.2 ms per P-frame and 8 ms per I-frame on one core),
+ *   and it scales with the number of decoders.
+ * - The hardware decoder is limited by getting the decoded frames back from the GPU, and the GPU does not scale with
+ *   the number of decoders. The conversion to the output pixel format is done in software in both cases.
+ * - The results may be different for other video (larger frames, H.264, longer GOPs), GPUs and drivers.
  */
+// clang-format on
 #ifndef __FPSDK_COMMON_VIDEO_HPP__
 #define __FPSDK_COMMON_VIDEO_HPP__
 

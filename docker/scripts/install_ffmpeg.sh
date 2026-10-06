@@ -52,6 +52,8 @@ tar --strip-components=1 -xvf ../ffmpeg.tar.gz
   --enable-parser=hevc \
   --enable-parser=mjpeg \
   --enable-vaapi \
+  --enable-hwaccel=h264_vaapi \
+  --enable-hwaccel=hevc_vaapi \
   \
   --disable-static \
   --enable-shared \
