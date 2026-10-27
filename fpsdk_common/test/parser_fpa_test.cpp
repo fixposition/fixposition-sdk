@@ -312,7 +312,7 @@ TEST(ParserFpaTest, FpaGnsscorrPayload)
     }
     {
         FpaGnsscorrPayload payload;
-        const char* msg = "$FP,GNSSCORR,1,2237,250548.999744,8,25,18,8,25,18,,,,,,,,,*24\r\n";
+        const char* msg = "$FP,GNSSCORR,1,2237,250548.999744,8,25,18,11,25,18,,,,,,,,,*XX\r\n";
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_TRUE(payload.valid_);
         EXPECT_TRUE(payload.gps_time.week.valid);
@@ -325,7 +325,7 @@ TEST(ParserFpaTest, FpaGnsscorrPayload)
         EXPECT_EQ(payload.gnss1_nsig_l1.value, 25);
         EXPECT_TRUE(payload.gnss1_nsig_l2.valid);
         EXPECT_EQ(payload.gnss1_nsig_l2.value, 18);
-        EXPECT_EQ(payload.gnss2_fix, FpaGnssFix::RTK_FIXED);
+        EXPECT_EQ(payload.gnss2_fix, FpaGnssFix::PPP);
         EXPECT_TRUE(payload.gnss2_nsig_l1.valid);
         EXPECT_EQ(payload.gnss2_nsig_l1.value, 25);
         EXPECT_TRUE(payload.gnss2_nsig_l2.valid);
@@ -733,7 +733,7 @@ TEST(ParserFpaTest, FpaOdomstatusPayload)
     {
         FpaOdomstatusPayload payload;
         const char* msg =  // clang-format off
-            "$FP,ODOMSTATUS,1,2342,321241.350000,2,2,1,1,1,1,,0,,,,,,1,1,3,8,8,3,5,5,,0,6,,,,,,,,,,,,*24\r\n";  // clang-format on
+            "$FP,ODOMSTATUS,1,2342,321241.350000,2,2,1,1,1,1,,0,,,,,,1,1,3,8,3,3,5,5,,0,6,,,,,,,,,,,,*24\r\n";  // clang-format on
         EXPECT_TRUE(payload.SetFromMsg((const uint8_t*)msg, std::strlen(msg)));
         EXPECT_EQ(payload.msg_type_, FpaMessageType::ODOMSTATUS);
         EXPECT_TRUE(payload.valid_);
@@ -754,7 +754,7 @@ TEST(ParserFpaTest, FpaOdomstatusPayload)
         EXPECT_EQ(payload.imu_noise, FpaImuNoise::LOW_NOISE);
         EXPECT_EQ(payload.imu_conv, FpaImuConv::WAIT_MOTION);
         EXPECT_EQ(payload.gnss1_status, FpaGnssStatus::RTK_FIXED);
-        EXPECT_EQ(payload.gnss2_status, FpaGnssStatus::RTK_FIXED);
+        EXPECT_EQ(payload.gnss2_status, FpaGnssStatus::PPP_FLOAT);
         EXPECT_EQ(payload.baseline_status, FpaBaselineStatus::PASSING);
         EXPECT_EQ(payload.corr_status, FpaCorrStatus::GOOD_CORR);
         EXPECT_EQ(payload.cam1_status, FpaCamStatus::GOOD);
