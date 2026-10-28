@@ -592,7 +592,7 @@ TEST(ParserNmeaTest, NmeaVtgPayload)
         EXPECT_NEAR(vtg.sogn.value, 0.015, 1e-6);
         EXPECT_TRUE(vtg.sogk.valid);
         EXPECT_NEAR(vtg.sogk.value, 0.027, 1e-6);
-        EXPECT_EQ(vtg.mode, NmeaModeVtg::INVALID);
+        EXPECT_EQ(vtg.mode, NmeaModeVtg::DGNSS);
     }
     {
         NmeaVtgPayload vtg;
