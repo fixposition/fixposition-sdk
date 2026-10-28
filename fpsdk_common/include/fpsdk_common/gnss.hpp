@@ -568,13 +568,22 @@ FixType NmeaQualityGgaToFixType(const parser::nmea::NmeaQualityGga quality);
 FixType NmeaModeRmcGnsToFixType(const parser::nmea::NmeaModeRmcGns mode);
 
 /**
+ * @brief Convert NMEA GLL mode to fix type
+ *
+ * @param[in]  mode  NMEA GLL mode
+ *
+ * @returns the fix type corresponding to the mode
+ */
+FixType NmeaModeGllToFixType(const parser::nmea::NmeaModeGll mode);
+
+/**
  * @brief Convert NMEA GLL/VTG mode to fix type
  *
  * @param[in]  mode  NMEA GLL/VTG mode
  *
  * @returns the fix type corresponding to the mode
  */
-FixType NmeaModeGllVtgToFixType(const parser::nmea::NmeaModeGllVtg mode);
+FixType NmeaModeVtgToFixType(const parser::nmea::NmeaModeVtg mode);
 
 /**
  * @brief Convert NMEA system ID and satellite number to satellite

@@ -383,7 +383,8 @@ const char* FpaGnssFixStr(const FpaGnssFix fix)
         case FpaGnssFix::S3D_DR:      return "S3D_DR";
         case FpaGnssFix::RTK_FLOAT:   return "RTK_FLOAT";
         case FpaGnssFix::RTK_FIXED:   return "RTK_FIXED";
-        case FpaGnssFix::PPP:         return "PPP";
+        case FpaGnssFix::PPP_FLOAT:   return "PPP_FLOAT";
+        case FpaGnssFix::PPP_FIXED:   return "PPP_FIXED";
     }  // clang-format on
     return "?";
 }
@@ -953,9 +954,10 @@ static bool GetGnssFix(FpaGnssFix& fix, const std::string& field)
 {
     bool ok = false;
     fix = FpaGnssFix::UNSPECIFIED;
-    // Two-digits vlues
+    // Two-digits values
     if (field.size() == 2) {  // clang-format off
-        if      (field == "11") { fix = FpaGnssFix::PPP; ok = true; }
+        if      (field == "11") { fix = FpaGnssFix::PPP_FLOAT; ok = true; }
+        else if (field == "12") { fix = FpaGnssFix::PPP_FIXED; ok = true; }
     }  // clang-format on
     // Single-digit values
     else if (field.size() == 1) {
@@ -970,7 +972,8 @@ static bool GetGnssFix(FpaGnssFix& fix, const std::string& field)
             case FpaGnssFix::RTK_FLOAT:    fix = FpaGnssFix::RTK_FLOAT; ok = true; break;
             case FpaGnssFix::RTK_FIXED:    fix = FpaGnssFix::RTK_FIXED; ok = true; break;  // clang-format on
             // Not single-digit value, handled above or invalid
-            case FpaGnssFix::PPP:
+            case FpaGnssFix::PPP_FLOAT:
+            case FpaGnssFix::PPP_FIXED:
             case FpaGnssFix::UNSPECIFIED:
                 break;
         }

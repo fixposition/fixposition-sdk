@@ -528,7 +528,8 @@ enum class FpaGnssFix : int
     S3D_DR                   = '6',  //!< Single 3D fix with dead-reckoning
     RTK_FLOAT                = '7',  //!< RTK float fix
     RTK_FIXED                = '8',  //!< RTK fixed fix
-    PPP                      = 'b',  //!< PPP fix (11)
+    PPP_FLOAT                = 'b',  //!< PPP fix (11 == 0xb)
+    PPP_FIXED                = 'c',  //!< PPP fix (12 == 0xc)
 };  // clang-format on
 
 /**

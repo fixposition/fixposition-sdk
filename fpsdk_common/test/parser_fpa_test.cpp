@@ -325,7 +325,7 @@ TEST(ParserFpaTest, FpaGnsscorrPayload)
         EXPECT_EQ(payload.gnss1_nsig_l1.value, 25);
         EXPECT_TRUE(payload.gnss1_nsig_l2.valid);
         EXPECT_EQ(payload.gnss1_nsig_l2.value, 18);
-        EXPECT_EQ(payload.gnss2_fix, FpaGnssFix::PPP);
+        EXPECT_EQ(payload.gnss2_fix, FpaGnssFix::PPP_FLOAT);
         EXPECT_TRUE(payload.gnss2_nsig_l1.valid);
         EXPECT_EQ(payload.gnss2_nsig_l1.value, 25);
         EXPECT_TRUE(payload.gnss2_nsig_l2.valid);
