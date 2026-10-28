@@ -538,8 +538,8 @@ std::vector<uint8_t> Base64Dec(const std::string& str)
 {
     std::vector<uint8_t> data;
     data.resize(boost::beast::detail::base64::decoded_size(str.size()));
-    boost::beast::detail::base64::decode(data.data(), str.data(), str.size());
-    data.resize(data.size() - 1);
+    const auto res = boost::beast::detail::base64::decode(data.data(), str.data(), str.size());
+    data.resize(res.first);  // Number of bytes written (decoded_size() is an upper bound)
     return data;
 }
 
