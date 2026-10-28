@@ -12,9 +12,9 @@ all: $(OUTPUTS)
 	@echo "$< -> $@"
 	@echo -n > $@.tmp
 	@echo "// clang-format off" >> $@.tmp
-	@xxd -i -C -c 32 $< \
-		| sed -e 's/unsigned char/static const std::vector<uint8_t>/' -e 's/\[\]//' -e '/unsigned int/d' \
-		>> $@.tmp
+	@echo "static const std::vector<uint8_t> $(shell echo $(subst .,_,$<) | tr a-z A-Z) = fpsdk::common::string::Base64Dec(" >> $@.tmp
+	@base64 -w 128 $< | sed -e 's/^/    "/' -e 's/$$/"/' >> $@.tmp
+	@echo ");" >> $@.tmp
 	@mv $@.tmp $@
 
 

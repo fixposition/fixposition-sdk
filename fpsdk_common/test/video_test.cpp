@@ -19,6 +19,7 @@
 /* PACKAGE */
 #include <fpsdk_common/logging.hpp>
 #include <fpsdk_common/path.hpp>
+#include <fpsdk_common/string.hpp>
 #include <fpsdk_common/video.hpp>
 
 namespace {
