@@ -173,4 +173,3 @@ if [ -n "${ROS_DISTRO}" ]; then
     esac
 
 fi
-
