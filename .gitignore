@@ -15,13 +15,8 @@ CMakeCache.txt
 *.fpl.gz
 *.bag
 *.bak
-/.devcontainer/.bash_history.d
-/.devcontainer/.claude
-/.devcontainer/.local
-/.devcontainer/.vscode-server
-/.devcontainer/.claude
-/.devcontainer/.local
-.devcontainer/.gdb/__pycache__
+/.devcontainer/.persist
+__pycache__
 /ws
 /ws2
 /ros_ws
@@ -46,6 +41,9 @@ baz*
 /*.json
 /.claude
 /*_bag
+/prompt.md
+/notes.md
+
 
 # We must not commit such files ever. See section FPSDK_BUILD_ROS in fpsdk_doc/fpsdk_build.hpp
 CATKIN_IGNORE
