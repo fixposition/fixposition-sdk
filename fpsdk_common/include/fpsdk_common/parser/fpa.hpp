@@ -315,10 +315,10 @@ enum class FpaGnssStatus : int
     NO_FIX                   = '0',  //!< No fix
     SPP                      = '1',  //!< Single-point positioning (SPP)
     RTK_MB                   = '2',  //!< RTK moving baseline
-    RESERVED3                = '3',  //!< Reserved
+    PPP_FLOAT                = '3',  //!< PPP float
     RESERVED4                = '4',  //!< Reserved
     RTK_FLOAT                = '5',  //!< RTK float
-    RESERVED6                = '6',  //!< Reserved
+    PPP_FIXED                = '6',  //!< PPP fixed
     RESERVED7                = '7',  //!< Reserved
     RTK_FIXED                = '8',  //!< RTK fixed
     RESERVED9                = '9',  //!< Reserved
@@ -528,6 +528,8 @@ enum class FpaGnssFix : int
     S3D_DR                   = '6',  //!< Single 3D fix with dead-reckoning
     RTK_FLOAT                = '7',  //!< RTK float fix
     RTK_FIXED                = '8',  //!< RTK fixed fix
+    PPP_FLOAT                = 'b',  //!< PPP fix (11 == 0xb)
+    PPP_FIXED                = 'c',  //!< PPP fix (12 == 0xc)
 };  // clang-format on
 
 /**

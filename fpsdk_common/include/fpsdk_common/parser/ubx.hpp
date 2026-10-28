@@ -2312,14 +2312,19 @@ static constexpr bool        UBX_NAV_SIG_V0_SIGFLAGS_PR_CORR_USED(const uint16_t
 static constexpr bool        UBX_NAV_SIG_V0_SIGFLAGS_CR_CORR_USED(const uint16_t sigFlags)          { return (sigFlags & 0x0080) == 0x0080; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_SIG_V0_SIGFLAGS_DO_CORR_USED(const uint16_t sigFlags)          { return (sigFlags & 0x0100) == 0x0100; }  //!< @todo documentation
 static constexpr bool        UBX_NAV_SIG_V0_SIGFLAGS_AUTH_STATUS(const uint16_t sigFlags)           { return (sigFlags & 0x0200) == 0x0200; }  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_NONE                                         = 0;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_SBAS                                         = 1;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_BDS                                          = 2;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_RTCM2                                        = 3;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_RTCM3_OSR                                    = 4;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_RTCM3_SSR                                    = 5;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_QZSS_SLAS                                    = 6;  //!< @todo documentation
-static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_SPARTN                                       = 7;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_NONE                                         =  0;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_SBAS                                         =  1;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_BDS                                          =  2;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_RTCM2                                        =  3;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_RTCM3_OSR                                    =  4;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_RTCM3_SSR                                    =  5;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_QZSS_SLAS                                    =  6;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_SPARTN                                       =  7;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_CLAS                                         =  9;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_LPP_OSR                                      = 10;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_LPP_SSR                                      = 11;  //!< @todo documentation
+static constexpr uint8_t     UBX_NAV_SIG_V0_CORRSOURCE_GAL_HAS                                      = 12;  //!< @todo documentation
+
 inline     const char *      UBX_NAV_SIG_V0_CORRSOURCE_STR(const uint8_t corrSource)                { return types::IxToStr(corrSource, "NONE", "SBAS", "BDS", "RTCM2", "RTCM3_OSR", "RTCM3_SSR", "QZSS_SLAS", "SPARTN"); } //!< @todo documentation
 static constexpr double      UBX_NAV_SIG_V0_PRRES_SCALE                                             = 1e-1;  //!< @todo documentation
 // clang-format on
