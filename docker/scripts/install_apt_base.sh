@@ -52,6 +52,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic.humble.jazzy.lyrical.trixie      libtiff-dev
     noetic.humble.jazzy.lyrical.trixie      libva-dev                         # automatically installs va-driver-all?
     noetic.humble.jazzy.lyrical.trixie      libyaml-cpp-dev
+    noetic.humble.jazzy.lyrical.trixie      locales
     noetic.humble.jazzy.lyrical.trixie      nasm
     noetic.humble.jazzy.lyrical.trixie      netbase
     noetic.humble.jazzy.lyrical.trixie      nlohmann-json3-dev
@@ -83,6 +84,7 @@ packages=$(awk -v filt=${FPSDK_IMAGE%-*} '$1 ~ filt { print $2 }' <<EOF
     noetic............................      ros-noetic-tf2-geometry-msgs
     noetic.humble.jazzy.lyrical.trixie      sqlite3
     noetic.humble.jazzy.lyrical.trixie      sudo
+    noetic.humble.jazzy.lyrical.trixie      time
     ..............jazzy.lyrical.......      unminimize
     noetic.humble.jazzy.lyrical.trixie      unzip
     noetic.humble.jazzy.lyrical.trixie      zlib1g-dev

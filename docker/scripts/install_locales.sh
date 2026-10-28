@@ -8,20 +8,18 @@
 #
 ########################################################################################################################
 #
-# Set timezone, sane language and locale
+# Set timezone, sane language and locale, see also ENV in the Dockerfiles
 #
 ########################################################################################################################
 set -eEu
 
 set -e
-export DEBIAN_FRONTEND=noninteractive
-apt-get -y update
-apt-get -y --with-new-pkgs upgrade
-apt-get -y install locales sudo
-apt-get clean
+
+echo "en_GB.UTF-8 UTF-8" >  /etc/locale.gen
+echo "en_US.UTF-8 UTF-8" >> /etc/locale.gen
+locale-gen en_GB.UTF-8 en_US.UTF-8
+update-locale LANG=en_GB.UTF-8
+
 ln -snf /usr/share/zoneinfo/$TZ /etc/localtime
-echo $TZ > /etc/timezone
-sed -i '/en_GB.UTF-8/s/^# //g' /etc/locale.gen
-locale-gen
 
 ########################################################################################################################
