@@ -244,7 +244,7 @@ namespace fpsdk {
 
     @subsection FPSDK_BUILD_DETAILS Details
 
-    Refer to the various CMakeList.txt files, the CI workflow configuration (`.github/workflows/ci.yml`)
+    Refer to the various CMakeLists.txt files, the CI workflow configuration (`.github/workflows/ci.yml`)
     and the CI script (`docker/ci.sh`) for details on how things are done.
 
 
