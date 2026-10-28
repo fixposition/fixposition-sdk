@@ -164,6 +164,10 @@ const char* SigCorrStr(const SigCorr corr)
         case SigCorr::RTCM3_SSR:  return "RTCM3_SSR";
         case SigCorr::QZSS_SLAS:  return "QZSS_SLAS";
         case SigCorr::SPARTN:     return "SPARTN";
+        case SigCorr::CLAS:       return "CLAS";
+        case SigCorr::LPP_OSR:    return "LPP_OSR";
+        case SigCorr::LPP_SSR:    return "LPP_SSR";
+        case SigCorr::GAL_HAS:    return "GAL_HAS";
         }  // clang-format on
     return "?";
 }

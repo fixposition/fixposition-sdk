@@ -202,6 +202,10 @@ enum class SigCorr : uint8_t
     RTCM3_SSR,    //!< RTCM v3.x SSR type RTK corrections available
     QZSS_SLAS,    //!< QZSS SLAS corrections available
     SPARTN,       //!< SPARTN corrections available
+    CLAS,         //!< QZSS centimeter-level augmentation service (CLAS) corrections available
+    LPP_OSR,      //!< LTE positioning protocol (LPP) OSR type corrections available
+    LPP_SSR,      //!< LTE positioning protocol (LPP) SSR type corrections available
+    GAL_HAS,      //!< Galileo high-accurcy service (HAS) corrections available
 };
 
 /**
