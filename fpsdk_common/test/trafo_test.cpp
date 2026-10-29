@@ -13,6 +13,9 @@
 
 /* LIBC/STL */
 #include <cmath>
+#include <limits>
+#include <thread>
+#include <vector>
 
 /* EXTERNAL */
 #include <gtest/gtest.h>
@@ -322,6 +325,171 @@ TEST(TrafoTest, Trafo)
     // https://epsg.io/8401 ETRF2014 xyz
     // https://epsg.io/7930 ETRF2000 xyz
     // https://epsg.io/7922 ETRF93 xyz
+}
+
+TEST(TrafoTest, TrafoCrsInfo)
+{
+    {
+        Transformer trafo("uninitialised");
+        EXPECT_EQ(trafo.SourceCrs().type_, CrsType::UNKNOWN);
+        EXPECT_EQ(trafo.TargetCrs().type_, CrsType::UNKNOWN);
+    }
+    {
+        Transformer trafo("ecef_to_llh");
+        ASSERT_TRUE(trafo.Init("EPSG:4978", "EPSG:4979"));
+        EXPECT_EQ(trafo.SourceCrs().type_, CrsType::GEOCENTRIC);
+        EXPECT_EQ(trafo.SourceCrs().name_, "WGS 84");
+        EXPECT_TRUE(trafo.SourceCrs().sub_types_.empty());
+        EXPECT_EQ(trafo.TargetCrs().type_, CrsType::GEOGRAPHIC_3D);
+    }
+    {
+        Transformer trafo("llh_to_ch1903");
+        ASSERT_TRUE(trafo.Init("EPSG:4326", "EPSG:2056"));
+        EXPECT_EQ(trafo.SourceCrs().type_, CrsType::GEOGRAPHIC_2D);
+        EXPECT_EQ(trafo.TargetCrs().type_, CrsType::PROJECTED);
+    }
+    {
+        // https://epsg.io/4936 ETRS89 x/y/z, https://epsg.io/4258 ETRS89 lat/lon, https://epsg.io/5730 EVRF2000 height
+        Transformer trafo("etrs89_to_compound");
+        ASSERT_TRUE(trafo.Init("EPSG:4936", "EPSG:4258+5730"));
+        EXPECT_EQ(trafo.TargetCrs().type_, CrsType::COMPOUND);
+        EXPECT_EQ(trafo.TargetCrs().sub_types_, std::vector<CrsType>({ CrsType::GEOGRAPHIC_2D, CrsType::VERTICAL }));
+    }
+    EXPECT_STREQ(CrsTypeStr(CrsType::GEOCENTRIC), "GEOCENTRIC");
+}
+
+TEST(TrafoTest, TrafoInitFail)
+{
+    {
+        Transformer trafo("bad_crs");
+        EXPECT_FALSE(trafo.Init("EPSG:4978", "not a CRS"));
+        EXPECT_FALSE(trafo.Init("not a CRS", "EPSG:4979"));
+        EXPECT_FALSE(trafo.Init("EPSG:4978", "EPSG:4979+3855"));  // Geographic 3D + vertical is not allowed
+    }
+    {
+        Transformer trafo("init_twice");
+        EXPECT_TRUE(trafo.Init("EPSG:4978", "EPSG:4979"));
+        EXPECT_FALSE(trafo.Init("EPSG:4978", "EPSG:4979"));
+    }
+}
+
+TEST(TrafoTest, TrafoOpts)
+{
+    const Eigen::Vector3d llh_deg = { 47.4002984167, 8.45036571389, 459.410 };
+    const Eigen::Vector3d xyz = TfEcefWgs84Llh(LlhDegToRad(llh_deg));
+    const Eigen::Vector3d err = { 1e-8, 1e-8, 1e-3 };
+
+    // Native axis order of EPSG:4979 is lat/lon
+    {
+        Transformer trafo("native");
+        ASSERT_TRUE(trafo.Init("EPSG:4978", "EPSG:4979"));
+        Eigen::Vector3d p;
+        ASSERT_TRUE(trafo.Transform(xyz, p));
+        EXPECT_NEAR_EIGEN_VECTOR3D(llh_deg, p, err);
+    }
+    // Normalized axis order is lon/lat, for EPSG:4979 as well as for OGC:CRS84h (which natively is lon/lat)
+    const Eigen::Vector3d lonlath_deg = { llh_deg.y(), llh_deg.x(), llh_deg.z() };
+    for (const char* target_crs : { "EPSG:4979", "OGC:CRS84h" }) {
+        Transformer trafo("normalized");
+        TransformerOpts opts;
+        opts.normalize_axes_ = true;
+        ASSERT_TRUE(trafo.Init("EPSG:4978", target_crs, opts));
+        Eigen::Vector3d p;
+        ASSERT_TRUE(trafo.Transform(xyz, p));
+        EXPECT_NEAR_EIGEN_VECTOR3D(lonlath_deg, p, err);
+        Eigen::Vector3d q;
+        ASSERT_TRUE(trafo.Transform(p, q, true));
+        EXPECT_NEAR_EIGEN_VECTOR3D(xyz, q, Eigen::Vector3d(1e-3, 1e-3, 1e-3));
+    }
+    // Precise
+    {
+        Transformer trafo("precise");
+        TransformerOpts opts;
+        opts.precise_ = true;
+        EXPECT_TRUE(trafo.Init("EPSG:4978", "EPSG:4979", opts));
+    }
+    // Network (no grids are required, so no network access happens)
+    {
+        Transformer trafo("network");
+        TransformerOpts opts;
+        opts.allow_network_ = true;
+        EXPECT_TRUE(trafo.Init("EPSG:4978", "EPSG:4979", opts));
+    }
+    // ETRS89 to WGS84 has no operation with an accuracy better than 1m
+    {
+        Transformer trafo("min_accuracy_ok");
+        TransformerOpts opts;
+        opts.min_accuracy_ = 2.0;
+        EXPECT_TRUE(trafo.Init("EPSG:4936", "EPSG:4978", opts));
+    }
+    {
+        Transformer trafo("min_accuracy_fail");
+        TransformerOpts opts;
+        opts.min_accuracy_ = 0.01;
+        EXPECT_FALSE(trafo.Init("EPSG:4936", "EPSG:4978", opts));
+    }
+    // Area of interest
+    {
+        Transformer trafo("area");
+        TransformerOpts opts;
+        opts.area_ = TransformerOpts::Area{ 5.9, 45.8, 10.5, 47.8 };  // Switzerland
+        ASSERT_TRUE(trafo.Init("EPSG:4326", "EPSG:2056", opts));
+        Eigen::Vector3d p;
+        ASSERT_TRUE(trafo.Transform(llh_deg, p));
+        EXPECT_NEAR_EIGEN_VECTOR3D(
+            Eigen::Vector3d(2676373.211, 1250433.955, 459.410), p, Eigen::Vector3d(1e-3, 1e-3, 1e-3));
+    }
+}
+
+TEST(TrafoTest, TrafoTransformFail)
+{
+    {
+        Transformer trafo("uninitialised");
+        Eigen::Vector3d p = { 1.0, 2.0, 3.0 };
+        EXPECT_FALSE(trafo.Transform(p));
+    }
+    {
+        Transformer trafo("nan");
+        ASSERT_TRUE(trafo.Init("EPSG:4978", "EPSG:4979"));
+        const double nan = std::numeric_limits<double>::quiet_NaN();
+        Eigen::Vector3d p = { nan, 1.0, 1.0 };
+        EXPECT_FALSE(trafo.Transform(p));
+        Eigen::Vector4d q;
+        EXPECT_FALSE(trafo.Transform(Eigen::Vector4d(nan, 1.0, 1.0, 0.0), q));
+    }
+}
+
+TEST(TrafoTest, TrafoThreads)
+{
+    const Eigen::Vector3d llh_deg = { 47.4002984167, 8.45036571389, 459.410 };
+    const Eigen::Vector3d xyz = TfEcefWgs84Llh(LlhDegToRad(llh_deg));
+    const Eigen::Vector3d err = { 1e-8, 1e-8, 1e-3 };
+
+    Transformer trafo_init("threads");
+    ASSERT_TRUE(trafo_init.Init("EPSG:4978", "EPSG:4979"));
+    const Transformer& trafo = trafo_init;
+
+    // Transform in threads different from the one that initialised the transformer, concurrently
+    constexpr int NUM_THREADS = 4;
+    constexpr int NUM_TRAFOS = 1000;
+    std::vector<int> num_ok(NUM_THREADS, 0);
+    std::vector<std::thread> threads;
+    for (int t_ix = 0; t_ix < NUM_THREADS; t_ix++) {
+        threads.emplace_back([&, t_ix]() {
+            for (int ix = 0; ix < NUM_TRAFOS; ix++) {
+                Eigen::Vector3d p;
+                if (trafo.Transform(xyz, p) && ((llh_deg - p).cwiseAbs().array() <= err.array()).all()) {
+                    num_ok[t_ix]++;
+                }
+            }
+        });
+    }
+    for (auto& thread : threads) {
+        thread.join();
+    }
+    for (int t_ix = 0; t_ix < NUM_THREADS; t_ix++) {
+        EXPECT_EQ(num_ok[t_ix], NUM_TRAFOS);
+    }
 }
 
 #  if 0
