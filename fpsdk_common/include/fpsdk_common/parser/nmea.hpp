@@ -859,6 +859,11 @@ inline NmeaPayloadPtr NmeaDecodeMessage(const std::vector<uint8_t>& msg)
 
 /**
  * @brief Collector for NMEA-Gx-GSA and NMEA-Gx-GPA
+ *
+ * Note that the user is responsible to call Complete() on every end of epoch. This collector by itself has no means to
+ * determine start or end of epoch. If Complete() is not called, the Add...() methods refuse to collect more data after
+ * a certain threshold (see MAX_COLLECT below) and fail. This is to prevent memory growing forever if Complete() is not
+ * called appropriately.
  */
 struct NmeaCollectGsaGsv
 {
@@ -929,6 +934,16 @@ struct NmeaCollectGsaGsv
 
    private:
     std::vector<NmeaSat> gsa_sats_;  //!< Satellites used
+
+    /**
+      * @brief Maximum number of entries to collect for any of sats_, sigs_ or gsa_sats_
+      *
+      * This is to prevent the memory usage growing over time if the user keeps adding data and never calls Complete().
+      * The value is large enough to cover the maximum number of satellits and signals a receiver will see. This should
+      * never be reached when the collector is used properly (by calling Complete() on end of epoch).
+      *
+     */
+    static constexpr std::size_t MAX_COLLECT = 1000;
 };
 
 /* ****************************************************************************************************************** */
