@@ -25,6 +25,7 @@
 /* EXTERNAL */
 
 /* PACKAGE */
+#include "fpsdk_common/logging.hpp"
 #include "fpsdk_common/math.hpp"
 #include "fpsdk_common/parser/nmea.hpp"
 #include "fpsdk_common/parser/types.hpp"
@@ -500,9 +501,9 @@ static bool StrToInt(const std::string& str, int32_t& value)
 
 // Debug prints, for development
 #if 0
-#  define NMEA_TRACE(fmt, ...) fprintf(stderr, fmt "\n", ##__VA_ARGS__)
+#  define NMEA_TRACE(...) TRACE(__VA_ARGS__)
 #else
-#  define NMEA_TRACE(fmt, ...) /* nothing */
+#  define NMEA_TRACE(...) /* nothing */
 #endif
 
 // Split NMEA sentence (message) into its meta data and the payload fields
@@ -1409,6 +1410,11 @@ bool NmeaCollectGsaGsv::AddGsaAndGsv(const std::vector<NmeaGsaPayload>& gsas, co
 
 bool NmeaCollectGsaGsv::AddGsa(const NmeaGsaPayload& gsa)
 {
+    if (gsa_sats_.size() > MAX_COLLECT) {
+        WARNING_THR(10000, "NmeaCollectGsaGsv: too many NMEA-Gx-GSA in epoch");
+        return false;
+    }
+
     // Collect all "satellites used" from GSA message. They have no numbering, so we have to rely on the user giving us
     // all messages.
     for (auto& gsa_sat : gsa.sats) {
@@ -1428,6 +1434,11 @@ bool NmeaCollectGsaGsv::AddGsa(const NmeaGsaPayload& gsa)
 
 bool NmeaCollectGsaGsv::AddGsv(const NmeaGsvPayload& gsv)
 {
+    if ((sats_.size() > MAX_COLLECT) || (sigs_.size() > MAX_COLLECT)) {
+        WARNING_THR(10000, "NmeaCollectGsaGsv: too many NMEA-Gx-GSV in epoch");
+        return false;
+    }
+
     // @todo: Add checks on expected sequence of messages maybe? We could use the msg_num and num_msgs fields and check
     //        that a set of messages for each GNSS was seen. Check for duplicate SVs, ...
 
