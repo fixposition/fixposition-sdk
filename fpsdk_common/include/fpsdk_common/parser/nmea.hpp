@@ -936,12 +936,11 @@ struct NmeaCollectGsaGsv
     std::vector<NmeaSat> gsa_sats_;  //!< Satellites used
 
     /**
-      * @brief Maximum number of entries to collect for any of sats_, sigs_ or gsa_sats_
-      *
-      * This is to prevent the memory usage growing over time if the user keeps adding data and never calls Complete().
-      * The value is large enough to cover the maximum number of satellits and signals a receiver will see. This should
-      * never be reached when the collector is used properly (by calling Complete() on end of epoch).
-      *
+     * @brief Maximum number of entries to collect for any of sats_, sigs_ or gsa_sats_
+     *
+     * This is to prevent the memory usage growing over time if the user keeps adding data and never calls Complete().
+     * The value is large enough to cover the maximum number of satellits and signals a receiver will see. This should
+     * never be reached when the collector is used properly (by calling Complete() on end of epoch).
      */
     static constexpr std::size_t MAX_COLLECT = 1000;
 };
