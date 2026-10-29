@@ -12,7 +12,12 @@
  */
 
 /* LIBC/STL */
+#include <cmath>
 #include <exception>
+#include <limits>
+#include <mutex>
+#include <string>
+#include <vector>
 
 /* EXTERNAL */
 #if FPSDK_USE_PROJ
@@ -236,7 +241,25 @@ Eigen::Vector3d LlhRadToDeg(const Eigen::Vector3d& llh_rad)
 }
 
 /* ****************************************************************************************************************** */
+
 #if FPSDK_USE_PROJ
+
+const char* CrsTypeStr(const CrsType type)
+{
+    switch (type) {  // clang-format off
+        case CrsType::UNKNOWN:       return "UNKNOWN";
+        case CrsType::GEOCENTRIC:    return "GEOCENTRIC";
+        case CrsType::GEOGRAPHIC_2D: return "GEOGRAPHIC_2D";
+        case CrsType::GEOGRAPHIC_3D: return "GEOGRAPHIC_3D";
+        case CrsType::PROJECTED:     return "PROJECTED";
+        case CrsType::VERTICAL:      return "VERTICAL";
+        case CrsType::COMPOUND:      return "COMPOUND";
+        case CrsType::OTHER:         return "OTHER";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
 
 Transformer::Transformer(const std::string& name) /* clang-format off */ :
     name_      { name },
@@ -248,6 +271,7 @@ Transformer::Transformer(const std::string& name) /* clang-format off */ :
 
 Transformer::~Transformer()
 {
+    std::unique_lock<std::mutex> lock(mutex_);
     if (pj_init_) {
         pj_init_ = false;
         proj_destroy((PJ*)pj_tf_);
@@ -270,75 +294,206 @@ static void ProjLogger(void* data, int level, const char* msg)
     }  // clang-format on
 }
 
-bool Transformer::Init(const std::string& source_crs, const std::string& target_crs)
+static const char* ProjErrorStr(PJ_CONTEXT* ctx, const char* fallback = "unknown error")
 {
+    const int err = proj_context_errno(ctx);
+    const char* err_str = (err != 0 ? proj_context_errno_string(ctx, err) : NULL);
+    return ((err_str != NULL) && (err_str[0] != '\0')) ? err_str : fallback;
+}
+
+static CrsType ProjTypeToCrsType(const PJ_TYPE type)
+{
+    switch (type) {  // clang-format off
+        case PJ_TYPE_UNKNOWN:            return CrsType::UNKNOWN;
+        case PJ_TYPE_GEOCENTRIC_CRS:     return CrsType::GEOCENTRIC;
+        case PJ_TYPE_GEOGRAPHIC_2D_CRS:  return CrsType::GEOGRAPHIC_2D;
+        case PJ_TYPE_GEOGRAPHIC_3D_CRS:  return CrsType::GEOGRAPHIC_3D;
+        case PJ_TYPE_PROJECTED_CRS:      return CrsType::PROJECTED;
+        case PJ_TYPE_VERTICAL_CRS:       return CrsType::VERTICAL;
+        case PJ_TYPE_COMPOUND_CRS:       return CrsType::COMPOUND;
+        default:                         return CrsType::OTHER;
+    }  // clang-format on
+}
+
+static CrsInfo GetCrsInfo(PJ_CONTEXT* ctx, const PJ* crs)
+{
+    CrsInfo info;
+    info.type_ = ProjTypeToCrsType(proj_get_type(crs));
+    const char* name = proj_get_name(crs);
+    info.name_ = (name != NULL ? name : "");
+    if (info.type_ == CrsType::COMPOUND) {
+        for (int ix = 0; true; ix++) {
+            PJ* sub_crs = proj_crs_get_sub_crs(ctx, crs, ix);
+            if (sub_crs == NULL) {
+                break;
+            }
+            info.sub_types_.push_back(ProjTypeToCrsType(proj_get_type(sub_crs)));
+            proj_destroy(sub_crs);
+        }
+    }
+    return info;
+}
+
+bool Transformer::Init(const std::string& source_crs, const std::string& target_crs, const TransformerOpts& opts)
+{
+    std::unique_lock<std::mutex> lock(mutex_);
     if (pj_init_) {
         return false;
     }
-    DEBUG("Transformer(%s) [%s] [%s]", name_.c_str(), source_crs.c_str(), target_crs.c_str());
+    DEBUG("Transformer(%s) [%s] [%s] precise=%s min_accuracy=%g normalize_axes=%s allow_network=%s area=%s",
+        name_.c_str(), source_crs.c_str(), target_crs.c_str(), opts.precise_ ? "true" : "false", opts.min_accuracy_,
+        opts.normalize_axes_ ? "true" : "false", opts.allow_network_ ? "true" : "false",
+        opts.area_
+            ? Sprintf("%g/%g/%g/%g", opts.area_->west_, opts.area_->south_, opts.area_->east_, opts.area_->north_)
+                  .c_str()
+            : "none");
 
     TRACE("Transformer(%s) create proj context", name_.c_str());
     PJ_CONTEXT* ctx = proj_context_create();
+    if (ctx == NULL) {
+        WARNING("Transformer(%s) failed creating PROJ context", name_.c_str());
+        return false;
+    }
 #  ifdef NDEBUG
     proj_log_level(ctx, PJ_LOG_DEBUG);
 #  else
     proj_log_level(ctx, PJ_LOG_TRACE);
 #  endif
     proj_log_func(ctx, (void*)name_.c_str(), ProjLogger);
+    if ((proj_context_set_enable_network(ctx, opts.allow_network_ ? 1 : 0) == 0) && opts.allow_network_) {
+        WARNING("Transformer(%s) PROJ has no network support", name_.c_str());
+    }
 
-    TRACE("Transformer(%s) create proj transformer", name_.c_str());
-    PJ* tf = proj_create_crs_to_crs(ctx, source_crs.c_str(), target_crs.c_str(), NULL);
-
-    if (tf == NULL) {
-        const int err = proj_context_errno(ctx);
-        const char* err_str = proj_context_errno_string(ctx, err);
-        WARNING("Transformer(%s) %s -> %s: %s", name_.c_str(), source_crs.c_str(), target_crs.c_str(), err_str);
+    // Source and target CRS
+    PJ* source = proj_create(ctx, source_crs.c_str());
+    if (source == NULL) {
+        WARNING("Transformer(%s) bad source CRS %s: %s", name_.c_str(), source_crs.c_str(), ProjErrorStr(ctx));
         proj_context_destroy(ctx);
         return false;
+    }
+    PJ* target = proj_create(ctx, target_crs.c_str());
+    if (target == NULL) {
+        WARNING("Transformer(%s) bad target CRS %s: %s", name_.c_str(), target_crs.c_str(), ProjErrorStr(ctx));
+        proj_destroy(source);
+        proj_context_destroy(ctx);
+        return false;
+    }
+    CrsInfo source_info = GetCrsInfo(ctx, source);
+    CrsInfo target_info = GetCrsInfo(ctx, target);
+
+    // Options for proj_create_crs_to_crs_from_pj()
+    std::vector<std::string> options;
+    if (opts.precise_) {
+        options.push_back("ALLOW_BALLPARK=NO");
+        options.push_back("ONLY_BEST=YES");
+    }
+    if (opts.min_accuracy_ > 0.0) {
+        options.push_back(Sprintf("ACCURACY=%.6f", opts.min_accuracy_));
+    }
+    std::vector<const char*> options_ptrs;
+    for (const auto& option : options) {
+        options_ptrs.push_back(option.c_str());
+    }
+    options_ptrs.push_back(NULL);
+
+    PJ_AREA* area = NULL;
+    if (opts.area_) {
+        area = proj_area_create();
+        proj_area_set_bbox(area, opts.area_->west_, opts.area_->south_, opts.area_->east_, opts.area_->north_);
+    }
+
+    TRACE("Transformer(%s) create proj transformer", name_.c_str());
+    PJ* tf = proj_create_crs_to_crs_from_pj(ctx, source, target, area, options_ptrs.data());
+    if (area != NULL) {
+        proj_area_destroy(area);
+    }
+    proj_destroy(source);
+    proj_destroy(target);
+
+    if (tf == NULL) {
+        WARNING("Transformer(%s) %s -> %s: %s", name_.c_str(), source_crs.c_str(), target_crs.c_str(),
+            ProjErrorStr(ctx, "no suitable operation"));
+        proj_context_destroy(ctx);
+        return false;
+    }
+    if (opts.precise_ && !proj_coordoperation_is_instantiable(ctx, tf)) {
+        WARNING("Transformer(%s) %s -> %s: operation not available (missing grids?)", name_.c_str(), source_crs.c_str(),
+            target_crs.c_str());
+        proj_destroy(tf);
+        proj_context_destroy(ctx);
+        return false;
+    }
+    if (opts.normalize_axes_) {
+        PJ* tf_norm = proj_normalize_for_visualization(ctx, tf);
+        proj_destroy(tf);
+        if (tf_norm == NULL) {
+            WARNING("Transformer(%s) %s -> %s: failed normalizing axes: %s", name_.c_str(), source_crs.c_str(),
+                target_crs.c_str(), ProjErrorStr(ctx));
+            proj_context_destroy(ctx);
+            return false;
+        }
+        tf = tf_norm;
     }
 
     pj_ctx_ = (void*)ctx;
     pj_tf_ = (void*)tf;
+    source_crs_ = source_info;
+    target_crs_ = target_info;
     pj_init_ = true;
     TRACE("Transformer(%s) init ok", name_.c_str());
     return true;
 }
 
-bool Transformer::Transform(const Eigen::Vector4d& in, Eigen::Vector4d& out, const bool inv)
+// ---------------------------------------------------------------------------------------------------------------------
+
+CrsInfo Transformer::SourceCrs() const
 {
-    if (pj_init_) {
-        const PJ_COORD src = { { in.x(), in.y(), in.z(), in.w() } };
-        const PJ_COORD dst = proj_trans((PJ*)pj_tf_, inv ? PJ_INV : PJ_FWD, src);
-        out.x() = dst.v[0];
-        out.y() = dst.v[1];
-        out.z() = dst.v[2];
-        out.w() = dst.v[3];
-        return true;
-    }
-    return false;
+    std::unique_lock<std::mutex> lock(mutex_);
+    return source_crs_;
 }
 
-bool Transformer::Transform(Eigen::Vector3d& inout, const bool inv)
+CrsInfo Transformer::TargetCrs() const
 {
-    if (pj_init_) {
-        const PJ_COORD src = { { inout.x(), inout.y(), inout.z(), std::numeric_limits<double>::infinity() } };
-        const PJ_COORD dst = proj_trans((PJ*)pj_tf_, inv ? PJ_INV : PJ_FWD, src);
-        inout.x() = dst.v[0];
-        inout.y() = dst.v[1];
-        inout.z() = dst.v[2];
-        return true;
-    }
-    return false;
+    std::unique_lock<std::mutex> lock(mutex_);
+    return target_crs_;
 }
 
-bool Transformer::Transform(const Eigen::Vector3d& in, Eigen::Vector3d& out, const bool inv)
+// ---------------------------------------------------------------------------------------------------------------------
+
+bool Transformer::_Transform(const Eigen::Vector4d& in, Eigen::Vector4d& out, const bool inv) const
 {
-    if (pj_init_) {
-        const PJ_COORD src = { { in.x(), in.y(), in.z(), std::numeric_limits<double>::infinity() } };
-        const PJ_COORD dst = proj_trans((PJ*)pj_tf_, inv ? PJ_INV : PJ_FWD, src);
-        out.x() = dst.v[0];
-        out.y() = dst.v[1];
-        out.z() = dst.v[2];
+    std::unique_lock<std::mutex> lock(mutex_);
+    if (!pj_init_) {
+        return false;
+    }
+    PJ* tf = (PJ*)pj_tf_;
+    proj_errno_reset(tf);
+    const PJ_COORD src = { { in.x(), in.y(), in.z(), in.w() } };
+    const PJ_COORD dst = proj_trans(tf, inv ? PJ_INV : PJ_FWD, src);
+    const int err = proj_errno(tf);
+    if ((err != 0) || !std::isfinite(dst.v[0]) || !std::isfinite(dst.v[1]) || !std::isfinite(dst.v[2])) {
+        TRACE("Transformer(%s) transform failed: %s", name_.c_str(), err != 0 ? proj_errno_string(err) : "bad result");
+        return false;
+    }
+    out = { dst.v[0], dst.v[1], dst.v[2], dst.v[3] };
+    return true;
+}
+
+bool Transformer::Transform(const Eigen::Vector4d& in, Eigen::Vector4d& out, const bool inv) const
+{
+    return _Transform(in, out, inv);
+}
+
+bool Transformer::Transform(Eigen::Vector3d& inout, const bool inv) const
+{
+    return Transform(inout, inout, inv);
+}
+
+bool Transformer::Transform(const Eigen::Vector3d& in, Eigen::Vector3d& out, const bool inv) const
+{
+    Eigen::Vector4d out4;
+    if (_Transform({ in.x(), in.y(), in.z(), std::numeric_limits<double>::infinity() }, out4, inv)) {
+        out = out4.head<3>();
         return true;
     }
     return false;
