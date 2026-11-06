@@ -42,14 +42,12 @@ services:
     trixie-dev:
         image: ghcr.io/fixposition/fixposition-sdk:trixie-dev
         volumes:
-            # Bash config
-            - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
-            - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
-            # Persistent stuff
-            - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
-            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
-            - ../.devcontainer/.claude:/home/fpsdk/.claude
-            - ../.devcontainer/.local:/home/fpsdk/.local
+            # Persistent stuff, see .devcontainer/helper.sh
+            - ../.devcontainer/.persist/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.devcontainer/.persist/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.persist/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.persist/.claude.json:/home/fpsdk/.claude.json
+            - ../.devcontainer/.persist/.local:/home/fpsdk/.local
             # Workspace
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
@@ -93,12 +91,11 @@ services:
     noetic-dev:
         image: ghcr.io/fixposition/fixposition-sdk:noetic-dev
         volumes:
-            - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
-            - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
-            - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
-            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
-            - ../.devcontainer/.claude:/home/fpsdk/.claude
-            - ../.devcontainer/.local:/home/fpsdk/.local
+            - ../.devcontainer/.persist/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.devcontainer/.persist/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.persist/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.persist/.claude.json:/home/fpsdk/.claude.json
+            - ../.devcontainer/.persist/.local:/home/fpsdk/.local
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
             - SYS_PTRACE
@@ -140,12 +137,11 @@ services:
     humble-dev:
         image: ghcr.io/fixposition/fixposition-sdk:humble-dev
         volumes:
-            - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
-            - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
-            - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
-            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
-            - ../.devcontainer/.claude:/home/fpsdk/.claude
-            - ../.devcontainer/.local:/home/fpsdk/.local
+            - ../.devcontainer/.persist/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.devcontainer/.persist/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.persist/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.persist/.claude.json:/home/fpsdk/.claude.json
+            - ../.devcontainer/.persist/.local:/home/fpsdk/.local
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
             - SYS_PTRACE
@@ -184,12 +180,11 @@ services:
     jazzy-dev:
         image: ghcr.io/fixposition/fixposition-sdk:jazzy-dev
         volumes:
-            - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
-            - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
-            - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
-            - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
-            - ../.devcontainer/.claude:/home/fpsdk/.claude
-            - ../.devcontainer/.local:/home/fpsdk/.local
+            - ../.devcontainer/.persist/.bash_history.d:/home/fpsdk/.bash_history.d
+            - ../.devcontainer/.persist/.vscode-server:/home/fpsdk/.vscode-server
+            - ../.devcontainer/.persist/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.persist/.claude.json:/home/fpsdk/.claude.json
+            - ../.devcontainer/.persist/.local:/home/fpsdk/.local
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:
             - SYS_PTRACE
@@ -228,11 +223,10 @@ services:
     lyrical-dev:
         image: ghcr.io/fixposition/fixposition-sdk:lyrical-dev
         volumes:
-            - ../.devcontainer/.bashrc:/home/fpsdk/.bashrc
-            - ../.devcontainer/.bash_logout:/home/fpsdk/.bash_logout
             - ../.devcontainer/.bash_history.d:/home/fpsdk/.bash_history.d
             - ../.devcontainer/.vscode-server:/home/fpsdk/.vscode-server
             - ../.devcontainer/.claude:/home/fpsdk/.claude
+            - ../.devcontainer/.claude.json:/home/fpsdk/.claude.json
             - ../.devcontainer/.local:/home/fpsdk/.local
             - ../.:/home/fpsdk/fixposition-sdk
         cap_add:

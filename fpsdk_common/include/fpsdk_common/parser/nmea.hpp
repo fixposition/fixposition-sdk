@@ -306,29 +306,55 @@ enum class NmeaStatusGllRmc : int
 const char* NmeaStatusGllRmcStr(const NmeaStatusGllRmc status);
 
 /**
- * @brief NMEA-Gx-GLL and NMEA-Gx-VTG pos mode
+ * @brief NMEA-Gx-GLL pos mode
  *
  * @note Do not use <, >, >=, <= operators on this!
  */
-enum class NmeaModeGllVtg : int
+enum class NmeaModeGll : int
 {  // clang-format off
     UNSPECIFIED = '!',  //!< Unspecified
-    INVALID     = 'N',  //!< Invalid (no fix)
     AUTONOMOUS  = 'A',  //!< Autonomous mode (SPP)
     DGNSS       = 'D',  //!< Differential GNSS fix
     ESTIMATED   = 'E',  //!< Estimated (dead reckoning only)
     MANUAL      = 'M',  //!< Manual input mode
     SIM         = 'S',  //!< Simulator mode
+    INVALID     = 'N',  //!< Invalid (no fix)
 };  // clang-format on
 
 /**
- * @brief Stringify NMEA-Gx-GLL and NMEA-Gx-VTG pos mode
+ * @brief Stringify NMEA-Gx-GLL pos mode
  *
- * @param[in]  mode  The NMEA-Gx-GLL and NMEA-Gx-VTG pos mode
+ * @param[in]  mode  The NMEA-Gx-GLL pos mode
  *
  * @returns the stringification of the NMEA-Gx-GLL and NMEA-Gx-VTG pos mode
  */
-const char* NmeaModeGllVtgStr(const NmeaModeGllVtg mode);
+const char* NmeaModeGllStr(const NmeaModeGll mode);
+
+/**
+ * @brief NMEA-Gx-VTG pos mode
+ *
+ * @note Do not use <, >, >=, <= operators on this!
+ */
+enum class NmeaModeVtg : int
+{  // clang-format off
+    UNSPECIFIED = '!',  //!< Unspecified
+    AUTONOMOUS  = 'A',  //!< Autonomous mode (SPP)
+    DGNSS       = 'D',  //!< Differential GNSS fix
+    ESTIMATED   = 'E',  //!< Estimated (dead reckoning only)
+    MANUAL      = 'M',  //!< Manual input mode
+    INVALID     = 'N',  //!< Invalid (no fix)
+    PRECISE     = 'P',  //!< Precise (e.g. PPP)
+    SIM         = 'S',  //!< Simulator mode
+};  // clang-format on
+
+/**
+ * @brief Stringify NMEA-Gx-VTG pos mode
+ *
+ * @param[in]  mode  The NMEA-Gx-VTG pos mode
+ *
+ * @returns the stringification of the NMEA-Gx-GLL and NMEA-Gx-VTG pos mode
+ */
+const char* NmeaModeVtgStr(const NmeaModeVtg mode);
 
 /**
  * @brief NMEA-Gx-RMC and NMEA-Gx-GNS pos mode
@@ -675,7 +701,7 @@ struct NmeaGllPayload : public NmeaPayload
     NmeaLlh ll;                                               //!< Position (no height)
     NmeaTime time;                                            //!< Time
     NmeaStatusGllRmc status = NmeaStatusGllRmc::UNSPECIFIED;  //!< Positioning system status
-    NmeaModeGllVtg mode = NmeaModeGllVtg::UNSPECIFIED;        //!< Positioning system mode
+    NmeaModeGll mode = NmeaModeGll::UNSPECIFIED;              //!< Positioning system mode
 
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
@@ -706,11 +732,11 @@ struct NmeaRmcPayload : public NmeaPayload
  */
 struct NmeaVtgPayload : public NmeaPayload
 {
-    NmeaFloat cogt;  //!< Course over ground (true) [deg]
-    NmeaFloat cogm;  //!< Course over ground (magnetic) [deg], not typically available
-    NmeaFloat sogn;  //!< Speed over ground [knots]
-    NmeaFloat sogk;  //!< Speed over ground [km/h]
-    NmeaModeGllVtg mode = NmeaModeGllVtg::UNSPECIFIED;  //!< Positioning system mode
+    NmeaFloat cogt;                               //!< Course over ground (true) [deg]
+    NmeaFloat cogm;                               //!< Course over ground (magnetic) [deg], not typically available
+    NmeaFloat sogn;                               //!< Speed over ground [knots]
+    NmeaFloat sogk;                               //!< Speed over ground [km/h]
+    NmeaModeVtg mode = NmeaModeVtg::UNSPECIFIED;  //!< Positioning system mode
 
     bool SetFromMsg(const uint8_t* msg, const std::size_t msg_size) final;
 
@@ -833,6 +859,11 @@ inline NmeaPayloadPtr NmeaDecodeMessage(const std::vector<uint8_t>& msg)
 
 /**
  * @brief Collector for NMEA-Gx-GSA and NMEA-Gx-GPA
+ *
+ * Note that the user is responsible to call Complete() on every end of epoch. This collector by itself has no means to
+ * determine start or end of epoch. If Complete() is not called, the Add...() methods refuse to collect more data after
+ * a certain threshold (see MAX_COLLECT below) and fail. This is to prevent memory growing forever if Complete() is not
+ * called appropriately.
  */
 struct NmeaCollectGsaGsv
 {
@@ -903,6 +934,15 @@ struct NmeaCollectGsaGsv
 
    private:
     std::vector<NmeaSat> gsa_sats_;  //!< Satellites used
+
+    /**
+     * @brief Maximum number of entries to collect for any of sats_, sigs_ or gsa_sats_
+     *
+     * This is to prevent the memory usage growing over time if the user keeps adding data and never calls Complete().
+     * The value is large enough to cover the maximum number of satellits and signals a receiver will see. This should
+     * never be reached when the collector is used properly (by calling Complete() on end of epoch).
+     */
+    static constexpr std::size_t MAX_COLLECT = 1000;
 };
 
 /* ****************************************************************************************************************** */

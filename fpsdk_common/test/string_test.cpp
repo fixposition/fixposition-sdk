@@ -768,6 +768,25 @@ TEST(StringTest, Base64)
         const auto data2 = Base64Dec(str);
         EXPECT_EQ(data, data2);
     }
+    // All padding variants
+    for (const auto& [plain, enc] : std::vector<std::pair<std::string, std::string>>{
+             { "", "" }, { "a", "YQ==" }, { "ab", "YWI=" }, { "abc", "YWJj" }, { "abcd", "YWJjZA==" } }) {
+        SCOPED_TRACE(plain);
+        const std::vector<uint8_t> data = StrToBuf(plain);
+        const auto str = Base64Enc(data);
+        EXPECT_EQ(str, enc);
+        const auto data2 = Base64Dec(str);
+        EXPECT_EQ(data, data2);
+    }
+    // Longer data, all byte values, length multiple of 3
+    {
+        std::vector<uint8_t> data;
+        for (int ix = 0; ix < (3 * 256); ix++) {
+            data.push_back(ix % 256);
+        }
+        const auto data2 = Base64Dec(Base64Enc(data));
+        EXPECT_EQ(data, data2);
+    }
 }
 
 /* ****************************************************************************************************************** */

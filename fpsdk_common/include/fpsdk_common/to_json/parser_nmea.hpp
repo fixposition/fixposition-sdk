@@ -45,9 +45,14 @@ inline void to_json(nlohmann::json& j, const NmeaStatusGllRmc e)
     j = NmeaStatusGllRmcStr(e);
 }
 
-inline void to_json(nlohmann::json& j, const NmeaModeGllVtg e)
+inline void to_json(nlohmann::json& j, const NmeaModeGll e)
 {
-    j = NmeaModeGllVtgStr(e);
+    j = NmeaModeGllStr(e);
+}
+
+inline void to_json(nlohmann::json& j, const NmeaModeVtg e)
+{
+    j = NmeaModeVtgStr(e);
 }
 
 inline void to_json(nlohmann::json& j, const NmeaModeRmcGns e)

@@ -164,6 +164,10 @@ const char* SigCorrStr(const SigCorr corr)
         case SigCorr::RTCM3_SSR:  return "RTCM3_SSR";
         case SigCorr::QZSS_SLAS:  return "QZSS_SLAS";
         case SigCorr::SPARTN:     return "SPARTN";
+        case SigCorr::CLAS:       return "CLAS";
+        case SigCorr::LPP_OSR:    return "LPP_OSR";
+        case SigCorr::LPP_SSR:    return "LPP_SSR";
+        case SigCorr::GAL_HAS:    return "GAL_HAS";
         }  // clang-format on
     return "?";
 }
@@ -588,16 +592,31 @@ FixType NmeaModeRmcGnsToFixType(const parser::nmea::NmeaModeRmcGns mode)
     return FixType::UNKNOWN;
 }
 
-FixType NmeaModeGllVtgToFixType(const parser::nmea::NmeaModeGllVtg mode)
+FixType NmeaModeGllToFixType(const parser::nmea::NmeaModeGll mode)
 {
     switch (mode) {  // clang-format off
-        case parser::nmea::NmeaModeGllVtg::INVALID:     /* FALLTHROUGH */
-        case parser::nmea::NmeaModeGllVtg::MANUAL:      return FixType::NOFIX;
-        case parser::nmea::NmeaModeGllVtg::AUTONOMOUS:  /* FALLTHROUGH */
-        case parser::nmea::NmeaModeGllVtg::DGNSS:       /* FALLTHROUGH */
-        case parser::nmea::NmeaModeGllVtg::SIM:         return FixType::SPP_3D;
-        case parser::nmea::NmeaModeGllVtg::ESTIMATED:   return FixType::DRONLY;
-        case parser::nmea::NmeaModeGllVtg::UNSPECIFIED: break;
+        case parser::nmea::NmeaModeGll::INVALID:     /* FALLTHROUGH */
+        case parser::nmea::NmeaModeGll::MANUAL:      return FixType::NOFIX;
+        case parser::nmea::NmeaModeGll::AUTONOMOUS:  /* FALLTHROUGH */
+        case parser::nmea::NmeaModeGll::DGNSS:       /* FALLTHROUGH */
+        case parser::nmea::NmeaModeGll::SIM:         return FixType::SPP_3D;
+        case parser::nmea::NmeaModeGll::ESTIMATED:   return FixType::DRONLY;
+        case parser::nmea::NmeaModeGll::UNSPECIFIED: break;
+    }  // clang-format on
+    return FixType::UNKNOWN;
+}
+
+FixType NmeaModeVtgToFixType(const parser::nmea::NmeaModeVtg mode)
+{
+    switch (mode) {  // clang-format off
+        case parser::nmea::NmeaModeVtg::INVALID:     /* FALLTHROUGH */
+        case parser::nmea::NmeaModeVtg::MANUAL:      return FixType::NOFIX;
+        case parser::nmea::NmeaModeVtg::AUTONOMOUS:  /* FALLTHROUGH */
+        case parser::nmea::NmeaModeVtg::DGNSS:       /* FALLTHROUGH */
+        case parser::nmea::NmeaModeVtg::PRECISE:     /* FALLTHROUGH */
+        case parser::nmea::NmeaModeVtg::SIM:         return FixType::SPP_3D;
+        case parser::nmea::NmeaModeVtg::ESTIMATED:   return FixType::DRONLY;
+        case parser::nmea::NmeaModeVtg::UNSPECIFIED: break;
     }  // clang-format on
     return FixType::UNKNOWN;
 }

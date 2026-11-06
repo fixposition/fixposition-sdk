@@ -202,6 +202,10 @@ enum class SigCorr : uint8_t
     RTCM3_SSR,    //!< RTCM v3.x SSR type RTK corrections available
     QZSS_SLAS,    //!< QZSS SLAS corrections available
     SPARTN,       //!< SPARTN corrections available
+    CLAS,         //!< QZSS centimeter-level augmentation service (CLAS) corrections available
+    LPP_OSR,      //!< LTE positioning protocol (LPP) OSR type corrections available
+    LPP_SSR,      //!< LTE positioning protocol (LPP) SSR type corrections available
+    GAL_HAS,      //!< Galileo high-accurcy service (HAS) corrections available
 };
 
 /**
@@ -564,13 +568,22 @@ FixType NmeaQualityGgaToFixType(const parser::nmea::NmeaQualityGga quality);
 FixType NmeaModeRmcGnsToFixType(const parser::nmea::NmeaModeRmcGns mode);
 
 /**
+ * @brief Convert NMEA GLL mode to fix type
+ *
+ * @param[in]  mode  NMEA GLL mode
+ *
+ * @returns the fix type corresponding to the mode
+ */
+FixType NmeaModeGllToFixType(const parser::nmea::NmeaModeGll mode);
+
+/**
  * @brief Convert NMEA GLL/VTG mode to fix type
  *
  * @param[in]  mode  NMEA GLL/VTG mode
  *
  * @returns the fix type corresponding to the mode
  */
-FixType NmeaModeGllVtgToFixType(const parser::nmea::NmeaModeGllVtg mode);
+FixType NmeaModeVtgToFixType(const parser::nmea::NmeaModeVtg mode);
 
 /**
  * @brief Convert NMEA system ID and satellite number to satellite

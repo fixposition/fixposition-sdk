@@ -431,7 +431,7 @@ TEST(ParserNmeaTest, NmeaGllPayload)
         EXPECT_FALSE(gll.ll.height_valid);
         EXPECT_NEAR(gll.ll.height, 0.0, 1e-9);
         EXPECT_EQ(gll.status, NmeaStatusGllRmc::VALID);
-        EXPECT_EQ(gll.mode, NmeaModeGllVtg::DGNSS);
+        EXPECT_EQ(gll.mode, NmeaModeGll::DGNSS);
     }
     {
         NmeaGllPayload gll;
@@ -450,7 +450,7 @@ TEST(ParserNmeaTest, NmeaGllPayload)
         EXPECT_FALSE(gll.ll.height_valid);
         EXPECT_EQ(gll.ll.height, 0.0);
         EXPECT_EQ(gll.status, NmeaStatusGllRmc::INVALID);
-        EXPECT_EQ(gll.mode, NmeaModeGllVtg::INVALID);
+        EXPECT_EQ(gll.mode, NmeaModeGll::INVALID);
     }
 }
 
@@ -592,6 +592,7 @@ TEST(ParserNmeaTest, NmeaVtgPayload)
         EXPECT_NEAR(vtg.sogn.value, 0.015, 1e-6);
         EXPECT_TRUE(vtg.sogk.valid);
         EXPECT_NEAR(vtg.sogk.value, 0.027, 1e-6);
+        EXPECT_EQ(vtg.mode, NmeaModeVtg::DGNSS);
     }
     {
         NmeaVtgPayload vtg;
@@ -608,6 +609,7 @@ TEST(ParserNmeaTest, NmeaVtgPayload)
         EXPECT_EQ(vtg.sogn.value, 0.0);
         EXPECT_FALSE(vtg.sogk.valid);
         EXPECT_EQ(vtg.sogk.value, 0.0);
+        EXPECT_EQ(vtg.mode, NmeaModeVtg::INVALID);
     }
 }
 

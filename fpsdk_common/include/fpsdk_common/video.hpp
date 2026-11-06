@@ -75,7 +75,7 @@ enum class PixelFmt : int
     UNSPECIFIED = 0,  //!< Invalid
     Y8,               //!< Planar Y (greyscale), 8bpp         (= FFmpeg AV_PIX_FMT_GRAY8)
     RGB24,            //!< Packed RGB 8:8:8, 24bpp, RGBRGB... (= FFmpeg AV_PIX_FMT_RGB24)
-    GBRP,  //!< Planar GBR, 24bpp  [R][R][R]...[G][G][G]...[B][B][B]... (~ FFmpeg AV_PIX_FMT_GBRP/AV_PIX_FMT_GBR24P)
+    GBRP,  //!< Planar GBR, 24bpp  [G][G][G]...[B][B][B]...[R][R][R]... (~ FFmpeg AV_PIX_FMT_GBRP/AV_PIX_FMT_GBR24P)
 };
 
 /**

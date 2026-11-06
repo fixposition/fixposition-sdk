@@ -25,6 +25,14 @@ ENTRYPOINT []
 COPY docker/scripts/install_apt_base.sh /tmp
 RUN /tmp/install_apt_base.sh && rm -f /tmp/install_apt_base.sh
 
+# Set timezone, sane language and locale
+ENV TZ=Europe/Zurich
+ENV LANG=en_GB.UTF-8
+ENV LANGUAGE=en_GB
+ENV LC_ALL=C.UTF-8
+COPY docker/scripts/install_locales.sh /tmp
+RUN /tmp/install_locales.sh && rm -f /tmp/install_locales.sh
+
 # Download, build and install FFmpeg libraries (LGPL)
 COPY docker/scripts/install_ffmpeg.sh /tmp
 RUN /tmp/install_ffmpeg.sh && rm -f /tmp/install_ffmpeg.sh

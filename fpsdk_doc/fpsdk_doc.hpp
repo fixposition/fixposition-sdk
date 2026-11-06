@@ -24,7 +24,10 @@ namespace fpsdk {
 /*!
     @mainpage
 
+    @image html logo.png
+
     @section FPSDK_OVERVIEW Overview
+
 
     The Fixposition SDK provides building blocks to write apps to use with Fixposition products, namely the Vision-RTK 2
     sensor. Some apps to test and demponstrate some of the functionality are included. Some examples are provided to

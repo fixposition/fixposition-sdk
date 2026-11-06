@@ -25,6 +25,7 @@
 /* EXTERNAL */
 
 /* PACKAGE */
+#include "fpsdk_common/logging.hpp"
 #include "fpsdk_common/math.hpp"
 #include "fpsdk_common/parser/nmea.hpp"
 #include "fpsdk_common/parser/types.hpp"
@@ -284,16 +285,33 @@ const char* NmeaStatusGllRmcStr(const NmeaStatusGllRmc status)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-const char* NmeaModeGllVtgStr(const NmeaModeGllVtg mode)
+const char* NmeaModeGllStr(const NmeaModeGll mode)
 {
     switch (mode) {  // clang-format off
-        case NmeaModeGllVtg::UNSPECIFIED: return "UNSPECIFIED";
-        case NmeaModeGllVtg::INVALID:     return "INVALID";
-        case NmeaModeGllVtg::AUTONOMOUS:  return "AUTONOMOUS";
-        case NmeaModeGllVtg::DGNSS:       return "DGNSS";
-        case NmeaModeGllVtg::ESTIMATED:   return "ESTIMATED";
-        case NmeaModeGllVtg::MANUAL:      return "MANUAL";
-        case NmeaModeGllVtg::SIM:         return "SIM";
+        case NmeaModeGll::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaModeGll::AUTONOMOUS:  return "AUTONOMOUS";
+        case NmeaModeGll::DGNSS:       return "DGNSS";
+        case NmeaModeGll::ESTIMATED:   return "ESTIMATED";
+        case NmeaModeGll::MANUAL:      return "MANUAL";
+        case NmeaModeGll::SIM:         return "SIM";
+        case NmeaModeGll::INVALID:     return "INVALID";
+    }  // clang-format on
+    return "?";
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+const char* NmeaModeVtgStr(const NmeaModeVtg mode)
+{
+    switch (mode) {  // clang-format off
+        case NmeaModeVtg::UNSPECIFIED: return "UNSPECIFIED";
+        case NmeaModeVtg::AUTONOMOUS:  return "AUTONOMOUS";
+        case NmeaModeVtg::DGNSS:       return "DGNSS";
+        case NmeaModeVtg::ESTIMATED:   return "ESTIMATED";
+        case NmeaModeVtg::MANUAL:      return "MANUAL";
+        case NmeaModeVtg::INVALID:     return "INVALID";
+        case NmeaModeVtg::PRECISE:     return "PRECISE";
+        case NmeaModeVtg::SIM:         return "SIM";
     }  // clang-format on
     return "?";
 }
@@ -483,9 +501,9 @@ static bool StrToInt(const std::string& str, int32_t& value)
 
 // Debug prints, for development
 #if 0
-#  define NMEA_TRACE(fmt, ...) fprintf(stderr, fmt "\n", ##__VA_ARGS__)
+#  define NMEA_TRACE(...) TRACE(__VA_ARGS__)
 #else
-#  define NMEA_TRACE(fmt, ...) /* nothing */
+#  define NMEA_TRACE(...) /* nothing */
 #endif
 
 // Split NMEA sentence (message) into its meta data and the payload fields
@@ -746,24 +764,46 @@ static bool GetStatusGllRmc(NmeaStatusGllRmc& status, const std::string& field)
     return ok;
 }
 
-// Get GLL/VTG mode flag
-static bool GetModeGllVtg(NmeaModeGllVtg& mode, const std::string& field)
+// Get GLL mode flag
+static bool GetModeGll(NmeaModeGll& mode, const std::string& field)
 {
     bool ok = true;
     if (!field.empty()) {
-        switch ((NmeaModeGllVtg)field[0]) {  // clang-format off
-            case NmeaModeGllVtg::INVALID:      mode = NmeaModeGllVtg::INVALID;     break;
-            case NmeaModeGllVtg::AUTONOMOUS:   mode = NmeaModeGllVtg::AUTONOMOUS;  break;
-            case NmeaModeGllVtg::DGNSS:        mode = NmeaModeGllVtg::DGNSS;       break;
-            case NmeaModeGllVtg::ESTIMATED:    mode = NmeaModeGllVtg::ESTIMATED;   break;
-            case NmeaModeGllVtg::MANUAL:       mode = NmeaModeGllVtg::MANUAL;      break;
-            case NmeaModeGllVtg::SIM:          mode = NmeaModeGllVtg::SIM;         break;
-            case NmeaModeGllVtg::UNSPECIFIED:  ok = false; break;
+        switch ((NmeaModeGll)field[0]) {  // clang-format off
+            case NmeaModeGll::AUTONOMOUS:   mode = NmeaModeGll::AUTONOMOUS;  break;
+            case NmeaModeGll::DGNSS:        mode = NmeaModeGll::DGNSS;       break;
+            case NmeaModeGll::ESTIMATED:    mode = NmeaModeGll::ESTIMATED;   break;
+            case NmeaModeGll::MANUAL:       mode = NmeaModeGll::MANUAL;      break;
+            case NmeaModeGll::SIM:          mode = NmeaModeGll::SIM;         break;
+            case NmeaModeGll::INVALID:      mode = NmeaModeGll::INVALID;     break;
+            case NmeaModeGll::UNSPECIFIED:  ok = false; break;
         }  // clang-format on
     } else {
         ok = false;
     }
-    NMEA_TRACE("GetModeGllVtg(\"%s\")=%s mode=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(mode));
+    NMEA_TRACE("GetModeGll(\"%s\")=%s mode=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(mode));
+    return ok;
+}
+
+// Get VTG mode flag
+static bool GetModeVtg(NmeaModeVtg& mode, const std::string& field)
+{
+    bool ok = true;
+    if (!field.empty()) {
+        switch ((NmeaModeVtg)field[0]) {  // clang-format off
+            case NmeaModeVtg::AUTONOMOUS:   mode = NmeaModeVtg::AUTONOMOUS;  break;
+            case NmeaModeVtg::DGNSS:        mode = NmeaModeVtg::DGNSS;       break;
+            case NmeaModeVtg::ESTIMATED:    mode = NmeaModeVtg::ESTIMATED;   break;
+            case NmeaModeVtg::MANUAL:       mode = NmeaModeVtg::MANUAL;      break;
+            case NmeaModeVtg::INVALID:      mode = NmeaModeVtg::INVALID;     break;
+            case NmeaModeVtg::PRECISE:      mode = NmeaModeVtg::PRECISE;     break;
+            case NmeaModeVtg::SIM:          mode = NmeaModeVtg::SIM;         break;
+            case NmeaModeVtg::UNSPECIFIED:  ok = false; break;
+        }  // clang-format on
+    } else {
+        ok = false;
+    }
+    NMEA_TRACE("GetModeVtg(\"%s\")=%s mode=%c", field.c_str(), string::ToStr(ok), types::EnumToVal(mode));
     return ok;
 }
 
@@ -1062,9 +1102,8 @@ bool NmeaGllPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
     bool ok = false;
     NmeaParts m;
     if (GetParts(m, FORMATTER, msg, msg_size) && GetTalker(talker_, m.meta_.talker_) && (m.fields_.size() == 7)) {
-        ok = (GetTime(time, m.fields_[4]) && GetStatusGllRmc(status, m.fields_[5]) &&
-              GetModeGllVtg(mode, m.fields_[6]) &&
-              GetLlh(ll, m.fields_, 0, 2, -1, -1, mode != NmeaModeGllVtg::INVALID));
+        ok = (GetTime(time, m.fields_[4]) && GetStatusGllRmc(status, m.fields_[5]) && GetModeGll(mode, m.fields_[6]) &&
+              GetLlh(ll, m.fields_, 0, 2, -1, -1, mode != NmeaModeGll::INVALID));
     }
     NMEA_TRACE("NmeaGllPayload %s", string::ToStr(ok));
     valid_ = ok;
@@ -1109,7 +1148,7 @@ bool NmeaVtgPayload::SetFromMsg(const uint8_t* msg, const std::size_t msg_size)
         // Ignore magnetic course fields_[2] and fields_[3]
         ok = (GetTalker(talker_, m.meta_.talker_) && (m.fields_[1] == "T") && GetFloat(cogt, m.fields_[0], false) &&
               (m.fields_[5] == "N") && GetFloat(sogn, m.fields_[4], false) && (m.fields_[7] == "K") &&
-              GetFloat(sogk, m.fields_[6], false) && GetModeGllVtg(mode, m.fields_[8]));
+              GetFloat(sogk, m.fields_[6], false) && GetModeVtg(mode, m.fields_[8]));
     }
     NMEA_TRACE("NmeaVtgPayload %s", string::ToStr(ok));
     valid_ = ok;
@@ -1371,6 +1410,11 @@ bool NmeaCollectGsaGsv::AddGsaAndGsv(const std::vector<NmeaGsaPayload>& gsas, co
 
 bool NmeaCollectGsaGsv::AddGsa(const NmeaGsaPayload& gsa)
 {
+    if (gsa_sats_.size() > MAX_COLLECT) {
+        WARNING_THR(10000, "NmeaCollectGsaGsv: too many NMEA-Gx-GSA in epoch");
+        return false;
+    }
+
     // Collect all "satellites used" from GSA message. They have no numbering, so we have to rely on the user giving us
     // all messages.
     for (auto& gsa_sat : gsa.sats) {
@@ -1390,6 +1434,11 @@ bool NmeaCollectGsaGsv::AddGsa(const NmeaGsaPayload& gsa)
 
 bool NmeaCollectGsaGsv::AddGsv(const NmeaGsvPayload& gsv)
 {
+    if ((sats_.size() > MAX_COLLECT) || (sigs_.size() > MAX_COLLECT)) {
+        WARNING_THR(10000, "NmeaCollectGsaGsv: too many NMEA-Gx-GSV in epoch");
+        return false;
+    }
+
     // @todo: Add checks on expected sequence of messages maybe? We could use the msg_num and num_msgs fields and check
     //        that a set of messages for each GNSS was seen. Check for duplicate SVs, ...
 
