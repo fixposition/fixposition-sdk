@@ -1,8 +1,10 @@
 name: docker
 
 on:
-    # We build this only by manually triggering this job from the actions tab
+    # Manual start, or weekly to get the latest base images
     workflow_dispatch:
+    schedule:  # applies to default branch only
+        - cron: "17 19 * * 0"  # Sundays 19:17 UTC
 
 # Splitting into separate jobs to make stuff build in parallel (on multiple runners)
 jobs:
