@@ -746,6 +746,13 @@ CamData::CamData(const FplMessage& log_msg)
         type_ = CamDataTypeFromValOr(meta.type_, cam::CamDataType::UNSPECIFIED);
         fmt_ = CamDataFmtFromValOr(meta.fmt_, cam::CamDataFmt::UNSPECIFIED);
         frm_ = CamDataFrmFromValOr(meta.frm_, cam::CamDataFrm::UNSPECIFIED);
+        // Assume an old .fpl file from a in-development sensor software that didn't yet have the frm_ in the meta data.
+        // That sofware's recordings _should_ be all-I-frames. If this turns out to be too otimistic, we'll have to look
+        // at data_ and check what kind of NALUs it contains. For an fpl file where this assumption fails, the
+        // extraction (of camera data) will fail.
+        if ((frm_ == cam::CamDataFrm::UNSPECIFIED) && (meta.frm_ == 0) && (fmt_ == cam::CamDataFmt::H265_NAL)) {
+            frm_ = cam::CamDataFrm::I_FRAME;
+        }
         seq_ = meta.seq_;
         ts_ = meta.ts_;
         dt_ = meta.dt_;
