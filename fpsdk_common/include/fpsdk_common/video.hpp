@@ -9,13 +9,61 @@
  *
  * @file
  * @brief Fixposition SDK: Video frame decoding
- *
+ */
+// clang-format off
+/**
  * @page FPSDK_COMMON_VIDEO Video frame decoding
  *
  * **API**: fpsdk_common/video.hpp and fpsdk::common::video
  *
  * @note This is only available if compiled with FFmpeg, see @ref FPSDK_BUILD_DEPS.
+ *
+ * @section FPSDK_COMMON_VIDEO_HWACCEL Hardware vs. software decoding
+ *
+ * Hardware decoding (fpsdk::common::video::HwAccel::HW, currently VA-API) is not necessarily faster than software
+ * decoding (fpsdk::common::video::HwAccel::SW). The following are wall-clock times for "fpltool extract" of a 32 s
+ * recording with two cameras (H.265, 1024x768, 25 fps, 10 frames per GOP, 1547 frames in total) decoded to RGB24
+ * (a 3.5 GB ROS1 bag), using different numbers of parallel decoders (-j). Measured on an AMD Ryzen 7 PRO 8840HS
+ * (8 cores, 16 threads) with Radeon 780M graphics, FFmpeg 7.1, Release build, median of three runs:
+ *
+ * | Decoders | -e jsonl,raw,file,ros,cam -a SW | -e jsonl,raw,file,ros,cam -a HW | -e ros,cam -a SW | -e ros,cam -a HW |
+ * |----------|---------------------------------|---------------------------------|------------------|------------------|
+ * | -j 1     | 5.3 s                           | 5.9 s                           | 4.4 s            | 5.7 s            |
+ * | -j 2     | 4.7 s                           | 5.8 s                           | 4.7 s            | 6.2 s            |
+ * | -j 4     | 4.2 s                           | 6.1 s                           | 4.2 s            | 5.6 s            |
+ * | -j 8     | 4.2 s                           | 6.5 s                           | 4.0 s            | 5.5 s            |
+ *
+ * The following are decoding rates (average frames per second, fps) measured with a test program that only decodes
+ * (VideoFrameDecoder::DecodeFrame()) on the same machine, for the first 100 frames (10 I frames, 90 P frames) of a
+ * camera recording (H.265, 1024x768) decoded to RGB24, 10 repetitions. In "indep" mode each of the -j decoders decodes all
+ * frames (that is, -j times the work). In "gop" mode each GOP is decoded by a new decoder and the GOPs are distributed
+ * to the -j decoder threads, which is what "fpltool extract" does (with 11 GOPs this mode stops scaling at about -j 5):
+ *
+ * | Decoders | indep -a SW | indep -a HW | gop -a SW | gop -a HW |
+ * |----------|-------------|-------------|-----------|-----------|
+ * | -j 1     | 324 fps     | 304 fps     | 286 fps   | 225 fps   |
+ * | -j 2     | 521 fps     | 643 fps     | 476 fps   | 372 fps   |
+ * | -j 4     | 789 fps     | 751 fps     | 679 fps   | 480 fps   |
+ * | -j 8     | 1030 fps    | 820 fps     | 800 fps   | 534 fps   |
+ *
+ * Findings:
+ *
+ * - Software decoding is faster than hardware decoding in almost all cases. Only with 2 or 3 decoders running at the
+ *   same time, each with its own continuous stream of frames, hardware decoding is slightly faster.
+ * - Decoding this kind of video is cheap on the CPU (about 1.2-1.6 ms per P frame and 8-15 ms per I frame on one core,
+ *   depending on the recording). It scales with the number of decoders, but not linearly: with 8 decoders the
+ *   throughput is about 3 times that of one decoder, as each decoder gets slower (for example, 1.6 ms per P frame with
+ *   one decoder, 4.8 ms with 8 decoders).
+ * - The hardware decoder decodes I frames faster than software (about 3.6 ms), but P frames slower (about 3.0 ms). It
+ *   is limited by getting the decoded frames back from the GPU, and the GPU does not scale with the number of decoders
+ *   (the throughput stops increasing at about 800 fps with 3 decoders). The conversion to the output pixel format is
+ *   done in software in both cases.
+ * - The hardware device is set up when the first frame is decoded, which costs about 10 ms (up to about 40 ms when
+ *   many decoders do this at the same time). This makes hardware decoding even slower when a new decoder is used for
+ *   each GOP.
+ * - The results may be different for other video (larger frames, H.264, longer GOPs), GPUs and drivers.
  */
+// clang-format on
 #ifndef __FPSDK_COMMON_VIDEO_HPP__
 #define __FPSDK_COMMON_VIDEO_HPP__
 

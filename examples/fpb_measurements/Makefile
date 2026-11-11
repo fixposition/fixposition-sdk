@@ -1,6 +1,6 @@
 .SUFFIXES:
 
-deps = $(sort $(wildcard CMakeList.txt Makefile ../../fpsdk_doc/* *.cpp \
+deps = $(sort $(wildcard CMakeLists.txt Makefile ../../fpsdk_doc/* *.cpp \
     ../../fpsdk_common/* ../../fpsdk_common/*/* ../../fpsdk_common/*/*/* ../../fpsdk_common/*/*/*/* \
     ../../fpsdk_apps/* ../../fpsdk_apps/*/* ../../fpsdk_apps/*/*/* ../../fpsdk_apps/*/*/*/*))
 

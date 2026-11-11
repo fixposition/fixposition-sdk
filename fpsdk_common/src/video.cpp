@@ -14,6 +14,7 @@
 /* LIBC/STL */
 #include <algorithm>
 #include <array>
+#include <atomic>
 #include <cmath>
 #include <cstring>
 
@@ -210,14 +211,11 @@ class VideoFrameDecoderImpl : public VideoFrameDecoder, private NoCopyNoMove
     std::optional<ImageData> DecodeFrame(const uint8_t* data, const std::size_t size) override final;
     bool IsOkay() const override final;
 
-    enum AVPixelFormat GetHwFormat(const enum AVPixelFormat* fmts) const;
-
    private:
     // clang-format off
     enum class State { DEINIT, INIT_AV, INIT_GRAPH, ERROR };
     State                 state_           = State::DEINIT;
     AVHWDeviceType        hw_type_         = AV_HWDEVICE_TYPE_NONE;  // AV_HWDEVICE_TYPE_VAAPI
-    enum AVPixelFormat    src_fmt_         = AV_PIX_FMT_YUVJ420P;    // AV_PIX_FMT_VAAPI
     const AVCodec*        codec_           = nullptr;
     AVCodecContext*       ctx_             = nullptr;
     AVBufferRef*          hw_ctx_          = nullptr;  // hwdevice_ctx
@@ -264,21 +262,6 @@ bool VideoFrameDecoderImpl::IsOkay() const
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-
-static enum AVPixelFormat GetHwFormatCb(AVCodecContext* ctx, const enum AVPixelFormat* fmts)
-{
-    return static_cast<VideoFrameDecoderImpl*>(ctx->opaque)->GetHwFormat(fmts);
-}
-
-enum AVPixelFormat VideoFrameDecoderImpl::GetHwFormat(const enum AVPixelFormat* fmts) const
-{
-    for (const enum AVPixelFormat* p = fmts; *p != AV_PIX_FMT_NONE; ++p) {
-        if (*p == src_fmt_) {
-            return *p;
-        }
-    }
-    return AV_PIX_FMT_NONE;
-}
 
 bool VideoFrameDecoderImpl::InitAv()
 {
@@ -354,14 +337,10 @@ bool VideoFrameDecoderImpl::InitAv()
                 }
                 hw = nullptr;
             } else {
-                // hw_ctx_ = reinterpret_cast<void*>(hw);
-                hw_ctx_ = av_buffer_ref(hw);
+                // FFmpeg's default get_format() selects the hw pixel format if the decoder can use this device.
+                // Otherwise it decodes in sw and we get sw frames, see InitGraph().
+                hw_ctx_ = hw;
                 hw_type_ = AV_HWDEVICE_TYPE_VAAPI;
-                src_fmt_ = AV_PIX_FMT_VAAPI;
-                // @todo this crashes..
-                // ctx_->opaque = this;
-                // ctx_->get_format = GetHwFormatCb;
-                UNUSED(GetHwFormatCb);
             }
         }
 
@@ -449,13 +428,33 @@ bool VideoFrameDecoderImpl::InitGraph()
 
     int src_width = 0;
     int src_height = 0;
-    AVPixelFormat src_format = AV_PIX_FMT_NONE;  // TODO check <-> src_fmt_
+    AVPixelFormat src_format = AV_PIX_FMT_NONE;
     AVRational src_time_base = { 1, 25 };
     AVRational src_sar = { 1, 1 };
 
     src_width = frame_->width;
     src_height = frame_->height;
-    src_format = static_cast<AVPixelFormat>(frame_->format);  // yuvj420p, check that
+    src_format = static_cast<AVPixelFormat>(frame_->format);  // sw: yuvj420p, hw: vaapi
+
+    // We may have a hw device, but the decoder may not be able to use it (codec, profile, FFmpeg build, ...)
+    const bool hw_frame = (src_format == AV_PIX_FMT_VAAPI);
+    if (!hw_frame && (params_.accel_ == HwAccel::HW)) {
+        WARNING("VideoFrameDecoder(%s) no hw decoding for this video", params_.name_.c_str());
+        return false;
+    }
+    if (!hw_frame && hw_ctx_) {
+        DEBUG("VideoFrameDecoder(%s) no hw decoding for this video, using sw decoding", params_.name_.c_str());
+    }
+
+    // Tell the user once, not for each decoder
+    static std::atomic_flag info_done = ATOMIC_FLAG_INIT;
+    if (!info_done.test_and_set()) {
+        if (hw_frame) {
+            INFO("Using hardware (%s) video decoder", av_hwdevice_get_type_name(hw_type_));
+        } else {
+            INFO("Using software video decoder");
+        }
+    }
     if ((ctx_->time_base.num > 0) && (ctx_->time_base.den > 0)) {
         src_time_base = ctx_->time_base;
     } else {
@@ -506,12 +505,12 @@ bool VideoFrameDecoderImpl::InitGraph()
             ok = false;
             break;
         }
-        par->format = src_fmt_;
+        par->format = src_format;
         par->width = src_width;
         par->height = src_height;
         par->time_base = src_time_base;
         par->sample_aspect_ratio = src_sar;
-        if (hw_ctx_) {
+        if (hw_frame) {
             if (frame_->hw_frames_ctx) {  // Should be present now that we have decoded the first frame
                 par->hw_frames_ctx = av_buffer_ref(frame_->hw_frames_ctx);
             } else {
@@ -581,9 +580,12 @@ bool VideoFrameDecoderImpl::InitGraph()
 #  endif
 
         char filter_desc[256];
-        if (hw_ctx_) {
-            std::snprintf(filter_desc, sizeof(filter_desc), "scale_vaapi=w=%d:h=%d:format=nv12,hwdownload,format=nv12",
-                dst_width, dst_height);
+        if (hw_frame) {
+            // Scale on the GPU, download the frame, convert the pixel format in sw. Download yuv420p, not nv12, as
+            // swscale is much slower for nv12 to rgb24.
+            std::snprintf(filter_desc, sizeof(filter_desc),
+                "scale_vaapi=w=%d:h=%d:format=yuv420p,hwdownload,format=yuv420p,scale,format=pix_fmts=%s", dst_width,
+                dst_height, PixelFmtToFlag(params_.fmt_));
         } else {
             std::snprintf(filter_desc, sizeof(filter_desc), "scale=w=%d:h=%d:flags=%s,format=pix_fmts=%s", dst_width,
                 dst_height, ScalingQualToFlag(params_.qual_), PixelFmtToFlag(params_.fmt_));
