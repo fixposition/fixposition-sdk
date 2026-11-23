@@ -9,6 +9,10 @@ on:
     schedule:  # applies to default branch only
         - cron: "17 21 * * 0"  # Sundays 21:17 UTC
 
+# No attestations: push plain manifests, no index
+env:
+    BUILDX_NO_DEFAULT_ATTESTATIONS: "1"
+
 jobs:
     # Note: job names should be unique across all workflows (e.g. to reference them as pull request checks)!
 
@@ -144,12 +148,12 @@ jobs:
                   docker compose push build-trixie-run build-noetic-run build-humble-run build-jazzy-run build-lyrical-run
             - name: Expire old images
               if: ${{ github.ref == 'refs/heads/main' }}
-              uses: actions/delete-package-versions@v5 # https://github.com/actions/delete-package-versions
+              uses: dataaxiom/ghcr-cleanup-action@v1 # https://github.com/dataaxiom/ghcr-cleanup-action
               with:
-                  package-name:                  ${{ github.event.repository.name }}
-                  package-type:                  container
-                  min-versions-to-keep:          0
-                  delete-only-untagged-versions: true
+                  # Multi-arch aware, keeps children of tagged images
+                  package:         ${{ github.event.repository.name }}
+                  delete-untagged: true
+                  validate:        true
 
     ci-pages:
         runs-on: ubuntu-latest
