@@ -96,6 +96,11 @@ echo "Installing: ${packages}"
 
 export DEBIAN_FRONTEND=noninteractive
 
+# Retry failed downloads, also in derived images
+cat > /etc/apt/apt.conf.d/80-fpsdk-retries <<EOF
+Acquire::Retries "10";
+EOF
+
 apt-get -y update
 apt-get -y --with-new-pkgs upgrade
 apt-get -y --no-install-recommends install ${packages}
