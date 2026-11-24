@@ -50,6 +50,8 @@ services:
             - ../.devcontainer/.persist/.local:/home/fpsdk/.local
             # Workspace
             - ../.:/home/fpsdk/fixposition-sdk
+        devices:
+            - /dev/dri
         cap_add:
             - SYS_PTRACE # Set kernel.yama.ptrace_scope = 0 in /etc/sysctl.d/10-ptrace.conf
         hostname: fpsdk-trixie-dev-${USER}
