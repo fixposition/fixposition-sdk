@@ -15,6 +15,8 @@
 #include <map>
 #include <set>
 #include <unordered_map>
+#include <utility>
+#include <vector>
 
 /* EXTERNAL */
 #include <gtest/gtest.h>
@@ -196,6 +198,9 @@ TEST(GnssTest, SatStr)
     EXPECT_EQ(std::string(Sat(Gnss::BDS,     5).GetStr()), std::string("C05"));
     EXPECT_EQ(std::string(Sat(Gnss::QZSS,    9).GetStr()), std::string("J09"));
     EXPECT_EQ(std::string(Sat(Gnss::GLO,    15).GetStr()), std::string("R15"));
+    EXPECT_EQ(std::string(Sat(Gnss::BDS,    39).GetStr()), std::string("C39"));
+    EXPECT_EQ(std::string(Sat(Gnss::BDS,    49).GetStr()), std::string("C49"));
+    EXPECT_EQ(std::string(Sat(Gnss::BDS,    59).GetStr()), std::string("C59"));
 
     // Invalid
     EXPECT_EQ(std::string(Sat(Gnss::GPS,     0).GetStr()), std::string("G??"));
@@ -209,6 +214,27 @@ TEST(GnssTest, SatStr)
     EXPECT_EQ(std::string(Sat(Gnss::UNKNOWN, 2).GetStr()), std::string("???"));
 
     // clang-format on
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+
+TEST(GnssTest, SatStrRoundtrip)
+{
+    const std::vector<std::pair<Gnss, std::pair<SvNr, SvNr>>> ranges = {
+        { Gnss::GPS, { FIRST_GPS, NUM_GPS } },
+        { Gnss::SBAS, { FIRST_SBAS, NUM_SBAS } },
+        { Gnss::GAL, { FIRST_GAL, NUM_GAL } },
+        { Gnss::BDS, { FIRST_BDS, NUM_BDS } },
+        { Gnss::QZSS, { FIRST_QZSS, NUM_QZSS } },
+        { Gnss::GLO, { FIRST_GLO, NUM_GLO } },
+        { Gnss::NAVIC, { FIRST_NAVIC, NUM_NAVIC } },
+    };
+    for (const auto& range : ranges) {
+        for (int n = range.second.first; n < (range.second.first + range.second.second); n++) {
+            const Sat sat(range.first, (SvNr)n);
+            EXPECT_EQ(Sat(sat.GetStr()), sat) << sat.GetStr() << " is not " << GnssStr(range.first) << " " << n;
+        }
+    }
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
